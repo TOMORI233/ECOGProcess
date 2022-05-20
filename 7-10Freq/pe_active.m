@@ -9,9 +9,6 @@ epocs = temp.epocs;
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
 streams = temp.streams;
 
-%% Behavior result
-plotBehaviorOnly(trialAll);
-
 %% Processing
 window = [-2000, 1000]; % ms
 fs = 300; % Hz, for downsampling
@@ -20,6 +17,9 @@ scaleFactor = 1e6;
 trialAll = ActiveProcess_ECOG(epocs);
 devFreq = unique([trialAll.devFreq])';
 devFreq(devFreq == 0) = [];
+
+%% Behavior result
+plotBehaviorOnly(trialAll);
 
 for dIndex = 1:length(devFreq)
     dRatio = roundn(devFreq(dIndex) / devFreq(1), -2);
@@ -58,5 +58,5 @@ for dIndex = 1:length(devFreq)
         plot(allAxes(aIndex), [0, 0] - window(1), yRange, "w--", "LineWidth", 0.6);
     end
     drawnow;
-    saveas(Fig1, strcat("figs/time-freq/", posStr(posIndex), "_dRatio", num2str(dRatio), "_TFA.jpg"));
+    saveas(Fig2, strcat("figs/time-freq/", posStr(posIndex), "_dRatio", num2str(dRatio), "_TFA.jpg"));
 end
