@@ -1,4 +1,4 @@
-function trialAll = PassiveProcess_ECOG(epocs)
+function trialAll = PassiveProcess_7_10Freq(epocs)
     %% Information extraction
     % fixation 20220520 Block-2
     for index = 1:length(unique(epocs.swee.data))

@@ -1,4 +1,4 @@
-function trialAll = ActiveProcess_ECOG(epocs, choiceWin)
+function trialAll = ActiveProcess_7_10Freq(epocs, choiceWin)
     narginchk(1, 2);
 
     if nargin < 2

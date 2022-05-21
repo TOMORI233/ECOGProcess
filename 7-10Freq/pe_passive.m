@@ -14,7 +14,7 @@ window = [-2000, 1000]; % ms
 fs = 300; % Hz, for downsampling
 scaleFactor = 1e6;
 
-trialAll = PassiveProcess_ECOG(epocs);
+trialAll = PassiveProcess_7_10Freq(epocs);
 devFreq = unique([trialAll.devFreq])';
 devFreq(devFreq == 0) = [];
 

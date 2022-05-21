@@ -1,6 +1,6 @@
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'E:\ECoG\Data\chouchou\cc20220520\Block-1';
+BLOCKPATH = 'G:\ECoG\chouchou\cc20220521\Block-1';
 posIndex = 1; % 1-AC, 2-PFC
 
 posStr = ["LAuC", "LPFC"];
@@ -11,20 +11,21 @@ streams = temp.streams;
 
 %% Processing
 window = [-2000, 1000]; % ms
+choiceWin = [0, 800]; % ms
 fs = 300; % Hz, for downsampling
 scaleFactor = 1e6;
 
-trialAll = ActiveProcess_ECOG(epocs);
+trialAll = ActiveProcess_7_10Freq(epocs, choiceWin);
 devFreq = unique([trialAll.devFreq])';
 devFreq(devFreq == 0) = [];
 
-%% Behavior result
-plotBehaviorOnly(trialAll);
+plotBehaviorOnly(trialAll, "b", "7-10 Freq");
 
+%%
 for dIndex = 1:length(devFreq)
     dRatio = roundn(devFreq(dIndex) / devFreq(1), -2);
     trials = trialAll([trialAll.correct] == true & [trialAll.devFreq] == devFreq(dIndex));
-    result = selectEcog(streams.(posStr(posIndex)), trials, "dev onset", window) * scaleFactor;
+    result = cellfun(@(x) x * scaleFactor, selectEcog(streams.(posStr(posIndex)), trials, "dev onset", window), 'UniformOutput', false);
     totalChNum = length(streams.(posStr(posIndex)).channels);
     fs0 = streams.(posStr(posIndex)).fs;
     temp = cell2mat(result);
@@ -38,14 +39,14 @@ for dIndex = 1:length(devFreq)
     end
 
     % Raw wave
-%     Fig1 = plotRawWave(chMean, chSE, window);
-%     yRange = scaleAxes(Fig1, "y", [-100, 100]);
-%     allAxes = findobj(Fig1, "Type", "axes");
-%     title(allAxes(end), ['CH 1 | dRatio=', num2str(dRatio)])
-%     for aIndex = 1:length(allAxes)
-%         plot(allAxes(aIndex), [0, 0], yRange, "k--", "LineWidth", 0.6);
-%     end
-%     drawnow;
+    Fig1 = plotRawWave(chMean, chSE, window);
+    yRange = scaleAxes(Fig1, "y", [-100, 100]);
+    allAxes = findobj(Fig1, "Type", "axes");
+    title(allAxes(end), ['CH 1 | dRatio=', num2str(dRatio)])
+    for aIndex = 1:length(allAxes)
+        plot(allAxes(aIndex), [0, 0], yRange, "k--", "LineWidth", 0.6);
+    end
+    drawnow;
 %     saveas(Fig1, strcat("figs/raw/", posStr(posIndex), "_dRatio", num2str(dRatio), "_Raw.jpg"));
 
     % Time-Freq
@@ -58,5 +59,5 @@ for dIndex = 1:length(devFreq)
         plot(allAxes(aIndex), [0, 0] - window(1), yRange, "w--", "LineWidth", 0.6);
     end
     drawnow;
-    saveas(Fig2, strcat("figs/time-freq/", posStr(posIndex), "_dRatio", num2str(dRatio), "_TFA.jpg"));
+%     saveas(Fig2, strcat("figs/time-freq/", posStr(posIndex), "_dRatio", num2str(dRatio), "_TFA.jpg"));
 end
