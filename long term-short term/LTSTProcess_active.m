@@ -1,3 +1,4 @@
+addpath(genpath("..\..\ECOGProcess"));
 %% Data loading
 clear; clc; close all;
 BLOCKPATH = 'E:\ECoG\Data\chouchou\cc20220521\Block-1';
@@ -31,11 +32,10 @@ fs0 = streams.(posStr(posIndex)).fs;
 % trials = trialsConst([trialsConst.correct] == true);
 trials = trialsRand([trialsRand.correct] == true);
 
-trialsSTD = cell(length(stdNumAll), 1);
 resultSTD = cell(length(stdNumAll), 1);
 
 for sIndex = 1:length(stdNumAll)
-    trialsSTD{sIndex} = trials([trials.correct] == true & [trials.stdNum] == stdNumAll(sIndex));
+    trialsSTD = trials([trials.correct] == true & [trials.stdNum] >= stdNumAll(sIndex));
 
     if sIndex == 1
         windowSTD = [window(1), ISI * stdNumAll(sIndex)];
@@ -43,10 +43,10 @@ for sIndex = 1:length(stdNumAll)
         windowSTD = [ISI * (stdNumAll(sIndex) - 1), ISI * stdNumAll(sIndex)];
     end
 
-    ECOG = selectEcog(streams.(posStr(posIndex)), cell2mat(trialsSTD(1:sIndex)), "trial onset", window) * scaleFactor;
+    ECOG = cellfun(@(x) x * scaleFactor, selectEcog(streams.(posStr(posIndex)), trialsSTD, "trial onset", window), "UniformOutput", false);
     weightSTD = zeros(1, size(ECOG{1}, 2));
     weightSTD(floor((windowSTD(1) - window(1)) * fs0 / 1000 + 1):floor((windowSTD(2) - window(1)) * fs0 / 1000)) = 1 / length(ECOG);
-    resultSTD{sIndex} = cell2mat(cellfun(@sum, changeCellRowNum(ECOG .* weightSTD), "UniformOutput", false));
+    resultSTD{sIndex} = cell2mat(cellfun(@sum, changeCellRowNum(cellfun(@(x) x .* weightSTD, ECOG, "UniformOutput", false)), "UniformOutput", false));
 end
 
 chMean = resultSTD{1};
@@ -63,7 +63,7 @@ chSE = zeros(size(chMean, 1), size(chMean, 2));
 
 %% Raw wave
 Fig1 = plotRawWave(chMean, chSE, window);
-yRange = scaleAxes(Fig1, "y", [-100, 100]);
+yRange = scaleAxes(Fig1, "y");
 allAxes = findobj(Fig1, "Type", "axes");
 % title(allAxes(end), ['CH 1 | dRatio=', num2str(dRatio)])
 for aIndex = 1:length(allAxes)
@@ -76,7 +76,7 @@ drawnow;
 %% Time-Freq
 Fig2 = plotTimeFreqAnalysis(double(chMean), fs0, fs);
 yRange = scaleAxes(Fig2);
-cRange = scaleAxes(Fig2, "c");
+cRange = scaleAxes(Fig2, "c", [0, 25]);
 allAxes = findobj(Fig2, "Type", "axes");
 % title(allAxes(end), ['CH 1 | dRatio=', num2str(roundn(devFreq(dIndex) / devFreq(1), -2))])
 for aIndex = 1:length(allAxes)
