@@ -12,6 +12,7 @@ streams = temp.streams;
 %% Params settings
 clearvars -except posIndex posStr epocs streams
 window = [-2500, 6000]; % ms
+
 choiceWin = [0, 600]; % ms
 fs = 300; % Hz, for downsampling
 scaleFactor = 1e6;
