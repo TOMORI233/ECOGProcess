@@ -33,7 +33,6 @@ function [Fig, mAxe] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe)
         meanRT = mean(RT);
         yaxis = get(mAxe(dIndex + 1), "YLim");
         stem(mAxe(dIndex + 1), meanRT, yaxis(2), "Color", color, "LineStyle", "-", "LineWidth", 1.5);
-        title(mAxe(dIndex + 1), ['diff ratio = ', num2str(diffLevelUnique(dIndex)), ' (Mean RT ', num2str(roundn(meanRT, -2)), ' ms)']);
         xlim(mAxe(dIndex + 1), [0, 800]);
         xlabel(mAxe(dIndex + 1), 'Reaction Time (ms)');
     end
