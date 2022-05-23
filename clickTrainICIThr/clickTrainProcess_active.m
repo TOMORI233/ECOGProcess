@@ -1,62 +1,102 @@
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'G:\ECoG\chouchou\cc20220522\Block-3';
+addpath(genpath('E:\OneDrive\OneDrive - zju.edu.cn\实验室\Matlab程序\MATLABUtils'));
+BLOCKPATH = 'E:\ECoG\chouchou\cc20220520\Block-3';
 posIndex = 1; % 1-AC, 2-PFC
-
+ICIStr = {'4','4.01','4.03','4.04','4.06'};
+% ICIStr = {'4','4.03','4.06','4.09','4.12'};
 posStr = ["LAuC", "LPFC"];
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'},'T2',1500);
+temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
 epocs = temp.epocs;
-% temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
-% streams = temp.streams;
+temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'});
+streams = temp.streams;
 
-%% Processing
-ICIStr = {'4','4.03','4.06','4.09','4.12'};
-window = [-2000, 1000]; % ms
+%% Params settings
+clearvars -except posIndex posStr epocs streams ICIStr
+
+window = [-2500, 6000]; % ms
+
 choiceWin = [0, 600]; % ms
 fs = 300; % Hz, for downsampling
 scaleFactor = 1e6;
 
 trialAll = ActiveProcess_clickTrain(epocs, choiceWin);
-trialsReg = trialAll([trialAll.stdOrdr] == 1);
-trialsIrreg = trialAll([trialAll.stdOrdr] == 6);
-[Fig, mAxe] = plotClickTrainBehaviorOnly(trialsReg, "r", "Reg");
 
-[Fig, mAxe] = plotClickTrainBehaviorOnly(trialsIrreg, "b", "Irreg",  ICIStr, Fig, mAxe);
+trialsNoInterrupt = trialAll([trialAll.interrupt] == false);
+ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trialsNoInterrupt.soundOnsetSeq}, {trialsNoInterrupt.stdNum})));
+stdNumAll = unique([trialsNoInterrupt.stdNum]);
 
-% trials = trialsConst([trialsConst.correct] == true);
-trials = trialsRand([trialsRand.correct] == true);
-result = cellfun(@(x) x * scaleFactor, selectEcog(streams.(posStr(posIndex)), trials, "dev onset", window), 'UniformOutput', false);
-totalChNum = length(streams.(posStr(posIndex)).channels);
+trialReg = trialAll([trialAll.stdOrdr] == 1);
+trialIrreg = trialAll([trialAll.stdOrdr] == 6);
+
 fs0 = streams.(posStr(posIndex)).fs;
-temp = cell2mat(result);
 
-chMean = zeros(totalChNum, size(result{1}, 2));
-chSE = zeros(totalChNum, size(result{1}, 2));
 
-for index = 1:totalChNum
-    chMean(index, :) = mean(temp(index:totalChNum:length(result) * totalChNum, :), 1);
-    chSE(index, :) = std(temp(index:totalChNum:length(result) * totalChNum, :), [], 1);
+
+%% Behavior
+[Fig, mAxe] = plotClickTrainBehaviorOnly(trialReg, "r", "Regular", ICIStr);
+[Fig, mAxe] = plotClickTrainBehaviorOnly(trialIrreg, "b", "Irregular", ICIStr, Fig, mAxe);
+
+%% reconstruct data
+trialReg = trialReg([trialReg.correct] == true);
+trialIrreg = trialIrreg([trialIrreg.correct] == true);
+trials = trialReg;
+% trials = trialIRReg;
+trialsSTD = cell(length(stdNumAll), 1);
+resultSTD = cell(length(stdNumAll), 1);
+
+for sIndex = 1:length(stdNumAll)+1
+   
+    if sIndex == length(stdNumAll)+1
+        windowSTD = [ISI * stdNumAll(sIndex - 1) - 1 , window(2)];
+        ECOG = selectEcog(streams.(posStr(posIndex)), trials, "trial onset", window) * scaleFactor;
+    else
+         trialsSTD{sIndex} = trials([trials.correct] == true & [trials.stdNum] >= stdNumAll(sIndex));
+        if sIndex == 1
+            windowSTD = [window(1), ISI * stdNumAll(sIndex)];
+        else
+            windowSTD = [ISI * (stdNumAll(sIndex) - 1), ISI * stdNumAll(sIndex)];
+        end
+        ECOG = selectEcog(streams.(posStr(posIndex)), trialsSTD{sIndex}, "trial onset", window) * scaleFactor;
+    end
+    weightSTD{sIndex} = zeros(1, size(ECOG{1}, 2));
+    weightSTD{sIndex}(floor((windowSTD(1) - window(1)) * fs0 / 1000 + 1):floor((windowSTD(2) - window(1)) * fs0 / 1000)) = 1 / length(ECOG);
+    resultSTD{sIndex} = cell2mat(cellfun(@sum, changeCellRowNum(ECOG .* weightSTD{sIndex}), "UniformOutput", false));
+
 end
 
-% Raw wave
+chMean = resultSTD{1};
+
+for index = 2:length(resultSTD)
+    chMean = chMean + resultSTD{index};
+end
+
+chSE = zeros(size(chMean, 1), size(chMean, 2));
+
+
+%% Raw wave
 Fig1 = plotRawWave(chMean, chSE, window);
 yRange = scaleAxes(Fig1, "y", [-100, 100]);
 allAxes = findobj(Fig1, "Type", "axes");
-title(allAxes(end), ['CH 1 | dRatio=', num2str(dRatio)])
+% title(allAxes(end), ['CH 1 | dRatio=', num2str(dRatio)])
 for aIndex = 1:length(allAxes)
     plot(allAxes(aIndex), [0, 0], yRange, "k--", "LineWidth", 0.6);
+    plot(allAxes(aIndex), [0, 0], yRange, "k--", "LineWidth", 0.6);
 end
+
 drawnow;
 % saveas(Fig1, strcat("figs/raw/", posStr(posIndex), "_dRatio", num2str(dRatio), "_Raw.jpg"));
 
-% Time-Freq
-Fig2 = plotTimeFreqAnalysis(chMean, fs0, fs);
+%% Time-Freq
+Fig2 = plotTimeFreqAnalysis(double(chMean), fs0, fs);
 yRange = scaleAxes(Fig2);
 cRange = scaleAxes(Fig2, "c");
 allAxes = findobj(Fig2, "Type", "axes");
-title(allAxes(end), ['CH 1 | dRatio=', num2str(roundn(devFreq(dIndex) / devFreq(1), -2))])
+% title(allAxes(end), ['CH 1 | dRatio=', num2str(roundn(devFreq(dIndex) / devFreq(1), -2))])
 for aIndex = 1:length(allAxes)
     plot(allAxes(aIndex), [0, 0] - window(1), yRange, "w--", "LineWidth", 0.6);
+    plot(allAxes(aIndex), [0, 0] - window(1), yRange, "k--", "LineWidth", 0.6);
 end
+
 drawnow;
 % saveas(Fig2, strcat("figs/time-freq/", posStr(posIndex), "_dRatio", num2str(dRatio), "_TFA.jpg"));
