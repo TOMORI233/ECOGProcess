@@ -16,8 +16,7 @@ function Fig = plotTimeFreqAnalysis(data, fs0, fs)
             title(['CH ', num2str(chNum)]);
             set(gca, "YScale", "log");
             xlim([min(X), max(X)]);
-            ylim([0, inf]);
-            yticks([0, 2.^(0:nextpow2(max(Y)) - 1)]);
+            yticks([0, 2 .^ (0:nextpow2(max(Y)) - 1)]);
     
             if ~mod((chNum - 1), 8) == 0
                 yticklabels('');
