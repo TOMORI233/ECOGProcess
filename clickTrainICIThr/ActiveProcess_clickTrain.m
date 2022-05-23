@@ -1,4 +1,4 @@
-function trialAll = ActiveProcess_LTST(epocs, choiceWin)
+function trialAll = ActiveProcess_clickTrain(epocs, choiceWin)
     narginchk(1, 2);
 
     if nargin < 2
@@ -11,21 +11,32 @@ function trialAll = ActiveProcess_LTST(epocs, choiceWin)
         idx = find(epocs.swee.data == index);
         epocs.num0.data(idx) = (1:length(idx))';
     end
+    
+    % change irreg dev ordr for easy plot
+    epocs.ordr.data(epocs.ordr.data == 7) = 12;
+    epocs.ordr.data(epocs.ordr.data == 8) = 18;
+    epocs.ordr.data(epocs.ordr.data == 9) = 24;
+    epocs.ordr.data(epocs.ordr.data == 10) = 30;
 
     trialOnsetIndex = find(epocs.num0.data == 1);
     trialOnsetTimeAll = epocs.num0.onset(trialOnsetIndex) * 1000; % ms
     soundOnsetTimeAll = epocs.num0.onset * 1000; % ms
-    errorPushTimeAll = epocs.erro.onset(epocs.erro.data ~= 0) * 1000; % ms
+    if isfield(epocs,'erro')
+        errorPushTimeAll = epocs.erro.onset(epocs.erro.data ~= 0) * 1000; % ms
+    else
+        errorPushTimeAll = [];
+    end
     pushTimeAll = epocs.push.onset * 1000; % ms
-    freqAll = epocs.freq.data; % Hz
+    ordrAll = epocs.ordr.data; % Hz
 
     n = length(trialOnsetIndex) - 1;
     temp = cell(n, 1);
     trialAll = struct('trialNum', temp, ...
                       'soundOnsetSeq', temp, ...
                       'devOnset', temp, ...
-                      'freqSeq', temp, ...
-                      'devFreq', temp, ...
+                      'ordrSeq', temp, ...
+                      'stdOrdr',temp, ...
+                      'devOrdr', temp, ...
                       'interrupt', temp, ...
                       'oddballType', temp, ...
                       'stdNum', temp, ...
@@ -41,32 +52,32 @@ function trialAll = ActiveProcess_LTST(epocs, choiceWin)
 
         trialAll(tIndex, 1).soundOnsetSeq = soundOnsetTimeAll(soundOnsetIndex);
         trialAll(tIndex, 1).devOnset = trialAll(tIndex, 1).soundOnsetSeq(end);
-        trialAll(tIndex, 1).freqSeq = freqAll(soundOnsetIndex);
+        trialAll(tIndex, 1).ordrSeq = ordrAll(soundOnsetIndex);
+        trialAll(tIndex, 1).stdOrdr = trialAll(tIndex, 1).ordrSeq(1);
 
         %% Interrupt or not
         if ~isempty(find(errorPushTimeAll >= trialAll(tIndex, 1).soundOnsetSeq(end) & errorPushTimeAll < trialOnsetTimeAll(tIndex + 1), 1))
             trialAll(tIndex, 1).interrupt = true;
             trialAll(tIndex, 1).oddballType = "INTERRUPT";
 
-            if trialAll(tIndex, 1).freqSeq(end) ~= trialAll(tIndex, 1).freqSeq(1)
-                trialAll(tIndex, 1).devFreq = trialAll(tIndex, 1).freqSeq(end);
+            if trialAll(tIndex, 1).ordrSeq(end) ~= trialAll(tIndex, 1).ordrSeq(1)
+                trialAll(tIndex, 1).devOrdr = trialAll(tIndex, 1).ordrSeq(end);
                 trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).soundOnsetSeq) - 1;
             else
-                trialAll(tIndex, 1).devFreq = 0;
+                trialAll(tIndex, 1).devOrdr = 0;
                 trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).soundOnsetSeq);
             end
 
         else
             trialAll(tIndex, 1).interrupt = false;
 
-            if trialAll(tIndex, 1).freqSeq(end) == trialAll(tIndex, 1).freqSeq(1)
+            if trialAll(tIndex, 1).ordrSeq(end) == trialAll(tIndex, 1).ordrSeq(1)
                 trialAll(tIndex, 1).oddballType = "STD";
             else
                 trialAll(tIndex, 1).oddballType = "DEV";
             end
-
-            trialAll(tIndex, 1).devFreq = trialAll(tIndex, 1).freqSeq(end);
-            trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).freqSeq) - 1;
+            trialAll(tIndex, 1).devOrdr = trialAll(tIndex, 1).ordrSeq(end);
+            trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).ordrSeq) - 1;
         end
 
         %% Correct or not

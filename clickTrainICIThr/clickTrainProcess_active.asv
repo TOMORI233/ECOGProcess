@@ -1,25 +1,27 @@
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'G:\ECoG\chouchou\cc20220521\Block-1';
+BLOCKPATH = 'G:\ECoG\chouchou\cc20220522\Block-3';
 posIndex = 1; % 1-AC, 2-PFC
 
 posStr = ["LAuC", "LPFC"];
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
 epocs = temp.epocs;
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
-streams = temp.streams;
+% temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
+% streams = temp.streams;
 
 %% Processing
+ICIStr = {'4','4.03','4.06','4.09','4.12'};
 window = [-2000, 1000]; % ms
 choiceWin = [0, 600]; % ms
 fs = 300; % Hz, for downsampling
 scaleFactor = 1e6;
 
-trialAll = ActiveProcess_LTST(epocs, choiceWin);
-trialsConst = trialAll(logical(mod(ceil([trialAll.trialNum] / 20), 2)));
-trialsRand = trialAll(~logical(mod(ceil([trialAll.trialNum] / 20), 2)));
-[Fig, mAxe] = plotBehaviorOnly(trialsConst, "b", "Constant");
-[Fig, mAxe] = plotBehaviorOnly(trialsRand, "r", "Random", Fig, mAxe);
+trialAll = ActiveProcess_clickTrain(epocs, choiceWin);
+trialsReg = trialAll([trialAll.stdOrdr] == 1);
+trialsIrreg = trialAll([trialAll.stdOrdr] == 6);
+[Fig, mAxe] = plotClickTrainBehaviorOnly(trialsReg, "r", "Reg");
+
+[Fig, mAxe] = plotClickTrainBehaviorOnly(trialsIrreg, "b", "Irreg",  ICIStr, Fig, mAxe);
 
 % trials = trialsConst([trialsConst.correct] == true);
 trials = trialsRand([trialsRand.correct] == true);

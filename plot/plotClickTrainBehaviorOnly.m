@@ -1,12 +1,14 @@
-function [Fig, mAxe] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe)
-    narginchk(3, 5);
+function [Fig, mAxe] = plotClickTrainBehaviorOnly(trials, color, legendStr, xticklabelStr,  Fig, mAxe)
+    narginchk(3, 6);
     margins = [0.1, 0.1, 0.1, 0.1];
-
     if nargin < 4
+        xticklabelStr = {'4','4.01','4.03','4.05','4.07'};
+    end
+    if nargin < 5
         Fig = figure;
     end
 
-    if nargin == 4
+    if nargin == 5
         error("The number of input params should be 1 or 3");
     end
     
@@ -28,7 +30,7 @@ function [Fig, mAxe] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe)
         nPush = [nPush, length([temp.firstPush])];
         RT = cell2mat(cellfun(@(x, y) x - y, {temp.firstPush}, {temp.devOnset}, 'UniformOutput', false));
 
-        if nargin < 5
+        if nargin < 6
             mAxe(dIndex + 1) = mSubplot(Fig, length(diffLevelUnique), 4, 4 * dIndex, [1, 1], [0.1, 0.1, 0.15, 0.15]);
         end
 
@@ -42,23 +44,25 @@ function [Fig, mAxe] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe)
         xlabel(mAxe(dIndex + 1), 'Reaction Time (ms)');
     end
 
-    if nargin < 5
+    if nargin < 6
         mAxe(1) = mSubplot(Fig, 2, 2, 1, [1, 1], margins);
     end
 
-    plot(mAxe(1), nPush ./ nTotal, "Color", color, "LineWidth", 2, "DisplayName", legendStr);
+    plot(mAxe(1), diffLevelUnique, nPush ./ nTotal, "Color", color, "LineWidth", 2, "DisplayName", legendStr);
     hold on;
+    if length(diffLevelUnique) >= length(mAxe(1).XTick) || nargin < 5
     xticks(1:length(diffLevelUnique));
-    xticklabels(diffLevelUnique);
+    xticklabels(xticklabelStr);
+    end
     ylim([0 1]);
     yticks(0:0.2:1);
-    xlabel("Difference Ratio (DEV / STD)");
+    xlabel("ICI (ms)");
     ylabel("Push Ratio");
-    title('Frequency Oddball Task');
+    title('ClickTrain Oddball Task');
     legend;
 
     for index = 1:length(nPush)
-        text(mAxe(1), index, nPush(index) / nTotal(index), [num2str(nPush(index)), '/', num2str(nTotal(index))]);
+        text(mAxe(1), diffLevelUnique(index), nPush(index) / nTotal(index), [num2str(nPush(index)), '/', num2str(nTotal(index))]);
     end
 
     return;
