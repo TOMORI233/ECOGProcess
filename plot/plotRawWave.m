@@ -2,9 +2,9 @@ function Fig = plotRawWave(dataMean, dataSD, window)
     Fig = figure;
     margins = [0.05, 0.05, 0.1, 0.1];
     maximizeFig(Fig);
-    
+
     for rIndex = 1:8
-    
+
         for cIndex = 1:8
             chNum = (rIndex - 1) * 8 + cIndex;
             t = linspace(window(1), window(2), size(dataMean, 2));
@@ -17,17 +17,17 @@ function Fig = plotRawWave(dataMean, dataSD, window)
 
             xlim(window);
             title(['CH ', num2str(chNum)]);
-    
+
             if ~mod((chNum - 1), 8) == 0
                 yticklabels('');
             end
-    
+
             if chNum < 57
                 xticklabels('');
             end
-    
+
         end
-    
+
     end
 
     return;

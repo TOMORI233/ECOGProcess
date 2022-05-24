@@ -1,7 +1,7 @@
 addpath(genpath("..\..\ECOGProcess"));
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'E:\ECoG\Data\chouchou\cc20220523\Block-1';
+BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220523\Block-1';
 posIndex = 1; % 1-AC, 2-PFC
 
 posStr = ["LAuC", "LPFC"];
@@ -32,7 +32,9 @@ trials7_9 = trialAll([trialAll.stdNum] >= 7 & [trialAll.stdNum] <= 9);
 [Fig, mAxe] = plotBehaviorOnly(trials7_9, "r", "7 8 9", Fig, mAxe);
 
 %% ECOG
-trials = [{trials1_3}; {trials4_6}; {trials7_9}];
+trials = [{trials1_3([trials1_3.correct] == true & [trials1_3.oddballType] == "DEV")}; ...
+          {trials4_6([trials4_6.correct] == true & [trials4_6.oddballType] == "DEV")}; ...
+          {trials7_9([trials7_9.correct] == true & [trials7_9.oddballType] == "DEV")}];
 legendStr = ["1-3", "4-6", "7-9"];
 
 for tIndex = 1:length(trials)
@@ -48,15 +50,17 @@ for tIndex = 1:length(trials)
 
     %% Raw wave
     Fig1(tIndex) = plotRawWave(chMean, chSE, window);
+    plotLayout(Fig1(tIndex), posIndex);
     set(Fig1(tIndex), "NumberTitle", "off", "Name", legendStr(tIndex));
     
     %% Time-Freq
     Fig2(tIndex) = plotTimeFreqAnalysis(double(chMean), fs0, fs);
+    plotLayout(Fig2(tIndex), posIndex);
     set(Fig2(tIndex), "NumberTitle", "off", "Name", legendStr(tIndex));
 end
 
-%% Scale
-scaleAxes(Fig1, "x", [-300, 1000]);
+% Scale
+scaleAxes(Fig1, "x", [-500, 1000]);
 yRange = scaleAxes(Fig1, "y", [-50, 50]);
 allAxes = findobj(Fig1, "Type", "axes");
 for aIndex = 1:length(allAxes)
@@ -64,7 +68,7 @@ for aIndex = 1:length(allAxes)
 end
 drawnow;
 
-scaleAxes(Fig2, "x", [-300, 1000] - window(1));
+scaleAxes(Fig2, "x", [-500, 1000] - window(1));
 yRange = scaleAxes(Fig2);
 cRange = scaleAxes(Fig2, "c");
 allAxes = findobj(Fig2, "Type", "axes");
