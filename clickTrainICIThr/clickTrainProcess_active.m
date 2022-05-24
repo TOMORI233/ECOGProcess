@@ -1,15 +1,15 @@
 %% Data loading
 clear; clc; close all;
-addpath(genpath('E:\OneDrive\OneDrive - zju.edu.cn\实验室\Matlab程序\MATLABUtils'));
-BLOCKPATH = 'E:\ECoG\chouchou\cc20220520\Block-3';
+% addpath(genpath('E:\OneDrive\OneDrive - zju.edu.cn\实验室\Matlab程序\MATLABUtils'));
+BLOCKPATH = 'G:\ECoG\chouchou\cc20220523\Block-3';
 posIndex = 1; % 1-AC, 2-PFC
-ICIStr = {'4','4.01','4.03','4.04','4.06'};
-% ICIStr = {'4','4.03','4.06','4.09','4.12'};
+% ICIStr = {'4','4.01','4.03','4.04','4.06'};
+ICIStr = {'4','4.03','4.06','4.09','4.12'};
 posStr = ["LAuC", "LPFC"];
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
 epocs = temp.epocs;
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'});
-streams = temp.streams;
+% temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'});
+% streams = temp.streams;
 
 %% Params settings
 clearvars -except posIndex posStr epocs streams ICIStr
@@ -29,7 +29,7 @@ stdNumAll = unique([trialsNoInterrupt.stdNum]);
 trialReg = trialAll([trialAll.stdOrdr] == 1);
 trialIrreg = trialAll([trialAll.stdOrdr] == 6);
 
-fs0 = streams.(posStr(posIndex)).fs;
+
 
 
 
@@ -38,6 +38,7 @@ fs0 = streams.(posStr(posIndex)).fs;
 [Fig, mAxe] = plotClickTrainBehaviorOnly(trialIrreg, "b", "Irregular", ICIStr, Fig, mAxe);
 
 %% reconstruct data
+fs0 = streams.(posStr(posIndex)).fs;
 trialReg = trialReg([trialReg.correct] == true);
 trialIrreg = trialIrreg([trialIrreg.correct] == true);
 trials = trialReg;
