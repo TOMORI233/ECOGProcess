@@ -1,7 +1,7 @@
 addpath(genpath("..\..\ECOGProcess"));
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'E:\ECoG\Data\chouchou\cc20220523\Block-1';
+BLOCKPATH = 'G:\ECoG\chouchou\cc20220524\Block-1';
 posIndex = 1; % 1-AC, 2-PFC
 
 posStr = ["LAuC", "LPFC"];
@@ -32,7 +32,9 @@ trials7_9 = trialAll([trialAll.stdNum] >= 7 & [trialAll.stdNum] <= 9);
 [Fig, mAxe] = plotBehaviorOnly(trials7_9, "r", "7 8 9", Fig, mAxe);
 
 %% ECOG
-trials = [{trials1_3}; {trials4_6}; {trials7_9}];
+trials = [{trials1_3([trials1_3.correct] == true)}; ...
+          {trials4_6([trials4_6.correct] == true)}; ...
+          {trials7_9([trials7_9.correct] == true)}];
 legendStr = ["1-3", "4-6", "7-9"];
 
 for tIndex = 1:length(trials)
