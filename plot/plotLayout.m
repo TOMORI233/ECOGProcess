@@ -1,6 +1,7 @@
 function Figs = plotLayout(Figs, posIndex)
     
     for fIndex = 1:length(Figs)
+        setAxes(Figs(fIndex), 'color', 'none');
         layAx = mSubplot(Figs(fIndex), 1, 1, 1, [1 1], zeros(4, 1));
         load('layout.mat');
     
@@ -10,13 +11,14 @@ function Figs = plotLayout(Figs, posIndex)
             case 2 %PFC
                 image(layAx, PFC_sulcus); hold on
         end
-    
+
         set(layAx, 'XTickLabel', []);
         set(layAx, 'YTickLabel', []);
         set(layAx, 'Box', 'off');
         set(layAx, 'visible', 'off');
         allAxes = findobj(Figs(fIndex), "Type", "axes");
         set(Figs(fIndex), 'child', [allAxes; layAx]);
+        drawnow;
     end
 
     return;

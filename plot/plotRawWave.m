@@ -1,4 +1,12 @@
-function Fig = plotRawWave(dataMean, dataSD, window)
+function Fig = plotRawWave(dataMean, dataSD, window, titleStr)
+    narginchk(3, 4);
+
+    if nargin < 4
+        titleStr = '';
+    else
+        titleStr = [' | ', char(titleStr)];
+    end
+
     Fig = figure;
     margins = [0.05, 0.05, 0.1, 0.1];
     maximizeFig(Fig);
@@ -16,7 +24,7 @@ function Fig = plotRawWave(dataMean, dataSD, window)
             plot(t, dataMean(chNum, :), "r", "LineWidth", 1.5);
 
             xlim(window);
-            title(['CH ', num2str(chNum)]);
+            title(['CH ', num2str(chNum), titleStr]);
 
             if ~mod((chNum - 1), 8) == 0
                 yticklabels('');
