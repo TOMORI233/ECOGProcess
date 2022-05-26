@@ -1,7 +1,7 @@
-function Fig = plotTimeFreqAnalysis(data, fs0, fs, titleStr)
-    narginchk(3, 4);
+function Fig = plotTimeFreqAnalysis(data, fs0, fs, window, titleStr)
+    narginchk(4, 5);
 
-    if nargin < 4
+    if nargin < 5
         titleStr = '';
     else
         titleStr = [' | ', char(titleStr)];
@@ -24,7 +24,6 @@ function Fig = plotTimeFreqAnalysis(data, fs0, fs, titleStr)
             plot(X, coi, 'w--', 'LineWidth', 0.6);
             title(['CH ', num2str(chNum), titleStr]);
             set(gca, "YScale", "log");
-            xlim([min(X), max(X)]);
             yticks([0, 2.^(0:nextpow2(max(Y)) - 1)]);
 
             if ~mod((chNum - 1), 8) == 0
@@ -36,4 +35,14 @@ function Fig = plotTimeFreqAnalysis(data, fs0, fs, titleStr)
 
     end
 
+    yRange = scaleAxes(Fig);
+    scaleAxes(Fig, "c");
+    scaleAxes(Fig, "x", window - window(1));
+    allAxes = findobj(Fig, "Type", "axes");
+
+    for aIndex = 1:length(allAxes)
+        plot(allAxes(aIndex), [0, 0] - window(1), yRange, "w--", "LineWidth", 0.6);
+    end
+
+    return;
 end
