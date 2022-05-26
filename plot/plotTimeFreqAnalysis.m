@@ -1,4 +1,4 @@
-function Fig = plotTimeFreqAnalysis(data, fs0, fs, window, titleStr)
+function Fig = plotTimeFreqAnalysis(chMean, fs0, fs, window, titleStr)
     narginchk(4, 5);
 
     if nargin < 5
@@ -16,7 +16,7 @@ function Fig = plotTimeFreqAnalysis(data, fs0, fs, window, titleStr)
         for cIndex = 1:8
             chNum = (rIndex - 1) * 8 + cIndex;
             mSubplot(Fig, 8, 8, chNum, [1, 1], margins);
-            [t, Y, CData, coi] = mCWT(data(chNum, :), fs0, 'morlet', fs);
+            [t, Y, CData, coi] = mCWT(chMean(chNum, :), fs0, 'morlet', fs);
             X = t * 1000;
             imagesc('XData', X, 'YData', Y, 'CData', CData);
             colormap("jet");

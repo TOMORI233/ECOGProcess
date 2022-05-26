@@ -10,7 +10,8 @@ epocs = temp.epocs;
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
 streams = temp.streams;
 
-fs0 = streams.(posStr(posIndex)).fs;
+ECOGDataset = streams.(posStr(posIndex));
+fs0 = ECOGDataset.fs;
 
 %% Parameter setting
 choiceWin = [0, 800]; % ms
@@ -22,19 +23,43 @@ trialAll = ActiveProcess_7_10Freq(epocs, choiceWin);
 %% Behavior
 plotBehaviorOnly(trialAll, "r", "7-10 Freq");
 
+%% 7-10
+window = [-1500, 1000];
+
+for sIndex = 7:10
+    trials = trialAll([trialAll.stdNum] == sIndex & [trialAll.correct] == true & [trialAll.oddballType] == "STD");
+    [result, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
+
+    % Raw wave
+    Fig1(sIndex - 6) = plotRawWave(chMean, chStd, window, ['std number = ', num2str(sIndex)]);
+    drawnow;
+
+    % TFA
+    Fig2(sIndex - 6) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['std number = ', num2str(sIndex)]);
+    drawnow;
+end
+
+% Scale
+scaleAxes(Fig1);
+plotLayout(Fig1, posIndex);
+
+scaleAxes(Fig2);
+scaleAxes(Fig2, "c");
+plotLayout(Fig2, posIndex);
+
 %% STD
 window = [-2500, 6000]; % ms
 [chMean, chStd] = joinSTD(trialAll, streams.(posStr(posIndex)), window);
 
 % Raw wave
-Fig0(1) = plotRawWave(chMean, chStd, window);
+FigSTD(1) = plotRawWave(chMean, chStd, window);
 drawnow;
 
 % Time-Freq
-Fig0(2) = plotTimeFreqAnalysis(double(chMean), fs0, fs, window);
+FigSTD(2) = plotTimeFreqAnalysis(double(chMean), fs0, fs, window);
 drawnow;
 
-Fig0 = plotLayout(Fig0, posIndex);
+FigSTD = plotLayout(FigSTD, posIndex);
 
 %% DEV
 window = [-2000, 2000]; % ms
@@ -49,23 +74,23 @@ for dIndex = 1:length(dRatio)
     [result, chMean, chStd] = selectEcog(streams.(posStr(posIndex)), trials, "dev onset", window);
 
     % Raw wave
-    Fig1(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio = ', num2str(dRatio(dIndex))]);
+    FigDEV1(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio = ', num2str(dRatio(dIndex))]);
     drawnow;
 
     % Time-Freq
-    Fig2(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['dRatio = ', num2str(dRatio(dIndex))]);
+    FigDEV2(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['dRatio = ', num2str(dRatio(dIndex))]);
     drawnow;
 end
 
 % Scale
-scaleAxes(Fig1, "x", [-300, 1000]);
-scaleAxes(Fig1, "y", [-80, 80]);
-Fig1 = plotLayout(Fig1, posIndex);
+scaleAxes(FigDEV1, "x", [-300, 1000]);
+scaleAxes(FigDEV1, "y", [-80, 80]);
+FigDEV1 = plotLayout(FigDEV1, posIndex);
 
-scaleAxes(Fig2, "x", [-300, 1000] - window(1));
-scaleAxes(Fig2);
-scaleAxes([Fig0(2), Fig2], "c");
-Fig2 = plotLayout(Fig2, posIndex);
+scaleAxes(FigDEV2, "x", [-300, 1000] - window(1));
+scaleAxes(FigDEV2);
+scaleAxes([FigSTD(2), FigDEV2], "c");
+FigDEV2 = plotLayout(FigDEV2, posIndex);
 
 %% Save
 dRatio = roundn(dRatio, -2);
@@ -77,10 +102,10 @@ STDROOTPATH = strcat("D:\Education\Lab\monkey\ECOG\Figures\7-10Freq\", DateStr, 
 mkdir(DEVROOTPATH);
 mkdir(STDROOTPATH);
 
-print(Fig0(1), strcat(STDROOTPATH, AREANAME(posIndex), "_STD_Raw"), "-djpeg", "-r200");
-print(Fig0(2), strcat(STDROOTPATH, AREANAME(posIndex), "_STD_TFA"), "-djpeg", "-r200");
+print(FigSTD(1), strcat(STDROOTPATH, AREANAME(posIndex), "_STD_Raw"), "-djpeg", "-r200");
+print(FigSTD(2), strcat(STDROOTPATH, AREANAME(posIndex), "_STD_TFA"), "-djpeg", "-r200");
 
-for dIndex = 1:length(Fig1)
-    print(Fig1(dIndex), strcat(DEVROOTPATH, AREANAME(posIndex), "_DEV_Raw_dRatio", num2str(dIndex)), "-djpeg", "-r200");
-    print(Fig2(dIndex), strcat(DEVROOTPATH, AREANAME(posIndex), "_DEV_TFA_dRatio", num2str(dIndex)), "-djpeg", "-r200");
+for dIndex = 1:length(FigDEV1)
+    print(FigDEV1(dIndex), strcat(DEVROOTPATH, AREANAME(posIndex), "_DEV_Raw_dRatio", num2str(dIndex)), "-djpeg", "-r200");
+    print(FigDEV2(dIndex), strcat(DEVROOTPATH, AREANAME(posIndex), "_DEV_TFA_dRatio", num2str(dIndex)), "-djpeg", "-r200");
 end
