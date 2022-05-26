@@ -15,8 +15,9 @@ fs = 300; % Hz, for downsampling
 scaleFactor = 1e6;
 
 trialAll = ActiveProcess_7_10Freq(epocs, choiceWin);
-devFreq = unique([trialAll.devFreq])';
-devFreq(devFreq == 0) = [];
+devFreqAll = [trialAll.devFreq];
+stdFreqAll = cellfun(@(x) x(1), {trialAll.freqSeq});
+dRatioAll = devFreqAll ./ stdFreqAll;
 
 trialsNoInterrupt = trialAll([trialAll.interrupt] == false);
 ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trialsNoInterrupt.soundOnsetSeq}, {trialsNoInterrupt.stdNum})));
@@ -67,23 +68,22 @@ drawnow;
 % Time-Freq
 Fig0(2) = plotTimeFreqAnalysis(double(chMean), fs0, fs);
 yRange = scaleAxes(Fig0(2));
-scaleAxes(Fig0(2), "c", [0, 25]);
 allAxes = findobj(Fig0(2), "Type", "axes");
 for aIndex = 1:length(allAxes)
     plot(allAxes(aIndex), [0, 0] - window(1), yRange, "w--", "LineWidth", 0.6);
 end
 drawnow;
 
-scaleAxes(Fig0(1), "x", [-500, window(2)]);
-scaleAxes(Fig0(2), "x", [-500, window(2)] - window(1));
+scaleAxes(Fig0(2), "x", window - window(1));
 Fig0 = plotLayout(Fig0, posIndex);
 
 %% DEV
 window = [-2000, 2000]; % ms
+dRatio = unique(dRatioAll);
+dRatio(dRatio == 0) = [];
 
-for dIndex = 1:length(devFreq)
-    dRatio = roundn(devFreq(dIndex) / devFreq(1), -2);
-    trials = trialAll([trialAll.correct] == true & [trialAll.devFreq] == devFreq(dIndex));
+for dIndex = 1:length(dRatio)
+    trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex));
     result = cellfun(@(x) x * scaleFactor, selectEcog(streams.(posStr(posIndex)), trials, "dev onset", window), 'UniformOutput', false);
     totalChNum = length(streams.(posStr(posIndex)).channels);
     temp = cell2mat(result);
@@ -97,18 +97,18 @@ for dIndex = 1:length(devFreq)
     end
 
     % Raw wave
-    Fig1(dIndex) = plotRawWave(chMean, chSE, window, ['dRatio = ', num2str(dRatio)]);
-    set(Fig1(dIndex), "NumberTitle", "off", "Name", strcat("difference ratio ", num2str(dRatio)));
+    Fig1(dIndex) = plotRawWave(chMean, chSE, window, ['dRatio = ', num2str(dRatio(dIndex))]);
+    set(Fig1(dIndex), "NumberTitle", "off", "Name", strcat("DEV onset - difference ratio ", num2str(dRatio(dIndex))));
     drawnow;
 
     % Time-Freq
-    Fig2(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, ['dRatio = ', num2str(dRatio)]);
-    set(Fig2(dIndex), "NumberTitle", "off", "Name", strcat("difference ratio ", num2str(dRatio)));
+    Fig2(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, ['dRatio = ', num2str(dRatio(dIndex))]);
+    set(Fig2(dIndex), "NumberTitle", "off", "Name", strcat("DEV onset - difference ratio ", num2str(dRatio(dIndex))));
     drawnow;
 end
 
 % Scale
-scaleAxes(Fig1, "x", [-1500, 1000]);
+scaleAxes(Fig1, "x", [-300, 1000]);
 yRange = scaleAxes(Fig1, "y", [-80, 80]);
 allAxes = findobj(Fig1, "Type", "axes");
 for aIndex = 1:length(allAxes)
@@ -117,12 +117,33 @@ end
 Fig1 = plotLayout(Fig1, posIndex);
 drawnow;
 
-scaleAxes(Fig2, "x", [-1500, 1000] - window(1));
+scaleAxes(Fig2, "x", [-300, 1000] - window(1));
 yRange = scaleAxes(Fig2);
-cRange = scaleAxes(Fig2, "c");
+cRange = scaleAxes([Fig0(2), Fig2], "c");
 allAxes = findobj(Fig2, "Type", "axes");
 for aIndex = 1:length(allAxes)
     plot(allAxes(aIndex), [0, 0] - window(1), yRange, "w--", "LineWidth", 0.6);
 end
 Fig2 = plotLayout(Fig2, posIndex);
 drawnow;
+
+%% Save
+dRatio = roundn(dRatio, -2);
+AREANAME = ["AC", "PFC"];
+temp = string(split(BLOCKPATH, '\'));
+DateStr = temp(end - 1);
+DEVROOTPATH = strcat("D:\Education\Lab\monkey\ECOG\Figures\7-10Freq\", DateStr, "\DEV\");
+STDROOTPATH = strcat("D:\Education\Lab\monkey\ECOG\Figures\7-10Freq\", DateStr, "\STD\");
+
+try
+    mkdir(DEVROOTPATH);
+    mkdir(STDROOTPATH);
+end
+
+for dIndex = 1:length(Fig1)
+    print(Fig1(dIndex), strcat(DEVROOTPATH, AREANAME(posIndex), "_DEV_Raw_dRatio", num2str(dIndex)), "-djpeg", "-r200");
+    print(Fig2(dIndex), strcat(DEVROOTPATH, AREANAME(posIndex), "_DEV_TFA_dRatio", num2str(dIndex)), "-djpeg", "-r200");
+end
+
+print(Fig0(1), strcat(STDROOTPATH, AREANAME(posIndex), "_STD_Raw"), "-djpeg", "-r200");
+print(Fig0(2), strcat(STDROOTPATH, AREANAME(posIndex), "_STD_TFA"), "-djpeg", "-r200");
