@@ -1,6 +1,6 @@
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220520\Block-1';
+BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220517\Block-8';
 posIndex = 1; % 1-AC, 2-PFC
 posStr = ["LAuC", "LPFC"];
 
@@ -24,7 +24,7 @@ trialAll = ActiveProcess_7_10Freq(epocs, choiceWin);
 plotBehaviorOnly(trialAll, "r", "7-10 Freq");
 
 %% 7-10
-window = [-1500, 1000];
+window = [-1500, 2000];
 
 for sIndex = 7:10
     trials = trialAll([trialAll.stdNum] == sIndex & [trialAll.correct] == true & [trialAll.oddballType] == "STD");
@@ -40,11 +40,13 @@ for sIndex = 7:10
 end
 
 % Scale
-scaleAxes(Fig1);
+scaleAxes(Fig1, "y", [-80, 80]);
+scaleAxes(Fig1, "x", [-1000, 1500]);
 plotLayout(Fig1, posIndex);
 
 scaleAxes(Fig2);
-scaleAxes(Fig2, "c");
+scaleAxes(Fig2, "x", [-1000, 1500]);
+cRange = scaleAxes(Fig2, "c", [0, 30]);
 plotLayout(Fig2, posIndex);
 
 %% STD
@@ -87,7 +89,6 @@ scaleAxes(FigDEV1, "x", [-300, 1000]);
 scaleAxes(FigDEV1, "y", [-80, 80]);
 FigDEV1 = plotLayout(FigDEV1, posIndex);
 
-scaleAxes(FigDEV2, "x", [-300, 1000] - window(1));
 scaleAxes(FigDEV2);
 scaleAxes([FigSTD(2), FigDEV2], "c");
 FigDEV2 = plotLayout(FigDEV2, posIndex);
