@@ -28,7 +28,7 @@ window = [-1500, 2000];
 
 for sIndex = 7:10
     trials = trialAll([trialAll.stdNum] == sIndex & [trialAll.correct] == true & [trialAll.oddballType] == "STD");
-    [result, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
+    [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
 
     % Raw wave
     Fig1(sIndex - 6) = plotRawWave(chMean, chStd, window, ['std number = ', num2str(sIndex)]);
@@ -51,7 +51,7 @@ plotLayout(Fig2, posIndex);
 
 %% STD
 window = [-2500, 6000]; % ms
-[chMean, chStd] = joinSTD(trialAll, streams.(posStr(posIndex)), window);
+[chMean, chStd] = joinSTD(trialAll, ECOGDataset, window);
 
 % Raw wave
 FigSTD(1) = plotRawWave(chMean, chStd, window);
@@ -73,7 +73,7 @@ dRatio(dRatio == 0) = [];
 
 for dIndex = 1:length(dRatio)
     trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex));
-    [result, chMean, chStd] = selectEcog(streams.(posStr(posIndex)), trials, "dev onset", window);
+    [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
 
     % Raw wave
     FigDEV1(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio = ', num2str(dRatio(dIndex))]);

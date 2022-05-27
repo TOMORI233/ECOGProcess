@@ -1,87 +1,84 @@
-addpath(genpath("..\..\ECOGProcess"));
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'E:\ECoG\Data\chouchou\cc20220521\Block-1';
+BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220521\Block-1';
 posIndex = 1; % 1-AC, 2-PFC
-
 posStr = ["LAuC", "LPFC"];
+
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
 epocs = temp.epocs;
+
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
 streams = temp.streams;
 
+ECOGDataset = streams.(posStr(posIndex));
+fs0 = ECOGDataset.fs;
+
 %% Params settings
-clearvars -except posIndex posStr epocs streams
-window = [-2500, 6000]; % ms
-
-choiceWin = [0, 600]; % ms
+choiceWin = [0, 800]; % ms
 fs = 300; % Hz, for downsampling
-scaleFactor = 1e6;
 
+%% Processing
 trialAll = ActiveProcess_LTST(epocs, choiceWin);
 
-trialsNoInterrupt = trialAll([trialAll.interrupt] == false);
-ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trialsNoInterrupt.soundOnsetSeq}, {trialsNoInterrupt.stdNum})));
-stdNumAll = unique([trialsNoInterrupt.stdNum]);
-
-trialsConst = trialAll(logical(mod(ceil([trialAll.trialNum] / 20), 2)));
-trialsRand = trialAll(~logical(mod(ceil([trialAll.trialNum] / 20), 2)));
-
-fs0 = streams.(posStr(posIndex)).fs;
-
-% trials = trialsConst([trialsConst.correct] == true);
-trials = trialsRand([trialsRand.correct] == true);
-
-resultSTD = cell(length(stdNumAll), 1);
-
-for sIndex = 1:length(stdNumAll)
-    trialsSTD = trials([trials.correct] == true & [trials.stdNum] >= stdNumAll(sIndex));
-
-    if sIndex == 1
-        windowSTD = [window(1), ISI * stdNumAll(sIndex)];
-    else
-        windowSTD = [ISI * (stdNumAll(sIndex) - 1), ISI * stdNumAll(sIndex)];
-    end
-
-    ECOG = cellfun(@(x) x * scaleFactor, selectEcog(streams.(posStr(posIndex)), trialsSTD, "trial onset", window), "UniformOutput", false);
-    weightSTD = zeros(1, size(ECOG{1}, 2));
-    weightSTD(floor((windowSTD(1) - window(1)) * fs0 / 1000 + 1):floor((windowSTD(2) - window(1)) * fs0 / 1000)) = 1 / length(ECOG);
-    resultSTD{sIndex} = cell2mat(cellfun(@sum, changeCellRowNum(cellfun(@(x) x .* weightSTD, ECOG, "UniformOutput", false)), "UniformOutput", false));
-end
-
-chMean = resultSTD{1};
-
-for index = 2:length(resultSTD)
-    chMean = chMean + resultSTD{index};
-end
-
-chSE = zeros(size(chMean, 1), size(chMean, 2));
-
 %% Behavior
+constIdx = logical(mod(ceil([trialAll.trialNum] / 20), 2));
+randIdx = ~logical(mod(ceil([trialAll.trialNum] / 20), 2));
+trialsConst = trialAll(constIdx);
+trialsRand = trialAll(randIdx);
 [Fig, mAxe] = plotBehaviorOnly(trialsConst, "b", "Constant");
 [Fig, mAxe] = plotBehaviorOnly(trialsRand, "r", "Random", Fig, mAxe);
 
-%% Raw wave
-Fig1 = plotRawWave(chMean, chSE, window);
-yRange = scaleAxes(Fig1, "y");
-allAxes = findobj(Fig1, "Type", "axes");
-% title(allAxes(end), ['CH 1 | dRatio=', num2str(dRatio)])
-for aIndex = 1:length(allAxes)
-    plot(allAxes(aIndex), [0, 0], yRange, "k--", "LineWidth", 0.6);
+%% STD
+window = [-2500, 6000]; % ms
+
+% Constant
+[chMean, chStd] = joinSTD(trialsConst, ECOGDataset, window);
+FigSTD_Wave_Const = plotRawWave(chMean, chStd, window, "Constant std");
+drawnow;
+FigSTD_TFA_Const = plotTimeFreqAnalysis(double(chMean), fs0, fs, window, "Constant std");
+drawnow;
+
+% Random
+[chMean, chStd] = joinSTD(trialsRand, ECOGDataset, window);
+FigSTD_Wave_Rand = plotRawWave(chMean, chStd, window, "Random std");
+drawnow;
+FigSTD_TFA_Rand = plotTimeFreqAnalysis(double(chMean), fs0, fs, window, "Random std");
+drawnow;
+
+% Scale
+scaleAxes([FigSTD_Wave_Const, FigSTD_Wave_Rand], "y", [-80, 80]);
+scaleAxes([FigSTD_TFA_Const, FigSTD_TFA_Rand], "c");
+plotLayout([FigSTD_Wave_Const, FigSTD_Wave_Rand, FigSTD_TFA_Const, FigSTD_TFA_Rand], posIndex);
+
+%% DEV
+window = [-1500, 2000];
+devFreqAll = [trialAll.devFreq];
+stdFreqAll = cellfun(@(x) x(1), {trialAll.freqSeq});
+dRatioAll = roundn(devFreqAll ./ stdFreqAll, -2);
+dRatio = unique(dRatioAll);
+dRatio(dRatio == 0) = [];
+
+for dIndex = 1:length(dRatio)
+    % Constant
+    trials = trialAll(constIdx & dRatioAll == dRatio(dIndex) & [trialAll.correct] == true);
+    [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
+    FigDEV_Wave_Const(dIndex) = plotRawWave(chMean, chStd, window, strcat("Constant dRatio = ", num2str(dRatio(dIndex))));
+    drawnow;
+    FigDEV_TFA_Const(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, strcat("Constant dRatio = ", num2str(dRatio(dIndex))));
+    drawnow;
+
+    % Random
+    trials = trialAll(randIdx & dRatioAll == dRatio(dIndex) & [trialAll.correct] == true);
+    [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
+    FigDEV_Wave_Rand(dIndex) = plotRawWave(chMean, chStd, window, strcat("Random dRatio = ", num2str(dRatio(dIndex))));
+    drawnow;
+    FigDEV_TFA_Rand(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, strcat("Random dRatio = ", num2str(dRatio(dIndex))));
+    drawnow;
 end
 
-drawnow;
-% saveas(Fig1, strcat("figs/raw/", posStr(posIndex), "_dRatio", num2str(dRatio), "_Raw.jpg"));
-
-%% Time-Freq
-Fig2 = plotTimeFreqAnalysis(double(chMean), fs0, fs);
-yRange = scaleAxes(Fig2);
-cRange = scaleAxes(Fig2, "c", [0, 25]);
-allAxes = findobj(Fig2, "Type", "axes");
-% title(allAxes(end), ['CH 1 | dRatio=', num2str(roundn(devFreq(dIndex) / devFreq(1), -2))])
-for aIndex = 1:length(allAxes)
-    plot(allAxes(aIndex), [0, 0] - window(1), yRange, "w--", "LineWidth", 0.6);
-end
-
-drawnow;
-% saveas(Fig2, strcat("figs/time-freq/", posStr(posIndex), "_dRatio", num2str(dRatio), "_TFA.jpg"));
+% Scale
+scaleAxes([FigDEV_Wave_Const, FigDEV_TFA_Const, FigDEV_Wave_Rand, FigDEV_TFA_Rand], "x", [-300, 1000]);
+scaleAxes([FigDEV_Wave_Const, FigDEV_Wave_Rand], "y", [-80, 80]);
+scaleAxes([FigDEV_TFA_Const, FigDEV_TFA_Rand], "y");
+scaleAxes([FigDEV_TFA_Const, FigDEV_TFA_Rand], "c");
+plotLayout([FigDEV_Wave_Const, FigDEV_TFA_Const, FigDEV_Wave_Rand, FigDEV_TFA_Rand], posIndex);

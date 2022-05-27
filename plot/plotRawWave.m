@@ -1,4 +1,4 @@
-function Fig = plotRawWave(dataMean, dataSD, window, titleStr)
+function Fig = plotRawWave(chMean, chStd, window, titleStr)
     narginchk(3, 4);
 
     if nargin < 4
@@ -15,13 +15,13 @@ function Fig = plotRawWave(dataMean, dataSD, window, titleStr)
 
         for cIndex = 1:8
             chNum = (rIndex - 1) * 8 + cIndex;
-            t = linspace(window(1), window(2), size(dataMean, 2));
+            t = linspace(window(1), window(2), size(chMean, 2));
             mSubplot(Fig, 8, 8, chNum, [1, 1], margins);
-            y1 = dataMean(chNum, :) + dataSD(chNum, :);
-            y2 = dataMean(chNum, :) - dataSD(chNum, :);
+            y1 = chMean(chNum, :) + chStd(chNum, :);
+            y2 = chMean(chNum, :) - chStd(chNum, :);
             fill([t fliplr(t)], [y1 fliplr(y2)], [0, 0, 0], 'edgealpha', '0', 'facealpha', '0.3', 'DisplayName', 'Error bar');
             hold on;
-            plot(t, dataMean(chNum, :), "r", "LineWidth", 1.5);
+            plot(t, chMean(chNum, :), "r", "LineWidth", 1.5);
 
             xlim(window);
             title(['CH ', num2str(chNum), titleStr]);
