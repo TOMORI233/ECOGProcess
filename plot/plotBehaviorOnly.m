@@ -39,6 +39,7 @@ function [Fig, mAxe] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe)
         stem(mAxe(dIndex + 1), meanRT, yaxis(2), "Color", color, "LineStyle", "-", "LineWidth", 1.5);
         xlim(mAxe(dIndex + 1), [0, 800]);
         xlabel(mAxe(dIndex + 1), 'Reaction Time (ms)');
+        title(['dRatio = ', num2str(diffLevelUnique(dIndex))]);
     end
 
     if nargin < 5
@@ -54,7 +55,7 @@ function [Fig, mAxe] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe)
     xlabel("Difference Ratio (DEV / STD)");
     ylabel("Push Ratio");
     title('Frequency Oddball Task');
-    legend;
+    legend("Location", "best");
 
     for index = 1:length(nPush)
         text(mAxe(1), index, nPush(index) / nTotal(index), [num2str(nPush(index)), '/', num2str(nTotal(index))]);

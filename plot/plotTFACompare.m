@@ -1,7 +1,7 @@
-function Fig = plotRawWave(chMean, chStd, window, titleStr)
-    narginchk(3, 4);
+function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr)
+    narginchk(5, 6);
 
-    if nargin < 4
+    if nargin < 6
         titleStr = '';
     else
         titleStr = [' | ', char(titleStr)];
@@ -15,21 +15,18 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr)
 
         for cIndex = 1:8
             chNum = (rIndex - 1) * 8 + cIndex;
-            t = linspace(window(1), window(2), size(chMean, 2));
             mSubplot(Fig, 8, 8, chNum, [1, 1], margins);
-
-            if ~isempty(chStd)
-                y1 = chMean(chNum, :) + chStd(chNum, :);
-                y2 = chMean(chNum, :) - chStd(chNum, :);
-                fill([t fliplr(t)], [y1 fliplr(y2)], [0, 0, 0], 'edgealpha', '0', 'facealpha', '0.3', 'DisplayName', 'Error bar');
-                hold on;
-            end
-
-            plot(t, chMean(chNum, :), "r", "LineWidth", 1.5);
+            [t, Y, CData1, coi] = mCWT(chMean1(chNum, :), fs0, 'morlet', fs);
+            [~, ~, CData2, ~] = mCWT(chMean2(chNum, :), fs0, 'morlet', fs);
+            X = t * 1000 + window(1);
+            imagesc('XData', X, 'YData', Y, 'CData', CData1 - CData2);
+            colormap("jet");
             hold on;
-
-            xlim(window);
+            plot(X, coi, 'w--', 'LineWidth', 0.6);
             title(['CH ', num2str(chNum), titleStr]);
+            set(gca, "YScale", "log");
+            yticks([0, 2.^(0:nextpow2(max(Y)) - 1)]);
+            xlim(window);
 
             if ~mod((chNum - 1), 8) == 0
                 yticklabels('');
@@ -44,10 +41,11 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr)
     end
 
     yRange = scaleAxes(Fig);
+    scaleAxes(Fig, "c");
     allAxes = findobj(Fig, "Type", "axes");
 
     for aIndex = 1:length(allAxes)
-        plot(allAxes(aIndex), [0, 0], yRange, "k--", "LineWidth", 0.6);
+        plot(allAxes(aIndex), [0, 0], yRange, "w--", "LineWidth", 0.6);
     end
 
     return;
