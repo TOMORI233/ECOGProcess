@@ -1,5 +1,5 @@
-function result = selectEcog(ecog, trials, segOption, window)
-    narginchk(2, 4);
+function [result, chMean, chStd] = selectEcog(ECOGDataset, trials, segOption, window, scaleFactor)
+    narginchk(2, 5);
 
     if nargin < 3
         segOption = "trial onset";
@@ -9,7 +9,11 @@ function result = selectEcog(ecog, trials, segOption, window)
         window = [-3000, 7000];
     end
 
-    fs = ecog.fs;
+    if nargin < 5
+        scaleFactor = 1e6;
+    end
+
+    fs = ECOGDataset.fs;
     windowIndex = fix(window / 1000 * fs);
 
     switch segOption
@@ -26,10 +30,25 @@ function result = selectEcog(ecog, trials, segOption, window)
             segIndex = fix([trials.firstPush]' / 1000 * fs);
     end
 
+    % by trial
     result = cell(length(segIndex), 1);
 
     for index = 1:length(segIndex)
-        result{index} = ecog.data(:, segIndex(index) + windowIndex(1):segIndex(index) + windowIndex(2));
+        result{index} = ECOGDataset.data(:, segIndex(index) + windowIndex(1):segIndex(index) + windowIndex(2));
+    end
+
+    % scale
+    result = cellfun(@(x) x * scaleFactor, result, "UniformOutput", false);
+
+    % by channel
+    nChs = length(ECOGDataset.channels);
+    temp = cell2mat(result);
+    chMean = zeros(nChs, size(result{1}, 2));
+    chStd = zeros(nChs, size(result{1}, 2));
+    
+    for index = 1:nChs
+        chMean(index, :) = mean(temp(index:nChs:length(result) * nChs, :), 1);
+        chStd(index, :) = std(temp(index:nChs:length(result) * nChs, :), [], 1);
     end
 
     return;
