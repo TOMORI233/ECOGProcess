@@ -1,10 +1,14 @@
-function trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin)
-    narginchk(1, 2);
+function trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin, soundDuration)
+    narginchk(1, 3);
 
     if nargin < 2
         choiceWin = [0, 600];
+        soundDuration = 0;
     end
-
+    if nargin < 3
+        soundDuration = 0;
+    end
+    choiceWin = choiceWin + soundDuration;
     %% Information extraction
     % fixation 20220520 Block-1
     for index = 1:length(unique(epocs.swee.data))
@@ -107,7 +111,7 @@ function trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin)
             else
                 pushInWinFlag = false;
     
-                if firstPush > trialAll(tIndex, 1).soundOnsetSeq(end) + choiceWin(2)
+                if firstPush > trialAll(tIndex, 1).soundOnsetSeq(end) +  + choiceWin(2)
                     trialAll(tIndex, 1).firstPush = [];
                 end
     
