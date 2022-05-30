@@ -1,9 +1,11 @@
 addpath(genpath("..\..\ECOGProcess"));
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'G:\ECoG\chouchou\cc20220527\Block-2';
+BLOCKPATH = 'G:\ECoG\chouchou\cc20220530\Block-4';
 posIndex = 1; % 1-AC, 2-PFC
-pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','4-4.06InC','4-4.06InD','40-40.6RC','40-40.6RD','Tone-C','Tone-D'};
+% pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','4-4.06InC','4-4.06InD','40-40.6RC','40-40.6RD','Tone-C','Tone-D'};
+pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','Tone-C','Tone-D'};
+
 posStr = ["LAuC", "LPFC"];
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
 epocs = temp.epocs;
@@ -14,7 +16,7 @@ epocs = temp.epocs;
 
 %% Params settings
 window = [-3000, 3000]; % ms
-choiceWin = [-300, 1000]; % ms
+choiceWin = [-250, 1000]; % ms
 fs = 300; % Hz, for downsampling
 scaleFactor = 1e6;
 
@@ -27,6 +29,7 @@ ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trialsNoInterrupt.soundOnse
 trials = trialsNoInterrupt;
 [Fig, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'},pairStr);
 
+toneTrials = trials([trials.stdOrdr]' == 6 & [trials.devOrdr]' == 8);
 %% ECOG
 trials = [{trials1_3([trials1_3.correct] == true & [trials1_3.oddballType] == "DEV")}; ...
           {trials4_6([trials4_6.correct] == true & [trials4_6.oddballType] == "DEV")}; ...
