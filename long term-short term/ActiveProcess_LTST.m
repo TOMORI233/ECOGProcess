@@ -6,12 +6,6 @@ function trialAll = ActiveProcess_LTST(epocs, choiceWin)
     end
 
     %% Information extraction
-    % fixation 20220520 Block-1
-    for index = 1:length(unique(epocs.swee.data))
-        idx = find(epocs.swee.data == index);
-        epocs.num0.data(idx) = (1:length(idx))';
-    end
-
     trialOnsetIndex = find(epocs.num0.data == 1);
     trialOnsetTimeAll = epocs.num0.onset(trialOnsetIndex) * 1000; % ms
     soundOnsetTimeAll = epocs.num0.onset * 1000; % ms

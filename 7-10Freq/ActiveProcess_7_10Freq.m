@@ -7,10 +7,10 @@ function trialAll = ActiveProcess_7_10Freq(epocs, choiceWin)
 
     %% Information extraction
     % fixation 20220520 Block-1
-%     for index = 1:length(unique(epocs.swee.data))
-%         idx = find(epocs.swee.data == index);
-%         epocs.num0.data(idx) = (1:length(idx))';
-%     end
+    for index = 1:length(unique(epocs.swee.data))
+        idx = find(epocs.swee.data == index);
+        epocs.num0.data(idx) = (1:length(idx))';
+    end
 
     trialOnsetIndex = find(epocs.num0.data == 1);
     trialOnsetTimeAll = epocs.num0.onset(trialOnsetIndex) * 1000; % ms

@@ -1,7 +1,7 @@
 addpath(genpath("..\..\ECOGProcess"));
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'G:\ECoG\chouchou\cc20220530\Block-4';
+BLOCKPATH = 'G:\ECoG\chouchou\cc20220528\Block-1';
 posIndex = 1; % 1-AC, 2-PFC
 % pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','4-4.06InC','4-4.06InD','40-40.6RC','40-40.6RD','Tone-C','Tone-D'};
 pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','Tone-C','Tone-D'};
@@ -9,6 +9,7 @@ pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','Tone-C','Tone-D'};
 posStr = ["LAuC", "LPFC"];
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
 epocs = temp.epocs;
+soundDuration = 600; % ms
 % temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
 % streams = temp.streams;
 % fs0 = streams.(posStr(posIndex)).fs;
@@ -21,13 +22,15 @@ fs = 300; % Hz, for downsampling
 scaleFactor = 1e6;
 
 %% Behavior processing
-trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin);
+trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin, soundDuration);
 trialsNoInterrupt = trialAll([trialAll.interrupt] == false);
 ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trialsNoInterrupt.soundOnsetSeq}, {trialsNoInterrupt.stdNum})));
 
 %% Plot behavior result
-trials = trialsNoInterrupt;
-[Fig, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'},pairStr);
+trials1 = trialsNoInterrupt(1:floor(length(trialsNoInterrupt)/2));
+[Fig, mAxe] = plotClickTrainWMBehaviorOnly(trials1, "k", {'control', 'dev'},pairStr);
+trials2 = trialsNoInterrupt(floor(length(trialsNoInterrupt))/2 + 1:end);
+[Fig, mAxe] = plotClickTrainWMBehaviorOnly(trials2, "k", {'control', 'dev'},pairStr);
 
 toneTrials = trials([trials.stdOrdr]' == 6 & [trials.devOrdr]' == 8);
 %% ECOG
