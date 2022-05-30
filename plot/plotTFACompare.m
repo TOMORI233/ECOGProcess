@@ -9,13 +9,14 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr)
 
     Fig = figure;
     margins = [0.05, 0.05, 0.1, 0.1];
+    paddings = [0.01, 0.03, 0.01, 0.01];
     maximizeFig(Fig);
 
     for rIndex = 1:8
 
         for cIndex = 1:8
             chNum = (rIndex - 1) * 8 + cIndex;
-            mSubplot(Fig, 8, 8, chNum, [1, 1], margins);
+            mSubplot(Fig, 8, 8, chNum, [1, 1], margins, paddings);
             [t, Y, CData1, coi] = mCWT(chMean1(chNum, :), fs0, 'morlet', fs);
             [~, ~, CData2, ~] = mCWT(chMean2(chNum, :), fs0, 'morlet', fs);
             X = t * 1000 + window(1);
@@ -39,6 +40,8 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr)
         end
 
     end
+
+    colorbar('position', [1 - paddings(2),   0.1 , 0.5 * paddings(2), 0.8]);
 
     yRange = scaleAxes(Fig);
     scaleAxes(Fig, "c");

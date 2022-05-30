@@ -9,6 +9,7 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr)
 
     Fig = figure;
     margins = [0.05, 0.05, 0.1, 0.1];
+    paddings = [0.01, 0.03, 0.01, 0.01];
     maximizeFig(Fig);
 
     for rIndex = 1:8
@@ -16,7 +17,7 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr)
         for cIndex = 1:8
             chNum = (rIndex - 1) * 8 + cIndex;
             t = linspace(window(1), window(2), size(chMean, 2));
-            mSubplot(Fig, 8, 8, chNum, [1, 1], margins);
+            mSubplot(Fig, 8, 8, chNum, [1, 1], margins, paddings);
 
             if ~isempty(chStd)
                 y1 = chMean(chNum, :) + chStd(chNum, :);
