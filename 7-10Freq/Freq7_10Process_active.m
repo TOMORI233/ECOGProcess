@@ -3,8 +3,8 @@ clear; clc; close all;
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220517\Block-8';
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220518\Block-1';
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220519\Block-3';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220520\Block-1';
-BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220525\Block-1';
+BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220520\Block-1';
+% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220525\Block-1';
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220530\Block-1';
 posIndex = 1; % 1-AC, 2-PFC
 posStr = ["LAuC", "LPFC"];
@@ -38,10 +38,26 @@ dRatio(dRatio == 0) = [];
 FigBehavior = plotBehaviorOnly(trialAll, "r", "7-10 Freq");
 drawnow;
 
+%% PE
+% window = [-2000, 2000];
+% trials5 = trialAll([trialAll.correct] == true & dRatioAll == dRatio(end));
+% trials4 = trialAll([trialAll.correct] == true & dRatioAll == dRatio(end - 1));
+% trials3 = trialAll([trialAll.correct] == true & dRatioAll == dRatio(end - 2));
+% [~, chMean5, ~] = selectEcog(ECOGDataset, trials5, "dev onset", window);
+% [~, chMean4, ~] = selectEcog(ECOGDataset, trials4, "dev onset", window);
+% [~, chMean3, ~] = selectEcog(ECOGDataset, trials3, "dev onset", window);
+% Fig1(1) = plotRawWave(chMean5 - chMean4, [], window, "5-4");
+% Fig2(1) = plotTFACompare(chMean5, chMean4, fs0, fs, window, "5-4");
+% Fig1(2) = plotRawWave(chMean5 - chMean3, [], window, "5-3");
+% Fig2(2) = plotTFACompare(chMean5, chMean3, fs0, fs, window, "5-3");
+% scaleAxes([Fig1, Fig2], "x", [-500, 1000]);
+% scaleAxes(Fig1, "y", []);
+% scaleAxes(Fig2, "c", []);
+
 %% Prediction
 window = [-2500, 6000]; % ms
-[chMean, chStd] = joinSTD(trialAll([trialAll.correct] == true), ECOGDataset, window);
-FigP(1) = plotRawWave(chMean, chStd, window);
+[chMean, ~] = joinSTD(trialAll([trialAll.correct] == true), ECOGDataset, window);
+FigP(1) = plotRawWave(chMean, [], window);
 drawnow;
 FigP(2) = plotTimeFreqAnalysis(chMean, fs0, fs, window);
 drawnow;
@@ -86,7 +102,16 @@ drawnow;
 % Scale
 scaleAxes([FigDM1, FigDM2], "x", [-1000, 1000]);
 scaleAxes(FigDM1, "y");
-cRange = scaleAxes(FigDM2, "c", []);
+cRange = scaleAxes(FigDM2, "c", [], [-0.1, 0.1], "max");
+
+%% Motion response
+% window = [-3000, 2000];
+% [~, chMean, chStd] = selectEcog(ECOGDataset, trialAll([trialAll.correct] == true & [trialAll.interrupt] == false & [trialAll.oddballType] == "DEV"), "push onset", window);
+% FigTemp(1) = plotRawWave(chMean, chStd, window, "push onset");
+% FigTemp(2) = plotTimeFreqAnalysis(chMean, fs0, fs, window, "push onset");
+% scaleAxes(FigTemp, "x", [-1000, 2000]);
+% scaleAxes(FigTemp(1), "y", [], [-80, 80]);
+% scaleAxes(FigTemp(2), "c", [], [0, 20]);
 
 %% Layout
 plotLayout([FigP(1), FigPE1, FigDM1], posIndex);
@@ -110,6 +135,6 @@ print(FigDM1, strcat(DMPATH, AREANAME(posIndex), "_DM_Raw_", DateStr), "-djpeg",
 print(FigDM2, strcat(DMPATH, AREANAME(posIndex), "_DM_TFA_", DateStr), "-djpeg", "-r200");
 
 for dIndex = 1:length(FigPE1)
-    print(FigPE1(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_Raw_", num2str(dIndex)), "-djpeg", "-r200");
-    print(FigPE2(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_TFA_", num2str(dIndex)), "-djpeg", "-r200");
+    print(FigPE1(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_Raw_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
+    print(FigPE2(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_TFA_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
 end
