@@ -17,7 +17,7 @@ function Fig = plotTimeFreqAnalysis(chMean, fs0, fs, window, titleStr)
         for cIndex = 1:8
             chNum = (rIndex - 1) * 8 + cIndex;
             mSubplot(Fig, 8, 8, chNum, [1, 1], margins, paddings);
-            [t, Y, CData, coi] = mCWT(chMean(chNum, :), fs0, 'morlet', fs);
+            [t, Y, CData, coi] = mCWT(double(chMean(chNum, :)), fs0, 'morlet', fs);
             X = t * 1000 + window(1);
             imagesc('XData', X, 'YData', Y, 'CData', CData);
             colormap("jet");

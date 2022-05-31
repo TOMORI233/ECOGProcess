@@ -112,5 +112,8 @@ function trialAll = ActiveProcess_1_9Freq(epocs, choiceWin)
 
     end
 
+    % Abort the first trial
+    trialAll(1) = [];
+
     return;
 end

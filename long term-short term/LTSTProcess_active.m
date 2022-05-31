@@ -1,7 +1,7 @@
 %% Data loading
 clear; clc; close all;
 BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220521\Block-1';
-posIndex = 1; % 1-AC, 2-PFC
+posIndex = 2; % 1-AC, 2-PFC
 posStr = ["LAuC", "LPFC"];
 
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
@@ -37,15 +37,15 @@ drawnow;
 window = [-2500, 6000]; % ms
 
 % Constant
-[chMeanConst, chStd] = joinSTD(trialsConst, ECOGDataset, window);
-FigP_Wave_Const = plotRawWave(chMeanConst, chStd, window, "Constant std");
+[chMeanConst, ~] = joinSTD(trialsConst([trialsConst.correct] == true), ECOGDataset, window);
+FigP_Wave_Const = plotRawWave(chMeanConst, [], window, "Constant std");
 drawnow;
 FigP_TFA_Const = plotTimeFreqAnalysis(double(chMeanConst), fs0, fs, window, "Constant std");
 drawnow;
 
 % Random
-[chMeanRand, chStd] = joinSTD(trialsRand, ECOGDataset, window);
-FigP_Wave_Rand = plotRawWave(chMeanRand, chStd, window, "Random std");
+[chMeanRand, ~] = joinSTD(trialsRand([trialsRand.correct] == true), ECOGDataset, window);
+FigP_Wave_Rand = plotRawWave(chMeanRand, [], window, "Random std");
 drawnow;
 FigP_TFA_Rand = plotTimeFreqAnalysis(chMeanRand, fs0, fs, window, "Random std");
 drawnow;

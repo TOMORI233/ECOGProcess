@@ -41,8 +41,8 @@ drawnow;
 
 %% Prediction
 window = [-2500, 6000]; % ms
-[chMean, chStd] = joinSTD(trialAll, ECOGDataset, window);
-FigP(1) = plotRawWave(chMean, chStd, window);
+[chMean, ~] = joinSTD(trialAll([trialAll.correct] == true), ECOGDataset, window);
+FigP(1) = plotRawWave(chMean, [], window);
 drawnow;
 FigP(2) = plotTimeFreqAnalysis(double(chMean), fs0, fs, window);
 drawnow;
