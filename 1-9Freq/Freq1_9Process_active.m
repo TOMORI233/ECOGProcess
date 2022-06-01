@@ -51,18 +51,33 @@ drawnow;
 window = [-2000, 2000]; % ms
 
 for dIndex = 1:length(dRatio)
-    trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex));
+    % 1-3
+    trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex) & [trialAll.stdNum] >= 1 & [trialAll.stdNum] <= 3);
     [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
-    FigPE1(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
+    FigPE_Wave1_3(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 1-3']);
     drawnow;
-    FigPE2(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
+    FigPE_TFA1_3(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 1-3']);
+    drawnow;
+    % 4-6
+    trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex) & [trialAll.stdNum] >= 4 & [trialAll.stdNum] <= 6);
+    [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
+    FigPE_Wave4_6(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 4-6']);
+    drawnow;
+    FigPE_TFA4_6(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 4-6']);
+    drawnow;
+    % 7-9
+    trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex) & [trialAll.stdNum] >= 7 & [trialAll.stdNum] <= 9);
+    [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
+    FigPE_Wave7_9(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 7-9']);
+    drawnow;
+    FigPE_TFA7_9(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 7-9']);
     drawnow;
 end
 
 % Scale
-scaleAxes([FigPE1, FigPE2], "x", [-300, 1000]);
-scaleAxes([FigP(1), FigPE1], "y", [-80, 80]);
-scaleAxes([FigP(2), FigPE2], "c");
+scaleAxes([FigPE_Wave1_3, FigPE_Wave4_6, FigPE_Wave7_9, FigPE_TFA1_3, FigPE_TFA4_6, FigPE_TFA7_9], "x", [-500, 1000]);
+scaleAxes([FigP(1), FigPE_Wave1_3, FigPE_Wave4_6, FigPE_Wave7_9], "y", [], [-80, 80]);
+scaleAxes([FigP(2), FigPE_TFA1_3, FigPE_TFA4_6, FigPE_TFA7_9], "c", [], [0, 20]);
 
 %% Decision making
 window = [-2000, 2000];

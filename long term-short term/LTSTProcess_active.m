@@ -57,7 +57,7 @@ FigP_TFA_Diff = plotTFACompare(chMeanConst, chMeanRand, fs0, fs, window, "Consta
 % Scale
 scaleAxes([FigP_Wave_Const, FigP_Wave_Rand, FigP_Wave_Diff], "y", [-80, 80]);
 scaleAxes([FigP_TFA_Const, FigP_TFA_Rand], "c");
-scaleAxes(FigP_TFA_Diff, "c", [-20, 20]);
+scaleAxes(FigP_TFA_Diff, "c", [], [-10, 10], "max");
 
 %% DEV
 window = [-1500, 2000];

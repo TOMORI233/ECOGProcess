@@ -33,6 +33,7 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr)
             title(['CH ', num2str(chNum), titleStr]);
 
             if ~mod((chNum - 1), 8) == 0
+                yticks([]);
                 yticklabels('');
             end
 
