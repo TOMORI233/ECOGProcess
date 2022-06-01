@@ -1,7 +1,8 @@
 %% Data loading
 clear; clc; close all;
 BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220521\Block-1';
-posIndex = 2; % 1-AC, 2-PFC
+% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220531\Block-3';
+posIndex = 1; % 1-AC, 2-PFC
 posStr = ["LAuC", "LPFC"];
 
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
@@ -29,8 +30,8 @@ constIdx = logical(mod(ceil([trialAll.trialNum] / 20), 2));
 randIdx = ~logical(mod(ceil([trialAll.trialNum] / 20), 2));
 trialsConst = trialAll(constIdx);
 trialsRand = trialAll(randIdx);
-[FigBehavior, mAxe] = plotBehaviorOnly(trialsConst, "b", "Constant");
-[FigBehavior, mAxe] = plotBehaviorOnly(trialsRand, "r", "Random", FigBehavior, mAxe);
+[FigBehavior, mAxe] = plotBehaviorOnly(trialsConst, "r", "Constant");
+[FigBehavior, mAxe] = plotBehaviorOnly(trialsRand, "b", "Random", FigBehavior, mAxe);
 drawnow;
 
 %% Prediction
@@ -55,8 +56,8 @@ FigP_Wave_Diff = plotRawWave(chMeanConst - chMeanRand, [], window, "Constant - R
 FigP_TFA_Diff = plotTFACompare(chMeanConst, chMeanRand, fs0, fs, window, "Constant - Random");
 
 % Scale
-scaleAxes([FigP_Wave_Const, FigP_Wave_Rand, FigP_Wave_Diff], "y", [-80, 80]);
-scaleAxes([FigP_TFA_Const, FigP_TFA_Rand], "c");
+scaleAxes([FigP_Wave_Const, FigP_Wave_Rand, FigP_Wave_Diff], "y", [], [-80, 80], "max");
+scaleAxes([FigP_TFA_Const, FigP_TFA_Rand], "c", [], [0, 20]);
 scaleAxes(FigP_TFA_Diff, "c", [], [-10, 10], "max");
 
 %% DEV
@@ -92,10 +93,10 @@ for dIndex = 1:length(dRatio)
 end
 
 % Scale
-scaleAxes([FigPE_Wave_Const, FigPE_TFA_Const, FigPE_Wave_Rand, FigPE_TFA_Rand, FigPE_Wave_Diff, FigPE_TFA_Diff], "x", [-300, 1000]);
-scaleAxes([FigPE_Wave_Const, FigPE_Wave_Rand, FigPE_Wave_Diff], "y", [-80, 80]);
-scaleAxes([FigPE_TFA_Const, FigPE_TFA_Rand], "c");
-scaleAxes(FigPE_TFA_Diff, "c", [-20, 20]);
+scaleAxes([FigPE_Wave_Const, FigPE_TFA_Const, FigPE_Wave_Rand, FigPE_TFA_Rand, FigPE_Wave_Diff, FigPE_TFA_Diff], "x", [-500, 1000]);
+scaleAxes([FigPE_Wave_Const, FigPE_Wave_Rand, FigPE_Wave_Diff], "y", [], [-80, 80], "max");
+scaleAxes([FigPE_TFA_Const, FigPE_TFA_Rand], "c", [], [0, 20]);
+scaleAxes(FigPE_TFA_Diff, "c", [], [-20, 20], "max");
 
 %% Layout
 plotLayout([FigP_Wave_Const, FigP_Wave_Rand, FigP_Wave_Diff, FigPE_Wave_Const, FigPE_Wave_Rand, FigPE_Wave_Diff], posIndex);

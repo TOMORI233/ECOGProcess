@@ -6,7 +6,7 @@ clear; clc; close all;
 BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220520\Block-1';
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220525\Block-1';
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220530\Block-1';
-posIndex = 1; % 1-AC, 2-PFC
+posIndex = 2; % 1-AC, 2-PFC
 posStr = ["LAuC", "LPFC"];
 
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
@@ -40,19 +40,21 @@ drawnow;
 
 %% PE
 % window = [-2000, 2000];
-% trials5 = trialAll([trialAll.correct] == true & dRatioAll == dRatio(end));
-% trials4 = trialAll([trialAll.correct] == true & dRatioAll == dRatio(end - 1));
-% trials3 = trialAll([trialAll.correct] == true & dRatioAll == dRatio(end - 2));
-% [~, chMean5, ~] = selectEcog(ECOGDataset, trials5, "dev onset", window);
-% [~, chMean4, ~] = selectEcog(ECOGDataset, trials4, "dev onset", window);
-% [~, chMean3, ~] = selectEcog(ECOGDataset, trials3, "dev onset", window);
-% Fig1(1) = plotRawWave(chMean5 - chMean4, [], window, "5-4");
-% Fig2(1) = plotTFACompare(chMean5, chMean4, fs0, fs, window, "5-4");
-% Fig1(2) = plotRawWave(chMean5 - chMean3, [], window, "5-3");
-% Fig2(2) = plotTFACompare(chMean5, chMean3, fs0, fs, window, "5-3");
-% scaleAxes([Fig1, Fig2], "x", [-500, 1000]);
-% scaleAxes(Fig1, "y", []);
-% scaleAxes(Fig2, "c", []);
+% trialsC = trialAll([trialAll.correct] == true & [trialAll.oddballType] == "DEV");
+% trialsW = trialAll([trialAll.correct] == false & [trialAll.interrupt] == false & [trialAll.oddballType] == "DEV");
+% [resultDEVC, chMeanDEVC, ~] = selectEcog(ECOGDataset, trialsC, "dev onset", window);
+% [resultSTDC, chMeanSTDC, ~] = selectEcog(ECOGDataset, trialsC, "last std", window);
+% [resultDEVW, chMeanDEVW, ~] = selectEcog(ECOGDataset, trialsW, "dev onset", window);
+% [resultSTDW, chMeanSTDW, ~] = selectEcog(ECOGDataset, trialsW, "last std", window);
+% chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVC - resultSTDC), "UniformOutput", false));
+% chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVW - resultSTDW), "UniformOutput", false));
+% Fig1(1) = plotRawWave(chMeanC, [], window, "C:DEV-last STD");
+% Fig1(2) = plotRawWave(chMeanW, [], window, "W:DEV-last STD");
+% Fig2(1) = plotTFACompare(chMeanDEVC, chMeanSTDC, fs0, fs, window, "C:DEV-last STD");
+% Fig2(2) = plotTFACompare(chMeanDEVW, chMeanSTDW, fs0, fs, window, "W:DEV-last STD");
+% scaleAxes([Fig1, Fig2], "x", [0, 500]);
+% scaleAxes(Fig1, "y", [], [-60, 60], "max");
+% scaleAxes(Fig2, "c", [], [-20, 20]);
 
 %% Prediction
 window = [-2500, 6000]; % ms
@@ -75,9 +77,9 @@ for dIndex = 1:length(dRatio)
 end
 
 % Scale
-scaleAxes([FigPE1, FigPE2], "x", [-500, 1000]);
+scaleAxes([FigPE1, FigPE2], "x", [-1500, 2000]);
 scaleAxes([FigP(1), FigPE1], "y", [-80, 80]);
-scaleAxes([FigP(2), FigPE2], "c", [], [0, 20]);
+scaleAxes([FigP(2), FigPE2], "c", [], [0, 15]);
 
 %% Decision making
 window = [-2000, 2000];
