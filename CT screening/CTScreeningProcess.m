@@ -1,4 +1,4 @@
-function trialAll = CTScreeningProcess(epocs)
+function trialAll = CTScreeningProcess(epocs, varargin)
     attAll = epocs.atts.data;
     freqAll = epocs.freq.data;
     trialOnsetTime = epocs.atts.onset * 1000; % ms
