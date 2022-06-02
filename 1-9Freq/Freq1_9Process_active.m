@@ -1,7 +1,8 @@
 clear; clc; close all;
 %% Parameter setting
-BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220523\Block-1';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220524\Block-1';
+% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220523\Block-1';
+BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220524\Block-1';
+% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220601\Block-1';
 
 params.posIndex = 1; % 1-AC, 2-PFC
 params.choiceWin = [0, 800];
@@ -10,8 +11,10 @@ params.processFcn = @ActiveProcess_1_9Freq;
 fs = 300; % Hz, for downsampling
 
 %% Processing
-[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params);
-fs0 = ECOGDataset.fs;
+[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params, true);
+if ~isempty(ECOGDataset)
+    fs0 = ECOGDataset.fs;
+end
 
 devFreqAll = [trialAll.devFreq];
 stdFreqAll = cellfun(@(x) x(1), {trialAll.freqSeq});
@@ -20,6 +23,15 @@ dRatio = unique(dRatioAll);
 dRatio(dRatio == 0) = [];
 
 %% Behavior
+% colors = generateColorGrad(9, 'rgb');
+% trials = trialAll([trialAll.stdNum] == 1);
+% [FigBehavior, mAxe] = plotBehaviorOnly(trials, colors{1}, num2str(1));
+% 
+% for sIndex = 2:9
+%     trials = trialAll([trialAll.stdNum] == sIndex);
+%     [FigBehavior, mAxe] = plotBehaviorOnly(trials, colors{sIndex}, num2str(sIndex), FigBehavior, mAxe);
+% end
+
 trials1_3 = trialAll([trialAll.stdNum] >= 1 & [trialAll.stdNum] <= 3);
 trials4_6 = trialAll([trialAll.stdNum] >= 4 & [trialAll.stdNum] <= 6);
 trials7_9 = trialAll([trialAll.stdNum] >= 7 & [trialAll.stdNum] <= 9);
