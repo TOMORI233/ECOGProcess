@@ -1,33 +1,22 @@
-%% Data loading
 clear; clc; close all;
+%% Parameter settings
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220517\Block-8';
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220518\Block-1';
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220519\Block-3';
 BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220520\Block-1';
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220525\Block-1';
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220530\Block-1';
-posIndex = 2; % 1-AC, 2-PFC
-posStr = ["LAuC", "LPFC"];
 
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
-epocs = temp.epocs;
+params.posIndex = 1; % 1-AC, 2-PFC
+params.choiceWin = [0, 600];
+params.processFcn = @ActiveProcess_7_10Freq;
 
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
-streams = temp.streams;
-
-ECOGDataset = streams.(posStr(posIndex));
-fs0 = ECOGDataset.fs;
-
-AREANAME = ["AC", "PFC"];
-temp = string(split(BLOCKPATH, '\'));
-DateStr = temp(end - 1);
-
-%% Parameter setting
-choiceWin = [0, 600]; % ms
 fs = 300; % Hz, for downsampling
 
 %% Processing
-trialAll = ActiveProcess_7_10Freq(epocs, choiceWin);
+[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params);
+fs0 = ECOGDataset.fs;
+
 devFreqAll = [trialAll.devFreq];
 stdFreqAll = cellfun(@(x) x(1), {trialAll.freqSeq});
 dRatioAll = roundn(devFreqAll ./ stdFreqAll, -2);
@@ -119,6 +108,10 @@ cRange = scaleAxes(FigDM2, "c", [], [-0.1, 0.1], "max");
 plotLayout([FigP(1), FigPE1, FigDM1], posIndex);
 
 %% Save
+AREANAME = ["AC", "PFC"];
+AREANAME = AREANAME(params.posIndex);
+temp = string(split(BLOCKPATH, '\'));
+DateStr = temp(end - 1);
 ROOTPATH = "D:\Education\Lab\monkey\ECOG\Figures\7-10Freq\";
 BPATH = strcat(ROOTPATH, DateStr, "\Behavior\");
 PEPATH = strcat(ROOTPATH, DateStr, "\Prediction error\");
@@ -130,13 +123,13 @@ mkdir(PPATH);
 mkdir(DMPATH);
 
 print(FigBehavior, strcat(BPATH, "Behavior_", DateStr), "-djpeg", "-r200");
-print(FigP(1), strcat(PPATH, AREANAME(posIndex), "_Prediction_Raw_", DateStr), "-djpeg", "-r200");
-print(FigP(2), strcat(PPATH, AREANAME(posIndex), "_Prediction_TFA_", DateStr), "-djpeg", "-r200");
+print(FigP(1), strcat(PPATH, AREANAME, "_Prediction_Raw_", DateStr), "-djpeg", "-r200");
+print(FigP(2), strcat(PPATH, AREANAME, "_Prediction_TFA_", DateStr), "-djpeg", "-r200");
 
-print(FigDM1, strcat(DMPATH, AREANAME(posIndex), "_DM_Raw_", DateStr), "-djpeg", "-r200");
-print(FigDM2, strcat(DMPATH, AREANAME(posIndex), "_DM_TFA_", DateStr), "-djpeg", "-r200");
+print(FigDM1, strcat(DMPATH, AREANAME, "_DM_Raw_", DateStr), "-djpeg", "-r200");
+print(FigDM2, strcat(DMPATH, AREANAME, "_DM_TFA_", DateStr), "-djpeg", "-r200");
 
 for dIndex = 1:length(FigPE1)
-    print(FigPE1(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_Raw_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
-    print(FigPE2(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_TFA_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
+    print(FigPE1(dIndex), strcat(PEPATH, AREANAME, "_PE_Raw_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
+    print(FigPE2(dIndex), strcat(PEPATH, AREANAME, "_PE_TFA_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
 end

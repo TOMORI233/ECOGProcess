@@ -1,29 +1,17 @@
-%% Data loading
 clear; clc; close all;
+%% Parameter setting
 BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220521\Block-1';
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220531\Block-3';
-posIndex = 1; % 1-AC, 2-PFC
-posStr = ["LAuC", "LPFC"];
 
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
-epocs = temp.epocs;
+params.posIndex = 1; % 1-AC, 2-PFC
+params.choiceWin = [0, 800];
+params.processFcn = @ActiveProcess_LTST;
 
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
-streams = temp.streams;
-
-ECOGDataset = streams.(posStr(posIndex));
-fs0 = ECOGDataset.fs;
-
-AREANAME = ["AC", "PFC"];
-temp = string(split(BLOCKPATH, '\'));
-DateStr = temp(end - 1);
-
-%% Params settings
-choiceWin = [0, 800]; % ms
 fs = 300; % Hz, for downsampling
 
 %% Processing
-trialAll = ActiveProcess_LTST(epocs, choiceWin);
+[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params);
+fs0 = ECOGDataset.fs;
 
 %% Behavior
 constIdx = logical(mod(ceil([trialAll.trialNum] / 20), 2));
@@ -102,6 +90,10 @@ scaleAxes(FigPE_TFA_Diff, "c", [], [-20, 20], "max");
 plotLayout([FigP_Wave_Const, FigP_Wave_Rand, FigP_Wave_Diff, FigPE_Wave_Const, FigPE_Wave_Rand, FigPE_Wave_Diff], posIndex);
 
 %% Save
+AREANAME = ["AC", "PFC"];
+AREANAME = AREANAME(params.posIndex);
+temp = string(split(BLOCKPATH, '\'));
+DateStr = temp(end - 1);
 ROOTPATH = "D:\Education\Lab\monkey\ECOG\Figures\long term-short term\";
 BPATH = strcat(ROOTPATH, DateStr, "\Behavior\");
 PEPATH = strcat(ROOTPATH, DateStr, "\Prediction error\");
@@ -111,18 +103,18 @@ mkdir(PPATH);
 mkdir(PEPATH);
 
 print(FigBehavior, strcat(BPATH, "Behavior_", DateStr), "-djpeg", "-r200");
-print(FigP_Wave_Const, strcat(PPATH, AREANAME(posIndex), "_Prediction_Raw_Const_", DateStr), "-djpeg", "-r200");
-print(FigP_Wave_Rand, strcat(PPATH, AREANAME(posIndex), "_Prediction_Raw_Rand_", DateStr), "-djpeg", "-r200");
-print(FigP_TFA_Const, strcat(PPATH, AREANAME(posIndex), "_Prediction_TFA_Const_", DateStr), "-djpeg", "-r200");
-print(FigP_TFA_Rand, strcat(PPATH, AREANAME(posIndex), "_Prediction_TFA_Rand_", DateStr), "-djpeg", "-r200");
-print(FigP_Wave_Diff, strcat(PPATH, AREANAME(posIndex), "_Prediction_Raw_Diff_", DateStr), "-djpeg", "-r200");
-print(FigP_TFA_Diff, strcat(PPATH, AREANAME(posIndex), "_Prediction_TFA_Diff_", DateStr), "-djpeg", "-r200");
+print(FigP_Wave_Const, strcat(PPATH, AREANAME, "_Prediction_Raw_Const_", DateStr), "-djpeg", "-r200");
+print(FigP_Wave_Rand, strcat(PPATH, AREANAME, "_Prediction_Raw_Rand_", DateStr), "-djpeg", "-r200");
+print(FigP_TFA_Const, strcat(PPATH, AREANAME, "_Prediction_TFA_Const_", DateStr), "-djpeg", "-r200");
+print(FigP_TFA_Rand, strcat(PPATH, AREANAME, "_Prediction_TFA_Rand_", DateStr), "-djpeg", "-r200");
+print(FigP_Wave_Diff, strcat(PPATH, AREANAME, "_Prediction_Raw_Diff_", DateStr), "-djpeg", "-r200");
+print(FigP_TFA_Diff, strcat(PPATH, AREANAME, "_Prediction_TFA_Diff_", DateStr), "-djpeg", "-r200");
 
 for dIndex = 1:length(FigPE_Wave_Const)
-    print(FigPE_Wave_Const(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_Raw_Const_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
-    print(FigPE_TFA_Const(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_TFA_Const_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
-    print(FigPE_Wave_Rand(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_Raw_Rand_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
-    print(FigPE_TFA_Rand(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_TFA_Rand_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
-    print(FigPE_Wave_Diff(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_Raw_Diff_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
-    print(FigPE_TFA_Diff(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_TFA_Diff_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
+    print(FigPE_Wave_Const(dIndex), strcat(PEPATH, AREANAME, "_PE_Raw_Const_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
+    print(FigPE_TFA_Const(dIndex), strcat(PEPATH, AREANAME, "_PE_TFA_Const_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
+    print(FigPE_Wave_Rand(dIndex), strcat(PEPATH, AREANAME, "_PE_Raw_Rand_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
+    print(FigPE_TFA_Rand(dIndex), strcat(PEPATH, AREANAME, "_PE_TFA_Rand_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
+    print(FigPE_Wave_Diff(dIndex), strcat(PEPATH, AREANAME, "_PE_Raw_Diff_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
+    print(FigPE_TFA_Diff(dIndex), strcat(PEPATH, AREANAME, "_PE_TFA_Diff_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
 end

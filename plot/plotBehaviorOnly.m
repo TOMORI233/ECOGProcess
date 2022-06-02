@@ -54,7 +54,6 @@ function [Fig, mAxe] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe)
     yticks(0:0.2:1);
     xlabel("Difference Ratio (DEV / STD)");
     ylabel("Push Ratio");
-    title('Frequency Oddball Task');
     legend("Location", "best");
 
     for index = 1:length(nPush)
