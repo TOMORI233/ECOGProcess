@@ -32,7 +32,7 @@ function Fig = plotRawWaveMulti(chData, window, titleStr)
                     hold on;
                 end
     
-                plot(t, chMean(chNum, :), color, "LineWidth", 1.5);
+                plot(t, chMean(chNum, :), "Color", color, "LineWidth", 1.5);
                 hold on;
             end
 

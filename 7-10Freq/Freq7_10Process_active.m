@@ -27,6 +27,22 @@ dRatio(dRatio == 0) = [];
 FigBehavior = plotBehaviorOnly(trialAll, "r", "7-10 Freq");
 drawnow;
 
+%% 
+window = [-2000, 2000];
+
+for dIndex = 1:length(dRatio)
+    trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex));
+    [result, chMean, ~] = selectEcog(ECOGDataset, trials, "dev onset", window);
+    chData = struct("chMean", result, "color", repmat({[0.5, 0.5, 0.5]}, length(result), 1));
+    chData0.chMean = chMean;
+    chData0.color = "r";
+    Fig = plotRawWaveMulti([chData; chData0], window, strcat("dRatio = ", num2str(dRatio(dIndex))));
+    scaleAxes(Fig, "x", [-500, 1000]);
+    scaleAxes(Fig, "y", [], [-80, 80], "max");
+    drawnow;
+end
+
+
 %% PE
 % window = [-2000, 2000];
 % trialsC = trialAll([trialAll.correct] == true & [trialAll.oddballType] == "DEV");
