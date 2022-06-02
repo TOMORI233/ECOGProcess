@@ -33,7 +33,7 @@ window = [-2500, 6000]; % ms
 [chMean, ~] = joinSTD(trialAll([trialAll.correct] == true), ECOGDataset, window);
 FigP(1) = plotRawWave(chMean, [], window);
 drawnow;
-FigP(2) = plotTimeFreqAnalysis(double(chMean), fs0, fs, window);
+FigP(2) = plotTFA(double(chMean), fs0, fs, window);
 drawnow;
 
 %% Prediction error
@@ -45,21 +45,21 @@ for dIndex = 1:length(dRatio)
     [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
     FigPE_Wave1_3(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 1-3']);
     drawnow;
-    FigPE_TFA1_3(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 1-3']);
+    FigPE_TFA1_3(dIndex) = plotTFA(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 1-3']);
     drawnow;
     % 4-6
     trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex) & [trialAll.stdNum] >= 4 & [trialAll.stdNum] <= 6);
     [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
     FigPE_Wave4_6(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 4-6']);
     drawnow;
-    FigPE_TFA4_6(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 4-6']);
+    FigPE_TFA4_6(dIndex) = plotTFA(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 4-6']);
     drawnow;
     % 7-9
     trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex) & [trialAll.stdNum] >= 7 & [trialAll.stdNum] <= 9);
     [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
     FigPE_Wave7_9(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 7-9']);
     drawnow;
-    FigPE_TFA7_9(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 7-9']);
+    FigPE_TFA7_9(dIndex) = plotTFA(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ') | 7-9']);
     drawnow;
 end
 

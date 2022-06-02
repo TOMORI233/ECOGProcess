@@ -50,7 +50,7 @@ window = [-2500, 6000]; % ms
 [chMean, ~] = joinSTD(trialAll([trialAll.correct] == true), ECOGDataset, window);
 FigP(1) = plotRawWave(chMean, [], window);
 drawnow;
-FigP(2) = plotTimeFreqAnalysis(chMean, fs0, fs, window);
+FigP(2) = plotTFA(chMean, fs0, fs, window);
 drawnow;
 
 %% Prediction error
@@ -61,7 +61,7 @@ for dIndex = 1:length(dRatio)
     [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
     FigPE1(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
     drawnow;
-    FigPE2(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
+    FigPE2(dIndex) = plotTFA(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
     drawnow;
 end
 
@@ -99,7 +99,7 @@ cRange = scaleAxes(FigDM2, "c", [], [-0.1, 0.1], "max");
 % window = [-3000, 2000];
 % [~, chMean, chStd] = selectEcog(ECOGDataset, trialAll([trialAll.correct] == true & [trialAll.interrupt] == false & [trialAll.oddballType] == "DEV"), "push onset", window);
 % FigTemp(1) = plotRawWave(chMean, chStd, window, "push onset");
-% FigTemp(2) = plotTimeFreqAnalysis(chMean, fs0, fs, window, "push onset");
+% FigTemp(2) = plotTFA(chMean, fs0, fs, window, "push onset");
 % scaleAxes(FigTemp, "x", [-1000, 2000]);
 % scaleAxes(FigTemp(1), "y", [], [-80, 80]);
 % scaleAxes(FigTemp(2), "c", [], [0, 20]);

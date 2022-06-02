@@ -29,14 +29,14 @@ window = [-2500, 6000]; % ms
 [chMeanConst, ~] = joinSTD(trialsConst([trialsConst.correct] == true), ECOGDataset, window);
 FigP_Wave_Const = plotRawWave(chMeanConst, [], window, "Constant std");
 drawnow;
-FigP_TFA_Const = plotTimeFreqAnalysis(double(chMeanConst), fs0, fs, window, "Constant std");
+FigP_TFA_Const = plotTFA(double(chMeanConst), fs0, fs, window, "Constant std");
 drawnow;
 
 % Random
 [chMeanRand, ~] = joinSTD(trialsRand([trialsRand.correct] == true), ECOGDataset, window);
 FigP_Wave_Rand = plotRawWave(chMeanRand, [], window, "Random std");
 drawnow;
-FigP_TFA_Rand = plotTimeFreqAnalysis(chMeanRand, fs0, fs, window, "Random std");
+FigP_TFA_Rand = plotTFA(chMeanRand, fs0, fs, window, "Random std");
 drawnow;
 
 % Difference
@@ -62,7 +62,7 @@ for dIndex = 1:length(dRatio)
     [~, chMeanConst, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
     FigPE_Wave_Const(dIndex) = plotRawWave(chMeanConst, chStd, window, strcat("Constant dRatio = ", num2str(dRatio(dIndex))));
     drawnow;
-    FigPE_TFA_Const(dIndex) = plotTimeFreqAnalysis(chMeanConst, fs0, fs, window, strcat("Constant dRatio = ", num2str(dRatio(dIndex))));
+    FigPE_TFA_Const(dIndex) = plotTFA(chMeanConst, fs0, fs, window, strcat("Constant dRatio = ", num2str(dRatio(dIndex))));
     drawnow;
 
     % Random
@@ -70,7 +70,7 @@ for dIndex = 1:length(dRatio)
     [~, chMeanRand, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
     FigPE_Wave_Rand(dIndex) = plotRawWave(chMeanRand, chStd, window, strcat("Random dRatio = ", num2str(dRatio(dIndex))));
     drawnow;
-    FigPE_TFA_Rand(dIndex) = plotTimeFreqAnalysis(chMeanRand, fs0, fs, window, strcat("Random dRatio = ", num2str(dRatio(dIndex))));
+    FigPE_TFA_Rand(dIndex) = plotTFA(chMeanRand, fs0, fs, window, strcat("Random dRatio = ", num2str(dRatio(dIndex))));
     drawnow;
 
     % Difference

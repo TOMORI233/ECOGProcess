@@ -1,4 +1,4 @@
-function Fig = plotTimeFreqAnalysis(chMean, fs0, fs, window, titleStr)
+function Fig = plotTFA(chMean, fs0, fs, window, titleStr)
     narginchk(4, 5);
     
     if nargin < 5
