@@ -1,4 +1,17 @@
-function [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params, behaviorOnly)
+function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, behaviorOnly)
+    % Description: load data from *.mat or TDT block
+    % Input:
+    %     DATAPATH: full path of *.mat or TDT block path
+    %     params:
+    %         - posStr: all possible recording storages
+    %         - posIndex: position number, 1-AC, 2-PFC
+    %         - choiceWin: choice window, in ms
+    %         - processFcn: behavior processing function handle
+    %         - behaviorOnly: if true, return [trialAll] only
+    % Output:
+    %     trialAll: n*1 struct of trial information
+    %     ECOGDataset: TDT dataset of [streams.(posStr(posIndex))]
+
     narginchk(2, 3);
 
     if nargin < 3
@@ -21,19 +34,32 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params, behaviorOnl
     end
 
     %% Loading data
-    temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
-    epocs = temp.epocs;
+    try
+        disp("Try loading data from MAT");
 
-    if ~behaviorOnly
-        temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
-        streams = temp.streams;
-        ECOGDataset = streams.(posStr(posIndex));
-    else
-        ECOGDataset = [];
+        if ~behaviorOnly
+            load(DATAPATH, "-mat", "trialAll", "ECOGDataset");
+        else
+            load(DATAPATH, "-mat", "trialAll");
+            ECOGDataset = [];
+        end
+
+    catch e
+        disp(e.message);
+        disp("Try loading data from TDT BLOCK...");
+        temp = TDTbin2mat(DATAPATH, 'TYPE', {'epocs'});
+        epocs = temp.epocs;
+    
+        if ~behaviorOnly
+            temp = TDTbin2mat(DATAPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
+            streams = temp.streams;
+            ECOGDataset = streams.(posStr(posIndex));
+        else
+            ECOGDataset = [];
+        end
+
+        trialAll = processFcn(epocs, choiceWin);
     end
-
-    %% Processing
-    trialAll = processFcn(epocs, choiceWin);
 
     return;
 end
