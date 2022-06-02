@@ -1,7 +1,7 @@
 addpath(genpath("..\..\ECOGProcess"));
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'G:\ECoG\chouchou\cc20220530\Block-4';
+BLOCKPATH = 'E:\ECoG\chouchou\cc20220528\Block-1';
 posIndex = 1; % 1-AC, 2-PFC
 temp = string(split(BLOCKPATH, '\'));
 DateStr = temp(end - 1);
@@ -11,8 +11,8 @@ ROOTPATH = fullfile('E:\ECoG\ECoGBehaviorResult',Paradigm,DateStr);
 
 soundDuration = 300; % ms
 
-% pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','4-4.06InC','4-4.06InD','40-40.6RC','40-40.6RD','Tone-C','Tone-D'};
-pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','Tone-C','Tone-D'};
+pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','4-4.06InC','4-4.06InD','40-40.6RC','40-40.6RD','Tone-C','Tone-D'};
+% pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','Tone-C','Tone-D'};
 typeStr = {'4-4.06Regular','4-4.06Irregular','Tone'};
 posStr = ["LAuC", "LPFC"];
 
@@ -21,11 +21,11 @@ posStr = ["LAuC", "LPFC"];
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
 epocs = temp.epocs;
 
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
-streams = temp.streams;
-
-ECOGDataset = streams.(posStr(posIndex));
-fs0 = ECOGDataset.fs;
+% temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
+% streams = temp.streams;
+% 
+% ECOGDataset = streams.(posStr(posIndex));
+% fs0 = ECOGDataset.fs;
 
 
 
