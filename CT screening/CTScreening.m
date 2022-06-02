@@ -32,3 +32,11 @@ for fIndex = 1:length(freqAll)
 end
 
 plotRawWaveMulti(chData, window, "CT Screening");
+
+%% check repetition frequency band
+window = [-1000 2000];
+trials = trialAll(10:end-10);
+[~, chMean, ~] = selectEcog(ECOGDataset, trials, "trial onset", window);
+Fig = plotTFA(chMean, fs0, 300, window);
+scaleAxes(Fig, 'y', [], [0 8]);
+scaleAxes(Fig, 'c', [], [0 5]);
