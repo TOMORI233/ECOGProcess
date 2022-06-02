@@ -56,7 +56,7 @@ trials = trialAll([trialAll.stdOrdr] == stdType(sIndex) & [trialAll.interrupt] =
 [chMean, chStd] = joinSTD(trials, ECOGDataset, window);
 FigPWave(sIndex) = plotRawWave(chMean, chStd, window);
 drawnow;
-FigPTF(sIndex) = plotTimeFreqAnalysis(double(chMean), fs0, fs, window);
+FigPTF(sIndex) = plotTFA(double(chMean), fs0, fs, window);
 drawnow;
 end
 scaleAxes(FigPTF, "c", [], [0, 20]);
@@ -83,7 +83,7 @@ for dIndex = 1:length(devType)
     [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
     FigDev1(dIndex) = plotRawWave(chMean, chStd, window, ['stiTyme: ', num2str(pairStr{dIndex}), '(N=', num2str(length(trials)), ')']);
     drawnow;
-    FigDev2(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['stiTyme: ', num2str(pairStr{dIndex}), '(N=', num2str(length(trials)), ')']);
+    FigDev2(dIndex) = plotTFA(chMean, fs0, fs, window, ['stiTyme: ', num2str(pairStr{dIndex}), '(N=', num2str(length(trials)), ')']);
     drawnow;
 end
 

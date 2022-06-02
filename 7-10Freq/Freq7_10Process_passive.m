@@ -38,7 +38,7 @@ window = [-2500, 6000]; % ms
 [chMean, ~] = joinSTD(trialAll, ECOGDataset, window);
 FigP(1) = plotRawWave(chMean, [], window);
 drawnow;
-FigP(2) = plotTimeFreqAnalysis(chMean, fs0, fs, window);
+FigP(2) = plotTFA(chMean, fs0, fs, window);
 drawnow;
 
 %% Prediction error
@@ -49,7 +49,7 @@ for dIndex = 1:length(dRatio)
     [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
     FigPE1(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
     drawnow;
-    FigPE2(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
+    FigPE2(dIndex) = plotTFA(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
     drawnow;
 end
 

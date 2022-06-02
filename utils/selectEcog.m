@@ -28,6 +28,12 @@ function [result, chMean, chStd] = selectEcog(ECOGDataset, trials, segOption, wi
             end
 
             segIndex = fix([trials.firstPush]' / 1000 * fs);
+        case "last std"
+            segIndex = cellfun(@(x) fix(x(end - 1) / 1000 * fs), {trials.soundOnsetSeq}');
+    end
+
+    if segIndex(1) <= 0
+        segIndex(1) = 1;
     end
 
     % by trial
