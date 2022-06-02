@@ -1,24 +1,13 @@
 clear; clc; close all;
-
+%% Parameter settings
 BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220530\Block-3';
-posIndex = 1; % 1-AC, 2-PFC
-posStr = ["LAuC", "LPFC"];
 
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
-epocs = temp.epocs;
-
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
-streams = temp.streams;
-
-ECOGDataset = streams.(posStr(posIndex));
-fs0 = ECOGDataset.fs;
-
-AREANAME = ["AC", "PFC"];
-temp = string(split(BLOCKPATH, '\'));
-DateStr = temp(end - 1);
+params.posIndex = 1;
+params.processFcn = @CTScreeningProcess;
 
 %% Processing
-trialAll = CTScreeningProcess(epocs);
+[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params);
+fs0 = ECOGDataset.fs;
 
 %% Plot
 window = [0, 500];
@@ -32,3 +21,12 @@ for fIndex = 1:length(freqAll)
 end
 
 plotRawWaveMulti(chData, window, "CT Screening");
+
+
+%% check repetition frequency band
+window = [-1000, 2000];
+trials = trialAll(10:end-10);
+[~, chMean, ~] = selectEcog(ECOGDataset, trials, "trial onset", window);
+Fig = plotTFA(chMean, fs0, 300, window);
+scaleAxes(Fig,'y',[],[0 10]);
+scaleAxes(Fig,'c',[],[0 5]);
