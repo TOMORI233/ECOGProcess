@@ -1,61 +1,77 @@
 function data = joinBlocks(opts, varargin)
+    % Example:
+    %     data1 = TDTbin2mat(BLOCKPATH1);
+    %     data2 = TDTbin2mat(BLOCKPATH2);
+    %     opts.sfNames = "LAuC";
+    %     opts.efNames = ["num0", "push", "erro", "freq"];
+    %     data = joinBlocks(opts, data1, data2);
+
     narginchk(3, inf);
 
     if nargin < 3
         error("Blocks to be joint should be at least 2");
     end
 
+    run("joinBlocksConfig.m");
+    opts = getOrFull(opts, jbDefaultOpts);
+    sfNames = opts.sfNames;
+    efNames = opts.efNames;
+
+    %% Time correction
     duration = zeros(length(varargin), 1); % s
-    opts.sfName = getOr(opts, "sfName", 'LAuC');
-    duration(1) = size(varargin{1}.streams.(opts.sfName).data, 2) / varargin{1}.streams.(opts.sfName).fs;
+    duration(1) = size(varargin{1}.streams.(sfNames(1)).data, 2) / varargin{1}.streams.(sfNames(1)).fs;
 
     for dIndex = 2:length(varargin)
-        duration(dIndex) = size(varargin{dIndex}.streams.(opts.sfName).data, 2) / varargin{dIndex}.streams.(opts.sfName).fs;
+        duration(dIndex) = size(varargin{dIndex}.streams.(sfNames(1)).data, 2) / varargin{dIndex}.streams.(sfNames(1)).fs;
         
-        
-        fNames = getOr(opts, "efNames", fieldnames(varargin{dIndex}.epocs));
-
-        for index = 1:length(fNames)
-            varargin{dIndex}.epocs.(fNames{index}).onset = varargin{dIndex}.epocs.(fNames{index}).onset + duration(dIndex - 1);
+        for eIndex = 1:length(efNames)
+            varargin{dIndex}.epocs.(efNames(eIndex)).onset = varargin{dIndex}.epocs.(efNames(eIndex)).onset + duration(dIndex - 1);
         end
 
     end
 
-    for index = 1:length(fNames)
-        epocs.(fNames{index}).onset = [];
-        epocs.(fNames{index}).data = [];
+    %% Join blocks
+    for sIndex = 1:length(sfNames)
+        streams.(sfNames(sIndex)) = struct('channels', varargin{1}.streams.(sfNames(sIndex)).channels, ...
+                                           'data', [], ...
+                                           'fs', varargin{1}.streams.(sfNames(sIndex)).fs);
     end
 
-    streams.(opts.sfName) = struct('channels', varargin{1}.streams.(opts.sfName).channels, 'data', [], 'fs', varargin{1}.streams.(opts.sfName).fs);
+    for eIndex = 1:length(efNames)
+        epocs.(efNames(eIndex)).onset = [];
+        epocs.(efNames(eIndex)).data = [];
+    end
 
     for dIndex = 1:length(varargin)
-        firstStiIdx = find(varargin{dIndex}.epocs.num0.data == 1);
-        fNames = getOr(opts, "efNames", fieldnames(varargin{dIndex}.epocs));
+        trialOnsetIdx = find(varargin{dIndex}.epocs.num0.data == 1);
 
-        for index = 1:length(fNames)
+        for eIndex = 1:length(efNames)
 
-            if strcmp(fNames{index}, 'push') || strcmp(fNames{index}, 'erro')
-                epocs.(fNames{index}).onset = vertcat(epocs.(fNames{index}).onset, varargin{dIndex}.epocs.(fNames{index}).onset);
-                epocs.(fNames{index}).data = vertcat(epocs.(fNames{index}).data, varargin{dIndex}.epocs.(fNames{index}).data);
+            if strcmp(efNames(eIndex), 'push') || strcmp(efNames(eIndex), 'erro')
+                epocs.(efNames(eIndex)).onset = vertcat(epocs.(efNames(eIndex)).onset, varargin{dIndex}.epocs.(efNames(eIndex)).onset);
+                epocs.(efNames(eIndex)).data = vertcat(epocs.(efNames(eIndex)).data, varargin{dIndex}.epocs.(efNames(eIndex)).data);
             else
                 
                 
                 if dIndex == 1 % abort the last trial of the first block
-                    epocs.(fNames{index}).onset = vertcat(epocs.(fNames{index}).onset, varargin{dIndex}.epocs.(fNames{index}).onset(1:firstStiIdx(end) - 1));
-                    epocs.(fNames{index}).data = vertcat(epocs.(fNames{index}).data, varargin{dIndex}.epocs.(fNames{index}).data(1:firstStiIdx(end) - 1));
+                    epocs.(efNames(eIndex)).onset = vertcat(epocs.(efNames(eIndex)).onset, varargin{dIndex}.epocs.(efNames(eIndex)).onset(1:trialOnsetIdx(end) - 1));
+                    epocs.(efNames(eIndex)).data = vertcat(epocs.(efNames(eIndex)).data, varargin{dIndex}.epocs.(efNames(eIndex)).data(1:trialOnsetIdx(end) - 1));
                 elseif dIndex > 1 && dIndex < length(varargin) % abort the first and the last trials
-                    epocs.(fNames{index}).onset = vertcat(epocs.(fNames{index}).onset, varargin{dIndex}.epocs.(fNames{index}).onset(firstStiIdx(2) : firstStiIdx(end) - 1));
-                    epocs.(fNames{index}).data = vertcat(epocs.(fNames{index}).data, varargin{dIndex}.epocs.(fNames{index}).data(firstStiIdx(2):firstStiIdx(end) - 1));
+                    epocs.(efNames(eIndex)).onset = vertcat(epocs.(efNames(eIndex)).onset, varargin{dIndex}.epocs.(efNames(eIndex)).onset(trialOnsetIdx(2):trialOnsetIdx(end) - 1));
+                    epocs.(efNames(eIndex)).data = vertcat(epocs.(efNames(eIndex)).data, varargin{dIndex}.epocs.(efNames(eIndex)).data(trialOnsetIdx(2):trialOnsetIdx(end) - 1));
                 else % abort the first trial of the last block
-                    epocs.(fNames{index}).onset = vertcat(epocs.(fNames{index}).onset, varargin{dIndex}.epocs.(fNames{index}).onset(firstStiIdx(2):end));
-                    epocs.(fNames{index}).data = vertcat(epocs.(fNames{index}).data, varargin{dIndex}.epocs.(fNames{index}).data(firstStiIdx(2):end));
+                    epocs.(efNames(eIndex)).onset = vertcat(epocs.(efNames(eIndex)).onset, varargin{dIndex}.epocs.(efNames(eIndex)).onset(trialOnsetIdx(2):end));
+                    epocs.(efNames(eIndex)).data = vertcat(epocs.(efNames(eIndex)).data, varargin{dIndex}.epocs.(efNames(eIndex)).data(trialOnsetIdx(2):end));
                 end
 
             end
 
         end
 
-        streams.(opts.sfName).data = horzcat(streams.(opts.sfName).data, varargin{dIndex}.streams.(opts.sfName).data);
+        for sIndex = 1:length(sfNames)
+            streams.(sfNames(sIndex)).data = horzcat(streams.(sfNames(sIndex)).data, varargin{dIndex}.streams.(sfNames(sIndex)).data);
+        end
+
     end
 
     data = struct('epocs', epocs, 'streams', streams);
