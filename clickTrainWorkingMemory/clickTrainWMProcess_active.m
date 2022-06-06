@@ -30,8 +30,10 @@ streams = temp.streams;
 ECOGDataset = streams.(posStr(posIndex));
 fs0 = ECOGDataset.fs;
 
-
-
+%% test
+epocs = data.epocs;
+ECOGDataset = data.streams.LAuC;
+fs0 = ECOGDataset.fs;
 %% Params settings
 choiceWin = [100, 800]; % ms
 fs = 500; % Hz, for downsampling
@@ -39,17 +41,12 @@ fs = 500; % Hz, for downsampling
 %% Behavior processing
 % trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin, soundDuration); % if input soundDuration, means offset choiceWin, otherwise, choiveWin aligns to deviant onset
 trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin);
-trialAll = trialAll(2:end-1);
->>>>>>> a16ece7f352ee0ff301005a95f4586f59ee32862
+trialAll = trialAll(2:end);
 trialsNoInterrupt = trialAll([trialAll.interrupt] == false);
 ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trialsNoInterrupt.soundOnsetSeq}, {trialsNoInterrupt.stdNum})));
 
 %% Plot behavior result
 trials = trialsNoInterrupt;
-<<<<<<< HEAD
-% trials = trialsNoInterrupt(ceil(1:end/2-1));
-=======
->>>>>>> a16ece7f352ee0ff301005a95f4586f59ee32862
 [Fig, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'},pairStr);
 
 diffPairs = [[trials.stdOrdr]' [trials.devOrdr]'];

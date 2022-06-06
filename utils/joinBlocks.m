@@ -11,16 +11,17 @@ function data = joinBlocks(opts, varargin)
 
     for dIndex = 2:length(varargin)
         duration(dIndex) = size(varargin{dIndex}.streams.(opts.sfName).data, 2) / varargin{dIndex}.streams.(opts.sfName).fs;
-
+        
+        
         fNames = getOr(opts, "efNames", fieldnames(varargin{dIndex}.epocs));
 
-        for index = 1:size(fNames, 1)
+        for index = 1:length(fNames)
             varargin{dIndex}.epocs.(fNames{index}).onset = varargin{dIndex}.epocs.(fNames{index}).onset + duration(dIndex - 1);
         end
 
     end
 
-    for index = 1:size(fNames, 1)
+    for index = 1:length(fNames)
         epocs.(fNames{index}).onset = [];
         epocs.(fNames{index}).data = [];
     end
@@ -28,24 +29,26 @@ function data = joinBlocks(opts, varargin)
     streams.(opts.sfName) = struct('channels', varargin{1}.streams.(opts.sfName).channels, 'data', [], 'fs', varargin{1}.streams.(opts.sfName).fs);
 
     for dIndex = 1:length(varargin)
+        firstStiIdx = find(varargin{dIndex}.epocs.num0.data == 1);
         fNames = getOr(opts, "efNames", fieldnames(varargin{dIndex}.epocs));
 
-        for index = 1:size(fNames, 1)
+        for index = 1:length(fNames)
 
             if strcmp(fNames{index}, 'push') || strcmp(fNames{index}, 'erro')
                 epocs.(fNames{index}).onset = vertcat(epocs.(fNames{index}).onset, varargin{dIndex}.epocs.(fNames{index}).onset);
                 epocs.(fNames{index}).data = vertcat(epocs.(fNames{index}).data, varargin{dIndex}.epocs.(fNames{index}).data);
             else
-
+                
+                
                 if dIndex == 1 % abort the last trial of the first block
-                    epocs.(fNames{index}).onset = vertcat(epocs.(fNames{index}).onset, varargin{dIndex}.epocs.(fNames{index}).onset(1:end - 1));
-                    epocs.(fNames{index}).data = vertcat(epocs.(fNames{index}).data, varargin{dIndex}.epocs.(fNames{index}).data(1:end - 1));
+                    epocs.(fNames{index}).onset = vertcat(epocs.(fNames{index}).onset, varargin{dIndex}.epocs.(fNames{index}).onset(1:firstStiIdx(end) - 1));
+                    epocs.(fNames{index}).data = vertcat(epocs.(fNames{index}).data, varargin{dIndex}.epocs.(fNames{index}).data(1:firstStiIdx(end) - 1));
                 elseif dIndex > 1 && dIndex < length(varargin) % abort the first and the last trials
-                    epocs.(fNames{index}).onset = vertcat(epocs.(fNames{index}).onset, varargin{dIndex}.epocs.(fNames{index}).onset(2:end - 1));
-                    epocs.(fNames{index}).data = vertcat(epocs.(fNames{index}).data, varargin{dIndex}.epocs.(fNames{index}).data(2:end - 1));
+                    epocs.(fNames{index}).onset = vertcat(epocs.(fNames{index}).onset, varargin{dIndex}.epocs.(fNames{index}).onset(firstStiIdx(2) : firstStiIdx(end) - 1));
+                    epocs.(fNames{index}).data = vertcat(epocs.(fNames{index}).data, varargin{dIndex}.epocs.(fNames{index}).data(firstStiIdx(2):firstStiIdx(end) - 1));
                 else % abort the first trial of the last block
-                    epocs.(fNames{index}).onset = vertcat(epocs.(fNames{index}).onset, varargin{dIndex}.epocs.(fNames{index}).onset(2:end));
-                    epocs.(fNames{index}).data = vertcat(epocs.(fNames{index}).data, varargin{dIndex}.epocs.(fNames{index}).data(2:end));
+                    epocs.(fNames{index}).onset = vertcat(epocs.(fNames{index}).onset, varargin{dIndex}.epocs.(fNames{index}).onset(firstStiIdx(2):end));
+                    epocs.(fNames{index}).data = vertcat(epocs.(fNames{index}).data, varargin{dIndex}.epocs.(fNames{index}).data(firstStiIdx(2):end));
                 end
 
             end

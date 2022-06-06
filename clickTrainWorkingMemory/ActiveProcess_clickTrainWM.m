@@ -10,17 +10,8 @@ function trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin, soundDuration)
     end
     choiceWinDev = choiceWin + soundDuration;
     %% Information extraction
-    % fixation 20220520 Block-1
-    for index = 1:length(unique(epocs.swee.data))
-        idx = find(epocs.swee.data == index);
-        epocs.num0.data(idx) = (1:length(idx))';
-    end
-    
-    % change irreg dev ordr for easy plot
-%     epocs.ordr.data(epocs.ordr.data == 7) = 12;
-%     epocs.ordr.data(epocs.ordr.data == 8) = 18;
-%     epocs.ordr.data(epocs.ordr.data == 9) = 24;
-%     epocs.ordr.data(epocs.ordr.data == 10) = 30;
+
+   
 
     trialOnsetIndex = find(epocs.num0.data == 1);
     trialOnsetTimeAll = epocs.num0.onset(trialOnsetIndex) * 1000; % ms
