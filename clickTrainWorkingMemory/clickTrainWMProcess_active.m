@@ -1,8 +1,8 @@
 addpath(genpath("..\..\ECOGProcess"));
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'E:\ECoG\chouchou\cc20220602\Block-1';
-posIndex = 1; % 1-AC, 2-PFC
+BLOCKPATH = 'E:\ECoG\chouchou\cc20220605\Block-3';
+posIndex = 2; % 1-AC, 2-PFC
 temp = string(split(BLOCKPATH, '\'));
 DateStr = temp(end - 1);
 Paradigm = 'ClickTrainOddDiffSoundsActive';
@@ -13,7 +13,7 @@ soundDuration = 300; % ms
 
 % pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','4-4.06InC','4-4.06InD','40-40.6RC','40-40.6RD','Tone-C','Tone-D'};
 pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','Tone-C','Tone-D'};
-typeStr = {'4-4.06Regular','4-4.06Irregular','Tone'};
+typeStr = {'4-4.06Regular','4-4.06Irregular','ComplexTone'};
 posStr = ["LAuC", "LPFC"];
 
 
@@ -54,11 +54,12 @@ window = [-2500, 6000]; % ms
 for sIndex = 1 : length(stdType)
 trials = trialAll([trialAll.stdOrdr] == stdType(sIndex) & [trialAll.interrupt] == false);
 [chMean, chStd] = joinSTD(trials, ECOGDataset, window);
-FigPWave(sIndex) = plotRawWave(chMean, chStd, window);
+FigPWave(sIndex) = plotRawWave(chMean, chStd, window, ['stiTyme: ', num2str(typeStr{sIndex}), '(N=', num2str(length(trials)), ')']);
 drawnow;
-FigPTF(sIndex) = plotTFA(double(chMean), fs0, fs, window);
+FigPTF(sIndex) = plotTFA(double(chMean), fs0, fs, window, ['stiTyme: ', num2str(typeStr{sIndex}), '(N=', num2str(length(trials)), ')']);
 drawnow;
 end
+scaleAxes(FigPWave, "y", [-60, 60]);
 scaleAxes(FigPTF, "c", [], [0, 20]);
 
 % Layout
@@ -89,7 +90,7 @@ end
 
 % Scale
 scaleAxes([FigDev1, FigDev2], "x", [-500, 1000]);
-scaleAxes(FigDev1, "y", [-80, 80]);
+scaleAxes(FigDev1, "y", [-60, 60]);
 scaleAxes(FigDev2, "c", [], [0, 20]);
 
 % Layout
@@ -118,16 +119,16 @@ for dIndex = 1 : length(devType)
     result = changeCellRowNum(cellfun(@zscore, changeCellRowNum(result), "UniformOutput", false));
     resultC = [resultC; result([trials.correct] == true)];
     resultW = [resultW; result([trials.correct] == false & [trials.interrupt] == false)];
-    if isempty(resultW) || isempty(resultC)
+    if length(resultW)<0.1*length(trials) || length(resultC)<0.1*length(trials)
         FigDM1(dIndex) = figure('Visible','off');
         FigDM2(dIndex) = figure('Visible','off');
         continue
     else
-    chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultC), "UniformOutput", false));
-    chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultW), "UniformOutput", false));
-    FigDM1(dIndex) = plotRawWave(chMeanC - chMeanW, [], window, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
+    chMeanStd = cell2mat(cellfun(@mean, changeCellRowNum(resultC), "UniformOutput", false));
+    chMeanDev = cell2mat(cellfun(@mean, changeCellRowNum(resultW), "UniformOutput", false));
+    FigDM1(dIndex) = plotRawWave(chMeanDev - chMeanStd, [], window, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
     drawnow;
-    FigDM2(dIndex) = plotTFACompare(chMeanC, chMeanW, fs0, fs, window, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
+    FigDM2(dIndex) = plotTFACompare(chMeanDev, chMeanStd, fs0, fs, window, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
     drawnow;
     end
 end
@@ -152,31 +153,34 @@ end
 
 
 %% MMN
-%% Decision making
 window = [-2000, 2000];
-% resultC = [];
-% resultW = [];
+dIndex = 2;
+trialsC = trialAll([trialAll.correct] == true & [trialAll.devOrdr] == devType(dIndex));
+trialsW = trialAll([trialAll.correct] == false & [trialAll.interrupt] == false & [trialAll.devOrdr] == devType(dIndex));
+[resultDEVC, chMeanDEVC, ~] = selectEcog(ECOGDataset, trialsC, "dev onset", window);
+[resultSTDC, chMeanSTDC, ~] = selectEcog(ECOGDataset, trialsC, "last std", window);
+[resultDEVW, chMeanDEVW, ~] = selectEcog(ECOGDataset, trialsW, "dev onset", window);
+[resultSTDW, chMeanSTDW, ~] = selectEcog(ECOGDataset, trialsW, "last std", window);
+chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVC - resultSTDC), "UniformOutput", false));
+chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVW - resultSTDW), "UniformOutput", false));
+FigMMN1(1) = plotRawWave(chMeanC, [], window, "C:DEV-last STD");
+FigMMN1(2) = plotRawWave(chMeanW, [], window, "W:DEV-last STD");
+FigMMN2(1) = plotTFACompare(chMeanDEVC, chMeanSTDC, fs0, fs, window, "C:DEV-last STD");
+FigMMN2(2) = plotTFACompare(chMeanDEVW, chMeanSTDW, fs0, fs, window, "W:DEV-last STD");
+scaleAxes([FigMMN1, FigMMN2], "x", [0, 500]);
+scaleAxes(FigMMN1, "y", [], [-60, 60], "max");
+scaleAxes(FigMMN2, "c", [], [-10, 10]);
+% Layout
+plotLayout(FigMMN1, posIndex);
 
-for dIndex = 1 : length(devType)
-    resultC = [];
-    resultW = [];
-    trials = trialAll([trialAll.devOrdr] == devType(dIndex));
-    [result, ~, ~] = selectEcog(ECOGDataset, trials, "dev onset", window);
-    result = changeCellRowNum(cellfun(@zscore, changeCellRowNum(result), "UniformOutput", false));
-    resultC = [resultC; result([trials.correct] == true)];
-    resultW = [resultW; result([trials.correct] == false & [trials.interrupt] == false)];
-    if isempty(resultW) || isempty(resultC)
-        FigDM1(dIndex) = figure('Visible','off');
-        FigDM2(dIndex) = figure('Visible','off');
-        continue
-    else
-    chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultC), "UniformOutput", false));
-    chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultW), "UniformOutput", false));
-    FigDM1(dIndex) = plotRawWave(chMeanC - chMeanW, [], window, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
-    drawnow;
-    FigDM2(dIndex) = plotTFACompare(chMeanC, chMeanW, fs0, fs, window, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
-    drawnow;
-    end
+% saveFigures
+MMNPath = fullfile(ROOTPATH,'MMN');
+if ~exist(MMNPath,"dir")
+    mkdir(MMNPath)
+end
+for figN = 1 : length(FigMMN1)
+    saveas(FigMMN1(figN),strcat(fullfile(MMNPath,pairStr{figN}), '_' , AREANAME{posIndex}, '_Waveform.jpg'));
+    saveas(FigMMN2(figN),strcat(fullfile(MMNPath,pairStr{figN}), '_' , AREANAME{posIndex}, '_TimeFrequency.jpg'));
 end
 
 

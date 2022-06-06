@@ -10,7 +10,7 @@ function mAxe = mSubplot(Fig, row, col, index, nSize, margins, paddings)
     end
 
     if nargin < 7
-        paddings = 0.01 * ones(1, 4);
+        paddings = 0.02 * ones(1, 4);
     end
 
     % nSize = [nX, nY]
