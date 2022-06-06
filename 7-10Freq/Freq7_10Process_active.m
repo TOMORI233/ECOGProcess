@@ -1,20 +1,14 @@
-clear; clc; close all;
+clear; clc;
 %% Parameter settings
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220517\Block-8';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220518\Block-1';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220519\Block-3';
-BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220520\Block-1';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220525\Block-1';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220530\Block-1';
-
 params.posIndex = 1; % 1-AC, 2-PFC
 params.choiceWin = [0, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
 
-fs = 300; % Hz, for downsampling
+fs = 500; % Hz, for downsampling
 
 %% Processing
-[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params);
+MATPATH = 'E:\ECoG\MAT Data\CC\7-10Freq Active\cc20220530\cc20220530_AC.mat';
+[trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
 fs0 = ECOGDataset.fs;
 
 devFreqAll = [trialAll.devFreq];
@@ -24,42 +18,41 @@ dRatio = unique(dRatioAll);
 dRatio(dRatio == 0) = [];
 
 %% Behavior
-FigBehavior = plotBehaviorOnly(trialAll, "r", "7-10 Freq");
-drawnow;
+% FigBehavior = plotBehaviorOnly(trialAll, "r", "7-10 Freq");
+% drawnow;
 
 %% 
-window = [-2000, 2000];
-
-for dIndex = 1:length(dRatio)
-    trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex));
-    [result, chMean, ~] = selectEcog(ECOGDataset, trials, "dev onset", window);
-    chData = struct("chMean", result, "color", repmat({[0.5, 0.5, 0.5]}, length(result), 1));
-    chData0.chMean = chMean;
-    chData0.color = "r";
-    Fig = plotRawWaveMulti([chData; chData0], window, strcat("dRatio = ", num2str(dRatio(dIndex))));
-    scaleAxes(Fig, "x", [-500, 1000]);
-    scaleAxes(Fig, "y", [], [-80, 80], "max");
-    drawnow;
-end
-
-
-%% PE
 % window = [-2000, 2000];
-% trialsC = trialAll([trialAll.correct] == true & [trialAll.oddballType] == "DEV");
-% trialsW = trialAll([trialAll.correct] == false & [trialAll.interrupt] == false & [trialAll.oddballType] == "DEV");
-% [resultDEVC, chMeanDEVC, ~] = selectEcog(ECOGDataset, trialsC, "dev onset", window);
-% [resultSTDC, chMeanSTDC, ~] = selectEcog(ECOGDataset, trialsC, "last std", window);
-% [resultDEVW, chMeanDEVW, ~] = selectEcog(ECOGDataset, trialsW, "dev onset", window);
-% [resultSTDW, chMeanSTDW, ~] = selectEcog(ECOGDataset, trialsW, "last std", window);
-% chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVC - resultSTDC), "UniformOutput", false));
-% chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVW - resultSTDW), "UniformOutput", false));
-% Fig1(1) = plotRawWave(chMeanC, [], window, "C:DEV-last STD");
-% Fig1(2) = plotRawWave(chMeanW, [], window, "W:DEV-last STD");
-% Fig2(1) = plotTFACompare(chMeanDEVC, chMeanSTDC, fs0, fs, window, "C:DEV-last STD");
-% Fig2(2) = plotTFACompare(chMeanDEVW, chMeanSTDW, fs0, fs, window, "W:DEV-last STD");
-% scaleAxes([Fig1, Fig2], "x", [0, 500]);
-% scaleAxes(Fig1, "y", [], [-60, 60], "max");
-% scaleAxes(Fig2, "c", [], [-20, 20]);
+% 
+% for dIndex = 1:length(dRatio)
+%     trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex));
+%     [result, chMean, ~] = selectEcog(ECOGDataset, trials, "dev onset", window);
+%     chData = struct("chMean", result, "color", repmat({[0.5, 0.5, 0.5]}, length(result), 1));
+%     chData0.chMean = chMean;
+%     chData0.color = "r";
+%     Fig = plotRawWaveMulti([chData; chData0], window, strcat("dRatio = ", num2str(dRatio(dIndex))));
+%     scaleAxes(Fig, "x", [-500, 1000]);
+%     scaleAxes(Fig, "y", [], [-80, 80], "max");
+%     drawnow;
+% end
+
+%% MMN - PE
+window = [-2000, 2000];
+trialsC = trialAll([trialAll.correct] == true & [trialAll.oddballType] == "DEV");
+trialsW = trialAll([trialAll.correct] == false & [trialAll.interrupt] == false & [trialAll.oddballType] == "DEV");
+[resultDEVC, chMeanDEVC, ~] = selectEcog(ECOGDataset, trialsC, "dev onset", window);
+[resultSTDC, chMeanSTDC, ~] = selectEcog(ECOGDataset, trialsC, "last std", window);
+[resultDEVW, chMeanDEVW, ~] = selectEcog(ECOGDataset, trialsW, "dev onset", window);
+[resultSTDW, chMeanSTDW, ~] = selectEcog(ECOGDataset, trialsW, "last std", window);
+chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVC - resultSTDC), "UniformOutput", false));
+chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVW - resultSTDW), "UniformOutput", false));
+Fig1(1) = plotRawWave(chMeanC, [], window, "C:DEV-last STD");
+Fig1(2) = plotRawWave(chMeanW, [], window, "W:DEV-last STD");
+Fig2(1) = plotTFACompare(chMeanDEVC, chMeanSTDC, fs0, fs, window, "C:DEV-last STD");
+Fig2(2) = plotTFACompare(chMeanDEVW, chMeanSTDW, fs0, fs, window, "W:DEV-last STD");
+scaleAxes([Fig1, Fig2], "x", [0, 500]);
+scaleAxes(Fig1, "y", [], [-60, 60], "max");
+scaleAxes(Fig2, "c", [], [-20, 20]);
 
 %% Prediction
 window = [-2500, 6000]; % ms

@@ -1,17 +1,15 @@
 clear; clc; close all;
 %% Parameter setting
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220523\Block-1';
-BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220524\Block-1';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220601\Block-1';
-
 params.posIndex = 1; % 1-AC, 2-PFC
-params.choiceWin = [0, 800];
+params.choiceWin = [0, 600];
 params.processFcn = @ActiveProcess_1_9Freq;
 
-fs = 300; % Hz, for downsampling
+fs = 500; % Hz, for downsampling
 
 %% Processing
-[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params, true);
+MATPATH = 'E:\ECoG\MAT Data\CC\1-9Freq Active\cc20220605\cc20220605_AC.mat';
+[trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
+
 if ~isempty(ECOGDataset)
     fs0 = ECOGDataset.fs;
 end
@@ -88,10 +86,8 @@ for dIndex = 2:length(dRatio)
     trialsW = trialAll([trialAll.correct] == false & [trialAll.interrupt] == false & dRatioAll == dRatio(dIndex));
 
     if isempty(trialsC) || isempty(trialsW)
-        FigDM1(dIndex - 1) = figure;
-        FigDM2(dIndex - 1) = figure;
-        set(FigDM1(dIndex - 1), "visible", "off");
-        set(FigDM2(dIndex - 1), "visible", "off");
+        FigDM1(dIndex - 1) = figure("visible", "off");
+        FigDM2(dIndex - 1) = figure("visible", "off");
         continue;
     end
 

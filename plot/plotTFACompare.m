@@ -1,4 +1,6 @@
 function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr)
+    % Description: plot cwt difference between chMean1 and chMean2
+
     narginchk(5, 6);
 
     if nargin < 6

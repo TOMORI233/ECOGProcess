@@ -18,11 +18,11 @@ function [t, f, CData, coi] = mCWT(data, fs0, cwtMethod, fs, freqLimits)
     end
 
     if nargin < 4
-        fs = 300;
+        fs = 500;
     end
 
     if nargin < 5
-        freqLimits = [0, 128];
+        freqLimits = [0, 256];
     end
     
     if fs ~= fs0

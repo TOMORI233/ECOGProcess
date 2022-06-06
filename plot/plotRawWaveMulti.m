@@ -1,4 +1,18 @@
 function Fig = plotRawWaveMulti(chData, window, titleStr)
+    % Description: plot serveral raw waves in one subplot
+    % Input:
+    %     chData: n*1 struct with fields [chMean], [chStd] and [color]
+    %     window: xlim
+    %     titleStr: title of subplot
+    % Output:
+    %     Fig: figure object
+    % Example:
+    %     [~, chData(1).chMean, ~] = selectEcog(ECOGDataset, trialsA, "dev onset", window);
+    %     chData(1).color = "r";
+    %     [~, chData(2).chMean, ~] = selectEcog(ECOGDataset, trialsB, "dev onset", window);
+    %     chData(2).color = "b";
+    %     Fig = plotRawWaveMulti(chData, window, "A vs B");
+
     narginchk(2, 3);
 
     if nargin < 3
