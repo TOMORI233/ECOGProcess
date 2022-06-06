@@ -1,12 +1,11 @@
-function [chMean, chStd] = joinSTD(trialAll, ECOGDataset, window)
-    trials = trialAll([trialAll.correct] == true);
+function [chMean, chStd] = joinSTD(trials, ECOGDataset, window)
     ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trials.soundOnsetSeq}, {trials.stdNum})));
     stdNumAll = unique([trials.stdNum]);
     fs0 = ECOGDataset.fs;
     resultSTD = cell(length(stdNumAll), 1);
     
     for sIndex = 1:length(stdNumAll)
-        trialsSTD = trials([trials.correct] == true & [trials.stdNum] >= stdNumAll(sIndex));
+        trialsSTD = trials([trials.stdNum] >= stdNumAll(sIndex));
     
         if sIndex == 1
             windowSTD = [window(1), ISI * stdNumAll(sIndex)];

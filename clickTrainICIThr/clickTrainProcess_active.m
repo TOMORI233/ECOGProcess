@@ -94,7 +94,7 @@ alphaAxes(Fig1,0.5);
 
 %% Time-Freq
 clearvars -except posIndex posStr epocs streams ICIStr chMean chSE window stdNumAll ISI fs0 fs
-Fig2 = plotTimeFreqAnalysis(double(chMean), fs0, fs);
+Fig2 = plotTFA(double(chMean), fs0, fs);
 yRange = scaleAxes(Fig2);
 cRange = scaleAxes(Fig2, "c");
 setAxes(Fig2,'color','none');

@@ -1,4 +1,6 @@
 function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr)
+    % Description: plot cwt difference between chMean1 and chMean2
+
     narginchk(5, 6);
 
     if nargin < 6
@@ -17,8 +19,8 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr)
         for cIndex = 1:8
             chNum = (rIndex - 1) * 8 + cIndex;
             mSubplot(Fig, 8, 8, chNum, [1, 1], margins, paddings);
-            [t, Y, CData1, coi] = mCWT(chMean1(chNum, :), fs0, 'morlet', fs);
-            [~, ~, CData2, ~] = mCWT(chMean2(chNum, :), fs0, 'morlet', fs);
+            [t, Y, CData1, coi] = mCWT(double(chMean1(chNum, :)), fs0, 'morlet', fs);
+            [~, ~, CData2, ~] = mCWT(double(chMean2(chNum, :)), fs0, 'morlet', fs);
             X = t * 1000 + window(1);
             imagesc('XData', X, 'YData', Y, 'CData', CData1 - CData2);
             colormap("jet");

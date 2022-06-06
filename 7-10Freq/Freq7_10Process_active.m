@@ -1,32 +1,16 @@
-%% Data loading
-clear; clc; close all;
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220517\Block-8';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220518\Block-1';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220519\Block-3';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220520\Block-1';
-BLOCKPATH = 'G:\xiaoxiao\20220601\Block-1';
-posIndex = 1; % 1-AC, 2-PFC
-posStr = ["LAuC", "LPFC"];
+clear; clc;
+%% Parameter settings
+params.posIndex = 1; % 1-AC, 2-PFC
+params.choiceWin = [0, 600];
+params.processFcn = @ActiveProcess_7_10Freq;
 
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
-epocs = temp.epocs;
-
-% temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
-% streams = temp.streams;
-% 
-% ECOGDataset = streams.(posStr(posIndex));
-% fs0 = ECOGDataset.fs;
-
-AREANAME = ["AC", "PFC"];
-temp = string(split(BLOCKPATH, '\'));
-DateStr = temp(end - 1);
-
-%% Parameter setting
-choiceWin = [0, 600]; % ms
-fs = 300; % Hz, for downsampling
+fs = 500; % Hz, for downsampling
 
 %% Processing
-trialAll = ActiveProcess_7_10Freq(epocs, choiceWin);
+MATPATH = 'E:\ECoG\MAT Data\CC\7-10Freq Active\cc20220530\cc20220530_AC.mat';
+[trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
+fs0 = ECOGDataset.fs;
+
 devFreqAll = [trialAll.devFreq];
 stdFreqAll = cellfun(@(x) x(1), {trialAll.freqSeq});
 dRatioAll = roundn(devFreqAll ./ stdFreqAll, -2);
@@ -34,36 +18,48 @@ dRatio = unique(dRatioAll);
 dRatio(dRatio == 0) = [];
 
 %% Behavior
-FigBehavior = plotBehaviorOnly(trialAll, "r", "7-10 Freq");
-drawnow;
+% FigBehavior = plotBehaviorOnly(trialAll, "r", "7-10 Freq");
+% drawnow;
 
-%% Temp
+%% 
 % window = [-2000, 2000];
 % 
-% trials5 = trialAll([trialAll.correct] == true & dRatioAll == dRatio(end));
-% trials4 = trialAll([trialAll.correct] == true & dRatioAll == dRatio(end - 1));
-% trials3 = trialAll([trialAll.correct] == true & dRatioAll == dRatio(end - 2));
-% [~, chMean5, ~] = selectEcog(ECOGDataset, trials5, "dev onset", window);
-% [~, chMean4, ~] = selectEcog(ECOGDataset, trials4, "dev onset", window);
-% [~, chMean3, ~] = selectEcog(ECOGDataset, trials3, "dev onset", window);
-% Fig1 = plotRawWave(chMean5 - chMean4, [], window, "5-4");
-% Fig2 = plotRawWave(chMean5 - chMean3, [], window, "5-3");
-% Fig3 = plotTFACompare(chMean5, chMean4, fs0, fs, window, "5-4");
-% Fig4 = plotTFACompare(chMean5, chMean3, fs0, fs, window, "5-3");
-% 
-% % Scale 
-% scaleAxes([Fig1, Fig2, Fig3, Fig4], "x", [-300, 1000]);
-% scaleAxes([Fig1, Fig2], "y", [-50, 50]);
-% scaleAxes([Fig3, Fig4], "c");
-% 
-% plotLayout([Fig1, Fig2], posIndex);
+% for dIndex = 1:length(dRatio)
+%     trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex));
+%     [result, chMean, ~] = selectEcog(ECOGDataset, trials, "dev onset", window);
+%     chData = struct("chMean", result, "color", repmat({[0.5, 0.5, 0.5]}, length(result), 1));
+%     chData0.chMean = chMean;
+%     chData0.color = "r";
+%     Fig = plotRawWaveMulti([chData; chData0], window, strcat("dRatio = ", num2str(dRatio(dIndex))));
+%     scaleAxes(Fig, "x", [-500, 1000]);
+%     scaleAxes(Fig, "y", [], [-80, 80], "max");
+%     drawnow;
+% end
+
+%% MMN - PE
+window = [-2000, 2000];
+trialsC = trialAll([trialAll.correct] == true & [trialAll.oddballType] == "DEV");
+trialsW = trialAll([trialAll.correct] == false & [trialAll.interrupt] == false & [trialAll.oddballType] == "DEV");
+[resultDEVC, chMeanDEVC, ~] = selectEcog(ECOGDataset, trialsC, "dev onset", window);
+[resultSTDC, chMeanSTDC, ~] = selectEcog(ECOGDataset, trialsC, "last std", window);
+[resultDEVW, chMeanDEVW, ~] = selectEcog(ECOGDataset, trialsW, "dev onset", window);
+[resultSTDW, chMeanSTDW, ~] = selectEcog(ECOGDataset, trialsW, "last std", window);
+chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVC - resultSTDC), "UniformOutput", false));
+chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVW - resultSTDW), "UniformOutput", false));
+Fig1(1) = plotRawWave(chMeanC, [], window, "C:DEV-last STD");
+Fig1(2) = plotRawWave(chMeanW, [], window, "W:DEV-last STD");
+Fig2(1) = plotTFACompare(chMeanDEVC, chMeanSTDC, fs0, fs, window, "C:DEV-last STD");
+Fig2(2) = plotTFACompare(chMeanDEVW, chMeanSTDW, fs0, fs, window, "W:DEV-last STD");
+scaleAxes([Fig1, Fig2], "x", [0, 500]);
+scaleAxes(Fig1, "y", [], [-60, 60], "max");
+scaleAxes(Fig2, "c", [], [-20, 20]);
 
 %% Prediction
 window = [-2500, 6000]; % ms
-[chMean, chStd] = joinSTD(trialAll, ECOGDataset, window);
-FigP(1) = plotRawWave(chMean, chStd, window);
+[chMean, ~] = joinSTD(trialAll([trialAll.correct] == true), ECOGDataset, window);
+FigP(1) = plotRawWave(chMean, [], window);
 drawnow;
-FigP(2) = plotTimeFreqAnalysis(double(chMean), fs0, fs, window);
+FigP(2) = plotTFA(chMean, fs0, fs, window);
 drawnow;
 
 %% Prediction error
@@ -74,53 +70,57 @@ for dIndex = 1:length(dRatio)
     [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
     FigPE1(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
     drawnow;
-    FigPE2(dIndex) = plotTimeFreqAnalysis(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
+    FigPE2(dIndex) = plotTFA(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
     drawnow;
 end
 
 % Scale
-scaleAxes([FigPE1, FigPE2], "x", [-300, 1000]);
+scaleAxes([FigPE1, FigPE2], "x", [-1500, 2000]);
 scaleAxes([FigP(1), FigPE1], "y", [-80, 80]);
-scaleAxes([FigP(2), FigPE2], "c");
+scaleAxes([FigP(2), FigPE2], "c", [], [0, 15]);
 
 %% Decision making
 window = [-2000, 2000];
+resultC = [];
+resultW = [];
 
 for dIndex = 2:length(dRatio)
-    trialsC = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex));
-    trialsW = trialAll([trialAll.correct] == false & [trialAll.interrupt] == false & dRatioAll == dRatio(dIndex));
-
-    if isempty(trialsC) || isempty(trialsW)
-        FigDM1(dIndex - 1) = figure;
-        FigDM2(dIndex - 1) = figure;
-        set(FigDM1(dIndex - 1), "visible", "off");
-        set(FigDM2(dIndex - 1), "visible", "off");
-        continue;
-    end
-
-    meanRT = mean([trialsC.firstPush]' - cellfun(@(x) x(end), {trialsC.soundOnsetSeq}'));
-    
-    for tIndex = 1:length(trialsW)
-        trialsW(tIndex).firstPush = trialsW(tIndex).soundOnsetSeq(end) + meanRT;
-    end
-
-    [~, chMeanC, ~] = selectEcog(ECOGDataset, trialsC, "dev onset", window);
-    [~, chMeanW, ~] = selectEcog(ECOGDataset, trialsW, "dev onset", window);
-    FigDM1(dIndex - 1) = plotRawWave(chMeanC - chMeanW, [], window, ['dRatio=', num2str(dRatio(dIndex))]);
-    drawnow;
-    FigDM2(dIndex - 1) = plotTFACompare(chMeanC, chMeanW, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex))]);
-    drawnow;
+    trials = trialAll(dRatioAll == dRatio(dIndex));
+    [result, ~, ~] = selectEcog(ECOGDataset, trials, "dev onset", window);
+    result = changeCellRowNum(cellfun(@zscore, changeCellRowNum(result), "UniformOutput", false));
+    resultC = [resultC; result([trials.correct] == true)];
+    resultW = [resultW; result([trials.correct] == false & [trials.interrupt] == false)];
 end
+
+chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultC), "UniformOutput", false));
+chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultW), "UniformOutput", false));
+FigDM1 = plotRawWave(chMeanC - chMeanW, [], window, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
+drawnow;
+FigDM2 = plotTFACompare(chMeanC, chMeanW, fs0, fs, window, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
+drawnow;
 
 % Scale
 scaleAxes([FigDM1, FigDM2], "x", [-1000, 1000]);
-scaleAxes(FigDM1, "y", [-80, 80]);
-cRange = scaleAxes(FigDM2, "c", [-20, 20]);
+scaleAxes(FigDM1, "y");
+cRange = scaleAxes(FigDM2, "c", [], [-0.1, 0.1], "max");
+
+%% Motion response
+% window = [-3000, 2000];
+% [~, chMean, chStd] = selectEcog(ECOGDataset, trialAll([trialAll.correct] == true & [trialAll.interrupt] == false & [trialAll.oddballType] == "DEV"), "push onset", window);
+% FigTemp(1) = plotRawWave(chMean, chStd, window, "push onset");
+% FigTemp(2) = plotTFA(chMean, fs0, fs, window, "push onset");
+% scaleAxes(FigTemp, "x", [-1000, 2000]);
+% scaleAxes(FigTemp(1), "y", [], [-80, 80]);
+% scaleAxes(FigTemp(2), "c", [], [0, 20]);
 
 %% Layout
 plotLayout([FigP(1), FigPE1, FigDM1], posIndex);
 
 %% Save
+AREANAME = ["AC", "PFC"];
+AREANAME = AREANAME(params.posIndex);
+temp = string(split(BLOCKPATH, '\'));
+DateStr = temp(end - 1);
 ROOTPATH = "D:\Education\Lab\monkey\ECOG\Figures\7-10Freq\";
 BPATH = strcat(ROOTPATH, DateStr, "\Behavior\");
 PEPATH = strcat(ROOTPATH, DateStr, "\Prediction error\");
@@ -132,15 +132,13 @@ mkdir(PPATH);
 mkdir(DMPATH);
 
 print(FigBehavior, strcat(BPATH, "Behavior_", DateStr), "-djpeg", "-r200");
-print(FigP(1), strcat(PPATH, AREANAME(posIndex), "_Prediction_Raw_", DateStr), "-djpeg", "-r200");
-print(FigP(2), strcat(PPATH, AREANAME(posIndex), "_Prediction_TFA_", DateStr), "-djpeg", "-r200");
+print(FigP(1), strcat(PPATH, AREANAME, "_Prediction_Raw_", DateStr), "-djpeg", "-r200");
+print(FigP(2), strcat(PPATH, AREANAME, "_Prediction_TFA_", DateStr), "-djpeg", "-r200");
 
-for dIndex = 1:length(FigDM1)
-    print(FigDM1(dIndex), strcat(DMPATH, AREANAME(posIndex), "_DM_Raw_", num2str(dIndex + 1), "_", DateStr), "-djpeg", "-r200");
-    print(FigDM2(dIndex), strcat(DMPATH, AREANAME(posIndex), "_DM_TFA_", num2str(dIndex + 1), "_", DateStr), "-djpeg", "-r200");
-end
+print(FigDM1, strcat(DMPATH, AREANAME, "_DM_Raw_", DateStr), "-djpeg", "-r200");
+print(FigDM2, strcat(DMPATH, AREANAME, "_DM_TFA_", DateStr), "-djpeg", "-r200");
 
 for dIndex = 1:length(FigPE1)
-    print(FigPE1(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_Raw_", num2str(dIndex)), "-djpeg", "-r200");
-    print(FigPE2(dIndex), strcat(PEPATH, AREANAME(posIndex), "_PE_TFA_", num2str(dIndex)), "-djpeg", "-r200");
+    print(FigPE1(dIndex), strcat(PEPATH, AREANAME, "_PE_Raw_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
+    print(FigPE2(dIndex), strcat(PEPATH, AREANAME, "_PE_TFA_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
 end
