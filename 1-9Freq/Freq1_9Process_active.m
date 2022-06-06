@@ -1,8 +1,8 @@
 %% Data loading
 clear; clc; close all;
 
-BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220523\Block-1';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220524\Block-1';
+% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220523\Block-1';
+BLOCKPATH = 'G:\xiaoxiao\20220531\Block-2';
 
 posIndex = 1; % 1-AC, 2-PFC
 posStr = ["LAuC", "LPFC"];

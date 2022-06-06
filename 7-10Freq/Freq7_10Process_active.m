@@ -4,18 +4,18 @@ clear; clc; close all;
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220518\Block-1';
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220519\Block-3';
 % BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220520\Block-1';
-BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220525\Block-1';
+BLOCKPATH = 'G:\xiaoxiao\20220601\Block-1';
 posIndex = 1; % 1-AC, 2-PFC
 posStr = ["LAuC", "LPFC"];
 
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
 epocs = temp.epocs;
 
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
-streams = temp.streams;
-
-ECOGDataset = streams.(posStr(posIndex));
-fs0 = ECOGDataset.fs;
+% temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
+% streams = temp.streams;
+% 
+% ECOGDataset = streams.(posStr(posIndex));
+% fs0 = ECOGDataset.fs;
 
 AREANAME = ["AC", "PFC"];
 temp = string(split(BLOCKPATH, '\'));

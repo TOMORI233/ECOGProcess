@@ -1,24 +1,24 @@
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220521\Block-1';
+BLOCKPATH = 'G:\xiaoxiao\xx20220606\Block-2';
 posIndex = 1; % 1-AC, 2-PFC
 posStr = ["LAuC", "LPFC"];
 
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
 epocs = temp.epocs;
 
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
-streams = temp.streams;
-
-ECOGDataset = streams.(posStr(posIndex));
-fs0 = ECOGDataset.fs;
+% temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
+% streams = temp.streams;
+% 
+% ECOGDataset = streams.(posStr(posIndex));
+% fs0 = ECOGDataset.fs;
 
 AREANAME = ["AC", "PFC"];
 temp = string(split(BLOCKPATH, '\'));
 DateStr = temp(end - 1);
 
 %% Params settings
-choiceWin = [0, 800]; % ms
+choiceWin = [0, 600]; % ms
 fs = 300; % Hz, for downsampling
 
 %% Processing
