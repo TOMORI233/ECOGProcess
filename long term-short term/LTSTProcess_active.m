@@ -1,16 +1,14 @@
 clear; clc; close all;
 %% Parameter setting
-BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220521\Block-1';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220531\Block-3';
-
 params.posIndex = 1; % 1-AC, 2-PFC
 params.choiceWin = [0, 800];
 params.processFcn = @ActiveProcess_LTST;
 
-fs = 300; % Hz, for downsampling
+fs = 500; % Hz, for downsampling
 
 %% Processing
-[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params);
+MATPATH = 'E:\ECoG\MAT Data\CC\LTST Active\cc20220531\cc20220531_AC.mat';
+[trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
 fs0 = ECOGDataset.fs;
 
 %% Behavior
