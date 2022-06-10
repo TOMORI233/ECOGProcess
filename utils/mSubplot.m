@@ -5,17 +5,22 @@ function mAxe = mSubplot(Fig, row, col, index, nSize, margins, paddings)
         nSize = [1, 1];
     end
 
-    if nargin < 6
+    if nargin < 6 || isempty(margins)
         margins = 0.01 * ones(1, 4);
     end
 
-    if nargin < 7
+    if nargin < 7 || isempty(paddings)
         paddings = 0.01 * ones(1, 4);
     end
 
     % nSize = [nX, nY]
     nX = nSize(1);
-    nY = nSize(2);
+
+    if length(nSize) == 1
+        nY = 1;
+    else
+        nY = nSize(2);
+    end
 
     % paddings or margins is [Left, Right, Bottom, Top]
     divWidth = (1 - paddings(1) - paddings(2)) / col;
