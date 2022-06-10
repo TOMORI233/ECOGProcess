@@ -12,22 +12,23 @@ clear; clc; close all;
 % params.processFcn = @ActiveProcess_7_10Freq;
 
 % 1-9Freq active
-SAVEPATH = "E:\ECoG\MAT Data\CC\1-9Freq Active\";
-BLOCKPATH{1} = 'E:\ECoG\TDT Data\chouchou\cc20220523\Block-1';
-BLOCKPATH{2} = 'E:\ECoG\TDT Data\chouchou\cc20220524\Block-1';
-BLOCKPATH{3} = 'E:\ECoG\TDT Data\chouchou\cc20220601\Block-1';
-BLOCKPATH{4} = 'E:\ECoG\TDT Data\chouchou\cc20220605\Block-1';
-params.choiceWin = [0, 600];
-params.processFcn = @ActiveProcess_1_9Freq;
+% SAVEPATH = "E:\ECoG\MAT Data\CC\1-9Freq Active\";
+% BLOCKPATH{1} = 'E:\ECoG\TDT Data\chouchou\cc20220523\Block-1';
+% BLOCKPATH{2} = 'E:\ECoG\TDT Data\chouchou\cc20220524\Block-1';
+% BLOCKPATH{3} = 'E:\ECoG\TDT Data\chouchou\cc20220601\Block-1';
+% BLOCKPATH{4} = 'E:\ECoG\TDT Data\chouchou\cc20220605\Block-1';
+% params.choiceWin = [0, 600];
+% params.processFcn = @ActiveProcess_1_9Freq;
 
 % LTST active
-% SAVEPATH = "E:\ECoG\MAT Data\CC\LTST Active\";
-% BLOCKPATH{1} = 'E:\ECoG\TDT Data\chouchou\cc20220521\Block-1';
-% BLOCKPATH{2} = 'E:\ECoG\TDT Data\chouchou\cc20220531\Block-3';
-% params.choiceWin = [0, 600];
-% params.processFcn = @ActiveProcess_LTST;
+SAVEPATH = "E:\ECoG\MAT Data\CC\LTST Active\";
+BLOCKPATH{1} = 'E:\ECoG\TDT Data\chouchou\cc20220521\Block-1';
+BLOCKPATH{2} = 'E:\ECoG\TDT Data\chouchou\cc20220531\Block-3';
+BLOCKPATH{3} = 'E:\ECoG\TDT Data\chouchou\cc20220606\Block-4';
+params.choiceWin = [0, 800];
+params.processFcn = @ActiveProcess_LTST;
 
-for index = 4:length(BLOCKPATH)
+for index = 1:length(BLOCKPATH)
     AREANAME = ["AC", "PFC"];
     temp = string(split(BLOCKPATH{index}, '\'));
     DateStr = temp(end - 1);

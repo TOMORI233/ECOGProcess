@@ -112,5 +112,8 @@ function trialAll = ActiveProcess_LTST(epocs, choiceWin)
 
     end
 
+    % Abort the first trial
+    trialAll(1) = [];
+
     return;
 end

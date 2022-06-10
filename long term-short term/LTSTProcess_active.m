@@ -7,7 +7,7 @@ params.processFcn = @ActiveProcess_LTST;
 fs = 500; % Hz, for downsampling
 
 %% Processing
-MATPATH = 'E:\ECoG\MAT Data\CC\LTST Active\cc20220531\cc20220531_AC.mat';
+MATPATH = 'E:\ECoG\MAT Data\CC\LTST Active\cc20220606\cc20220606_AC.mat';
 [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
 fs0 = ECOGDataset.fs;
 

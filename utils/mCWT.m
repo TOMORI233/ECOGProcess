@@ -25,10 +25,11 @@ function [t, f, CData, coi] = mCWT(data, fs0, cwtMethod, fs, freqLimits)
         freqLimits = [0, 256];
     end
     
-    if fs ~= fs0
+    if ~isempty(fs) && fs ~= fs0
         [P, Q] = rat(fs / fs0);
         dataResample = resample(data, P, Q);
     else
+        fs = fs0;
         dataResample = data;
     end
     

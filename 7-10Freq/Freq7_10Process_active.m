@@ -7,10 +7,33 @@ params.processFcn = @ActiveProcess_7_10Freq;
 fs = 500; % Hz, for downsampling
 
 %% Processing
-MATPATH = 'E:\ECoG\MAT Data\CC\7-10Freq Active\cc20220530\cc20220530_AC.mat';
+MATPATH = 'E:\ECoG\MAT Data\CC\7-10Freq Active\cc20220517\cc20220517_AC.mat';
 [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
 fs0 = ECOGDataset.fs;
 
+%% ICA
+window  = [-2000, 2000];
+[comp, trialsECOG] = mICA(ECOGDataset, trialAll, window, "dev onset", fs);
+S = cellfun(@(x) comp.unmixing * x, trialsECOG, "UniformOutput", false);
+chMean = cell2mat(cellfun(@mean, changeCellRowNum(S), "UniformOutput", false)) * 1e6;
+
+idx1 = [-2000, -1500, -1000, -500, 0];
+idx2 = idx1 + 200;
+idx1 = max(fix((idx1 - window(1)) / 1000 * fs0), 1);
+idx2 = min(fix((idx2 - window(1)) / 1000 * fs0), size(chMean, 2));
+pw = sum(abs(chMean(:, idx1:idx2)), 2);
+find(pw > 170)
+figure;
+mAxe = mSubplot(gcf, 1, 1, 1, 1, [], ones(1, 4) * 0.05);
+histogram(mAxe, pw, "BinWidth", 10); hold on;
+plot(200 * ones(1, 2), [0, mAxe.YLim(2)]);
+
+plotRawWave(chMean, [], window, "ICA");
+plotTFA(chMean, fs0, fs, window, "ICA");
+Fig1 = plotTopo(comp);
+scaleAxes(Fig1, "c");
+
+%%
 devFreqAll = [trialAll.devFreq];
 stdFreqAll = cellfun(@(x) x(1), {trialAll.freqSeq});
 dRatioAll = roundn(devFreqAll ./ stdFreqAll, -2);
@@ -18,8 +41,8 @@ dRatio = unique(dRatioAll);
 dRatio(dRatio == 0) = [];
 
 %% Behavior
-% FigBehavior = plotBehaviorOnly(trialAll, "r", "7-10 Freq");
-% drawnow;
+FigBehavior = plotBehaviorOnly(trialAll, "r", "7-10 Freq");
+drawnow;
 
 %% 
 % window = [-2000, 2000];

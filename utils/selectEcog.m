@@ -1,4 +1,4 @@
-function [result, chMean, chStd] = selectEcog(ECOGDataset, trials, segOption, window, scaleFactor)
+function [trialsECOG, chMean, chStd, sampleinfo] = selectEcog(ECOGDataset, trials, segOption, window, scaleFactor)
     narginchk(2, 5);
 
     if nargin < 3
@@ -37,24 +37,26 @@ function [result, chMean, chStd] = selectEcog(ECOGDataset, trials, segOption, wi
     end
 
     % by trial
-    result = cell(length(segIndex), 1);
+    trialsECOG = cell(length(segIndex), 1);
+    sampleinfo = zeros(length(segIndex), 2);
 
     for index = 1:length(segIndex)
-        result{index} = ECOGDataset.data(:, segIndex(index) + windowIndex(1):segIndex(index) + windowIndex(2));
+        sampleinfo(index, :) = [segIndex(index) + windowIndex(1), segIndex(index) + windowIndex(2)];
+        trialsECOG{index} = ECOGDataset.data(:, segIndex(index) + windowIndex(1):segIndex(index) + windowIndex(2));
     end
 
     % scale
-    result = cellfun(@(x) x * scaleFactor, result, "UniformOutput", false);
+    trialsECOG = cellfun(@(x) x * scaleFactor, trialsECOG, "UniformOutput", false);
 
     % by channel
     nChs = length(ECOGDataset.channels);
-    temp = cell2mat(result);
-    chMean = zeros(nChs, size(result{1}, 2));
-    chStd = zeros(nChs, size(result{1}, 2));
+    temp = cell2mat(trialsECOG);
+    chMean = zeros(nChs, size(trialsECOG{1}, 2));
+    chStd = zeros(nChs, size(trialsECOG{1}, 2));
     
     for index = 1:nChs
-        chMean(index, :) = mean(temp(index:nChs:length(result) * nChs, :), 1);
-        chStd(index, :) = std(temp(index:nChs:length(result) * nChs, :), [], 1);
+        chMean(index, :) = mean(temp(index:nChs:length(trialsECOG) * nChs, :), 1);
+        chStd(index, :) = std(temp(index:nChs:length(trialsECOG) * nChs, :), [], 1);
     end
 
     return;
