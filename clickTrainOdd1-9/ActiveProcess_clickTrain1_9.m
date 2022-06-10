@@ -1,4 +1,4 @@
-function trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin, soundDuration)
+function trialAll = ActiveProcess_clickTrain1_9(epocs, choiceWin, soundDuration)
     narginchk(1, 3);
 
     if nargin < 2
@@ -8,16 +8,10 @@ function trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin, soundDuration)
     if nargin < 3
         soundDuration = 0;
     end
-    choiceWin = choiceWin + soundDuration;
+    choiceWinDev = choiceWin + soundDuration;
     %% Information extraction
-    % fixation 20220520 Block-1
 
-    
-    % change irreg dev ordr for easy plot
-%     epocs.ordr.data(epocs.ordr.data == 7) = 12;
-%     epocs.ordr.data(epocs.ordr.data == 8) = 18;
-%     epocs.ordr.data(epocs.ordr.data == 9) = 24;
-%     epocs.ordr.data(epocs.ordr.data == 10) = 30;
+   
 
     trialOnsetIndex = find(epocs.num0.data == 1);
     trialOnsetTimeAll = epocs.num0.onset(trialOnsetIndex) * 1000; % ms
@@ -88,13 +82,13 @@ function trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin, soundDuration)
         % DEV: Whether push in choice window
         if strcmp(trialAll(tIndex, 1).oddballType, "DEV")
             
-            if firstPush >= trialAll(tIndex, 1).soundOnsetSeq(end) + choiceWin(1) && firstPush <= trialAll(tIndex, 1).soundOnsetSeq(end) + choiceWin(2)
+            if firstPush >= trialAll(tIndex, 1).soundOnsetSeq(end) + choiceWinDev(1) && firstPush <= trialAll(tIndex, 1).soundOnsetSeq(end) + choiceWinDev(2)
                 pushInWinFlag = true;
                 trialAll(tIndex, 1).firstPush = firstPush;
             else
                 pushInWinFlag = false;
     
-                if firstPush > trialAll(tIndex, 1).soundOnsetSeq(end) + choiceWin(2)
+                if firstPush > trialAll(tIndex, 1).soundOnsetSeq(end) + choiceWinDev(2)
                     trialAll(tIndex, 1).firstPush = [];
                 end
     
@@ -108,7 +102,7 @@ function trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin, soundDuration)
             else
                 pushInWinFlag = false;
     
-                if firstPush > trialAll(tIndex, 1).soundOnsetSeq(end) +  + choiceWin(2)
+                if firstPush > trialAll(tIndex, 1).soundOnsetSeq(end) +  choiceWin(2)
                     trialAll(tIndex, 1).firstPush = [];
                 end
     
