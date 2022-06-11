@@ -51,7 +51,7 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, behaviorOnly
         epocs = temp.epocs;
     
         if ~behaviorOnly
-            temp = TDTbin2mat(DATAPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
+            temp = TDTbin2mat(DATAPATH, 'TYPE', {'streams'});
             streams = temp.streams;
             ECOGDataset = streams.(posStr(posIndex));
         else

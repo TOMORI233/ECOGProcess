@@ -16,6 +16,9 @@ function Fig = plotTFA(chMean, fs0, fs, window, titleStr)
     
         for cIndex = 1:8
             chNum = (rIndex - 1) * 8 + cIndex;
+            if chNum > size(chMean,1)
+                continue
+            end
             mSubplot(Fig, 8, 8, chNum, [1, 1], margins, paddings);
             [t, Y, CData, coi] = mCWT(double(chMean(chNum, :)), fs0, 'morlet', fs);
             X = t * 1000 + window(1);

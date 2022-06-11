@@ -10,7 +10,7 @@ params.processFcn = @ActiveProcess_clickTrain1_9;
 fs = 500; % Hz, for downsampling
 
 %% Processing
-BLOCKPATH = 'E:\ECoG\chouchou\cc20220609\Block-1';
+BLOCKPATH = 'E:\ECoG\chouchou\cc20220610\Block-2';
 [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params);
 
 if ~isempty(ECOGDataset)
