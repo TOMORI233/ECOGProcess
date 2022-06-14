@@ -23,11 +23,11 @@ function Fig = plotTopo(comp)
             xlim([1 8]);
             ylim([1 8]);
             xticklabels('');
+            yticklabels('');
         end
     
     end
 
-    scaleAxes(Fig, "c");
     colorbar('position', [1 - paddings(2),   0.1 , 0.5 * paddings(2), 0.8]);
 
     return;

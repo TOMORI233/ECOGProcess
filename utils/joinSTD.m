@@ -1,4 +1,4 @@
-function [chMean, chStd] = joinSTD(trials, ECOGDataset, window)
+function [resultSTD, chMean, chStd] = joinSTD(trials, ECOGDataset, window)
     ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trials.soundOnsetSeq}, {trials.stdNum})));
     stdNumAll = unique([trials.stdNum]);
     fs0 = ECOGDataset.fs;
