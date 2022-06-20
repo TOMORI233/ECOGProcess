@@ -14,7 +14,7 @@ function [data, segTimePoint] = joinBlocks(opts, varargin)
 
     run("joinBlocksConfig.m");
     opts = getOrFull(opts, jbDefaultOpts);
-    headTail = getOr(opts, 'headTail', 1);
+    abortHeadTail = getOr(opts, 'abortHeadTail', 1);
     sfNames = opts.sfNames;
     efNames = opts.efNames;
 
@@ -55,7 +55,7 @@ function [data, segTimePoint] = joinBlocks(opts, varargin)
                 epocs.(efNames(eIndex)).onset = vertcat(epocs.(efNames(eIndex)).onset, varargin{dIndex}.epocs.(efNames(eIndex)).onset);
                 epocs.(efNames(eIndex)).data = vertcat(epocs.(efNames(eIndex)).data, varargin{dIndex}.epocs.(efNames(eIndex)).data);
             else
-                if headTail % abort first or last trial
+                if abortHeadTail % abort first or last trial
                 if dIndex == 1 % abort the last trial of the first block
                     epocs.(efNames(eIndex)).onset = vertcat(epocs.(efNames(eIndex)).onset, varargin{dIndex}.epocs.(efNames(eIndex)).onset(1:trialOnsetIdx(end) - 1));
                     epocs.(efNames(eIndex)).data = vertcat(epocs.(efNames(eIndex)).data, varargin{dIndex}.epocs.(efNames(eIndex)).data(1:trialOnsetIdx(end) - 1));

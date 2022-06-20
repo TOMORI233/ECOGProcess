@@ -9,7 +9,7 @@ for i = 1 : length(basicRegIrreg)
     blkMerge = struct2cell(basicRegIrreg(i));
     blkMerge(isemptycell(blkMerge)) = [];
     opts.efNames = ["num0", "ordr"];
-    opts.headTail = 0;
+    opts.abortHeadTail = 0;
     [trialAll, ECOGDatasetRaw, segTimePoint] = ECOGPreprocessJoinBlock(blkMerge, params, opts);
     for pos =  2
         clearvars -except i basicRegIrreg pos ECOGDatasetRaw segTimePoint trialAll posStr params  posIndex blkMerge
