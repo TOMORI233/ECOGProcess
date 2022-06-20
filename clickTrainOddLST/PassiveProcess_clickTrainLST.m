@@ -1,9 +1,14 @@
-function trialAll = PassiveProcess_clickTrainContinuous(epocs,varargin)
+function trialAll = PassiveProcess_clickTrain1_9(epocs)
     %% Information extraction
+    % fixation 20220520 Block-2
+    for index = 1:length(unique(epocs.swee.data))
+        idx = find(epocs.swee.data == index);
+        epocs.num0.data(idx) = (1:length(idx))';
+    end
 
     trialOnsetIndex = find(epocs.num0.data == 1);
     soundOnsetTimeAll = epocs.num0.onset * 1000; % ms
-    ordrAll = epocs.ordr.data; % Hz
+    freqAll = epocs.freq.data; % ms
 
     trialAll = struct('trialNum', temp, ...
                       'soundOnsetSeq', temp, ...
@@ -12,7 +17,9 @@ function trialAll = PassiveProcess_clickTrainContinuous(epocs,varargin)
                       'devFreq', temp, ...
                       'interrupt', temp, ...
                       'oddballType', temp, ...
-                      'stdNum', temp);
+                      'stdNum', temp, ...
+                      'firstPush', temp, ...
+                      'correct', temp);
 
     %% All trials
     % Absolute time, abort the last trial

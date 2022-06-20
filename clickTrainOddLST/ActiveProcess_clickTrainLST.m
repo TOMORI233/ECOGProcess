@@ -1,4 +1,4 @@
-function trialAll = ActiveProcess_clickTrain(epocs, choiceWin, soundDuration)
+function trialAll = ActiveProcess_clickTrainLST(epocs, choiceWin, soundDuration)
     narginchk(1, 3);
 
     if nargin < 2
@@ -78,7 +78,7 @@ function trialAll = ActiveProcess_clickTrain(epocs, choiceWin, soundDuration)
         %% Correct or not
         % Find first push time of this trial
         firstPush = pushTimeAll(find(pushTimeAll >= trialAll(tIndex, 1).soundOnsetSeq(end) & pushTimeAll <= trialOnsetTimeAll(tIndex + 1, 1), 1));
-
+        if ~isempty(firstPush)
         % DEV: Whether push in choice window
         if strcmp(trialAll(tIndex, 1).oddballType, "DEV")
             
@@ -109,7 +109,10 @@ function trialAll = ActiveProcess_clickTrain(epocs, choiceWin, soundDuration)
             end
             
         end
-
+        else
+            trialAll(tIndex, 1).firstPush = [];
+            pushInWinFlag = false;
+        end
         % DEV: push in choice window; STD: no push in choice window
         if ~trialAll(tIndex, 1).interrupt && ((strcmp(trialAll(tIndex, 1).oddballType, "DEV") && pushInWinFlag) || (strcmp(trialAll(tIndex, 1).oddballType, "STD") && ~pushInWinFlag))
             trialAll(tIndex, 1).correct = true;

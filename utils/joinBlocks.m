@@ -1,4 +1,4 @@
-function data = joinBlocks(opts, varargin)
+function [data, segTimePoint] = joinBlocks(opts, varargin)
     % Example:
     %     data1 = TDTbin2mat(BLOCKPATH1);
     %     data2 = TDTbin2mat(BLOCKPATH2);
@@ -14,19 +14,23 @@ function data = joinBlocks(opts, varargin)
 
     run("joinBlocksConfig.m");
     opts = getOrFull(opts, jbDefaultOpts);
+    headTail = getOr(opts, 'headTail', 1);
     sfNames = opts.sfNames;
     efNames = opts.efNames;
 
     %% Time correction
     duration = zeros(length(varargin), 1); % s
     duration(1) = size(varargin{1}.streams.(sfNames(1)).data, 2) / varargin{1}.streams.(sfNames(1)).fs;
-
+    segTimePoint = [0 duration(1)];
     for dIndex = 2:length(varargin)
-        duration(dIndex) = size(varargin{dIndex}.streams.(sfNames(1)).data, 2) / varargin{dIndex}.streams.(sfNames(1)).fs;
-        
+        duration(dIndex) = duration(dIndex - 1) + size(varargin{dIndex}.streams.(sfNames(1)).data, 2) / varargin{dIndex}.streams.(sfNames(1)).fs;
+        segTimePoint = [segTimePoint; [duration(dIndex -1)  duration(dIndex)] ];
+
         for eIndex = 1:length(efNames)
-            varargin{dIndex}.epocs.(efNames(eIndex)).onset = varargin{dIndex}.epocs.(efNames(eIndex)).onset + duration(dIndex - 1);
+            varargin{dIndex}.epocs.(efNames(eIndex)).onset = varargin{dIndex}.epocs.(efNames(eIndex)).onset + segTimePoint(dIndex - 1, 2);
         end
+
+        
 
     end
 
@@ -51,7 +55,7 @@ function data = joinBlocks(opts, varargin)
                 epocs.(efNames(eIndex)).onset = vertcat(epocs.(efNames(eIndex)).onset, varargin{dIndex}.epocs.(efNames(eIndex)).onset);
                 epocs.(efNames(eIndex)).data = vertcat(epocs.(efNames(eIndex)).data, varargin{dIndex}.epocs.(efNames(eIndex)).data);
             else
-
+                if headTail % abort first or last trial
                 if dIndex == 1 % abort the last trial of the first block
                     epocs.(efNames(eIndex)).onset = vertcat(epocs.(efNames(eIndex)).onset, varargin{dIndex}.epocs.(efNames(eIndex)).onset(1:trialOnsetIdx(end) - 1));
                     epocs.(efNames(eIndex)).data = vertcat(epocs.(efNames(eIndex)).data, varargin{dIndex}.epocs.(efNames(eIndex)).data(1:trialOnsetIdx(end) - 1));
@@ -62,7 +66,10 @@ function data = joinBlocks(opts, varargin)
                     epocs.(efNames(eIndex)).onset = vertcat(epocs.(efNames(eIndex)).onset, varargin{dIndex}.epocs.(efNames(eIndex)).onset(trialOnsetIdx(2):end));
                     epocs.(efNames(eIndex)).data = vertcat(epocs.(efNames(eIndex)).data, varargin{dIndex}.epocs.(efNames(eIndex)).data(trialOnsetIdx(2):end));
                 end
-
+                else
+                    epocs.(efNames(eIndex)).onset = vertcat(epocs.(efNames(eIndex)).onset, varargin{dIndex}.epocs.(efNames(eIndex)).onset);
+                    epocs.(efNames(eIndex)).data = vertcat(epocs.(efNames(eIndex)).data, varargin{dIndex}.epocs.(efNames(eIndex)).data);
+                end
             end
 
         end

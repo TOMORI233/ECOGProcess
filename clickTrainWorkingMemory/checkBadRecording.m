@@ -1,6 +1,15 @@
-%% normal load settings
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
-epocs = temp.epocs;
+
+clear; clc; close all;
+%% Parameter setting
+BLOCKPATH = 'E:\ECoG\chouchou\cc20220618\Block-1';
+params.posIndex = 1; % 1-AC, 2-PFC
+params.choiceWin = [100, 800];
+params.processFcn = @ActiveProcess_clickTrainWM;
+fs = 500; % Hz, for downsampling
+temp = TDTbin2mat(BLOCKPATH,'T2',1);
+fs0 = temp.streams.LAuC.fs;
+[trialAll, ~] = ECOGPreprocess(BLOCKPATH, params, 1);
+% trialAll(120).soundOnsetSeq(1) / fs0
 
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
 streams = temp.streams;

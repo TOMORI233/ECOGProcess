@@ -1,4 +1,4 @@
-function trialAll = ActiveProcess_clickTrain(epocs, choiceWin, soundDuration)
+function trialAll = ActiveProcess_clickTrainContinuous(epocs, choiceWin, soundDuration)
     narginchk(1, 3);
 
     if nargin < 2

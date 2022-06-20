@@ -10,12 +10,12 @@ if nargin < 3
 end
 choiceWinDev = choiceWin + soundDuration;
 %% Information extraction
-trialOnsetIndex = 1:length(epocs.num0.data);
+trialOnsetIndex = find(epocs.num0.data == 1);
 trialOnsetTimeAll = epocs.num0.onset(trialOnsetIndex) * 1000; % ms
 soundOnsetTimeAll = epocs.num0.onset * 1000; % ms
 ordrAll = epocs.ordr.data; % Hz
 
-n = length(trialOnsetIndex);
+n = length(trialOnsetIndex) - 1;
 temp = cell(n, 1);
 trialAll = struct('trialNum', temp, ...
     'soundOnsetSeq', temp, ...
@@ -28,7 +28,7 @@ trialAll = struct('trialNum', temp, ...
 
 %% All trials
 % Absolute time, abort the last trial
-for tIndex = 1:length(trialOnsetIndex)
+for tIndex = 1:length(trialOnsetIndex)-1
     trialAll(tIndex, 1).trialNum = tIndex;
     %% Sequence
     if tIndex < length(trialOnsetIndex)

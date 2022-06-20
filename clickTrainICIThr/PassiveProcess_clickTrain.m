@@ -1,4 +1,4 @@
-function trialAll = PassiveProcess_clickTrain(epocs)
+function trialAll = PassiveProcess_clickTrain1_9(epocs)
     %% Information extraction
     % fixation 20220520 Block-2
     for index = 1:length(unique(epocs.swee.data))
