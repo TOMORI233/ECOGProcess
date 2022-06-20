@@ -34,7 +34,6 @@ function Fig = plotTopo(comp, topoSize)
     
     end
 
-
     colorbar('position', [1 - paddings(2),   0.1 , 0.5 * paddings(2), 0.8]);
 
     return;

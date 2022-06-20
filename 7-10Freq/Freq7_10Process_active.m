@@ -7,7 +7,7 @@ params.processFcn = @ActiveProcess_7_10Freq;
 fs = 500; % Hz, for downsampling
 
 %% Processing
-MATPATH = 'E:\ECoG\MAT Data\CC\7-10Freq Active\cc20220517\cc20220517_AC.mat';
+MATPATH = 'E:\ECoG\MAT Data\CC\7-10Freq Active\cc20220519\cc20220519_AC.mat';
 [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
 fs0 = ECOGDataset.fs;
 
@@ -22,16 +22,13 @@ idx2 = idx1 + 200;
 idx1 = max(fix((idx1 - window(1)) / 1000 * fs0), 1);
 idx2 = min(fix((idx2 - window(1)) / 1000 * fs0), size(chMean, 2));
 pw = sum(abs(chMean(:, idx1:idx2)), 2);
-find(pw > 170)
 figure;
 mAxe = mSubplot(gcf, 1, 1, 1, 1, [], ones(1, 4) * 0.05);
-histogram(mAxe, pw, "BinWidth", 10); hold on;
-plot(200 * ones(1, 2), [0, mAxe.YLim(2)]);
+histogram(mAxe, pw, "BinWidth", 10);
 
 plotRawWave(chMean, [], window, "ICA");
 plotTFA(chMean, fs0, fs, window, "ICA");
-Fig1 = plotTopo(comp);
-scaleAxes(Fig1, "c");
+plotTopo(comp);
 
 %%
 devFreqAll = [trialAll.devFreq];
@@ -79,7 +76,7 @@ scaleAxes(Fig2, "c", [], [-20, 20]);
 
 %% Prediction
 window = [-2500, 6000]; % ms
-[chMean, ~] = joinSTD(trialAll([trialAll.correct] == true), ECOGDataset, window);
+[~, chMean, ~] = joinSTD(trialAll([trialAll.correct] == true), ECOGDataset, window);
 FigP(1) = plotRawWave(chMean, [], window);
 drawnow;
 FigP(2) = plotTFA(chMean, fs0, fs, window);

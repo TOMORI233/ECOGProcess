@@ -24,14 +24,14 @@ drawnow;
 window = [-2500, 6000]; % ms
 
 % Constant
-[chMeanConst, ~] = joinSTD(trialsConst([trialsConst.correct] == true), ECOGDataset, window);
+[~, chMeanConst, ~] = joinSTD(trialsConst([trialsConst.correct] == true), ECOGDataset, window);
 FigP_Wave_Const = plotRawWave(chMeanConst, [], window, "Constant std");
 drawnow;
 FigP_TFA_Const = plotTFA(double(chMeanConst), fs0, fs, window, "Constant std");
 drawnow;
 
 % Random
-[chMeanRand, ~] = joinSTD(trialsRand([trialsRand.correct] == true), ECOGDataset, window);
+[~, chMeanRand, ~] = joinSTD(trialsRand([trialsRand.correct] == true), ECOGDataset, window);
 FigP_Wave_Rand = plotRawWave(chMeanRand, [], window, "Random std");
 drawnow;
 FigP_TFA_Rand = plotTFA(chMeanRand, fs0, fs, window, "Random std");
