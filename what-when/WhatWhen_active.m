@@ -1,15 +1,25 @@
 clear; clc;
 %% Parameter settings
 params.posIndex = 1; % 1-AC, 2-PFC
-params.choiceWin = [0, 600];
-params.processFcn = @ActiveProcess_7_10Freq;
+params.choiceWin = [0, 800];
+params.processFcn = @ActiveProcess_whatwhen;
 
 fs = 500; % Hz, for downsampling
 
 %% Processing
-MATPATH = 'E:\ECoG\MAT Data\CC\7-10Freq Active\cc20220517\cc20220517_AC.mat';
-[trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
+% MATPATH = 'E:\ECoG\MAT Data\CC\7-10Freq Active\cc20220517\cc20220517_AC.mat';
+DATAPATH = 'G:\ECoG\chouchou\cc20220612\Block-1';
+[trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params);
 fs0 = ECOGDataset.fs;
+
+%% 
+window = [-3000, 7000];
+[trialsECOG, ~, ~] = selectEcog(ECOGDataset, trialAll, "trial onset", window);
+
+for tIndex = 21:25
+    plotRawWave(trialsECOG{tIndex}, [], window, strcat("Trial ", num2str(tIndex)));
+    plotTFA(trialsECOG{tIndex}, fs0, fs, window, strcat("Trial ", num2str(tIndex)));
+end
 
 %% ICA
 window  = [-2000, 2000];
@@ -41,7 +51,12 @@ dRatio = unique(dRatioAll);
 dRatio(dRatio == 0) = [];
 
 %% Behavior
-FigBehavior = plotBehaviorOnly(trialAll, "r", "7-10 Freq");
+constIdx = logical(mod(ceil([trialAll.trialNum] / 20), 2));
+randIdx = ~logical(mod(ceil([trialAll.trialNum] / 20), 2));
+trialsConst = trialAll(constIdx);
+trialsRand = trialAll(randIdx);
+[FigBehavior, mAxe] = plotBehaviorOnly(trialsConst, "r", "Constant ISI");
+[FigBehavior, mAxe] = plotBehaviorOnly(trialsRand, "b", "Random ISI", FigBehavior, mAxe);
 drawnow;
 
 %% 

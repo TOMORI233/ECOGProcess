@@ -1,6 +1,6 @@
 clear; clc; close all;
 %% Parameter settings
-BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220530\Block-3';
+BLOCKPATH = 'G:\ECoG\chouchou\cc20220530\Block-3';
 
 params.posIndex = 1;
 params.processFcn = @CTScreeningProcess;
@@ -25,7 +25,8 @@ plotRawWaveMulti(chData, window, "CT Screening");
 %% check repetition frequency band
 window = [-1000, 5000];
 trials = trialAll(10:end-10);
-[~, chMean, ~] = selectEcog(ECOGDataset, trials, "trial onset", window);
-Fig = plotTFA(chMean, fs0, 300, window);
+[trialsECOG, chMean, ~] = selectEcog(ECOGDataset, trials, "trial onset", window);
+Fig2 = plotTFA(chMean, fs0, 300, window);
+Fig = plotTFA2(trialsECOG, fs0, 300, window);
 scaleAxes(Fig,'y',[],[0 10]);
 scaleAxes(Fig,'c',[],[0 5]);

@@ -1,4 +1,4 @@
-function trialAll = ActiveProcess_LTST(epocs, choiceWin)
+function trialAll = ActiveProcess_whatwhen(epocs, choiceWin)
     narginchk(1, 2);
 
     if nargin < 2
@@ -66,13 +66,6 @@ function trialAll = ActiveProcess_LTST(epocs, choiceWin)
         %% Correct or not
         % Find first push time of this trial
         firstPush = pushTimeAll(find(pushTimeAll >= trialAll(tIndex, 1).soundOnsetSeq(end) & pushTimeAll <= trialOnsetTimeAll(tIndex + 1, 1), 1));
-        
-        if isempty(firstPush)
-            trialAll(tIndex, 1).correct = false;
-            trialAll(tIndex, 1).interrupt = true;
-            trialAll(tIndex, 1).oddballType = "ERROR";
-            continue;
-        end
 
         % DEV: Whether push in choice window
         if strcmp(trialAll(tIndex, 1).oddballType, "DEV")

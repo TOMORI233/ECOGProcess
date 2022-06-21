@@ -45,7 +45,7 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr)
 
     end
 
-    yRange = scaleAxes(Fig);
+    yRange = scaleAxes(Fig, "y");
     allAxes = findobj(Fig, "Type", "axes");
 
     for aIndex = 1:length(allAxes)
