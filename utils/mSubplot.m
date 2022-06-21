@@ -9,6 +9,7 @@ function mAxe = mSubplot(Fig, row, col, index, nSize, margins, paddings)
         margins = 0.01 * ones(1, 4);
     end
 
+
     if nargin < 7 || isempty(paddings)
         paddings = 0.01 * ones(1, 4);
     end

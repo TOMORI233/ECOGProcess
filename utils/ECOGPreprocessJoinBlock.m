@@ -1,4 +1,4 @@
-function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, behaviorOnly)
+function [trialAll, ECOGDataset, segTimePoint] = ECOGPreprocessJoinBlock(BLOCKPATH, params, opts, T2)
     % Description: load data from *.mat or TDT block
     % Input:
     %     DATAPATH: full path of *.mat or TDT block path
@@ -12,11 +12,11 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, behaviorOnly
     %     trialAll: n*1 struct of trial information
     %     ECOGDataset: TDT dataset of [streams.(posStr(posIndex))]
 
-    narginchk(2, 3);
-
-    if nargin < 3
-        behaviorOnly = false;
+    narginchk(2, 4);
+    if nargin < 4
+        T2 = zeros(1, length(BLOCKPATH));
     end
+
 
     %% Parameter settings
     run("paramsConfig.m");
@@ -34,32 +34,24 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, behaviorOnly
     end
 
     %% Loading data
-    try
-        disp("Try loading data from MAT");
 
-        if ~behaviorOnly
-            load(DATAPATH, "-mat", "trialAll", "ECOGDataset");
-        else
-            load(DATAPATH, "-mat", "trialAll");
-            ECOGDataset = [];
-        end
-
-    catch e
-        disp(e.message);
         disp("Try loading data from TDT BLOCK...");
-        temp = TDTbin2mat(DATAPATH, 'TYPE', {'epocs'});
-        epocs = temp.epocs;
-    
-        if ~behaviorOnly
-            temp = TDTbin2mat(DATAPATH, 'TYPE', {'streams'});
-            streams = temp.streams;
-            ECOGDataset = streams.(posStr(posIndex));
-        else
-            ECOGDataset = [];
+        if iscell(BLOCKPATH)
+            for i = 1:length(BLOCKPATH)
+                eval(['data' num2str(i) ' = TDTbin2mat(BLOCKPATH{' num2str(i) '}, ''T2'', T2(' num2str(i) '));']);
+            end
         end
-
+        
+        strBuffer = '[temp segTimePoint] = joinBlocks(opts';
+        for i = 1:length(BLOCKPATH)
+            strBuffer = [strBuffer ', data' num2str(i)];
+        end
+        strBuffer = [strBuffer ');'];
+        eval(strBuffer);
+        epocs = temp.epocs;
+        streams = temp.streams;
+        ECOGDataset = streams;
         trialAll = processFcn(epocs, choiceWin);
-    end
 
     return;
 end
