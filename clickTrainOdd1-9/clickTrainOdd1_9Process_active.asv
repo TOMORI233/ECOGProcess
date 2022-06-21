@@ -27,7 +27,7 @@ ROOTPATH = fullfile('E:\ECoG\ECoGBehaviorResult',Paradigm,DateStr);
 soundDuration = 200; % ms
 
 %% title & labels
-diffStr = {'control(4msReg)','deviant(4.03msReg)','deviant(4.06msReg)','deviant(4.09msReg)','deviant(4.12msReg)'};
+pairStr = {'control(4msReg)','deviant(4.03msReg)','deviant(4.06msReg)','deviant(4.09msReg)','deviant(4.12msReg)'};
 typeStr = {'1-3','4-6','7-9'};
 posStr = ["LAuC", "LPFC"];
 
@@ -50,7 +50,7 @@ trials7_9 = trialAll([trialAll.stdNum] >= 7 & [trialAll.stdNum] <= 9);
 [FigBehavior, mAxe] = plotBehaviorOnly(trials1_3, "k", "1 2 3");
 [FigBehavior, mAxe] = plotBehaviorOnly(trials4_6, "b", "4 5 6", FigBehavior, mAxe);
 [FigBehavior, mAxe] = plotBehaviorOnly(trials7_9, "r", "7 8 9", FigBehavior, mAxe);
-set(mAxe(1),'xticklabel',diffStr);
+set(mAxe(1),'xticklabel',);
 
 % saveFigures
 behavPath = fullfile(ROOTPATH,'behaviorResult');
@@ -90,23 +90,23 @@ for dIndex = 1:length(devType)
     %%1-3
     trials = trialAll([trialAll.devOrdr] == devType(dIndex) & [trialAll.interrupt] == false & [trialAll.correct] == true  & [trialAll.stdNum] >= 1 & [trialAll.stdNum] <= 3);
     [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
-    FigDev_Wave1_3(dIndex) = plotRawWave(chMean, chStd, window, ['stiTyme: ', num2str(diffStr{dIndex}), '(N=', num2str(length(trials)), ') | 1-3']);
+    FigDev_Wave1_3(dIndex) = plotRawWave(chMean, chStd, window, ['stiTyme: ', num2str(pairStr{dIndex}), '(N=', num2str(length(trials)), ') | 1-3']);
     drawnow;
-    FigDev_TFA1_3(dIndex) = plotTFA(chMean, fs0, fs, window, ['stiTyme: ', num2str(diffStr{dIndex}), '(N=', num2str(length(trials)), ') | 1-3']);
+    FigDev_TFA1_3(dIndex) = plotTFA(chMean, fs0, fs, window, ['stiTyme: ', num2str(pairStr{dIndex}), '(N=', num2str(length(trials)), ') | 1-3']);
     drawnow;
     %%4-6
     trials = trialAll([trialAll.devOrdr] == devType(dIndex) & [trialAll.interrupt] == false & [trialAll.correct] == true  & [trialAll.stdNum] >= 4 & [trialAll.stdNum] <= 6);
     [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
-    FigDev_Wave4_6(dIndex) = plotRawWave(chMean, chStd, window, ['stiTyme: ', num2str(diffStr{dIndex}), '(N=', num2str(length(trials)), ') | 4-6']);
+    FigDev_Wave4_6(dIndex) = plotRawWave(chMean, chStd, window, ['stiTyme: ', num2str(pairStr{dIndex}), '(N=', num2str(length(trials)), ') | 4-6']);
     drawnow;
-    FigDev_TFA4_6(dIndex) = plotTFA(chMean, fs0, fs, window, ['stiTyme: ', num2str(diffStr{dIndex}), '(N=', num2str(length(trials)), ') | 4-6']);
+    FigDev_TFA4_6(dIndex) = plotTFA(chMean, fs0, fs, window, ['stiTyme: ', num2str(pairStr{dIndex}), '(N=', num2str(length(trials)), ') | 4-6']);
     drawnow;
     %%7-9
     trials = trialAll([trialAll.devOrdr] == devType(dIndex) & [trialAll.interrupt] == false & [trialAll.correct] == true  & [trialAll.stdNum] >= 7 & [trialAll.stdNum] <= 9);
     [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
-    FigDev_Wave7_9(dIndex) = plotRawWave(chMean, chStd, window, ['stiTyme: ', num2str(diffStr{dIndex}), '(N=', num2str(length(trials)), ') | 7-9']);
+    FigDev_Wave7_9(dIndex) = plotRawWave(chMean, chStd, window, ['stiTyme: ', num2str(pairStr{dIndex}), '(N=', num2str(length(trials)), ') | 7-9']);
     drawnow;
-    FigDev_TFA7_9(dIndex) = plotTFA(chMean, fs0, fs, window, ['stiTyme: ', num2str(diffStr{dIndex}), '(N=', num2str(length(trials)), ') | 7-9']);
+    FigDev_TFA7_9(dIndex) = plotTFA(chMean, fs0, fs, window, ['stiTyme: ', num2str(pairStr{dIndex}), '(N=', num2str(length(trials)), ') | 7-9']);
     drawnow;
 end
 
@@ -124,12 +124,12 @@ if ~exist(devPath,"dir")
     mkdir(devPath)
 end
 for figN = 1 : length(FigDev_Wave1_3)
-    saveas(FigDev_Wave1_3(figN),strcat(fullfile(devPath, '1-3' ,diffStr{figN}), '_',  AREANAME{posIndex}, '_Waveform.jpg'));
-    saveas(FigDev_TFA1_3(figN),strcat(fullfile(devPath, '1-3' ,diffStr{figN}), '_',  AREANAME{posIndex}, '_TimeFrequency.jpg'));
-     saveas(FigDev_Wave4_6(figN),strcat(fullfile(devPath, '4-6' ,diffStr{figN}), '_',  AREANAME{posIndex}, '_Waveform.jpg'));
-    saveas(FigDev_TFA4_6(figN),strcat(fullfile(devPath, '4-6' ,diffStr{figN}), '_',  AREANAME{posIndex}, '_TimeFrequency.jpg'));
-     saveas(FigDev_Wave7_9(figN),strcat(fullfile(devPath, '7-9' ,diffStr{figN}), '_',  AREANAME{posIndex}, '_Waveform.jpg'));
-    saveas(FigDev_TFA7_9(figN),strcat(fullfile(devPath, '7-9' ,diffStr{figN}), '_',  AREANAME{posIndex}, '_TimeFrequency.jpg'));
+    saveas(FigDev_Wave1_3(figN),strcat(fullfile(devPath,pairStr{figN}), '_',  AREANAME{posIndex}, '_Waveform.jpg'));
+    saveas(FigDev_TFA1_3(figN),strcat(fullfile(devPath,pairStr{figN}), '_',  AREANAME{posIndex}, '_TimeFrequency.jpg'));
+     saveas(FigDev_Wave4_6(figN),strcat(fullfile(devPath,pairStr{figN}), '_',  AREANAME{posIndex}, '_Waveform.jpg'));
+    saveas(FigDev_TFA4_6(figN),strcat(fullfile(devPath,pairStr{figN}), '_',  AREANAME{posIndex}, '_TimeFrequency.jpg'));
+     saveas(FigDev_Wave7_9(figN),strcat(fullfile(devPath,pairStr{figN}), '_',  AREANAME{posIndex}, '_Waveform.jpg'));
+    saveas(FigDev_TFA7_9(figN),strcat(fullfile(devPath,pairStr{figN}), '_',  AREANAME{posIndex}, '_TimeFrequency.jpg'));
 end
 
 %% Decision making
@@ -173,8 +173,8 @@ if ~exist(DMPath,"dir")
     mkdir(DMPath)
 end
 for figN = 1 : length(FigDM1)
-    saveas(FigDM1(figN),strcat(fullfile(DMPath,diffStr{figN}), '_' , AREANAME{posIndex}, '_Waveform.jpg'));
-    saveas(FigDM2(figN),strcat(fullfile(DMPath,diffStr{figN}), '_' , AREANAME{posIndex}, '_TimeFrequency.jpg'));
+    saveas(FigDM1(figN),strcat(fullfile(DMPath,pairStr{figN}), '_' , AREANAME{posIndex}, '_Waveform.jpg'));
+    saveas(FigDM2(figN),strcat(fullfile(DMPath,pairStr{figN}), '_' , AREANAME{posIndex}, '_TimeFrequency.jpg'));
 end
 
 
@@ -206,8 +206,8 @@ if ~exist(MMNPath,"dir")
     mkdir(MMNPath)
 end
 for figN = 1 : length(FigMMN1)
-    saveas(FigMMN1(figN),strcat(fullfile(MMNPath,diffStr{figN}), '_' , AREANAME{posIndex}, '_Waveform.jpg'));
-    saveas(FigMMN2(figN),strcat(fullfile(MMNPath,diffStr{figN}), '_' , AREANAME{posIndex}, '_TimeFrequency.jpg'));
+    saveas(FigMMN1(figN),strcat(fullfile(MMNPath,pairStr{figN}), '_' , AREANAME{posIndex}, '_Waveform.jpg'));
+    saveas(FigMMN2(figN),strcat(fullfile(MMNPath,pairStr{figN}), '_' , AREANAME{posIndex}, '_TimeFrequency.jpg'));
 end
 
 

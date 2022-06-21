@@ -23,6 +23,13 @@ function [comp, ICAres] = mICA(ECOGDataset, trials, window, segOption, fs)
     data = ft_selectdata(cfg, data);
 
     cfg = [];
+    cfg.demean = 'no';
+    cfg.lpfilter = 'yes';
+    cfg.lpfreq = 50;
+    cfg.hpfilter = 'yes';
+    cfg.hpfreq = 0.5;
+    cfg.hpfiltord = 3;
+    cfg.dftfreq       = [50 100 150]; % line noise frequencies in Hz for DFT filter (default = [50 100 150])
     data = ft_preprocessing(cfg, data);
 
     %% Resampling
