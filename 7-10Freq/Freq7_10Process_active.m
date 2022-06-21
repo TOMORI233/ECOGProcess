@@ -1,7 +1,7 @@
 clear; clc;
 %% Parameter settings
 params.posIndex = 1; % 1-AC, 2-PFC
-params.choiceWin = [0, 600];
+params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
 
 fs = 500; % Hz, for downsampling
@@ -13,22 +13,30 @@ fs0 = ECOGDataset.fs;
 
 %% ICA
 window  = [-2000, 2000];
-[comp, trialsECOG] = mICA(ECOGDataset, trialAll, window, "dev onset", fs);
-S = cellfun(@(x) comp.unmixing * x, trialsECOG, "UniformOutput", false);
-chMean = cell2mat(cellfun(@mean, changeCellRowNum(S), "UniformOutput", false)) * 1e6;
+[comp, ICAres] = mICA(ECOGDataset, trialAll, window, "dev onset", fs);
+ICMean = cell2mat(cellfun(@mean, changeCellRowNum(ICAres), "UniformOutput", false));
 
 idx1 = [-2000, -1500, -1000, -500, 0];
 idx2 = idx1 + 200;
 idx1 = max(fix((idx1 - window(1)) / 1000 * fs0), 1);
-idx2 = min(fix((idx2 - window(1)) / 1000 * fs0), size(chMean, 2));
-pw = sum(abs(chMean(:, idx1:idx2)), 2);
+idx2 = min(fix((idx2 - window(1)) / 1000 * fs0), size(ICMean, 2));
+pw = sum(abs(ICMean(:, idx1:idx2)), 2);
 figure;
 mAxe = mSubplot(gcf, 1, 1, 1, 1, [], ones(1, 4) * 0.05);
 histogram(mAxe, pw, "BinWidth", 10);
 
-plotRawWave(chMean, [], window, "ICA");
-plotTFA(chMean, fs0, fs, window, "ICA");
+plotRawWave(ICMean, [], window, "ICA");
+plotTFA(ICMean, fs0, fs, window, "ICA");
 plotTopo(comp);
+
+%% reconstruction
+% ICs = find(pw > input("Th = "));
+ICs = 12;
+[rec, comp1] = reconstructData(ICAres, comp, ICs);
+chMeanRec = cell2mat(cellfun(@mean, changeCellRowNum(rec), "UniformOutput", false));
+plotTFA(chMeanRec, fs0, fs, window, "rec");
+plotRawWave(chMeanRec, [], window, "rec");
+plotTopo(comp1);
 
 %%
 devFreqAll = [trialAll.devFreq];

@@ -1,4 +1,4 @@
-function [comp, trialsECOG] = mICA(ECOGDataset, trials, window, segOption, fs)
+function [comp, ICAres] = mICA(ECOGDataset, trials, window, segOption, fs)
     narginchk(4, 5);
 
     if nargin < 5
@@ -9,7 +9,7 @@ function [comp, trialsECOG] = mICA(ECOGDataset, trials, window, segOption, fs)
     disp("Preprocessing...");
     fs0 = ECOGDataset.fs;
     channels = ECOGDataset.channels;
-    [trialsECOG, ~, ~, sampleinfo] = selectEcog(ECOGDataset, trials, segOption, window, 1);
+    [trialsECOG, ~, ~, sampleinfo] = selectEcog(ECOGDataset, trials, segOption, window);
     t = linspace(window(1), window(2), size(trialsECOG{1}, 2)) / 1000;
 
     cfg = [];
@@ -37,6 +37,24 @@ function [comp, trialsECOG] = mICA(ECOGDataset, trials, window, segOption, fs)
     cfg = [];
     cfg.method = 'runica';
     comp = ft_componentanalysis(cfg, data);
+    ICAres = cellfun(@(x) comp.unmixing * x, trialsECOG, "UniformOutput", false);
 
+    %% Adjustment
+    disp("Adjusting...");
+
+    for index = 1:size(comp.topo, 2)
+        temp = comp.topo(:, index);
+
+        if max(temp) < abs(min(temp))
+            disp(['IC', num2str(index), ' reverse']);
+            comp.topo(:, index) = -temp;
+            temp = changeCellRowNum(ICAres);
+            temp(index) = {-temp{index}};
+            ICAres = changeCellRowNum(temp);
+        end
+
+    end
+
+    disp("ICA done.");
     return;
 end
