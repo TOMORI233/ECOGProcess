@@ -1,4 +1,4 @@
-function comp = rearrangeIC(comp, window, t0, dt)
+function comp = realignIC(comp, window, t0, dt)
     ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
     fs = comp.fsample;
 

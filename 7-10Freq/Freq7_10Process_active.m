@@ -16,7 +16,7 @@ window  = [-2000, 2000];
 comp = mICA(ECOGDataset, trialAll(10:40), window, "dev onset", fs);
 
 %% rearrange
-comp1 = rearrangeIC(comp, window, [-2000, -1500, -1000, -500, 0], 200);
+comp1 = realignIC(comp, window, [-2000, -1500, -1000, -500, 0], 200);
 ICMean2 = cell2mat(cellfun(@mean, changeCellRowNum(comp1.trial), "UniformOutput", false));
 plotRawWave(ICMean2, [], window, "rearrange");
 plotTFA(ICMean2, fs, [], window, "rearrange");
