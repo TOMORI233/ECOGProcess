@@ -1,4 +1,4 @@
-function trialAll = ActiveProcess_1_9Freq(epocs, choiceWin)
+function trialAll = ActiveProcess_WhatWhen(epocs, choiceWin)
     narginchk(1, 2);
 
     if nargin < 2
@@ -69,6 +69,8 @@ function trialAll = ActiveProcess_1_9Freq(epocs, choiceWin)
 
         if isempty(firstPush)
             trialAll(tIndex, 1).correct = false;
+            trialAll(tIndex, 1).oddballType = "ERROR";
+            trialAll(tIndex, 1).interrupt = true;
             continue;
         end
 

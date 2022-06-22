@@ -1,5 +1,5 @@
-function Fig = plotRawWave(chMean, chStd, window, titleStr)
-    narginchk(3, 4);
+function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize)
+    narginchk(3, 5);
 
     if nargin < 4
         titleStr = '';
@@ -7,20 +7,26 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr)
         titleStr = [' | ', char(titleStr)];
     end
 
+    if nargin < 5
+        plotSize = [8, 8];
+    end
+
     Fig = figure;
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
     maximizeFig(Fig);
 
-    for rIndex = 1:8
+    for rIndex = 1:plotSize(1)
 
-        for cIndex = 1:8
-            chNum = (rIndex - 1) * 8 + cIndex;
-            if chNum > size(chMean,1)
-                continue
+        for cIndex = 1:plotSize(2)
+            chNum = (rIndex - 1) * plotSize(2) + cIndex;
+
+            if chNum > size(chMean, 1)
+                continue;
             end
+            
             t = linspace(window(1), window(2), size(chMean, 2));
-            mSubplot(Fig, 8, 8, chNum, [1, 1], margins, paddings);
+            mSubplot(Fig, plotSize(1), plotSize(2), chNum, [1, 1], margins, paddings);
             
             if ~isempty(chStd)
                 y1 = chMean(chNum, :) + chStd(chNum, :);
@@ -35,12 +41,12 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr)
             xlim(window);
             title(['CH ', num2str(chNum), titleStr]);
 
-            if ~mod((chNum - 1), 8) == 0
+            if ~mod((chNum - 1), plotSize(2)) == 0
                 yticks([]);
                 yticklabels('');
             end
 
-            if chNum < 57
+            if chNum < (plotSize(1) - 1) * plotSize(2) + 1
                 xticklabels('');
             end
 

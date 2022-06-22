@@ -1,9 +1,10 @@
-function Fig = plotRawWaveMulti(chData, window, titleStr)
+function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize)
     % Description: plot serveral raw waves in one subplot
     % Input:
     %     chData: n*1 struct with fields [chMean], [chStd] and [color]
     %     window: xlim
     %     titleStr: title of subplot
+    %     plotSize: [nRows, nColumns]
     % Output:
     %     Fig: figure object
     % Example:
@@ -13,7 +14,7 @@ function Fig = plotRawWaveMulti(chData, window, titleStr)
     %     chData(2).color = "b";
     %     Fig = plotRawWaveMulti(chData, window, "A vs B");
 
-    narginchk(2, 3);
+    narginchk(2, 4);
 
     if nargin < 3
         titleStr = '';
@@ -21,16 +22,20 @@ function Fig = plotRawWaveMulti(chData, window, titleStr)
         titleStr = [' | ', char(titleStr)];
     end
 
+    if nargin < 4
+        plotSize = [8, 8];
+    end
+
     Fig = figure;
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
     maximizeFig(Fig);
 
-    for rIndex = 1:8
+    for rIndex = 1:plotSize(1)
 
-        for cIndex = 1:8
-            chNum = (rIndex - 1) * 8 + cIndex;
-            mSubplot(Fig, 8, 8, chNum, [1, 1], margins, paddings);
+        for cIndex = 1:plotSize(2)
+            chNum = (rIndex - 1) * plotSize(2) + cIndex;
+            mSubplot(Fig, plotSize(1), plotSize(2), chNum, [1, 1], margins, paddings);
 
             for index = 1:length(chData)
                 chMean = chData(index).chMean;
@@ -53,12 +58,12 @@ function Fig = plotRawWaveMulti(chData, window, titleStr)
             xlim(window);
             title(['CH ', num2str(chNum), titleStr]);
 
-            if ~mod((chNum - 1), 8) == 0
+            if ~mod((chNum - 1), plotSize(2)) == 0
                 yticks([]);
                 yticklabels('');
             end
 
-            if chNum < 57
+            if chNum < (plotSize(1) - 1) * plotSize(2) + 1
                 xticklabels('');
             end
 

@@ -1,10 +1,14 @@
-function Fig = plotTFA(chMean, fs0, fs, window, titleStr)
-    narginchk(4, 5);
+function Fig = plotTFA(chMean, fs0, fs, window, titleStr, plotSize)
+    narginchk(4, 6);
     
     if nargin < 5
         titleStr = '';
     else
         titleStr = [' | ', char(titleStr)];
+    end
+
+    if nargin < 6
+        plotSize = [8, 8];
     end
     
     Fig = figure;
@@ -12,14 +16,16 @@ function Fig = plotTFA(chMean, fs0, fs, window, titleStr)
     paddings = [0.01, 0.03, 0.01, 0.01];
     maximizeFig(Fig);
     
-    for rIndex = 1:8
+    for rIndex = 1:plotSize(1)
     
-        for cIndex = 1:8
-            chNum = (rIndex - 1) * 8 + cIndex;
-            if chNum > size(chMean,1)
-                continue
+        for cIndex = 1:plotSize(2)
+            chNum = (rIndex - 1) * plotSize(2) + cIndex;
+
+            if chNum > size(chMean, 1)
+                continue;
             end
-            mSubplot(Fig, 8, 8, chNum, [1, 1], margins, paddings);
+            
+            mSubplot(Fig, plotSize(1), plotSize(2), chNum, [1, 1], margins, paddings);
             [t, Y, CData, coi] = mCWT(double(chMean(chNum, :)), fs0, 'morlet', fs);
             X = t * 1000 + window(1);
             imagesc('XData', X, 'YData', Y, 'CData', CData);
@@ -30,12 +36,13 @@ function Fig = plotTFA(chMean, fs0, fs, window, titleStr)
             set(gca, "YScale", "log");
             yticks([0, 2.^(0:nextpow2(max(Y)) - 1)]);
             xlim(window);
+            ylim([min(Y), max(Y)]);
     
-            if ~mod((chNum - 1), 8) == 0
+            if ~mod((chNum - 1), plotSize(2)) == 0
                 yticklabels('');
             end
     
-            if chNum < 57
+            if chNum < (plotSize(1) - 1) * plotSize(2) + 1
                 xticklabels('');
             end
     
