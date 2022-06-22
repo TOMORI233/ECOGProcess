@@ -5,7 +5,7 @@ clear; clc; close all;
 params.posIndex = 1; % 1-AC, 2-PFC
 posIndex = params.posIndex;
 params.choiceWin = [100, 800];
-params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.processFcn = @PassiveProcess_toneGroup;
 
 fs = 500; % Hz, for downsampling
 

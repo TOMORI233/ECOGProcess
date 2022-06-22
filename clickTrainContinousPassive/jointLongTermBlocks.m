@@ -11,12 +11,11 @@ for i = 1 : length(basicRegIrreg)
     opts.efNames = ["num0", "ordr"];
     opts.abortHeadTail = 0;
     [trialAll, ECOGDatasetRaw, segTimePoint] = ECOGPreprocessJoinBlock(blkMerge, params, opts);
-    for pos =  2
+    for pos =  1 : 2
         clearvars -except i basicRegIrreg pos ECOGDatasetRaw segTimePoint trialAll posStr params  posIndex blkMerge
         
-        
-        replotFigure = 1;
-        blkTrial = 80;
+        reLoadRawData = 0;
+        replotFigure = 0;
         posIndex = pos;
         fs = 500; % Hz, for downsampling
         run("loadAllBlocks.m");
@@ -56,7 +55,8 @@ for i = 1 : length(basicRegIrreg)
                 S = cellfun(@(x) comp.unmixing * x, trialsECOG([trialAll.devOrdr] == devType(dIndex) & [trialAll.devOnset] > segTimePoint(blk, 1)*1000 & [trialAll.devOnset] < segTimePoint(blk, 2)*1000), "UniformOutput", false);
                 chMean{dIndex} = cell2mat(cellfun(@mean, changeCellRowNum(S), "UniformOutput", false)) * 1e6;
                 trials{dIndex} = trialAll([trialAll.devOrdr] == devType(dIndex)  & [trialAll.devOnset] > segTimePoint(blk, 1)*1000 & [trialAll.devOnset] < segTimePoint(blk, 2)*1000);
-                t{dIndex} = (1:size(chMean{dIndex},2)) / fs - S1Duration(dIndex);
+                t{dIndex} = linspace(window(1), window(2), size(chMean{dIndex} , 2));
+%                 t{dIndex} = (1:size(chMean{dIndex},2)) * 1000 / fs0 - S1Duration(dIndex);
                 if ~exist(figPath,'dir') || replotFigure
                     FigDev_Wave(dIndex) = plotRawWave(chMean{dIndex}, [], window - S1Duration(dIndex), ['IC, stiTyme: ', num2str(stimStr{dIndex}), '(N=', num2str(length(trials{dIndex})), ')']);
                     drawnow;
@@ -64,7 +64,7 @@ for i = 1 : length(basicRegIrreg)
                     drawnow;
                 end
             end
-            ICARes = struct('chMean', chMean, 'trials', trials, 't', t, 'stimStr', stimStr, 'S1Duration', S1Duration);    
+            ICARes = struct('chMean', chMean, 'trials', trials, 't', t, 'stimStr', stimStr, 'S1Duration', num2cell(S1Duration'), 'fs0', fs0);    
             save(fullfile(paradigmPath,strcat(posStr(posIndex), '_ICARes.mat')), 'ICARes', '-mat');
 
             

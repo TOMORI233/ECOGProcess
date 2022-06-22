@@ -1,4 +1,4 @@
-function trialAll = PassiveProcess_clickTrainContinuous(epocs, choiceWin, soundDuration)
+function trialAll = PassiveProcess_toneGroup(epocs, choiceWin, soundDuration)
 narginchk(1, 3);
 
 if nargin < 2
