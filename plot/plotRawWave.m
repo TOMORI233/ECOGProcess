@@ -16,9 +16,11 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr)
 
         for cIndex = 1:8
             chNum = (rIndex - 1) * 8 + cIndex;
-            if chNum > size(chMean,1)
+
+            if chNum > size(chMean, 1)
                 continue
             end
+            
             t = linspace(window(1), window(2), size(chMean, 2));
             mSubplot(Fig, 8, 8, chNum, [1, 1], margins, paddings);
             

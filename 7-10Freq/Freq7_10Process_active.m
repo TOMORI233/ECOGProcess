@@ -13,30 +13,21 @@ fs0 = ECOGDataset.fs;
 
 %% ICA
 window  = [-2000, 2000];
-[comp, ICAres] = mICA(ECOGDataset, trialAll, window, "dev onset", fs);
-ICMean = cell2mat(cellfun(@mean, changeCellRowNum(ICAres), "UniformOutput", false));
+comp = mICA(ECOGDataset, trialAll(10:40), window, "dev onset", fs);
 
-idx1 = [-2000, -1500, -1000, -500, 0];
-idx2 = idx1 + 200;
-idx1 = max(fix((idx1 - window(1)) / 1000 * fs0), 1);
-idx2 = min(fix((idx2 - window(1)) / 1000 * fs0), size(ICMean, 2));
-pw = sum(abs(ICMean(:, idx1:idx2)), 2);
-figure;
-mAxe = mSubplot(gcf, 1, 1, 1, 1, [], ones(1, 4) * 0.05);
-histogram(mAxe, pw, "BinWidth", 10);
-
-plotRawWave(ICMean, [], window, "ICA");
-plotTFA(ICMean, fs0, fs, window, "ICA");
-plotTopo(comp);
+%% rearrange
+comp1 = rearrangeIC(comp, window, [-2000, -1500, -1000, -500, 0], 200);
+ICMean2 = cell2mat(cellfun(@mean, changeCellRowNum(comp1.trial), "UniformOutput", false));
+plotRawWave(ICMean2, [], window, "rearrange");
+plotTFA(ICMean2, fs, [], window, "rearrange");
+plotTopo(comp1);
 
 %% reconstruction
-% ICs = find(pw > input("Th = "));
-ICs = 12;
-[rec, comp1] = reconstructData(ICAres, comp, ICs);
-chMeanRec = cell2mat(cellfun(@mean, changeCellRowNum(rec), "UniformOutput", false));
-plotTFA(chMeanRec, fs0, fs, window, "rec");
-plotRawWave(chMeanRec, [], window, "rec");
-plotTopo(comp1);
+ICs = 2;
+comp2 = reconstructData(comp1, ICs);
+chMeanRec = cell2mat(cellfun(@mean, changeCellRowNum(comp2.trial), "UniformOutput", false));
+plotRawWave(chMeanRec, [], window, "reconstruct");
+plotTFA(chMeanRec, fs, [], window, "reconstruct");
 
 %%
 devFreqAll = [trialAll.devFreq];
@@ -49,21 +40,6 @@ dRatio(dRatio == 0) = [];
 FigBehavior = plotBehaviorOnly(trialAll, "r", "7-10 Freq");
 drawnow;
 
-%% 
-% window = [-2000, 2000];
-% 
-% for dIndex = 1:length(dRatio)
-%     trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex));
-%     [result, chMean, ~] = selectEcog(ECOGDataset, trials, "dev onset", window);
-%     chData = struct("chMean", result, "color", repmat({[0.5, 0.5, 0.5]}, length(result), 1));
-%     chData0.chMean = chMean;
-%     chData0.color = "r";
-%     Fig = plotRawWaveMulti([chData; chData0], window, strcat("dRatio = ", num2str(dRatio(dIndex))));
-%     scaleAxes(Fig, "x", [-500, 1000]);
-%     scaleAxes(Fig, "y", [], [-80, 80], "max");
-%     drawnow;
-% end
-
 %% MMN - PE
 window = [-2000, 2000];
 trialsC = trialAll([trialAll.correct] == true & [trialAll.oddballType] == "DEV");
@@ -72,8 +48,8 @@ trialsW = trialAll([trialAll.correct] == false & [trialAll.interrupt] == false &
 [resultSTDC, chMeanSTDC, ~] = selectEcog(ECOGDataset, trialsC, "last std", window);
 [resultDEVW, chMeanDEVW, ~] = selectEcog(ECOGDataset, trialsW, "dev onset", window);
 [resultSTDW, chMeanSTDW, ~] = selectEcog(ECOGDataset, trialsW, "last std", window);
-chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVC - resultSTDC), "UniformOutput", false));
-chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVW - resultSTDW), "UniformOutput", false));
+chMeanC = cell2mat(cellfun(@(x) mean(comp.unmixing * x), changeCellRowNum(resultDEVC - resultSTDC), "UniformOutput", false));
+chMeanW = cell2mat(cellfun(@(x) mean(comp.unmixing * x), changeCellRowNum(resultDEVW - resultSTDW), "UniformOutput", false));
 Fig1(1) = plotRawWave(chMeanC, [], window, "C:DEV-last STD");
 Fig1(2) = plotRawWave(chMeanW, [], window, "W:DEV-last STD");
 Fig2(1) = plotTFACompare(chMeanDEVC, chMeanSTDC, fs0, fs, window, "C:DEV-last STD");

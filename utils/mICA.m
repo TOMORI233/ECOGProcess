@@ -1,8 +1,8 @@
-function [comp, ICAres] = mICA(ECOGDataset, trials, window, segOption, fs)
+function comp = mICA(ECOGDataset, trials, window, segOption, fs)
     narginchk(4, 5);
 
     if nargin < 5
-        fs = 500; % Hz
+        fs = 500; % Hz, for downsampling
     end
 
     %% Preprocessing
@@ -34,26 +34,31 @@ function [comp, ICAres] = mICA(ECOGDataset, trials, window, segOption, fs)
 
     %% Resampling
     disp("Resampling...");
-    cfg = [];
-    cfg.resamplefs = fs;
-    cfg.trials = (1:length(data.trial))';
-    data = ft_resampledata(cfg, data);
+
+    if fs < fs0
+        cfg = [];
+        cfg.resamplefs = fs;
+        cfg.trials = (1:length(data.trial))';
+        data = ft_resampledata(cfg, data);
+    else
+        warning("resamplefs should not be greater than fsample. Skip resampling.");
+    end
 
     %% ICA
     disp("Performing ICA...");
     cfg = [];
     cfg.method = 'runica';
     comp = ft_componentanalysis(cfg, data);
-    ICAres = cellfun(@(x) comp.unmixing * x, trialsECOG, "UniformOutput", false);
 
     %% Adjustment
     disp("Adjusting...");
+    ICAres = comp.trial;
 
     for index = 1:size(comp.topo, 2)
         temp = comp.topo(:, index);
 
         if max(temp) < abs(min(temp))
-            disp(['IC', num2str(index), ' reverse']);
+            disp(['IC', num2str(index), ' inverse']);
             comp.topo(:, index) = -temp;
             temp = changeCellRowNum(ICAres);
             temp(index) = {-temp{index}};
@@ -62,6 +67,8 @@ function [comp, ICAres] = mICA(ECOGDataset, trials, window, segOption, fs)
 
     end
 
+    comp.trial = ICAres;
+    comp.unmixing = comp.topo ^ (-1);
     disp("ICA done.");
     return;
 end

@@ -1,8 +1,10 @@
 function Fig = plotTopo(comp, topoSize)
     narginchk(1, 2);
+
     if nargin < 2
         topoSize = [8, 8];
     end
+
     Fig = figure;
     maximizeFig(Fig);
     margins = [0.05, 0.05, 0.1, 0.1];
@@ -13,9 +15,11 @@ function Fig = plotTopo(comp, topoSize)
     
         for cIndex = 1:8
             ICNum = (rIndex - 1) * 8 + cIndex;
+
             if ICNum > size(topo, 1)
                 continue
             end
+
             mSubplot(Fig, 8, 8, ICNum, 1, margins, paddings);
             N = 4;
             C = flipud(reshape(topo(:, ICNum), topoSize)');
