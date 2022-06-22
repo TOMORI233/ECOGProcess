@@ -16,11 +16,20 @@ window  = [-2000, 2000];
 comp = mICA(ECOGDataset, trialAll(10:40), window, "dev onset", fs);
 
 %% rearrange
-comp1 = realignIC(comp, window, [-2000, -1500, -1000, -500, 0], 200);
+t1 = [-2000, -1500, -1000, -500, 0];
+t2 = t1 + 200;
+comp1 = realignIC(comp, window, t1, t2);
 ICMean2 = cell2mat(cellfun(@mean, changeCellRowNum(comp1.trial), "UniformOutput", false));
-plotRawWave(ICMean2, [], window, "rearrange");
-plotTFA(ICMean2, fs, [], window, "rearrange");
-plotTopo(comp1);
+plotRawWave(ICMean2, [], window, "realign", [3, 3]);
+plotTFA(ICMean2, fs, [], window, "realign", [3, 3]);
+plotTopo(comp1, [8, 8], [3, 3]);
+
+%% test
+comp3 = reverseIC(comp1, input("IC to reverse: "));
+ICMean2 = cell2mat(cellfun(@mean, changeCellRowNum(comp3.trial), "UniformOutput", false));
+plotRawWave(ICMean2, [], window, "realign", [2, 3]);
+plotTFA(ICMean2, fs, [], window, "realign", [2, 3]);
+plotTopo(comp3, [8, 8], [2, 3]);
 
 %% reconstruction
 ICs = 2;

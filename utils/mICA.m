@@ -1,4 +1,15 @@
 function comp = mICA(ECOGDataset, trials, window, segOption, fs)
+    % Description: Split data by trials, window and segOption. Filter and
+    %              resample data. Perform ICA on data.
+    % Input:
+    %     ECOGDataset: TDT dataset of [LAuC] or [LPFC]
+    %     trials: n*1 struct array of trial information
+    %     window: time window of interest of each trial
+    %     segOption: "trial onset" | "dev onset" | "push onset" | "last std"
+    %     fs: sample rate for downsampling, < fs0
+    % Output:
+    %     comp: result of ICA (FieldTrip)
+
     narginchk(4, 5);
 
     if nargin < 5
@@ -22,6 +33,7 @@ function comp = mICA(ECOGDataset, trials, window, segOption, fs)
     data.sampleinfo = sampleinfo;
     data = ft_selectdata(cfg, data);
 
+    % Filter
     cfg = [];
     cfg.demean = 'no';
     cfg.lpfilter = 'yes';
@@ -50,25 +62,6 @@ function comp = mICA(ECOGDataset, trials, window, segOption, fs)
     cfg.method = 'runica';
     comp = ft_componentanalysis(cfg, data);
 
-    %% Adjustment
-    disp("Adjusting...");
-    ICAres = comp.trial;
-
-    for index = 1:size(comp.topo, 2)
-        temp = comp.topo(:, index);
-
-        if max(temp) < abs(min(temp))
-            disp(['IC', num2str(index), ' inverse']);
-            comp.topo(:, index) = -temp;
-            temp = changeCellRowNum(ICAres);
-            temp(index) = {-temp{index}};
-            ICAres = changeCellRowNum(temp);
-        end
-
-    end
-
-    comp.trial = ICAres;
-    comp.unmixing = comp.topo ^ (-1);
     disp("ICA done.");
     return;
 end
