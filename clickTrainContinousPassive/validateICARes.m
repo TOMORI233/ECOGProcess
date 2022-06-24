@@ -19,18 +19,14 @@ for i = 1 : length(icaResDataPath)
 end
 regexp
 %% validate Raw result
-temp = dir('E:\ECoG\matData\chouchou\**\*Res.mat');
-rawResDataPath = cellfun(@(x) fullfile(x{1},x{2}),array2VectorCell([{temp.folder}' {temp.name}']),'uni',false);
-rawResDataPath = rawResDataPath(~contains(rawResDataPath, 'Merge'));
-foldName = {temp(~contains({temp.folder}, 'Merge')).folder}';
-matName = split({temp(~contains({temp.folder}, 'Merge')).name}' , '_');
-temp = split(foldName, '_');
-
-
+[rawResDataPath, temp] = getSubfoldPath('E:\ECoG\matData\xiaoxiao','Res.mat','^(?!.*Merge)');
 for i = 1 : length(rawResDataPath)
-    load(rawResDataPath{i});
-    Paradigm = temp{i,2};
-    resStr = strrep(matName{i,2}, '.mat', '');
+    clear data Res ICARes RawRes
+    data = load(rawResDataPath{i});
+    Paradigm = split(temp(i).folder, '_');
+    Paradigm = Paradigm{2};
+    matName = split(temp(i).name, '_');
+    resStr = strrep(matName{2}, '.mat', '');
     if contains(rawResDataPath{i}, 'offsetScreen')
         window = [0 7000];
     else
@@ -38,11 +34,13 @@ for i = 1 : length(rawResDataPath)
     end
     run("validS1Duration.m");
     disp(strcat('processing...(', num2str(i), '/', num2str(length(rawResDataPath)), ')'));
-    for j = 1 : length(ICARes)
-            ICARes(j).t = linspace(window(1), window(2), size(ICARes(j).chMean, 2)) - S1Duration(j);
-            ICARes(j).S1Duration = S1Duration(j);
-        ICARes(j).fs0 = size(ICARes(j).chMean, 2)/(diff(window)/1000);
+    fieldname = fields(data);
+    Res = data.(fieldname{1});
+    for j = 1 : length(Res)
+            Res(j).t = linspace(window(1), window(2), size(Res(j).chMean, 2)) - S1Duration(j);
+            Res(j).S1Duration = S1Duration(j);
+        Res(j).fs0 = size(Res(j).chMean, 2)/(diff(window)/1000);
     end
-    eval([resStr '= ICARes;']);
+    eval([resStr '= Res;']);
     save(rawResDataPath{i}, resStr);
 end

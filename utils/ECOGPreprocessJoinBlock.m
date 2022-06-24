@@ -19,6 +19,7 @@ function [trialAll, ECOGDataset, segTimePoint] = ECOGPreprocessJoinBlock(BLOCKPA
 
 
     %% Parameter settings
+    opts.behavOnly = getOr(opts, 'behavOnly', 0);
     run("paramsConfig.m");
     params = getOrFull(params, paramsDefault);
 
@@ -36,11 +37,20 @@ function [trialAll, ECOGDataset, segTimePoint] = ECOGPreprocessJoinBlock(BLOCKPA
     %% Loading data
 
         disp("Try loading data from TDT BLOCK...");
+        
         if iscell(BLOCKPATH)
-            for i = 1:length(BLOCKPATH)
-                eval(['data' num2str(i) ' = TDTbin2mat(BLOCKPATH{' num2str(i) '}, ''T2'', T2(' num2str(i) '));']);
+            if opts.behavOnly
+                for i = 1:length(BLOCKPATH)
+                    eval(['data' num2str(i) ' = TDTbin2mat(BLOCKPATH{' num2str(i) '}, ''TYPE'', 2,''T2'', T2(' num2str(i) '));']);
+                end  
+            else
+                for i = 1:length(BLOCKPATH)
+                    eval(['data' num2str(i) ' = TDTbin2mat(BLOCKPATH{' num2str(i) '}, ''T2'', T2(' num2str(i) '));']);
+                end
             end
         end
+
+        
         
         strBuffer = '[temp segTimePoint] = joinBlocks(opts';
         for i = 1:length(BLOCKPATH)
