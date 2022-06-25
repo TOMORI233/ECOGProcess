@@ -26,11 +26,9 @@ end
 function [res,resLogic] = regexpKeyword(data,keyword)
 str = data;
 pat = ".*"; %初始化正则表达式
-if ~iscell(keyword)
-    keyword = {keyword};
-end
+
 for keyN = 1:length(keyword) %根据keyword的长度设置循环次数
-    pat = strcat(pat, keyword{keyN}, ".*"); % 获得完整的正则表达式
+    pat = strcat(pat, keyword(keyN), ".*"); % 获得完整的正则表达式
 end
 resLogic = ~cellfun(@isempty,regexp(str,pat,'match'));
 if size(resLogic,2) ~= size(str,2)

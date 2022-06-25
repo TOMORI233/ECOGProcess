@@ -4,31 +4,30 @@ clear; clc; close all;
 posStr = ["LAuC", "LPFC"];
 params.posIndex = 1; % 1-AC, 2-PFC
 posIndex = params.posIndex;
-params.choiceWin = [100, 800];
+params.choiceWin = [100, 1000];
 params.processFcn = @ActiveProcess_clickTrainLST;
 
 fs = 500; % Hz, for downsampling
 
 %% Processing
-% joinBlocks
-BLOCKPATH1 = 'E:\ECoG\chouchou\cc20220623\Block-1';
-BLOCKPATH2 = 'E:\ECoG\chouchou\cc20220623\Block-2';
-opts.sfNames = posStr(posIndex);
-opts.efNames = ["num0", "push", "erro", "ordr"];
-opts.behavOnly = 1;
-[trialAll, ECOGDataset] = ECOGPreprocessJoinBlock({BLOCKPATH1, BLOCKPATH2}, params, opts, [2435 0]);
+% % joinBlocks
+% BLOCKPATH1 = 'E:\ECoG\chouchou\cc20220623\Block-1';
+% BLOCKPATH2 = 'E:\ECoG\chouchou\cc20220623\Block-2';
+% opts.sfNames = posStr(posIndex);
+% opts.efNames = ["num0", "push", "erro", "ordr"];
+% opts.behavOnly = 1;
+% [trialAll, ECOGDataset] = ECOGPreprocessJoinBlock({BLOCKPATH1, BLOCKPATH2}, params, opts, [2435 0]);
 
 % normal 
-% BLOCKPATH = 'E:\ECoG\chouchou\cc20220623\Block-2';
-% BLOCKPATH = 'E:\ECoG\chouchou\cc20220613\Block-1';
-% [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params,1);
+BLOCKPATH = 'E:\ECoG\chouchou\cc20220623\Block-2';
+[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params,1);
 
 if ~isempty(ECOGDataset)
     ECOGDataset = ECOGDataset.(posStr(posIndex));
     fs0 = ECOGDataset.fs;
 end
 %% Data saving params
-temp = string(split(BLOCKPATH1, '\'));
+temp = string(split(BLOCKPATH, '\'));
 DateStr = temp(end - 1);
 Paradigm = 'ClickTrainOddDurationLSTActive';
 AREANAME = {'AC', 'PFC'};
