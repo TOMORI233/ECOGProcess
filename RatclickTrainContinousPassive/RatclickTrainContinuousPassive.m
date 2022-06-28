@@ -11,7 +11,7 @@ fs = 500; % Hz, for downsampling
 
 
 %% Processing
-BLOCKPATH = 'E:\ECoG\HQYrat2\20220613\Block-3';
+BLOCKPATH = 'E:\ECoG\xiaoxiao\xx20220623\Block-3';
 
 if contains(BLOCKPATH,'HQY')
     params.posIndex = 3; % 1-AC, 2-PFC
@@ -43,37 +43,37 @@ devType = unique([trialAll.devOrdr]);
 window = [0, 5000]; %=
 topoSize = [8, 8];
 if contains(BLOCKPATH,'HQY')
-    topoSize = [4, 2];
+    topoSize = [6,2];
     ECOGDatasetCopy = ECOGDataset;
-    ECOGDataset.channels = 1:8;
-    ECOGDataset.data = ECOGDatasetCopy.data(1:8,:);
+    ECOGDataset.channels = 1:12;
+    ECOGDataset.data = ECOGDatasetCopy.data(1:12,:);
 end
 
 
 
 
-[comp, trialsECOG] = mICA(ECOGDataset, trialAll, window, "dev onset", fs);
+[comp] = mICA(ECOGDataset, trialAll, window, "dev onset", fs);
 
-Fig1 = plotTopo(comp, topoSize);
+Fig1 = plotTopo(comp, topoSize, [6 2]);
 
 
 
 
 %%
 for dIndex = 1:length(devType)
-    S = cellfun(@(x) comp.unmixing * x, trialsECOG([trialAll.devOrdr] == devType(dIndex)), "UniformOutput", false);
-    chMean = cell2mat(cellfun(@mean, changeCellRowNum(S), "UniformOutput", false)) * 1e6;
+    S = comp.trial([trialAll.devOrdr] == devType(dIndex))';
+    chMean = cell2mat(cellfun(@mean, changeCellRowNum(S), "UniformOutput", false));
     trials = trialAll([trialAll.devOrdr] == devType(dIndex));
     FigDev_Wave(dIndex) = plotRawWave(chMean, [], window - S1Duration(dIndex), ['IC, stiTyme: ', num2str(stimStr{dIndex}), '(N=', num2str(length(trials)), ')']);
     drawnow;
-    FigDev_TFA(dIndex) = plotTFA(chMean, fs0, fs, window - S1Duration(dIndex), ['IC, stiTyme: ', num2str(stimStr{dIndex}), '(N=', num2str(length(trials)), ') ']);
+    FigDev_TFA(dIndex) = plotTFA(chMean, fs, fs, window - S1Duration(dIndex), ['IC, stiTyme: ', num2str(stimStr{dIndex}), '(N=', num2str(length(trials)), ') ']);
     drawnow
 
 end
 
 setAxes([FigDev_Wave, FigDev_TFA], "xticklabel", setAxes([FigDev_Wave, FigDev_TFA], "xtick"));
 % Scale
-scaleAxes(FigDev_Wave, "y", [-10, 10]);
+% scaleAxes(FigDev_Wave, "y", [-10, 10]);
 %     scaleAxes(FigDev_TFA, "c", [], [0, 20]);
 
 
@@ -107,7 +107,7 @@ for dIndex = 1:length(devType)
 end
 
 % Scale
-setAxes([FigDev_Wave, FigDev_TFA], "xticklabel", setAxes([FigDev_Wave, FigDev_TFA], "xtick"));
+setAxes([FigDev_Wave, FigDev_TFA], "xticklabel", setAxes([FigDev_Wave2, FigDev_TFA2], "xtick"));
 
 scaleAxes(FigDev_Wave2, "y", [-80, 80]);
 scaleAxes(FigDev_TFA2, "c", [], [0, 20]);
