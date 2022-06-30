@@ -1,10 +1,11 @@
-function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize)
+function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs)
     % Description: plot serveral raw waves in one subplot
     % Input:
-    %     chData: n*1 struct with fields [chMean], [chStd] and [color]
+    %     chData: n*1 struct with fields [chMean], [color] and [legend]
     %     window: xlim
     %     titleStr: title of subplot
     %     plotSize: [nRows, nColumns]
+    %     chs: a nRows*nColumns matrix with each element specifying a channel number
     % Output:
     %     Fig: figure object
     % Example:
@@ -14,7 +15,7 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize)
     %     chData(2).color = "b";
     %     Fig = plotRawWaveMulti(chData, window, "A vs B");
 
-    narginchk(2, 4);
+    narginchk(2, 5);
 
     if nargin < 3
         titleStr = '';
@@ -26,6 +27,15 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize)
         plotSize = [8, 8];
     end
 
+    if nargin < 5
+        chs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(1), plotSize(2))';
+    end
+
+    if size(chs, 1) ~= plotSize(1) || size(chs, 2) ~= plotSize(2)
+        disp("chs option not matched with plotSize. Resize chs...");
+        chs = reshape(chs(1):(chs(1) + plotSize(1) * plotSize(2) - 1), plotSize(1), plotSize(2))';
+    end
+
     Fig = figure;
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
@@ -34,31 +44,39 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize)
     for rIndex = 1:plotSize(1)
 
         for cIndex = 1:plotSize(2)
-            chNum = (rIndex - 1) * plotSize(2) + cIndex;
-            mSubplot(Fig, plotSize(1), plotSize(2), chNum, [1, 1], margins, paddings);
+
+            if chs(rIndex, cIndex) > size(chData(1).chMean, 1)
+                continue;
+            end
+
+            chNum = chs(rIndex, cIndex);
+            mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
 
             for index = 1:length(chData)
                 chMean = chData(index).chMean;
-                chStd = getOr(chData(index), "chStd", []);
                 color = getOr(chData(index), "color", "r");
-
+                chData(index).legend = getOr(chData(index), "legend", []);
                 t = linspace(window(1), window(2), size(chMean, 2));
-    
-                if ~isempty(chStd)
-                    y1 = chMean(chNum, :) + chStd(chNum, :);
-                    y2 = chMean(chNum, :) - chStd(chNum, :);
-                    fill([t fliplr(t)], [y1 fliplr(y2)], [0, 0, 0], 'edgealpha', '0', 'facealpha', '0.3');
-                    hold on;
+
+                if ~isempty(chData(index).legend)
+                    plot(t, chMean(chNum, :), "Color", color, "LineWidth", 1.5, "DisplayName", chData(index).legend);
+                else
+                    plot(t, chMean(chNum, :), "Color", color, "LineWidth", 1.5);
                 end
-    
-                plot(t, chMean(chNum, :), "Color", color, "LineWidth", 1.5);
+
                 hold on;
             end
 
             xlim(window);
             title(['CH ', num2str(chNum), titleStr]);
 
-            if ~mod((chNum - 1), plotSize(2)) == 0
+            if (rIndex == 1 && cIndex == 1) && ~isempty([chData.legend])
+                legend(gca, "show");
+            else
+                legend(gca, "hide");
+            end
+
+            if ~mod(((rIndex - 1) * plotSize(2) + cIndex - 1), plotSize(2)) == 0
                 yticks([]);
                 yticklabels('');
             end
@@ -75,7 +93,8 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize)
     allAxes = findobj(Fig, "Type", "axes");
 
     for aIndex = 1:length(allAxes)
-        plot(allAxes(aIndex), [0, 0], yRange, "k--", "LineWidth", 0.6);
+        h = plot(allAxes(aIndex), [0, 0], yRange, "k--", "LineWidth", 0.6);
+        set(get(get(h, 'Annotation'), 'LegendInformation'), 'IconDisplayStyle', 'off');
     end
 
     return;
