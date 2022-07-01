@@ -28,12 +28,12 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs)
     end
 
     if nargin < 5
-        chs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(1), plotSize(2))';
+        chs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
     end
 
     if size(chs, 1) ~= plotSize(1) || size(chs, 2) ~= plotSize(2)
         disp("chs option not matched with plotSize. Resize chs...");
-        chs = reshape(chs(1):(chs(1) + plotSize(1) * plotSize(2) - 1), plotSize(1), plotSize(2))';
+        chs = reshape(chs(1):(chs(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
     end
 
     Fig = figure;
