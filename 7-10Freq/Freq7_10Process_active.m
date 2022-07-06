@@ -15,28 +15,19 @@ fs0 = ECOGDataset.fs;
 window  = [-2000, 2000];
 comp = mICA(ECOGDataset, trialAll(10:40), window, "dev onset", fs);
 
-%% rearrange
 t1 = [-2000, -1500, -1000, -500, 0];
 t2 = t1 + 200;
-comp1 = realignIC(comp, window, t1, t2);
-ICMean2 = cell2mat(cellfun(@mean, changeCellRowNum(comp1.trial), "UniformOutput", false));
-plotRawWave(ICMean2, [], window, "realign", [3, 3]);
-plotTFA(ICMean2, fs, [], window, "realign", [3, 3]);
-plotTopo(comp1, [8, 8], [3, 3]);
+comp = realignIC(comp, window, t1, t2);
+ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
+plotRawWave(ICMean, [], window, "ICA", [4, 5]);
+plotTFA(ICMean, fs, [], window, "ICA", [4, 5]);
+plotTopo(comp, [8, 8], [4, 5]);
 
-%% test
-comp3 = reverseIC(comp1, input("IC to reverse: "));
-ICMean2 = cell2mat(cellfun(@mean, changeCellRowNum(comp3.trial), "UniformOutput", false));
-plotRawWave(ICMean2, [], window, "realign", [2, 3]);
-plotTFA(ICMean2, fs, [], window, "realign", [2, 3]);
-plotTopo(comp3, [8, 8], [2, 3]);
-
-%% reconstruction
-ICs = 2;
-comp2 = reconstructData(comp1, ICs);
-chMeanRec = cell2mat(cellfun(@mean, changeCellRowNum(comp2.trial), "UniformOutput", false));
-plotRawWave(chMeanRec, [], window, "reconstruct");
-plotTFA(chMeanRec, fs, [], window, "reconstruct");
+comp = reverseIC(comp, input("IC to reverse: "));
+ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
+plotRawWave(ICMean, [], window, "ICA", [4, 5]);
+plotTFA(ICMean, fs, [], window, "ICA", [4, 5]);
+plotTopo(comp, [8, 8], [4, 5]);
 
 %%
 devFreqAll = [trialAll.devFreq];
