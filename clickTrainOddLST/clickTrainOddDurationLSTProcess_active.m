@@ -17,15 +17,21 @@ fs = 500; % Hz, for downsampling
 % opts.efNames = ["num0", "push", "erro", "ordr"];
 % opts.behavOnly = 1;
 % [trialAll, ECOGDataset] = ECOGPreprocessJoinBlock({BLOCKPATH1, BLOCKPATH2}, params, opts, [2435 0]);
+% if ~isempty(ECOGDataset)
+%     ECOGDataset = ECOGDataset.(posStr(posIndex));
+%     fs0 = ECOGDataset.fs;
+% end
+
+
 
 % normal 
 BLOCKPATH = 'E:\ECoG\chouchou\cc20220623\Block-2';
 [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params,1);
-
 if ~isempty(ECOGDataset)
-    ECOGDataset = ECOGDataset.(posStr(posIndex));
     fs0 = ECOGDataset.fs;
 end
+
+
 %% Data saving params
 temp = string(split(BLOCKPATH, '\'));
 DateStr = temp(end - 1);

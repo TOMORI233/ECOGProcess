@@ -19,7 +19,7 @@ for i = 1 : length(icaResDataPath)
 end
 regexp
 %% validate Raw result
-[rawResDataPath, temp] = getSubfoldPath('E:\ECoG\matData\xiaoxiao','Res.mat','^(?!.*Merge)');
+[rawResDataPath, temp] = getSubfoldPath('E:\ECoG\matData\xiaoxiao','Res.mat');
 for i = 1 : length(rawResDataPath)
     clear data Res ICARes RawRes
     data = load(rawResDataPath{i});

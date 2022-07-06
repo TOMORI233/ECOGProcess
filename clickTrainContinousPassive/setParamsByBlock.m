@@ -27,6 +27,10 @@ switch BLOCKPATH
         stimStr = {'4-4.06ms Reg Insert','4.06-4ms Reg Insert' ,'4-4.06ms Irreg Insert','4.06-4ms Irreg Insert'};
         S1Duration = [5005, 5080.1, 5000.2, 5075.2];
         Paradigm = 'ClickTrainSSALongTermInsert';
+    case Tone4msRelevantBlk
+        stimStr = {'250Hz tone','246Hz tone' ,'125Hz tone','123Hz tone' };
+        S1Duration = [5000, 5000, 5000, 5000];
+        Paradigm = 'ClickTrainSSALongTermTone4ms';
     case irregVar1Blk
         stimStr = {'normalize SD = 0.067','normalize SD = 0.1248' ,'normalize SD = 0.2203','normalize SD = 0.4508'};
         S1Duration = [5000.2, 5000.2, 5000.2, 5000.2];
@@ -58,5 +62,6 @@ switch BLOCKPATH
         stimStr = {'4ms -4.01ms Reg','4ms -4.02ms Reg' ,'4ms -4.03ms Reg','4ms -4.04ms Reg'};
         S1Duration = [5005+4.01, 5005+4.02, 5005+4.03, 5005+4.04];
         Paradigm = 'ClickTrainSSALongTermICIThr401234';
+    
 end
 

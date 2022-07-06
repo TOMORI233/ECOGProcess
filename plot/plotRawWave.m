@@ -35,7 +35,7 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize)
                 hold on;
             end
 
-            plot(t, chMean(chNum, :), "r", "LineWidth", 1.5);
+            plot(t, chMean(chNum, :), "r", "LineWidth", 1.5); hold on;
             hold on;
 
             xlim(window);
@@ -58,7 +58,7 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize)
     allAxes = findobj(Fig, "Type", "axes");
 
     for aIndex = 1:length(allAxes)
-        plot(allAxes(aIndex), [0, 0], yRange, "k--", "LineWidth", 0.6);
+        plot(allAxes(aIndex), [0, 0], yRange, "k--", "LineWidth", 0.6); hold on;
     end
 
     return;
