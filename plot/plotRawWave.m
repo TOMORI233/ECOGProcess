@@ -1,5 +1,5 @@
-function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize, chs)
-    narginchk(3, 6);
+function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize, chs, visible)
+    narginchk(3, 7);
 
     if nargin < 4
         titleStr = '';
@@ -15,12 +15,19 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize, chs)
         chs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
     end
 
+    if nargin < 7 
+        visible = "on";
+    end
+
+    
+
+
     if size(chs, 1) ~= plotSize(1) || size(chs, 2) ~= plotSize(2)
         disp("chs option not matched with plotSize. Resize chs...");
         chs = reshape(chs(1):(chs(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
     end
 
-    Fig = figure;
+    Fig = figure("Visible", visible);
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
     maximizeFig(Fig);

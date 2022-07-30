@@ -1,5 +1,5 @@
-function Fig = plotTFA(chMean, fs0, fs, window, titleStr, plotSize)
-    narginchk(4, 6);
+function Fig = plotTFA(chMean, fs0, fs, window, titleStr, plotSize, visible)
+    narginchk(4, 7);
     
     if nargin < 5
         titleStr = '';
@@ -11,7 +11,11 @@ function Fig = plotTFA(chMean, fs0, fs, window, titleStr, plotSize)
         plotSize = [8, 8];
     end
     
-    Fig = figure;
+    if nargin < 7
+        visible = "on";
+    end
+
+    Fig = figure("Visible", visible);
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
     maximizeFig(Fig);

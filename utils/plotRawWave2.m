@@ -27,7 +27,7 @@ function Fig = plotRawWave2(Fig, chMean, chStd, window, lineColor, plotSize)
                 hold on;
             end
 
-            plot(allAxes(length(allAxes) - chNum + 1), t, chMean(chNum, :), 'color', lineColor, "LineWidth", 1); 
+            plot(allAxes(length(allAxes) - chNum + 1), t, chMean(chNum, :), 'color', lineColor, "LineWidth", 1.5); 
             hold on;
 
             xlim(window);
@@ -36,3 +36,4 @@ function Fig = plotRawWave2(Fig, chMean, chStd, window, lineColor, plotSize)
     end
     return;
 end
+

@@ -16,7 +16,11 @@ function [resultSTD, chMean, chStd] = joinSTD(trials, ECOGDataset, window)
         ECOG = selectEcog(ECOGDataset, trialsSTD, "trial onset", window);
         weightSTD = zeros(1, size(ECOG{1}, 2));
         weightSTD(floor((windowSTD(1) - window(1)) * fs0 / 1000 + 1):floor((windowSTD(2) - window(1)) * fs0 / 1000)) = 1 / length(ECOG);
-        resultSTD{sIndex} = cell2mat(cellfun(@sum, changeCellRowNum(cellfun(@(x) x .* weightSTD, ECOG, "UniformOutput", false)), "UniformOutput", false));
+        if length(ECOG) > 1
+            resultSTD{sIndex} = cell2mat(cellfun(@sum, changeCellRowNum(cellfun(@(x) x .* weightSTD, ECOG, "UniformOutput", false)), "UniformOutput", false));
+        else
+            resultSTD{sIndex} = ECOG{1};
+        end
     end
     
     chMean = resultSTD{1};

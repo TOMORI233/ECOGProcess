@@ -54,7 +54,7 @@ switch BLOCKPATH
     case longICI40OrderBlk
         stimStr = {'40ms - 43ms regular','40ms - 44ms regular' ,'40ms - 45ms regular','40ms - 46ms regular'};
         S1Duration = [5005+43, 5005+44, 5005+45, 5005+46];
-        Paradigm = 'ClickTrainSSALongTermOffConvertLowHigh43444546';
+        Paradigm = 'ClickTrainSSALongTermLowHigh4043444546';
 %     case longICIInvertOrderBlk
 %         stimStr = {'4ms Reg Insert','4.06ms Reg Insert' ,'4ms Irreg Insert','4.06ms Irreg Insert'};
 %         S1Duration = [5005, 5080.1, 5000.2, 5075.2];
