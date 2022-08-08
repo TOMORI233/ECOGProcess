@@ -2,7 +2,7 @@ clear all; clc
 monkeyId = ["cc", "xx"];
 posStr = ["LAuC", "LPFC"];
 plotFigure = 0;
-reprocess = 1;
+reprocess = 0;
 plotMultiFigure = 0;
 selectWin = [-100 500];
 plotSize = [8, 8];
@@ -15,7 +15,7 @@ resData = ["MMNData.mat", "predictData.mat"]; %,
 badRecording = [""];
 pairStrRep = num2cell(["Reg4o16C", "Reg4o16D", "Reg5C", "Reg5D", "Irreg4o16C", "Irreg4o16D", "Irreg5C", "Irreg5D", "Tone250Hz", "Tone240Hz", "Tone250Hz", "Tone200Hz"]);
 
-for resN = 1 : length(resData) %% result type
+for resN = 1 : length(resData) %% resx`ult type
     for id = 1:2 % monkey id
         rootPath = "E:\ECoG\matData\behavior";
         for pN = 1 : length(paradigmKeyword) % protocol number
@@ -28,7 +28,8 @@ for resN = 1 : length(resData) %% result type
                     dateStr = string(temp{7});
                     clear MMNData predictData
                     savePath = fullfile("E:\ECoG\corelDraw\jpg\raw", paradigmStr(pN), dateStr, activeOrPassive);
-                    if ~exist(savePath, 'dir') || reprocess
+                    processMark = fullfile(savePath, "process.mat");
+                    if ~exist(processMark, "file") || reprocess
                         load(matPath{recordCode});
                     else
                         continue
@@ -38,6 +39,18 @@ for resN = 1 : length(resData) %% result type
                     disp(strjoin(["processing", paradigmStr(pN), monkeyId(id), posStr(pos), "...(", num2str(recordCode), '/', num2str(length(matPath)), ')'], ' '));
 
 
+                    pairStr = {'4-4.16RC','4-4.16RD','4-5RC','4-5RD','4-4.16IC','4-4.16ID','4-5IC','4-5ID','250-250Hz','250-240Hz','250-250Hz','250-200Hz'};
+                    typeStr = {'4-4o16Regular','4-5Regular','4-4o06Irregular','4-5Irregular','250-240HzTone','250-200HzTone'};
+                    %% plot behavior result
+                    if resData(resN) == "MMNData.mat" && activeOrPassive == "Active"
+                        trialAll = cell2mat([{MMNData.trialsC}'; {MMNData.trialsW}']);
+                        trials = trialAll([trialAll.interrupt] == false);
+                        [FigBehavior, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'}, pairStr);
+                        behavPath = fullfile(savePath, "behavior");
+                        mkdir(behavPath)
+                        print(FigBehavior, fullfile(behavPath,  "behaviorResult"), "-djpeg", "-r300");
+                        close(FigBehavior);
+                    end
 
 
 
@@ -48,7 +61,7 @@ for resN = 1 : length(resData) %% result type
                                 devStd_wave(dIndex) = plotRawWave(MMNData(dIndex).chMeanDEV, [], MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr,posStr(pos), " dev vs last std"), plotSize, chs, "off");
                                 devStd_wave(dIndex) = plotRawWave2(devStd_wave(dIndex), MMNData(dIndex).chMeanLastSTD, [], MMNData(dIndex).window, 'blue');
                                 if mod(dIndex, 2) == 1
-                                    MMN_Wave(ceil(dIndex / 2)) = plotRawWave(MMNData(dIndex).chMeanDEV - MMNData(dIndex).chMeanLastSTD, [], MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr, posStr(pos), " MMN dev vs control"), plotSize, chs, "off");
+                                    MMN_Wave(ceil(dIndex / 2)) = plotRawWave(MMNData(dIndex).chMeanDEV - MMNData(dIndex).chMeanLastSTD, [], MMNData(dIndex).window, strcat( MMNData(dIndex + 1).pairStr, posStr(pos), " MMN"), plotSize, chs, "off");
                                     devCompare_Wave(ceil(dIndex / 2)) = plotRawWave(MMNData(dIndex).chMeanDEV, [], MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr, posStr(pos), " dev reg vs irreg"), plotSize, chs, "off");
                                     setLine([MMN_Wave(ceil(dIndex / 2)) devCompare_Wave(ceil(dIndex / 2))], "Color", "blue", "LineStyle", "-");
                                 else
@@ -113,9 +126,15 @@ for resN = 1 : length(resData) %% result type
                             end
                             close all
 
+                            if pos == 2
+                                processed = 1;
+                                save(processMark, "processed");
+                            end
+
                     end
                 end
             end
         end
     end
 end
+

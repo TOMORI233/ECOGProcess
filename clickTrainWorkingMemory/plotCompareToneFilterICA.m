@@ -11,8 +11,7 @@ chs = (1 : 64)';
 % posIndex = input('recording area : 1-AC, 2-PFC \n');
 paradigmKeyword = "ClickTrainOddCompareTone";
 paradigmStr = strrep(paradigmKeyword, '[^0]', '');
-resData = ["MMNData.mat", "predictData.mat"]; % 
-badRecording = [""];
+resData = ["filterMMNData.mat", "filterPredictData.mat"]; %,badRecording = [""];
 pairStrRep = num2cell(["Reg4o16C", "Reg4o16D", "Reg5C", "Reg5D", "Irreg4o16C", "Irreg4o16D", "Irreg5C", "Irreg5D", "Tone250Hz", "Tone240Hz", "Tone250Hz", "Tone200Hz"]);
 
 for resN = 1 : length(resData) %% result type
@@ -26,8 +25,8 @@ for resN = 1 : length(resData) %% result type
                     temp = strsplit(matPath{recordCode}, '\');
                     activeOrPassive = string(temp{6});
                     dateStr = string(temp{7});
-                    savePath = fullfile("E:\ECoG\corelDraw\jpg\ICA", paradigmStr(pN), dateStr, activeOrPassive);
-                    processMark = fullfile(savePath, "process.mat");
+                    savePath = fullfile("E:\ECoG\corelDraw\jpg\filterICA", paradigmStr(pN), dateStr, activeOrPassive);
+                    processMark = fullfile(savePath, "filterProcess.mat");
                     if ~exist(processMark, "file") || reprocess
                         clear MMNData clear predictData
                         load(matPath{recordCode});
@@ -43,7 +42,7 @@ for resN = 1 : length(resData) %% result type
                     pairStr = {'4-4.16RC','4-4.16RD','4-5RC','4-5RD','4-4.16IC','4-4.16ID','4-5IC','4-5ID','250-250Hz','250-240Hz','250-250Hz','250-200Hz'};
                     typeStr = {'4-4o16Regular','4-5Regular','4-4o06Irregular','4-5Irregular','250-240HzTone','250-200HzTone'};
                     %% plot behavior result   
-                    if resData(resN) == "MMNData.mat" && activeOrPassive == "Active"
+                    if resData(resN) == "filterMMNData.mat" && activeOrPassive == "Active"
                         trialAll = cell2mat([{MMNData.trialsC}'; {MMNData.trialsW}']);
                         trials = trialAll([trialAll.interrupt] == false);
                         [FigBehavior, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'}, pairStr);
@@ -56,7 +55,7 @@ for resN = 1 : length(resData) %% result type
 
                     %% plot ICA topo
                     clear comp
-                    load(strrep(matPath{recordCode}, resData(resN), 'icaComp.mat'));
+                    load(strrep(matPath{recordCode}, resData(resN), 'filterIcaComp.mat'));
                     FigTopo = plotTopo(comp, [8, 8], [8, 8], "on");
                     topoPath = fullfile(savePath, "icaTopo");
                     mkdir(topoPath)
@@ -64,13 +63,13 @@ for resN = 1 : length(resData) %% result type
                     close(FigTopo);
 
                     switch resData(resN)
-                        case "MMNData.mat"
+                        case "filterMMNData.mat"
                             MMNData = addFieldToStruct(MMNData, pairStrRep', "pairStr");
                             for dIndex = 1 : length(MMNData)
                                 devStd_wave(dIndex) = plotRawWave(MMNData(dIndex).chMeanDEVICA, [], MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr,posStr(pos), " dev vs last std"), plotSize, chs, "off");
                                 devStd_wave(dIndex) = plotRawWave2(devStd_wave(dIndex), MMNData(dIndex).chMeanLastSTDICA, [], MMNData(dIndex).window, 'blue');
                                 if mod(dIndex, 2) == 1
-                                    MMN_Wave(ceil(dIndex / 2)) = plotRawWave(MMNData(dIndex).chMeanDEVICA - MMNData(dIndex).chMeanLastSTDICA, [], MMNData(dIndex).window, strcat( MMNData(dIndex + 1).pairStr, posStr(pos), " MM"), plotSize, chs, "off");
+                                    MMN_Wave(ceil(dIndex / 2)) = plotRawWave(MMNData(dIndex).chMeanDEVICA - MMNData(dIndex).chMeanLastSTDICA, [], MMNData(dIndex).window, strcat( MMNData(dIndex + 1).pairStr, posStr(pos), " MMN"), plotSize, chs, "off");
                                     devCompare_Wave(ceil(dIndex / 2)) = plotRawWave(MMNData(dIndex).chMeanDEVICA, [], MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr, posStr(pos), " dev reg vs irreg"), plotSize, chs, "off");
                                     setLine([MMN_Wave(ceil(dIndex / 2)) devCompare_Wave(ceil(dIndex / 2))], "Color", "blue", "LineStyle", "-");
                                 else
@@ -116,7 +115,7 @@ for resN = 1 : length(resData) %% result type
                             end
                             close all
 
-                        case "predictData.mat"
+                        case "filterPredictData.mat"
                             for sIndex = 1 : length(predictData)
                                 prediction_wave(sIndex) =  plotRawWave(predictData(sIndex).chMeanICA, [], predictData(sIndex).window, strcat( predictData(sIndex).typeStr, posStr(pos), " prediction"), plotSize, chs, "off");
                                 prediction_TFA(sIndex) =  plotTFA(predictData(sIndex).chMeanICA, predictData(sIndex).fs0, predictData(sIndex).fs, predictData(sIndex).window, strcat( predictData(sIndex).typeStr, posStr(pos), " prediction"), plotSize, "off");

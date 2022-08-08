@@ -2,7 +2,7 @@ clear all; clc
 monkeyId = ["cc", "xx"];
 posStr = ["LAuC", "LPFC"];
 plotFigure = 0;
-reprocess = 1;
+reprocess = 0;
 plotMultiFigure = 0;
 selectWin = [-100 500];
 plotSize = [8, 8];
@@ -27,7 +27,8 @@ for resN = 1 : length(resData) %% result type
                     activeOrPassive = string(temp{6});
                     dateStr = string(temp{7});
                     savePath = fullfile("E:\ECoG\corelDraw\jpg\ICA", paradigmStr(pN), dateStr, activeOrPassive);
-                    if ~exist(savePath, 'dir') || reprocess
+                    processMark = fullfile(savePath, "process.mat");
+                    if ~exist(processMark, "file") || reprocess
                         clear MMNData clear predictData
                         load(matPath{recordCode});
                     else
@@ -37,10 +38,11 @@ for resN = 1 : length(resData) %% result type
                     clear devCompare_TFA devCompare_Wave  MMN_Wave MMN_TFA devStd_wave prediction_TFA prediction_wave
                     disp(strjoin(["processing", paradigmStr(pN), monkeyId(id), posStr(pos), "...(", num2str(recordCode), '/', num2str(length(matPath)), ')'], ' '));
 
-                    if resData(resN) == "MMNData.mat"
+                    
                         %% plot behavior result
                         pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','FuzaTone-C','FuzaTone-D'};
                         typeStr = {'4-4.06Regular','4-4.06Irregular','ComplexTone'};
+                    if resData(resN) == "MMNData.mat" && activeOrPassive == "Active"
                         trialAll = cell2mat([{MMNData.trialsC}'; {MMNData.trialsW}']);
                         trials = trialAll([trialAll.interrupt] == false);
                         [FigBehavior, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'}, pairStr);

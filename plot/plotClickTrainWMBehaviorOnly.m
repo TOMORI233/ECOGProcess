@@ -70,10 +70,11 @@ for index = 1:length(nPush)
     text(mAxe(1), index, nPush(index) / nTotal(index) + 0.05, [num2str(nPush(index)), '/', num2str(nTotal(index))]);
 end
 
-% chi2test with reg control
+%% chi2test with reg control
+
 nNoPush = nTotal - nPush;
-for index = 2 : length(pairIdx)
-    temp = [nTotal(1), nNoPush(1); nTotal(index), nNoPush(index)];
+for index = 1 : 2 : length(pairIdx)
+    temp = [nTotal(index), nNoPush(index); nTotal(index + 1), nNoPush(index + 1)];
     p(index) = chi2test(temp);
     text(mAxe(1), index, nPush(index) / nTotal(index) + 0.1, strcat("p=", num2str(p(index))));
 end

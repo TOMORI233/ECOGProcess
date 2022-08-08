@@ -1,31 +1,30 @@
 clear; clc; close all;
 %% Parameter setting
 blksActive = {...
-    'E:\ECoG\xiaoxiao\xx20220730\Block-1';...
-    'E:\ECoG\xiaoxiao\xx20220801\Block-1';...
-    'E:\ECoG\xiaoxiao\xx20220804\Block-1';...
-    'E:\ECoG\chouchou\cc20220804\Block-1';...
-    'E:\ECoG\xiaoxiao\xx20220805\Block-1';...
-    'E:\ECoG\xiaoxiao\xx20220806\Block-1';...
-    'E:\ECoG\chouchou\cc20220806\Block-2';...
+    'E:\ECoG\chouchou\cc20220725\Block-2';...
+    'E:\ECoG\xiaoxiao\xx20220728\Block-4';...
+    'E:\ECoG\xiaoxiao\xx20220729\Block-2';...
+    'E:\ECoG\xiaoxiao\xx20220730\Block-2';...
+    'E:\ECoG\xiaoxiao\xx20220801\Block-2';...
+    'E:\ECoG\xiaoxiao\xx20220806\Block-2';...
     };
-% blksActive = {'E:\ECoG\chouchou\cc20220604\Block-1'};
 
 for blkN = 1 : length(blksActive)
     for posIndex = 1 : 2
         clearvars -except posIndex blksActive blkN SAVEPATH
         disp(strcat('processing...(', num2str((posIndex - 1) * length(blksActive) + blkN), '/', num2str(2 * length(blksActive)), ')'));
-        SAVEPATH = 'E:\ECoG\matData\behavior\ClickTrainOddCompareTone\Active';
+        SAVEPATH = 'E:\ECoG\matData\behavior\ClickTrainOddCompareTone\Passive';
         posStr = ["LAuC", "LPFC"];
-        reprocess = 0;
+        reprocess = 1;
         params.posIndex = posIndex; % 1-AC, 2-PFC
         params.choiceWin = [100, 800];
-        params.processFcn = @ActiveProcess_clickTrainWM;
+        params.processFcn = @PassiveProcess_clickTrainWM;
         fs = 500; % Hz, for downsampling
-        flp = inf;
-        fhp = 0;
+        flp = 1;
+        fhp = 150;
 
         %% process content
+        conductICA = 1;
         processBehavior = 0;
         processPrediction = 1;
         processDeviant = 0;
@@ -46,8 +45,11 @@ for blkN = 1 : length(blksActive)
 
         if ~exist(fullfile(SAVEPATH,strcat(posStr(posIndex), '_rawData.mat')),"file") % check if rawData exist
             [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params);
-%             ECOGDataset = mResample2(ECOGDataset, fs, fhp, flp);% filtered, dowmsampled, zoomed
+            if DateStr == "cc20220725"
+                trialAll = changeOrderStr(trialAll, Paradigm);
+            end
             trialAll = deleteWrongTrial(trialAll, Paradigm);
+
             mkdir(SAVEPATH);
             save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_rawData.mat')), 'ECOGDataset', 'trialAll', '-mat');
         elseif   reprocess
@@ -56,21 +58,36 @@ for blkN = 1 : length(blksActive)
             continue
         end
 
-        clear comp
 
-        if ~exist(fullfile(SAVEPATH,strcat(posStr(posIndex), '_icaComp.mat')),"file") % check if rawData exist
-            window  = [-2000, 2000];
-            comp = mICA(ECOGDataset, trialAll, window, "dev onset", fs);
-            t1 = [-2000, -1500, -1000, -500, 0];
-            t2 = t1 + 300;
-            comp = realignIC(comp, window, t1, t2);
-            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_icaComp.mat')),  'comp', '-mat');
+        % filter
+        if ~exist(fullfile(SAVEPATH,strcat(posStr(posIndex), '_filterData.mat')),"file") % check if filterData exist
+            ECOGDataset = mResample2(ECOGDataset, fs, fhp, flp);% filtered, dowmsampled, zoomed
+            mkdir(SAVEPATH);
+            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_filterData.mat')), 'ECOGDataset', 'trialAll', '-mat');
+        elseif  reprocess
+            load(fullfile(SAVEPATH,strcat(posStr(posIndex), '_filterData.mat')));
         else
-            load(fullfile(SAVEPATH,strcat(posStr(posIndex), '_icaComp.mat')));
+            continue
         end
+
+        if conductICA
+            clear comp
+            if ~exist(fullfile(SAVEPATH,strcat(posStr(posIndex), '_filterIcaComp.mat')),"file") % check if rawData exist
+                window  = [-2000, 2000];
+                comp = mICA(ECOGDataset, trialAll, window, "dev onset", fs);
+                t1 = [-2000, -1500, -1000, -500, 0];
+                t2 = t1 + 300;
+                comp = realignIC(comp, window, t1, t2);
+                save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_filterIcaComp.mat')),  'comp', '-mat');
+            else
+                load(fullfile(SAVEPATH,strcat(posStr(posIndex), '_filterIcaComp.mat')));
+            end
+        end
+
         if ~isempty(ECOGDataset)
             fs0 = ECOGDataset.fs;
         end
+
 
         %% Data saving params
 
@@ -79,42 +96,27 @@ for blkN = 1 : length(blksActive)
         soundDuration = 200; % ms
 
         %% title & labels
-        % pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','4-4.06InC','4-4.06InD','40-40.6RC','40-40.6RD','Tone-C','Tone-D'};
         pairStr = {'4-4.16RC','4-4.16RD','4-5RC','4-5RD','4-4.16IC','4-4.16ID','4-5IC','4-5ID','250-250Hz','250-240Hz','250-250Hz','250-200Hz'};
         typeStr = {'4-4o16Regular','4-5Regular','4-4o06Irregular','4-5Irregular','250-240HzTone','250-200HzTone'};
-
         posStr = ["LAuC", "LPFC"];
 
 
-        %% Behavior processing
-        clear trialsNoInterrupt trials
+        %% stimulus processing
+        clear  trials
         trialAll = trialAll(2:end);
-        trialsNoInterrupt = trialAll([trialAll.interrupt] == false);
-        ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trialsNoInterrupt.soundOnsetSeq}, {trialsNoInterrupt.stdNum})));
-        diffPairs = [[trialsNoInterrupt.stdOrdr]' [trialsNoInterrupt.devOrdr]'];
+
+        ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trialAll.soundOnsetSeq}, {trialAll.stdNum})));
+        diffPairs = [[trialAll.stdOrdr]' [trialAll.devOrdr]'];
         diffPairsUnique = unique(diffPairs, 'rows');
         stdType = unique(diffPairsUnique(:,1));
         devType = unique(diffPairsUnique(:,2));
 
-        %% Plot behavior result
-        if processBehavior
-            trials = trialsNoInterrupt;
-            [FigBehavior, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'},pairStr);
-            % saveFigures
-            behavPath = fullfile(ROOTPATH,'behaviorResult');
-            if ~exist(behavPath,"dir")
-                mkdir(behavPath)
-            end
-            saveas(FigBehavior,strcat(behavPath, '_',  AREANAME{posIndex}, 'behavResult.jpg'));
 
-        end
         %% Prediction
         if processPrediction
             window = [-2500, 6000]; % ms
             for sIndex = 1 : length(stdType)
-                trials = trialAll([trialAll.stdOrdr] == stdType(sIndex) & [trialAll.interrupt] == false);
-                trialsC = trials([trials.correct]);
-                trialsW = trials(~[trials.correct]);
+                trials = trialAll([trialAll.stdOrdr] == stdType(sIndex));
                 [trialsECOG, chMean{sIndex, 1}, chStd{sIndex, 1}] = joinSTD(trials, ECOGDataset, window);
                 S2 = cellfun(@(x)  comp.unmixing * x, trialsECOG, "UniformOutput", false);
                 chMeanICA{sIndex, 1} = cell2mat(cellfun(@mean, changeCellRowNum(S2), "UniformOutput", false));
@@ -122,10 +124,10 @@ for blkN = 1 : length(blksActive)
 
             predictData = struct("typeStr", typeStr', "fs", num2cell(ones(length(stdType), 1) * fs), "fs0", num2cell(ones(length(stdType), 1) * fs0), "window", ...
                 array2VectorCell(repmat(window, length(stdType), 1)), "chMean", chMean, "chStd", chStd, ...
-                "chMeanICA", chMeanICA, "trialsC", trialsC, "trialsW", trialsW);
+                "chMeanICA", chMeanICA);
             % save prediction data
-            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_predictData.mat')), 'predictData');
-            clear chMean chStd  chMeanICA trialsC trialsW trials
+            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_filterPredictData.mat')), 'predictData');
+            clear chMean chStd  chMeanICA
         end
 
         %% deviant response
@@ -144,7 +146,7 @@ for blkN = 1 : length(blksActive)
             end
 
             % save deviant data
-            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_deviantData.mat')), 'trials','typeStr', 'pairStr', 'chMean', 'chStd', 'fs', 'fs0', 'window', 'stdType');
+            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_filterDeviantData.mat')), 'trials','typeStr', 'pairStr', 'chMean', 'chStd', 'fs', 'fs0', 'window', 'stdType');
             clear chMean chStd  chMeanICA
         end
 
@@ -152,9 +154,6 @@ for blkN = 1 : length(blksActive)
         %% Decision making
         if processDecisionMaking
             window = [-2000, 2000];
-            % resultC = [];
-            % resultW = [];
-
             for dIndex = 1 : length(devType)
                 trials = trialAll([trialAll.devOrdr] == devType(dIndex));
                 [result, ~, ~] = selectEcog(ECOGDataset, trials, "dev onset", window);
@@ -186,7 +185,7 @@ for blkN = 1 : length(blksActive)
             end
 
             % save deviant data
-            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_decisionMakingData.mat')), 'trials','typeStr', 'pairStr', 'resultC', 'resultW' ,'chMeanStd', 'chMeanDev', 'fs', 'fs0', 'window', 'stdType');
+            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_filterDecisionMakingData.mat')), 'trials','typeStr', 'pairStr', 'resultC', 'resultW' ,'chMeanStd', 'chMeanDev', 'chStd', 'fs', 'fs0', 'window', 'stdType');
             clear chMeanStdICA chMeanDevICA icaResultC icaResultW resultW resultC chMeanStd chMeanDev icaResult result
         end
 
@@ -195,25 +194,7 @@ for blkN = 1 : length(blksActive)
         if processMMN
             window = [-2000, 2000];
             for dIndex = 1 : length(devType)
-                trialsC{dIndex, 1} = trialAll([trialAll.correct] == true & [trialAll.devOrdr] == devType(dIndex));
-                trialsW{dIndex, 1} = trialAll([trialAll.correct] == false & [trialAll.interrupt] == false & [trialAll.devOrdr] == devType(dIndex));
                 trialsAll{dIndex, 1} = trialAll([trialAll.devOrdr] == devType(dIndex));
-
-                [trialsECOGDEVC, chMeanDEVC{dIndex, 1}, ~] = selectEcog(ECOGDataset, trialsC{dIndex, 1}, "dev onset", window);
-                S2 = cellfun(@(x)  comp.unmixing * x, trialsECOGDEVC, "UniformOutput", false);
-                chMeanDEVCICA{dIndex, 1} = cell2mat(cellfun(@mean, changeCellRowNum(S2), "UniformOutput", false));
-
-                [trialsECOGSTDC, chMeanLastSTDC{dIndex, 1}, ~] = selectEcog(ECOGDataset, trialsC{dIndex, 1}, "last std", window);
-                S2 = cellfun(@(x)  comp.unmixing * x, trialsECOGSTDC, "UniformOutput", false);
-                chMeanLastSTDCICA{dIndex, 1} = cell2mat(cellfun(@mean, changeCellRowNum(S2), "UniformOutput", false));
-
-                [trialsECOGDEVW, chMeanDEVW{dIndex, 1}, ~] = selectEcog(ECOGDataset, trialsW{dIndex, 1}, "dev onset", window);
-                S2 = cellfun(@(x)  comp.unmixing * x, trialsECOGDEVW, "UniformOutput", false);
-                chMeanDEVWICA{dIndex, 1} = cell2mat(cellfun(@mean, changeCellRowNum(S2), "UniformOutput", false));
-
-                [trialsECOGSTDW, chMeanLastSTDW{dIndex, 1}, ~] = selectEcog(ECOGDataset, trialsW{dIndex, 1}, "last std", window);
-                S2 = cellfun(@(x)  comp.unmixing * x, trialsECOGSTDW, "UniformOutput", false);
-                chMeanLastSTDWICA{dIndex, 1} = cell2mat(cellfun(@mean, changeCellRowNum(S2), "UniformOutput", false));
 
                 [trialsECOGDEV, chMeanDEV{dIndex, 1}, ~] = selectEcog(ECOGDataset, trialsAll{dIndex, 1}, "dev onset", window);
                 S2 = cellfun(@(x)  comp.unmixing * x, trialsECOGDEV, "UniformOutput", false);
@@ -225,15 +206,12 @@ for blkN = 1 : length(blksActive)
             end
 
             MMNData = struct("pairStr", pairStr', "fs", num2cell(ones(length(devType), 1) * fs), "fs0", num2cell(ones(length(devType), 1) * fs0), "window", ...
-                array2VectorCell(repmat(window, length(devType), 1)), "chMeanDEV", chMeanDEV, "chMeanLastSTD", chMeanLastSTD, "chMeanDEVC", chMeanDEVC, ...
-                "chMeanLastSTDC", chMeanLastSTDC, "chMeanDEVW", chMeanDEVW, "chMeanLastSTDW", chMeanLastSTDW, ...
-                "chMeanDEVICA", chMeanDEVICA, "chMeanLastSTDICA", chMeanLastSTDICA, "chMeanDEVCICA", chMeanDEVCICA, ...
-                "chMeanLastSTDCICA", chMeanLastSTDCICA, "chMeanDEVWICA", chMeanDEVWICA, "chMeanLastSTDWICA", chMeanLastSTDWICA, ...
-                "trialsC", trialsC, "trialsW", trialsW);
+                array2VectorCell(repmat(window, length(devType), 1)), "chMeanDEV", chMeanDEV, "chMeanLastSTD", chMeanLastSTD, ...
+                "chMeanDEVICA", chMeanDEVICA, "chMeanLastSTDICA", chMeanLastSTDICA);
 
             % save MMN data
-            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_MMNData.mat')), "MMNData");
-            clear trialsC trialsW trialsAll chMeanDEVC chMeanDEVCICA chMeanLastSTDC chMeanLastSTDCICA chMeanDEVW chMeanDEVWICA chMeanLastSTDW chMeanLastSTDWICA chMeanDEV chMeanDEVICA chMeanLastSTD chMeanLastSTDICA
+            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_filterMMNData.mat')), "MMNData");
+            clear  trialsAll  chMeanDEV chMeanDEVICA chMeanLastSTD chMeanLastSTDICA
         end
 
 
@@ -262,7 +240,7 @@ for blkN = 1 : length(blksActive)
                 [~, chMeanToneD, ~] = selectEcog(ECOGDataset, trialsToneD, "push onset", window);
             end
             % save dev v.s. control data
-            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_DevControlPush.mat')), 'typeStr', 'pairStr', 'chMeanRegD', 'chMeanIrregD', 'chMeanToneD', 'chStd', 'fs', 'fs0', 'window', 'stdType');
+            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_filterDevControlPush.mat')), 'typeStr', 'pairStr', 'chMeanRegD', 'chMeanIrregD', 'chMeanToneD', 'chStd', 'fs', 'fs0', 'window', 'stdType');
             clear   chMeanRegD      chMeanIrregD    chMeanToneD
         end
 
@@ -286,7 +264,7 @@ for blkN = 1 : length(blksActive)
             [~, chMeanToneD, ~] = selectEcog(ECOGDataset, trialsToneD, "dev onset", window);
 
             % save dev v.s. control data
-            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_DevControlDevOnset.mat')), 'typeStr', 'pairStr', 'chMeanRegD', 'chMeanRegC', 'chMeanIrregD', 'chMeanIrregC', 'chMeanToneD', 'chMeanToneC', 'chStd', 'fs', 'fs0', 'window', 'stdType');
+            save(fullfile(SAVEPATH,strcat(posStr(posIndex), '_filterDevControlDevOnset.mat')), 'typeStr', 'pairStr', 'chMeanRegD', 'chMeanRegC', 'chMeanIrregD', 'chMeanIrregC', 'chMeanToneD', 'chMeanToneC', 'chStd', 'fs', 'fs0', 'window', 'stdType');
         end
     end
 end

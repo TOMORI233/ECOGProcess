@@ -11,7 +11,7 @@ chs = (1 : 64)';
 % posIndex = input('recording area : 1-AC, 2-PFC \n');
 paradigmKeyword = "ClickTrainOddCompareTone";
 paradigmStr = strrep(paradigmKeyword, '[^0]', '');
-resData = ["MMNData.mat", "predictData.mat"]; % 
+resData = ["filterMMNData.mat", "filterPredictData.mat"]; %,
 badRecording = [""];
 pairStrRep = num2cell(["Reg4o16C", "Reg4o16D", "Reg5C", "Reg5D", "Irreg4o16C", "Irreg4o16D", "Irreg5C", "Irreg5D", "Tone250Hz", "Tone240Hz", "Tone250Hz", "Tone200Hz"]);
 
@@ -26,24 +26,23 @@ for resN = 1 : length(resData) %% result type
                     temp = strsplit(matPath{recordCode}, '\');
                     activeOrPassive = string(temp{6});
                     dateStr = string(temp{7});
-                    savePath = fullfile("E:\ECoG\corelDraw\jpg\ICA", paradigmStr(pN), dateStr, activeOrPassive);
-                    processMark = fullfile(savePath, "process.mat");
+                    clear MMNData predictData
+                    savePath = fullfile("E:\ECoG\corelDraw\jpg\filterRaw", paradigmStr(pN), dateStr, activeOrPassive);
+                    processMark = fullfile(savePath, "filterProcess.mat");
                     if ~exist(processMark, "file") || reprocess
-                        clear MMNData clear predictData
                         load(matPath{recordCode});
                     else
                         continue
                     end
 
-                    clear devCompare_TFA devCompare_Wave  MMN_Wave MMN_TFA devStd_wave prediction_TFA prediction_wave
+                    clear  devCompare_TFA devCompare_Wave  MMN_Wave MMN_TFA devStd_wave prediction_TFA prediction_wave
                     disp(strjoin(["processing", paradigmStr(pN), monkeyId(id), posStr(pos), "...(", num2str(recordCode), '/', num2str(length(matPath)), ')'], ' '));
-                    
 
 
                     pairStr = {'4-4.16RC','4-4.16RD','4-5RC','4-5RD','4-4.16IC','4-4.16ID','4-5IC','4-5ID','250-250Hz','250-240Hz','250-250Hz','250-200Hz'};
                     typeStr = {'4-4o16Regular','4-5Regular','4-4o06Irregular','4-5Irregular','250-240HzTone','250-200HzTone'};
-                    %% plot behavior result   
-                    if resData(resN) == "MMNData.mat" && activeOrPassive == "Active"
+                    %% plot behavior result
+                    if resData(resN) == "filterMMNData.mat" && activeOrPassive == "Active"
                         trialAll = cell2mat([{MMNData.trialsC}'; {MMNData.trialsW}']);
                         trials = trialAll([trialAll.interrupt] == false);
                         [FigBehavior, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'}, pairStr);
@@ -54,40 +53,31 @@ for resN = 1 : length(resData) %% result type
                     end
 
 
-                    %% plot ICA topo
-                    clear comp
-                    load(strrep(matPath{recordCode}, resData(resN), 'icaComp.mat'));
-                    FigTopo = plotTopo(comp, [8, 8], [8, 8], "on");
-                    topoPath = fullfile(savePath, "icaTopo");
-                    mkdir(topoPath)
-                    print(FigTopo, fullfile(topoPath, strcat(posStr(pos), "icaTopo")), "-djpeg", "-r300");
-                    close(FigTopo);
 
                     switch resData(resN)
-                        case "MMNData.mat"
+                        case "filterMMNData.mat"
                             MMNData = addFieldToStruct(MMNData, pairStrRep', "pairStr");
                             for dIndex = 1 : length(MMNData)
-                                devStd_wave(dIndex) = plotRawWave(MMNData(dIndex).chMeanDEVICA, [], MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr,posStr(pos), " dev vs last std"), plotSize, chs, "off");
-                                devStd_wave(dIndex) = plotRawWave2(devStd_wave(dIndex), MMNData(dIndex).chMeanLastSTDICA, [], MMNData(dIndex).window, 'blue');
+                                devStd_wave(dIndex) = plotRawWave(MMNData(dIndex).chMeanDEV, [], MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr,posStr(pos), " dev vs last std"), plotSize, chs, "off");
+                                devStd_wave(dIndex) = plotRawWave2(devStd_wave(dIndex), MMNData(dIndex).chMeanLastSTD, [], MMNData(dIndex).window, 'blue');
                                 if mod(dIndex, 2) == 1
-                                    MMN_Wave(ceil(dIndex / 2)) = plotRawWave(MMNData(dIndex).chMeanDEVICA - MMNData(dIndex).chMeanLastSTDICA, [], MMNData(dIndex).window, strcat( MMNData(dIndex + 1).pairStr, posStr(pos), " MM"), plotSize, chs, "off");
-                                    devCompare_Wave(ceil(dIndex / 2)) = plotRawWave(MMNData(dIndex).chMeanDEVICA, [], MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr, posStr(pos), " dev reg vs irreg"), plotSize, chs, "off");
+                                    MMN_Wave(ceil(dIndex / 2)) = plotRawWave(MMNData(dIndex).chMeanDEV - MMNData(dIndex).chMeanLastSTD, [], MMNData(dIndex).window, strcat( MMNData(dIndex + 1).pairStr, posStr(pos), " MMN"), plotSize, chs, "off");
+                                    devCompare_Wave(ceil(dIndex / 2)) = plotRawWave(MMNData(dIndex).chMeanDEV, [], MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr, posStr(pos), " dev reg vs irreg"), plotSize, chs, "off");
                                     setLine([MMN_Wave(ceil(dIndex / 2)) devCompare_Wave(ceil(dIndex / 2))], "Color", "blue", "LineStyle", "-");
                                 else
-                                    MMN_Wave(ceil(dIndex / 2)) = plotRawWave2(MMN_Wave(ceil(dIndex / 2)), MMNData(dIndex).chMeanDEVICA - MMNData(dIndex).chMeanLastSTDICA, [], MMNData(dIndex).window, 'red');
-                                    devCompare_Wave(ceil(dIndex / 2)) = plotRawWave2(devCompare_Wave(ceil(dIndex / 2)), MMNData(dIndex).chMeanDEVICA, [], MMNData(dIndex).window, 'red');
-                                    devCompare_TFA(ceil(dIndex / 2)) = plotTFACompare(MMNData(dIndex).chMeanDEVICA, MMNData(dIndex - 1).chMeanDEVICA, MMNData(dIndex).fs0, MMNData(dIndex).fs, MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr, posStr(pos), " dev compare"), plotSize, "off");
+                                    MMN_Wave(ceil(dIndex / 2)) = plotRawWave2(MMN_Wave(ceil(dIndex / 2)), MMNData(dIndex).chMeanDEV - MMNData(dIndex).chMeanLastSTD, [], MMNData(dIndex).window, 'red');
+                                    devCompare_Wave(ceil(dIndex / 2)) = plotRawWave2(devCompare_Wave(ceil(dIndex / 2)), MMNData(dIndex).chMeanDEV, [], MMNData(dIndex).window, 'red');
+                                    devCompare_TFA(ceil(dIndex / 2)) = plotTFACompare(MMNData(dIndex).chMeanDEV, MMNData(dIndex - 1).chMeanDEV, MMNData(dIndex).fs0, MMNData(dIndex).fs, MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr, posStr(pos), "dev compare"), plotSize, "off");
                                 end
-                                MMN_TFA(dIndex) = plotTFACompare(MMNData(dIndex).chMeanDEVICA, MMNData(dIndex).chMeanLastSTDICA, MMNData(dIndex).fs0, MMNData(dIndex).fs, MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr, posStr(pos), "MMN"), plotSize, "off");
+                                MMN_TFA(dIndex) = plotTFACompare(MMNData(dIndex).chMeanDEV, MMNData(dIndex).chMeanLastSTD, MMNData(dIndex).fs0, MMNData(dIndex).fs, MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr, posStr(pos), "MMN"), plotSize, "off");
                             end
 
                             lines(1).X = 200;
                             addLines2Axes([devStd_wave, devCompare_Wave, MMN_Wave, MMN_TFA, devCompare_TFA], lines);
                             scaleAxes([devStd_wave, devCompare_Wave, MMN_Wave, MMN_TFA, devCompare_TFA], "x", selectWin);
-                            scaleAxes([devStd_wave, devCompare_Wave, MMN_Wave], "y", [-6, 6]);
-                            scaleAxes(devCompare_TFA, "c", [], [-0.3, 0.3]);
-                            scaleAxes(MMN_TFA, "c", [], [0, 0.3]);
-
+                            scaleAxes([devStd_wave, devCompare_Wave, MMN_Wave], "y", [-60, 60]);
+                            scaleAxes(MMN_TFA, "c", [], [0, 20]);
+                            scaleAxes(devCompare_TFA, "c", [], [-20, 20]);
                             for dIndex = 1 : length(MMNData)
 
                                 devStdPath = fullfile(savePath, "devStd_Wave");
@@ -115,26 +105,27 @@ for resN = 1 : length(resData) %% result type
                                 end
                             end
                             close all
-
-                        case "predictData.mat"
+                        case "filterPredictData.mat"
                             for sIndex = 1 : length(predictData)
-                                prediction_wave(sIndex) =  plotRawWave(predictData(sIndex).chMeanICA, [], predictData(sIndex).window, strcat( predictData(sIndex).typeStr, posStr(pos), " prediction"), plotSize, chs, "off");
-                                prediction_TFA(sIndex) =  plotTFA(predictData(sIndex).chMeanICA, predictData(sIndex).fs0, predictData(sIndex).fs, predictData(sIndex).window, strcat( predictData(sIndex).typeStr, posStr(pos), " prediction"), plotSize, "off");
+                                prediction_wave(sIndex) =  plotRawWave(predictData(sIndex).chMean, [], predictData(sIndex).window, strcat( predictData(sIndex).typeStr, posStr(pos), " prediction"), plotSize, chs, "off");
+                                prediction_TFA(sIndex) =  plotTFA(predictData(sIndex).chMean, predictData(sIndex).fs0, predictData(sIndex).fs, predictData(sIndex).window, strcat( predictData(sIndex).typeStr, posStr(pos), " prediction"), plotSize, "off");
                             end
-                            
-                            scaleAxes(prediction_wave, "y");
-                            scaleAxes(prediction_TFA, "c");
+                            lines(1).X = 200;
+                            addLines2Axes([prediction_wave, prediction_TFA], lines);
+                            scaleAxes(prediction_wave, "y", [-60, 60]);
+                            scaleAxes(prediction_TFA, "c", [], [0, 20]);
 
                             for sIndex = 1 : length(predictData)
                                 predictionWavePath =  fullfile(savePath, "prediction wave");
                                 mkdir(predictionWavePath);
-                                print(prediction_wave(sIndex), fullfile(predictionWavePath, strrep(predictData(sIndex).typeStr, ".", "o")), "-djpeg", "-r300");
+                                print(prediction_wave(sIndex), fullfile(predictionWavePath, strcat(posStr(pos), predictData(sIndex).typeStr)), "-djpeg", "-r300");
 
                                 predictionTFAPath =  fullfile(savePath, "precition TFA");
                                 mkdir(predictionTFAPath);
-                                print(prediction_TFA(sIndex), fullfile(predictionTFAPath, strcat(posStr(pos), strrep(predictData(sIndex).typeStr, ".", "o"))), "-djpeg", "-r300");
+                                print(prediction_TFA(sIndex), fullfile(predictionTFAPath, strcat(posStr(pos), predictData(sIndex).typeStr)), "-djpeg", "-r300");
                             end
                             close all
+
                             if pos == 2
                                 processed = 1;
                                 save(processMark, "processed");
@@ -146,3 +137,4 @@ for resN = 1 : length(resData) %% result type
         end
     end
 end
+
