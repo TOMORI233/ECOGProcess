@@ -1,5 +1,5 @@
 function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotSize)
-    % Description: plot cwt difference between chMean1 and chMean2
+    % Description: plot cwt difference between chMean1 and chMean2 (1 - 2)
 
     narginchk(5, 7);
 
@@ -23,7 +23,7 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotS
         for cIndex = 1:plotSize(2)
             chNum = (rIndex - 1) * plotSize(2) + cIndex;
 
-            if chNum > size(chMean, 1)
+            if chNum > size(chMean1, 1) || chNum > size(chMean2, 1)
                 continue;
             end
 
