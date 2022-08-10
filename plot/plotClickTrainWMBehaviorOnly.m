@@ -64,11 +64,21 @@ yticks(0:0.2:1);
 xlabel("S1-S2 pairs");
 ylabel("Push Ratio");
 title('ClickTrain Working Memory Task');
-legend(legendStr);
+legend(legendStr, "location", "northwest");
 
 for index = 1:length(nPush)
     text(mAxe(1), index, nPush(index) / nTotal(index) + 0.05, [num2str(nPush(index)), '/', num2str(nTotal(index))]);
 end
+
+%% chi2test with reg control
+
+nNoPush = nTotal - nPush;
+for index = 1 : 2 : length(pairIdx)
+    temp = [nTotal(index), nNoPush(index); nTotal(index + 1), nNoPush(index + 1)];
+    p(index) = chi2test(temp);
+    text(mAxe(1), index, nPush(index) / nTotal(index) + 0.1, strcat("p=", num2str(p(index))));
+end
+
 
 return;
 end

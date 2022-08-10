@@ -1,5 +1,5 @@
-function Fig = plotTopo(comp, topoSize, plotSize)
-    narginchk(1, 3);
+function Fig = plotTopo(comp, topoSize, plotSize, visible)
+    narginchk(1, 4);
 
     if nargin < 2
         topoSize = [8, 8];
@@ -9,7 +9,11 @@ function Fig = plotTopo(comp, topoSize, plotSize)
         plotSize = [8, 8];
     end
 
-    Fig = figure;
+    if nargin < 4
+        visible = "on";
+    end
+
+    Fig = figure("Visible", visible);
     maximizeFig(Fig);
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];

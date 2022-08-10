@@ -1,7 +1,7 @@
-function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotSize)
-    % Description: plot cwt difference between chMean1 and chMean2 (1 - 2)
+function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotSize, visible)
+    % Description: plot cwt difference between chMean1 and chMean2
 
-    narginchk(5, 7);
+    narginchk(5, 8);
 
     if nargin < 6
         titleStr = '';
@@ -13,7 +13,11 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotS
         plotSize = [8, 8];
     end
 
-    Fig = figure;
+    if nargin < 8
+        visible = "on";
+    end
+
+    Fig = figure("Visible", visible);
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
     maximizeFig(Fig);
@@ -23,7 +27,11 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotS
         for cIndex = 1:plotSize(2)
             chNum = (rIndex - 1) * plotSize(2) + cIndex;
 
+<<<<<<< HEAD
             if chNum > size(chMean1, 1) || chNum > size(chMean2, 1)
+=======
+            if chNum > size(chMean1, 1)
+>>>>>>> f7249b910bbba1fd5c49ce85eb431ae9e35be106
                 continue;
             end
 

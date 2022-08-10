@@ -11,15 +11,15 @@ fs = 500; % Hz, for downsampling
 
 %% Processing
 % joinBlocks
-BLOCKPATH1 = 'E:\ECoG\chouchou\cc20220614\Block-3';
-BLOCKPATH2 = 'E:\ECoG\chouchou\cc20220614\Block-4';
-opts.sfNames = posStr(posIndex);
-opts.efNames = ["num0", "push", "erro", "ordr"];
-[trialAll, ECOGDataset] = ECOGPreprocessJoinBlock(BLOCKPATH1, BLOCKPATH2, params, opts, [1679 1849]);
+% BLOCKPATH1 = 'E:\ECoG\chouchou\cc20220614\Block-3';
+% BLOCKPATH2 = 'E:\ECoG\chouchou\cc20220614\Block-4';
+% opts.sfNames = posStr(posIndex);
+% opts.efNames = ["num0", "push", "erro", "ordr"];
+% [trialAll, ECOGDataset] = ECOGPreprocessJoinBlock(BLOCKPATH1, BLOCKPATH2, params, opts, [1679 1849]);
 
 % normal 
-% BLOCKPATH = 'E:\ECoG\chouchou\cc20220613\Block-1';
-% [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params);
+BLOCKPATH = 'E:\ECoG\chouchou\cc20220624\Block-1';
+[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params);
 if ~isempty(ECOGDataset)
     fs0 = ECOGDataset.fs;
 end

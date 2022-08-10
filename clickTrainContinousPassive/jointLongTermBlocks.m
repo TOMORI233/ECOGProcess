@@ -2,7 +2,7 @@
 clear; clc; close all;
 run("loadAllBlocks.m");
 
-for i = 1 : length(basicRegIrreg)
+for i = 10 : length(basicRegIrreg)
 
     posStr = ["LAuC", "LPFC"];
     params.processFcn = @PassiveProcess_clickTrainContinuous;
@@ -15,7 +15,7 @@ for i = 1 : length(basicRegIrreg)
         clearvars -except i basicRegIrreg pos ECOGDatasetRaw segTimePoint trialAll posStr params  posIndex blkMerge
         
         reLoadRawData = 0;
-        replotFigure = 0;
+        replotFigure = 1;
         posIndex = pos;
         fs = 500; % Hz, for downsampling
         run("loadAllBlocks.m");
@@ -33,14 +33,18 @@ for i = 1 : length(basicRegIrreg)
         icaPath = fullfile(savePath, 'icaData');
         
         if ~exist(fullfile(icaPath, strcat(posStr(posIndex), 'icaMergeData.mat')),'file')
-            [comp, trialsECOG] = mICA(ECOGDataset, trialAll, window, "dev onset", fs);
+            comp = mICA(ECOGDataset, trialAll, window, "dev onset", fs);
+            comp = rmfield(comp, "trial");
+            [trialsECOG, ~, ~] = selectEcog(ECOGDataset, trialAll, "trial onset", window);
             mkdir(icaPath);
-            save(fullfile(icaPath, strcat(posStr(posIndex), 'icaMergeData.mat')), 'comp', 'trialsECOG', 'segTimePoint', 'trialAll', 'blkMerge' ,'-v7.3');
+            save(fullfile(icaPath, strcat(posStr(posIndex), 'icaMergeData.mat')), 'comp', 'segTimePoint', 'trialAll', 'blkMerge' ,'-v7.3');
         else
+            continue
             load(fullfile(icaPath, strcat(posStr(posIndex), 'icaMergeData.mat')));
         end
 %%
         % topoFig
+        [trialsECOG, ~, ~] = selectEcog(ECOGDataset, trialAll, "trial onset", window);
         FigTopo = plotTopo(comp, topoSize);
         AREANAME = {'AC', 'PFC', 'ratAC'};
 
@@ -53,7 +57,7 @@ for i = 1 : length(basicRegIrreg)
             % plot figure
             for dIndex = 1:length(devType)
                 S = cellfun(@(x) comp.unmixing * x, trialsECOG([trialAll.devOrdr] == devType(dIndex) & [trialAll.devOnset] > segTimePoint(blk, 1)*1000 & [trialAll.devOnset] < segTimePoint(blk, 2)*1000), "UniformOutput", false);
-                chMean{dIndex} = cell2mat(cellfun(@mean, changeCellRowNum(S), "UniformOutput", false)) * 1e6;
+                chMean{dIndex} = cell2mat(cellfun(@mean, changeCellRowNum(S), "UniformOutput", false));
                 trials{dIndex} = trialAll([trialAll.devOrdr] == devType(dIndex)  & [trialAll.devOnset] > segTimePoint(blk, 1)*1000 & [trialAll.devOnset] < segTimePoint(blk, 2)*1000);
                 t{dIndex} = linspace(window(1), window(2), size(chMean{dIndex} , 2));
 %                 t{dIndex} = (1:size(chMean{dIndex},2)) * 1000 / fs0 - S1Duration(dIndex);
@@ -64,7 +68,7 @@ for i = 1 : length(basicRegIrreg)
                     drawnow;
                 end
             end
-            ICARes = struct('chMean', chMean, 'trials', trials, 't', t, 'stimStr', stimStr, 'S1Duration', num2cell(S1Duration'), 'fs0', fs0);    
+            ICARes = struct('chMean', chMean, 'trials', trials, 't', t, 'stimStr', stimStr, 'S1Duration', num2cell(S1Duration), 'fs0', fs0);    
             save(fullfile(paradigmPath,strcat(posStr(posIndex), '_ICARes.mat')), 'ICARes', '-mat');
 
             
