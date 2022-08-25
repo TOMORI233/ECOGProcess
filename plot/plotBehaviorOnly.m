@@ -1,9 +1,13 @@
-function [Fig, mAxe] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe)
-    narginchk(3, 5);
+function [Fig, mAxe] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe, cueType)
+    narginchk(3, 6);
     margins = [0.1, 0.1, 0.1, 0.1];
 
     if nargin < 4
         Fig = figure;
+        cueType = "freq";
+    end
+    if nargin < 6
+        cueType = "freq";
     end
 
     if nargin == 4
@@ -15,8 +19,14 @@ function [Fig, mAxe] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe)
     else
         diffLevel = roundn(cellfun(@(x) x(end) / x(1), {trials.freqSeq}), -2);
     end
-    diffLevelUnique = unique(diffLevel);
 
+    
+    
+    if  cueType == "loc"
+        diffLevel = cellfun(@(x) x(end), {trials.locSeq});
+    end
+    diffLevelUnique = unique(diffLevel);
+    
     nPush = [];
     nTotal = [];
     

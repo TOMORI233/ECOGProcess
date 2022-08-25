@@ -8,7 +8,7 @@ fs = 500; % Hz, for downsampling
 
 %% Processing
 % MATPATH = 'E:\ECoG\MAT Data\CC\LTST Active\cc20220606\cc20220606_AC.mat';
-BLOCKPATH = 'G:\ECoG\chouchou\cc20220612\Block-1';
+BLOCKPATH = 'G:\ECoG\xiaoxiao\xx20220704\Block-1';
 
 [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params, 1);
 % fs0 = ECOGDataset.fs;

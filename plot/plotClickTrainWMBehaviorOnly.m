@@ -37,7 +37,7 @@ for dIndex = 1:size(diffPairsUnique, 1)
     yaxis = get(mAxe(dIndex + 1), "YLim");
     stem(mAxe(dIndex + 1), meanRT, yaxis(2), "Color", color, "LineStyle", "-", "LineWidth", 1.5);
     title(mAxe(dIndex + 1), [xticklabelStr{dIndex}, ' (Mean RT ', num2str(roundn(meanRT, -2)), ' ms)']);
-    xlim(mAxe(dIndex + 1), [0, 1000]);
+    xlim(mAxe(dIndex + 1), [0, 800]);
     if dIndex == size(diffPairsUnique, 1)
         xlabel(mAxe(dIndex + 1), 'Reaction Time (ms)');
     end
@@ -49,12 +49,9 @@ end
 pairIdx = (1:size(diffPairsUnique, 1))'; ratio = nPush ./ nTotal;
 controlIdx = diffPairsUnique(:,1) == diffPairsUnique(:,2) ;
 
-% b = bar(mAxe(1), [pairIdx(controlIdx) pairIdx(~controlIdx)] , [ratio(controlIdx)' ratio(~controlIdx)'] );
-b(1) = bar(mAxe(1), pairIdx(controlIdx), ratio(controlIdx)');
-hold on;
-b(2) = bar(mAxe(1), pairIdx(~controlIdx), ratio(~controlIdx)');
-b(1).FaceColor = [0 0 0]; b(1).BarWidth = 0.5;
-b(2).FaceColor = [1 0 0]; b(2).BarWidth = 0.5;
+b = bar(mAxe(1), [pairIdx(controlIdx) pairIdx(~controlIdx)] , [ratio(controlIdx)' ratio(~controlIdx)'] );
+b(1).FaceColor = [0 0 0]; b(1).BarWidth = 2;
+b(2).FaceColor = [1 0 0]; b(2).BarWidth = 2;
 
 hold on;
 if length(diffPairsUnique) >= length(mAxe(1).XTick) || nargin < 5
@@ -67,11 +64,20 @@ yticks(0:0.2:1);
 xlabel("S1-S2 pairs");
 ylabel("Push Ratio");
 title('ClickTrain Working Memory Task');
-legend(legendStr);
+legend(legendStr, "location", "northwest");
 
 for index = 1:length(nPush)
     text(mAxe(1), index, nPush(index) / nTotal(index) + 0.05, [num2str(nPush(index)), '/', num2str(nTotal(index))]);
 end
+
+% chi2test with reg control
+nNoPush = nTotal - nPush;
+for index = 2 : length(pairIdx)
+    temp = [nTotal(1), nNoPush(1); nTotal(index), nNoPush(index)];
+    p(index) = chi2test(temp);
+    text(mAxe(1), index, nPush(index) / nTotal(index) + 0.1, strcat("p=", num2str(p(index))));
+end
+
 
 return;
 end

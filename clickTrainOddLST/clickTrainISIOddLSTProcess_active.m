@@ -11,15 +11,15 @@ fs = 500; % Hz, for downsampling
 
 %% Processing
 % joinBlocks
-BLOCKPATH1 = 'E:\ECoG\chouchou\cc20220614\Block-3';
-BLOCKPATH2 = 'E:\ECoG\chouchou\cc20220614\Block-4';
-opts.sfNames = posStr(posIndex);
-opts.efNames = ["num0", "push", "erro", "ordr"];
-[trialAll, ECOGDataset] = ECOGPreprocessJoinBlock(BLOCKPATH1, BLOCKPATH2, params, opts, [1679 1849]);
+% BLOCKPATH1 = 'E:\ECoG\chouchou\cc20220614\Block-3';
+% BLOCKPATH2 = 'E:\ECoG\chouchou\cc20220614\Block-4';
+% opts.sfNames = posStr(posIndex);
+% opts.efNames = ["num0", "push", "erro", "ordr"];
+% [trialAll, ECOGDataset] = ECOGPreprocessJoinBlock(BLOCKPATH1, BLOCKPATH2, params, opts, [1679 1849]);
 
 % normal 
-% BLOCKPATH = 'E:\ECoG\chouchou\cc20220613\Block-1';
-% [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params);
+BLOCKPATH = 'G:\ECoG\xiaoxiao\xx20220708\Block-2';
+[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params, 1);
 if ~isempty(ECOGDataset)
     fs0 = ECOGDataset.fs;
 end
@@ -47,7 +47,7 @@ trialsRand = trialAll(randIdx);
 
 %% Plot behavior result
 
-[FigBehavior, mAxe] = plotBehaviorOnly(trialsConst, "r", "500ms ISI", FigBehavior, mAxe);
+[FigBehavior, mAxe] = plotBehaviorOnly(trialsConst, "r", "400ms ISI");
 [FigBehavior, mAxe] = plotBehaviorOnly(trialsRand, "b", "800ms ISI", FigBehavior, mAxe);
 set(mAxe(1),'xticklabel',{'control(4msReg)','deviant(4.03msReg)','deviant(4.06msReg)','deviant(4.09msReg)','deviant(4.12msReg)'});
 

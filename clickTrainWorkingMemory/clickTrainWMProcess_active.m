@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-addpath(genpath(fileparts(mfilename('fullpath'))));
-=======
+
 addpath(genpath("..\..\ECOGProcess"));
->>>>>>> 29653e8ceb2f088327817ec0ce18d2e0ac0f68b9
 clear; clc; close all;
 %% Parameter setting
 params.posIndex = 1; % 1-AC, 2-PFC
@@ -11,11 +8,9 @@ params.processFcn = @ActiveProcess_clickTrainWM;
 fs = 500; % Hz, for downsampling
 
 %% Processing
-<<<<<<< HEAD
-BLOCKPATH = 'G:\xiaoxiao\xx20220611\Block-2';
-=======
-BLOCKPATH = 'E:\ECoG\chouchou\cc20220607\Block-1';
->>>>>>> 29653e8ceb2f088327817ec0ce18d2e0ac0f68b9
+BLOCKPATH = 'G:\ECoG\xiaoxiao\xx20220701\Block-2';
+% BLOCKPATH = 'G:\ECoG\chouchou\cc20220701\Block-2';
+
 [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params, 1);
 
 if ~isempty(ECOGDataset)
@@ -23,10 +18,6 @@ if ~isempty(ECOGDataset)
 end
 
 %% Data saving params
-<<<<<<< HEAD
-=======
-BLOCKPATH = 'E:\ECoG\chouchou\cc20220607\Block-1';
->>>>>>> 29653e8ceb2f088327817ec0ce18d2e0ac0f68b9
 temp = string(split(BLOCKPATH, '\'));
 DateStr = temp(end - 1);
 Paradigm = 'ClickTrainOddDiffSoundsActive';
@@ -40,15 +31,9 @@ pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','FuzaTone-C','FuzaTone-D'
 typeStr = {'4-4.06Regular','4-4.06Irregular','ComplexTone'};
 posStr = ["LAuC", "LPFC"];
 
-<<<<<<< HEAD
-%% Behavior processing
-% trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin, soundDuration); % if input soundDuration, means offset choiceWin, otherwise, choiveWin aligns to deviant onset
-% trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin);
-=======
+
 
 %% Behavior processing
-
->>>>>>> 29653e8ceb2f088327817ec0ce18d2e0ac0f68b9
 trialAll = trialAll(2:end);
 trialsNoInterrupt = trialAll([trialAll.interrupt] == false);
 ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trialsNoInterrupt.soundOnsetSeq}, {trialsNoInterrupt.stdNum})));
@@ -56,13 +41,6 @@ diffPairs = [[trialsNoInterrupt.stdOrdr]' [trialsNoInterrupt.devOrdr]'];
 diffPairsUnique = unique(diffPairs, 'rows');
 stdType = unique(diffPairsUnique(:,1));
 devType = unique(diffPairsUnique(:,2));
-<<<<<<< HEAD
-%% Plot behavior result
-trials = trialsNoInterrupt;
-[Fig, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'},pairStr);
-
-=======
->>>>>>> 29653e8ceb2f088327817ec0ce18d2e0ac0f68b9
 
 %% Plot behavior result
 trials = trialsNoInterrupt;
