@@ -1,6 +1,6 @@
 clear all; clc
 monkeyId = ["cc", "xx"];
-posStr = ["LAuC", "LPFC"];
+posStr = ["LAuC", "LFC"];
 plotFigure = 0;
 reprocess = 0;
 plotMultiFigure = 0;
@@ -20,7 +20,7 @@ for resN = 1 : length(resData) %% result type
         rootPath = "E:\ECoG\matData\behavior";
         for pN = 1 : length(paradigmKeyword) % protocol number
             for pos = 1:2 % LAuC or LPFC
-                matPath = getSubfoldPath(rootPath, resData(resN) , strcat(paradigmKeyword(pN), ".*", monkeyId(id), ".*" , posStr(pos)));
+                matPath = getSubfoldPath(rootPath, resData(resN) , strcat(paradigmKeyword(pN), ".*", monkeyId(id), ".*" , posStr(pos), "(?!.*filter)"));
                 recordN = 1;
                 for recordCode = 1 : length(matPath) % recording order
                     temp = strsplit(matPath{recordCode}, '\');

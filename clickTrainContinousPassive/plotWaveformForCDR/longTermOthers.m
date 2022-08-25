@@ -3,6 +3,7 @@ monkeyId = ["chouchou", "xiaoxiao"];
 posStr = ["LAuC", "LPFC"];
 plotFigure = 0;
 reprocess = 0;
+processCDR = 1;
 plotMultiFigure = 1;
 selectWin = [-200 600];
 yScale = [60 30];
@@ -16,7 +17,8 @@ s1OnsetOrS2Onset = 2; % 1: start, 2: trans
 % filterResDataPath = getSubfoldPath('E:\ECoG','Res.mat','^(?!.*Merge)');
 
 % paradigmKeyword = "Insert"; %Insert, RegInIrreg4o32, LowHigh43444546, ICIThr401234, Var3, offset, Tone
-paradigmKeyword = ["ICIThr401234", "Insert", "RegInIrreg4o32", "LowHigh43444546", "Var3", "Tone"]; %Insert, RegInIrreg4o32, LowHigh43444546, ICIThr401234, Var3, offset, Tone
+paradigmKeyword = ["LongTerm4[^0]", "LongTerm8[^0]", "LongTerm20", "LongTerm40", "LongTerm80"];
+% paradigmKeyword = ["ICIThr401234", "Insert", "RegInIrreg4o32", "LowHigh43444546", "Var3", "Tone"]; %Insert, RegInIrreg4o32, LowHigh43444546, ICIThr401234, Var3, offset, Tone
 
 paradigmStr = strrep(paradigmKeyword, '[^0]', '');
 
@@ -43,13 +45,16 @@ matPath = getSubfoldPath(rootPath,'filterResHP1Hz.mat', strcat(paradigmKeyword(1
                 savePath = fullfile("E:\ECoG\corelDraw\jpgHP1Hz", paradigmStr(pN), dateStr) ;
                 if ~exist(savePath, 'dir') || reprocess
                     load(matPath{recordCode});
-                    plotFigure = 1;
+                    plotFigure = 0;
+                elseif processCDR
+                    load(matPath{recordCode});
+                    plotFigure = 0;
                 else
                     plotFigure = 0;
                     continue
                 end
                 for stimCode = 1 : length(filterRes)
-                    clearvars -except savePath reprocess id monkeyId recordCode matPath selectWin selectRecord posStr pos posIndex pos stimCode paradigmKeyword paradigmStr pN filterRes rootPath cdrRes cdrPlot plotFigure dateStr plotCh chMeanSel yScale s1OnsetOrS2Onset plotMultiFigure
+                    clearvars -except processCDR savePath reprocess id monkeyId recordCode matPath selectWin selectRecord posStr pos posIndex pos stimCode paradigmKeyword paradigmStr pN filterRes rootPath cdrRes cdrPlot plotFigure dateStr plotCh chMeanSel yScale s1OnsetOrS2Onset plotMultiFigure
                     % get data
                     chMean = filterRes(stimCode).chMean;
                     t = filterRes(stimCode).t;
@@ -69,25 +74,25 @@ matPath = getSubfoldPath(rootPath,'filterResHP1Hz.mat', strcat(paradigmKeyword(1
                     filterRes(stimCode).tCDR = t(tIndex);
                     filterRes(stimCode).chMeanCDR = chMeanSel{pN}{stimCode, pos};
 
-                    cdrRes.(paradigmStr(pN)).(dateStr)(stimCode).tCDR = t(tIndex);
-                    cdrRes.(paradigmStr(pN)).(dateStr)(stimCode).chMeanCDR = chMeanSel{pN}{stimCode, pos};
-                    cdrRes.(paradigmStr(pN)).(dateStr)(stimCode).stimStr = filterRes(stimCode).stimStr;
+                    cdrRes.(posStr(pos)).(paradigmStr(pN)).(dateStr)(stimCode).tCDR = t(tIndex);
+                    cdrRes.(posStr(pos)).(paradigmStr(pN)).(dateStr)(stimCode).chMeanCDR = chMeanSel{pN}{stimCode, pos};
+                    cdrRes.(posStr(pos)).(paradigmStr(pN)).(dateStr)(stimCode).stimStr = filterRes(stimCode).stimStr;
                     % save(matPath{recordCode}, "filterRes");
 
                     for ch = 1 : size(chMeanSel{pN}{stimCode, pos}, 1)
-                        if paradigmKeyword(pN) == "LowHigh4043444546" || paradigmKeyword(pN) == "ICIThr401234"
-                            cdrPlot.(strcat('ch', num2str(ch))){recordCode, pos}(:, 2*(length(filterRes) - stimCode + 1) - 1) = t(tIndex);
-                            cdrPlot.(strcat('ch', num2str(ch))){recordCode, pos}(:, 2*(length(filterRes) - stimCode + 1)) = chMeanSel{pN}{stimCode, pos}(ch , :)';
-                        elseif paradigmKeyword(pN) == "offset"
-                            cdrPlot.(strcat('ch', num2str(ch))){recordCode, 2 - mod(stimCode , 2)}(:, 2 * ceil(stimCode / 2) - 1) = t(tIndex);
-                            cdrPlot.(strcat('ch', num2str(ch))){recordCode, 2 - mod(stimCode , 2)}(:, 2* ceil(stimCode / 2)) = chMeanSel{pN}{stimCode, pos}(ch , :)';
+                        if paradigmStr(pN) == "LowHigh4043444546" || paradigmStr(pN) == "ICIThr401234"
+                            cdrPlot.(paradigmStr(pN)).(posStr(pos)).(strcat('ch', num2str(ch))).(dateStr)(:, 2*(length(filterRes) - stimCode + 1) - 1) = t(tIndex);
+                            cdrPlot.(paradigmStr(pN)).(posStr(pos)).(strcat('ch', num2str(ch))).(dateStr)(:, 2*(length(filterRes) - stimCode + 1)) = chMeanSel{pN}{stimCode, pos}(ch , :)';
+                        elseif paradigmStr(pN) == "offset"
+                            cdrPlot.(paradigmStr(pN)).(posStr(pos)).(strcat('ch', num2str(ch))).(dateStr){1, 2 - mod(stimCode , 2)}(:, 2 * ceil(stimCode / 2) - 1) = t(tIndex);
+                            cdrPlot.(paradigmStr(pN)).(posStr(pos)).(strcat('ch', num2str(ch))).(dateStr){1, 2 - mod(stimCode , 2)}(:, 2* ceil(stimCode / 2)) = chMeanSel{pN}{stimCode, pos}(ch , :)';
                         else
-                            cdrPlot.(strcat('ch', num2str(ch))){recordCode, pos}(:, 2*stimCode - 1) = t(tIndex);
-                            cdrPlot.(strcat('ch', num2str(ch))){recordCode, pos}(:, 2*stimCode) = chMeanSel{pN}{stimCode, pos}(ch , :)';
+                            cdrPlot.(paradigmStr(pN)).(posStr(pos)).(strcat('ch', num2str(ch))).(dateStr)(:, 2*stimCode - 1) = t(tIndex);
+                            cdrPlot.(paradigmStr(pN)).(posStr(pos)).(strcat('ch', num2str(ch))).(dateStr)(:, 2*stimCode) = chMeanSel{pN}{stimCode, pos}(ch , :)';
                         end
                     end
                 end
-                clear cdrPlot cdrRes
+%                 clear cdrPlot cdrRes
             end
 
 

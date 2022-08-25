@@ -37,7 +37,11 @@ for dIndex = 2:length(varargin)
     segTimePoint = [segTimePoint; [duration(dIndex -1)  duration(dIndex)] ];
 
     for eIndex = 1:length(efNames)
-        varargin{dIndex}.epocs.(efNames(eIndex)).onset = varargin{dIndex}.epocs.(efNames(eIndex)).onset + segTimePoint(dIndex - 1, 2);
+        try
+            varargin{dIndex}.epocs.(efNames(eIndex)).onset = varargin{dIndex}.epocs.(efNames(eIndex)).onset + segTimePoint(dIndex - 1, 2);
+        catch e
+            disp(e.message);
+        end
     end
 
 

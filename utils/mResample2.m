@@ -45,7 +45,7 @@ function ECOGDataset = mResample2(ECOGDataset, fs, fhp, flp)
     % Filter
     cfg = [];
     cfg.demean = 'no';
-    if flp == inf
+    if flp == Inf
         cfg.lpfilter = 'no';
     else
         cfg.lpfilter = 'yes';
@@ -55,7 +55,7 @@ function ECOGDataset = mResample2(ECOGDataset, fs, fhp, flp)
     if fhp == 0
         cfg.hpfilter = 'no';
     else
-        cfg.lpfilter = 'yes';
+        cfg.hpfilter = 'yes';
         cfg.hpfreq = fhp;
     end
 

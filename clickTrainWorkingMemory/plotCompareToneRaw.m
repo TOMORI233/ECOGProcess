@@ -9,13 +9,21 @@ plotSize = [8, 8];
 chs = (1 : 64)';
 % idIdx = input('Monkey ID: 1-chouchou, 2-xiaoxiao \n');
 % posIndex = input('recording area : 1-AC, 2-PFC \n');
-paradigmKeyword = "ClickTrainOddCompareTone";
+paradigmKeyword = "ClickTrainOddCompareTone2";
 paradigmStr = strrep(paradigmKeyword, '[^0]', '');
 resData = ["MMNData.mat", "predictData.mat"]; %,
 badRecording = [""];
-pairStrRep = num2cell(["Reg4o16C", "Reg4o16D", "Reg5C", "Reg5D", "Irreg4o16C", "Irreg4o16D", "Irreg5C", "Irreg5D", "Tone250Hz", "Tone240Hz", "Tone250Hz", "Tone200Hz"]);
-
-for resN = 1 : length(resData) %% resx`ult type
+switch paradigmKeyword
+    case "ClickTrainOddCompareTone"
+        pairStrRep = num2cell(["Reg4o16C", "Reg4o16D", "Reg5C", "Reg5D", "Irreg4o16C", "Irreg4o16D", "Irreg5C", "Irreg5D", "Tone250Hz", "Tone240Hz", "Tone250Hz", "Tone200Hz"]);
+        pairStr = {'4-4.16RC','4-4.16RD','4-5RC','4-5RD','4-4.16IC','4-4.16ID','4-5IC','4-5ID','250-250Hz','250-240Hz','250-250Hz','250-200Hz'};
+        typeStr = {'4-4o16Regular','4-5Regular','4-4o16Irregular','4-5Irregular','250-240HzTone','250-200HzTone'};
+    case "ClickTrainOddCompareTone2"
+        pairStrRep = num2cell(["Reg4o08C", "Reg4o08D", "Irreg4o08C", "Irreg4o08D", "Tone250Hz", "Tone245Hz", "Tone250Hz", "Tone500Hz"]);
+        pairStr = {'4-4.08RC','4-4.08RD','4-4.16IC','4-4.16ID','250-250Hz','250-245Hz','250-250Hz','250-500Hz'};
+        typeStr = {'4-4o08Regular','4-4o08Irregular','250-245HzTone','250-500HzTone'};
+end
+for resN = 1 : length(resData) %% result type
     for id = 1:2 % monkey id
         rootPath = "E:\ECoG\matData\behavior";
         for pN = 1 : length(paradigmKeyword) % protocol number
@@ -39,9 +47,7 @@ for resN = 1 : length(resData) %% resx`ult type
                     disp(strjoin(["processing", paradigmStr(pN), monkeyId(id), posStr(pos), "...(", num2str(recordCode), '/', num2str(length(matPath)), ')'], ' '));
 
 
-                    pairStr = {'4-4.16RC','4-4.16RD','4-5RC','4-5RD','4-4.16IC','4-4.16ID','4-5IC','4-5ID','250-250Hz','250-240Hz','250-250Hz','250-200Hz'};
-                    typeStr = {'4-4o16Regular','4-5Regular','4-4o06Irregular','4-5Irregular','250-240HzTone','250-200HzTone'};
-                    %% plot behavior result
+                                       %% plot behavior result
                     if resData(resN) == "MMNData.mat" && activeOrPassive == "Active"
                         trialAll = cell2mat([{MMNData.trialsC}'; {MMNData.trialsW}']);
                         trials = trialAll([trialAll.interrupt] == false);
@@ -78,6 +84,9 @@ for resN = 1 : length(resData) %% resx`ult type
                             scaleAxes([devStd_wave, devCompare_Wave, MMN_Wave], "y", [-60, 60]);
                             scaleAxes(MMN_TFA, "c", [], [0, 20]);
                             scaleAxes(devCompare_TFA, "c", [], [-20, 20]);
+
+
+
                             for dIndex = 1 : length(MMNData)
 
                                 devStdPath = fullfile(savePath, "devStd_Wave");
