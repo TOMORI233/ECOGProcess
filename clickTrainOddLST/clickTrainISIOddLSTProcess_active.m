@@ -18,8 +18,8 @@ fs = 500; % Hz, for downsampling
 % [trialAll, ECOGDataset] = ECOGPreprocessJoinBlock(BLOCKPATH1, BLOCKPATH2, params, opts, [1679 1849]);
 
 % normal 
-BLOCKPATH = 'G:\ECoG\xiaoxiao\xx20220708\Block-2';
-[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params, 1);
+BLOCKPATH = 'E:\ECoG\chouchou\cc20220624\Block-1';
+[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params);
 if ~isempty(ECOGDataset)
     fs0 = ECOGDataset.fs;
 end

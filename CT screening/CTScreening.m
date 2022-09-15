@@ -1,6 +1,7 @@
 clear; clc; close all;
 %% Parameter settings
-BLOCKPATH = 'G:\ECoG\chouchou\cc20220530\Block-3';
+% BLOCKPATH = 'E:\ECoG\xiaoxiao\xx20220622\Block-7';
+BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220530\Block-3';
 
 params.posIndex = 1;
 params.processFcn = @CTScreeningProcess;
@@ -20,8 +21,8 @@ for fIndex = 1:length(freqAll)
     chData(fIndex).chMean = chMean;
 end
 
-plotRawWaveMulti(chData, window, "CT Screening");
-
+FigWave = plotRawWaveMulti(chData, window, "CT Screening");
+scaleAxes(FigWave,'y',[],[-50 50]);
 %% check repetition frequency band
 window = [-1000, 5000];
 trials = trialAll(10:end-10);

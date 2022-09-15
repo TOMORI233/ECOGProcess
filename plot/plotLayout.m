@@ -11,10 +11,22 @@ function Figs = plotLayout(Figs, posIndex, alphaValue)
         load('layout.mat');
     
         switch posIndex
-            case 1 % AC
-                image(layAx, AC_sulcus); hold on
-            case 2 % PFC
-                image(layAx, PFC_sulcus); hold on
+%             case 1 % chouchou AC large
+%                 image(layAx, cc_AC_sulcus_large); hold on
+%             case 2 % chouchou PFC large
+%                 image(layAx, cc_PFC_sulcus_large); hold on
+            case 1 % chouchou AC square
+                image(layAx, cc_AC_sulcus_square); hold on
+            case 2 % chouchou PFC square
+                image(layAx, cc_PFC_sulcus_square); hold on
+%             case 11 % xiaoxiao AC large
+%             
+%             case 12 % xiaoxiao PFC large
+
+            case 3 % xiaoxiao AC square 
+                image(layAx, xx_AC_sulcus_square); hold on
+            case 4 % xiaoxiao PFC square
+                image(layAx, xx_PFC_sulcus_square); hold on
         end
 
         alpha(layAx, alphaValue);

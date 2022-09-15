@@ -4,28 +4,35 @@ clear; clc; close all;
 posStr = ["LAuC", "LPFC"];
 params.posIndex = 1; % 1-AC, 2-PFC
 posIndex = params.posIndex;
-params.choiceWin = [200, 1000];
+params.choiceWin = [100, 1000];
 params.processFcn = @ActiveProcess_clickTrainLST;
 
 fs = 500; % Hz, for downsampling
 
 %% Processing
-% joinBlocks
-% BLOCKPATH1 = 'E:\ECoG\chouchou\cc20220614\Block-3';
-% BLOCKPATH2 = 'E:\ECoG\chouchou\cc20220614\Block-4';
+% % joinBlocks
+% BLOCKPATH1 = 'E:\ECoG\chouchou\cc20220623\Block-1';
+% BLOCKPATH2 = 'E:\ECoG\chouchou\cc20220623\Block-2';
 % opts.sfNames = posStr(posIndex);
 % opts.efNames = ["num0", "push", "erro", "ordr"];
-% [trialAll, ECOGDataset] = ECOGPreprocessJoinBlock({BLOCKPATH1, BLOCKPATH2}, params, opts, [1679 1849]);
+% opts.behavOnly = 1;
+% [trialAll, ECOGDataset] = ECOGPreprocessJoinBlock({BLOCKPATH1, BLOCKPATH2}, params, opts, [2435 0]);
+% if ~isempty(ECOGDataset)
+%     ECOGDataset = ECOGDataset.(posStr(posIndex));
+%     fs0 = ECOGDataset.fs;
+% end
+
+
 
 % normal 
-BLOCKPATH = 'G:\ECoG\xiaoxiao\xx20220708\Block-2';
-[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params, 1);
+BLOCKPATH = 'E:\ECoG\chouchou\cc20220623\Block-2';
+[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params,1);
 
-
-% ECOGDataset = ECOGDataset.(posStr(posIndex));
 if ~isempty(ECOGDataset)
     fs0 = ECOGDataset.fs;
 end
+
+
 %% Data saving params
 temp = string(split(BLOCKPATH, '\'));
 DateStr = temp(end - 1);

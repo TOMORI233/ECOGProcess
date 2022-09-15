@@ -1,7 +1,7 @@
-function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr)
+function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotSize, visible)
     % Description: plot cwt difference between chMean1 and chMean2
 
-    narginchk(5, 6);
+    narginchk(5, 8);
 
     if nargin < 6
         titleStr = '';
@@ -9,16 +9,29 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr)
         titleStr = [' | ', char(titleStr)];
     end
 
-    Fig = figure;
+    if nargin < 7
+        plotSize = [8, 8];
+    end
+
+    if nargin < 8
+        visible = "on";
+    end
+
+    Fig = figure("Visible", visible);
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
     maximizeFig(Fig);
 
-    for rIndex = 1:8
+    for rIndex = 1:plotSize(1)
 
-        for cIndex = 1:8
-            chNum = (rIndex - 1) * 8 + cIndex;
-            mSubplot(Fig, 8, 8, chNum, [1, 1], margins, paddings);
+        for cIndex = 1:plotSize(2)
+            chNum = (rIndex - 1) * plotSize(2) + cIndex;
+
+            if chNum > size(chMean1, 1)
+                continue;
+            end
+
+            mSubplot(Fig, plotSize(1), plotSize(2), chNum, [1, 1], margins, paddings);
             [t, Y, CData1, coi] = mCWT(double(chMean1(chNum, :)), fs0, 'morlet', fs);
             [~, ~, CData2, ~] = mCWT(double(chMean2(chNum, :)), fs0, 'morlet', fs);
             X = t * 1000 + window(1);
@@ -31,11 +44,11 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr)
             yticks([0, 2.^(0:nextpow2(max(Y)) - 1)]);
             xlim(window);
 
-            if ~mod((chNum - 1), 8) == 0
+            if ~mod((chNum - 1), plotSize(2)) == 0
                 yticklabels('');
             end
 
-            if chNum < 57
+            if chNum < (plotSize(1) - 1) * plotSize(2) + 1
                 xticklabels('');
             end
 

@@ -5,6 +5,7 @@ function [t, f, CData, coi] = mCWT(data, fs0, cwtMethod, fs, freqLimits)
     %     fs0: sample rate of data, in Hz
     %     cwtMethod: 'morse', 'morlet', 'bump' or 'STFT'
     %     fs: downsample rate, in Hz
+    %     freqLimits: frequency range for cwt mapping, specified as a two-element vector (default: [0, 256])
     % Output:
     %     t: time vector, in sec
     %     f: frequency vector, in Hz

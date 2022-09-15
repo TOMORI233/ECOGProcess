@@ -1,11 +1,11 @@
 %% Data loading
-clear; clc;
-% BLOCKPATH = 'D:\ECoG\xiaoxiao\xx20220914\Block-1';
-BLOCKPATH = 'D:\ECoG\chouchou\cc20220824\Block-1';
+clear; clc; close all;
+BLOCKPATH = 'E:\ECoG\xiaoxiao\xx20220709\Block-1';
+% BLOCKPATH = 'E:\ECoG\chouchou\cc20220630\Block-1';
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
 epocs = temp.epocs;
 
-choiceWin = [100, 600]; % ms
+choiceWin = [100, 800]; % ms
 
 % % %% LTST
 % trialAll = ActiveProcess_LTST(epocs, choiceWin);
@@ -17,7 +17,7 @@ choiceWin = [100, 600]; % ms
 % plotBehaviorOnly(trialsRand, "b", "Random", FigBehavior, mAxe);
 % drawnow;
 
-% % 1-9 / working memory
+% 1-9
 % trialAll = ActiveProcess_1_9Freq(epocs);
 % trials1_3 = trialAll([trialAll.stdNum] >= 1 & [trialAll.stdNum] <= 3);
 % trials4_6 = trialAll([trialAll.stdNum] >= 4 & [trialAll.stdNum] <= 6);
@@ -48,8 +48,7 @@ choiceWin = [100, 600]; % ms
 % [Fig, mAxe] = plotBehaviorOnly(trialsBlkLoc, "b", "block loc", Fig, mAxe, "loc");
 % [Fig, mAxe] = plotBehaviorOnly(trialsRandLoc, "k", "rand loc", Fig, mAxe, "loc");
 
-
-% click train compare
+% % click train compare
 % pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','FuzaTone-C','FuzaTone-D'};
 % trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin);
 % trialAll = trialAll(2:end);
@@ -75,4 +74,11 @@ trials = deleteWrongTrial(trialsNoInterrupt, "ClickTrainOddCompareTone");
 % trialAll = trialAll(2:end);
 % [FigBehavior, mAxe] = plotBehaviorOnly(trialAll, "k", "7-10");
 
+% trials = deleteWrongTrial(trialsNoInterrupt, 'clickTrainCompare');
+% 
+% [Fig, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'},pairStr);
 
+% click train ICI Thr
+trialAll = ActiveProcess_clickTrain1_9(epocs, choiceWin);
+trialAll = trialAll(2:end);
+[FigBehavior, mAxe] = plotBehaviorOnly(trialAll, "k", "7-10");

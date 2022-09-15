@@ -67,9 +67,13 @@ function trialAll = ActiveProcess_1_9Freq(epocs, choiceWin)
         % Find first push time of this trial
         firstPush = pushTimeAll(find(pushTimeAll >= trialAll(tIndex, 1).soundOnsetSeq(end) & pushTimeAll <= trialOnsetTimeAll(tIndex + 1, 1), 1));
 
+<<<<<<< HEAD
         % fixation: 20220613 Block-4
         if isempty(firstPush)
             pushInWinFlag = false;
+=======
+        if isempty(firstPush)
+>>>>>>> 9b985a0ace977fef21a5de6db691c21e38523fce
             trialAll(tIndex, 1).correct = false;
             continue;
         end
