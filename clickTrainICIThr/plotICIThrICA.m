@@ -64,7 +64,8 @@ for resN = 1 : length(resData) %% result type
                             MMNData = addFieldToStruct(MMNData, pairStrRep', "pairStr");
                             for dIndex = 1 : length(MMNData)
                                 devStd_wave(dIndex) = plotRawWave(MMNData(dIndex).chMeanDEV, [], MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr,posStr(pos), " dev vs last std"), plotSize, chs, "off");
-                                devStd_wave(dIndex) = plotRawWave2(devStd_wave(dIndex), MMNData(dIndex).chMeanLastSTD, [], MMNData(dIndex).window, 'blue');
+                                lineSetting.color = "blue";
+                                devStd_wave(dIndex) = plotRawWave2(devStd_wave(dIndex), MMNData(dIndex).chMeanLastSTD, [], MMNData(dIndex).window, lineSetting);
                                 dev_TFA(dIndex) = plotTFA(MMNData(dIndex).chMeanDEV, MMNData(dIndex).fs0, MMNData(dIndex).fs, MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr, posStr(pos), MMNData(dIndex).pairStr), plotSize, "off");
 
                                 if dIndex == 1
@@ -72,8 +73,9 @@ for resN = 1 : length(resData) %% result type
                                     devCompare_Wave = plotRawWave(MMNData(dIndex).chMeanDEVICA, [], MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr, posStr(pos), " dev reg vs irreg"), plotSize, chs, "off");
                                     setLine([MMN_Wave devCompare_Wave], "Color", "#AAAAAA", "LineStyle", "-");
                                 else
-                                    MMN_Wave = plotRawWave2(MMN_Wave, MMNData(dIndex).chMeanDEVICA - MMNData(dIndex).chMeanLastSTDICA, [], MMNData(dIndex).window, colors(dIndex));
-                                    devCompare_Wave = plotRawWave2(devCompare_Wave, MMNData(dIndex).chMeanDEVICA, [], MMNData(dIndex).window, colors(dIndex));
+                                    lineSetting.color = colors(dIndex);
+                                    MMN_Wave = plotRawWave2(MMN_Wave, MMNData(dIndex).chMeanDEVICA - MMNData(dIndex).chMeanLastSTDICA, [], MMNData(dIndex).window, lineSetting);
+                                    devCompare_Wave = plotRawWave2(devCompare_Wave, MMNData(dIndex).chMeanDEVICA, [], MMNData(dIndex).window, lineSetting);
                                 end
                                 MMN_TFA(dIndex) = plotTFACompare(MMNData(dIndex).chMeanDEVICA, MMNData(dIndex).chMeanLastSTDICA, MMNData(dIndex).fs0, MMNData(dIndex).fs, MMNData(dIndex).window, strcat( MMNData(dIndex).pairStr, posStr(pos), "MMN"), plotSize, "off");
                             end

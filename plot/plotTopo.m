@@ -24,7 +24,7 @@ function Fig = plotTopo(comp, topoSize, plotSize, visible)
         for cIndex = 1:plotSize(2)
             ICNum = (rIndex - 1) * plotSize(2) + cIndex;
 
-            if ICNum > size(topo, 1)
+            if ICNum > size(topo, 2)
                 continue;
             end
 

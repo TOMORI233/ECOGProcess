@@ -6,7 +6,7 @@ opts.posStr = ["LAuC", "LPFC"];
 temp = cdrPlot.chouchou.LAuC;
 opts.protocol = string(fields(temp));
 opts.ampType = ["ampRMS", "ampAREA", "ampPeak", "ampTrough"];
-opts.savePath = "E:\ECoG\corelDraw\jpgHP1Hz";
+opts.savePath = "E:\ECoG\corelDraw\amp";
 
 for pN = 1 : length(opts.protocol) % protocol
     plotPopAmpFigure(cdrPlot, opts, pN);
@@ -19,6 +19,7 @@ end
 function plotPopAmpFigure(cdrPlot, opts, pN)
 run("ampStrConfig.m");
 optsNames = fieldnames(opts);
+mkdir(opts.savePath);
 for index = 1:size(optsNames, 1)
     eval([optsNames{index}, '=opts.', optsNames{index}, ';']);
 end
@@ -40,9 +41,9 @@ for id = 1 : length(monkeyId)
             temp = [tempReg; tempInsert; tempIrreg];
             h1 = plot(1 : size(temp, 1), temp', "r-", "DisplayName", "AC"); hold on;
             
-            tempInsert = cdrPlot.(monkeyId(id)).LPFC.(curProt)(1).ampEx.(ampType(typeN))(1, :);
-            tempReg = cdrPlot.(monkeyId(id)).LPFC.diffICI(1).ampEx.(ampType(typeN))(1, :);
-            tempIrreg = cdrPlot.(monkeyId(id)).LPFC.diffICI(2).ampEx.(ampType(typeN))(1, :);
+            tempInsert = cdrPlot.(monkeyId(id)).LPFC.(curProt)(1).ampRaw.(ampType(typeN))(1, :);
+            tempReg = cdrPlot.(monkeyId(id)).LPFC.diffICI(1).ampRaw.(ampType(typeN))(1, :);
+            tempIrreg = cdrPlot.(monkeyId(id)).LPFC.diffICI(2).ampRaw.(ampType(typeN))(1, :);
             temp = [tempReg; tempInsert; tempIrreg];            
             h3 = plot(1 : size(temp, 1), temp', "b-", "DisplayName", "PFC"); hold on;
         else

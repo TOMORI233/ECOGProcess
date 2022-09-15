@@ -16,10 +16,10 @@ function [comp, pw] = realignIC(comp, window, t1, t2)
 
     ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
     fs = comp.fsample;
-
     tIdx1 = max(fix((t1 - window(1)) / 1000 * fs), 1);
     tIdx2 = min(fix((t2 - window(1)) / 1000 * fs), size(ICMean, 2));
-    pw = std(ICMean(:, tIdx1:tIdx2), [], 2);
+    idx = cell2mat(cellfun(@(x) x(1):x(2), array2VectorCell([tIdx1' tIdx2']), 'UniformOutput', false)');
+    pw = std(ICMean(:, idx), [], 2);
 
 %     plotRawWave(ICMean(:, tIdx1:end), [], [0 100]);
     

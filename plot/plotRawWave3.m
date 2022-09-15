@@ -1,4 +1,4 @@
-function Fig = plotRawWave2(Fig, chMean, chStd, window, lineSetting, plotSize)
+function Fig = plotRawWave3(Fig, chMean, chStd, X, lineSetting, plotSize)
     narginchk(5, 6);
 
 
@@ -20,7 +20,7 @@ style = getOr(lineSetting, "style", "-");
                 continue;
             end
             
-            t = linspace(window(1), window(2), size(chMean, 2));
+            t = X(chNum, :);
             
             if ~isempty(chStd)
                 y1 = chMean(chNum, :) + chStd(chNum, :);
@@ -32,7 +32,7 @@ style = getOr(lineSetting, "style", "-");
             plot(allAxes(length(allAxes) - chNum + 1), t, chMean(chNum, :), "color", color, "LineWidth", width, "LineStyle", style); 
             hold on;
 
-            xlim(window);
+%             xlim(window);
         end
 
     end

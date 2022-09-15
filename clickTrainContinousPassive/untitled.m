@@ -4,7 +4,7 @@
 run("longTermBasicRegIrreg.m");
 run("longTermOthers.m");
 run("clickTrainContinuousFilteredAmpLatency.m");
-% sigIndex = clickTrainContinuousSelectChannel;
+sigIndex = clickTrainContinuousSelectChannel;
 
 % 
 % run("ActiveProcess_clickTrainCompare.m");

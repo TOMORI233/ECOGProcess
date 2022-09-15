@@ -12,7 +12,7 @@ idIdx = 1:2;
 % posIndex = input('recording area : 1-AC, 2-PFC \n');
 posIndex = 1:2;
 % s1OnsetOrS2Onset = input('zero is : 1-s1 onset, 2-s2 onset \n'); % 1: start, 2: trans
-s1OnsetOrS2Onset = 2; % 1: start, 2: trans
+s1OnsetOrS2Onset = 1; % 1: start, 2: trans
 
 paradigmKeyword = ["LongTerm4[^0]", "LongTerm8[^0]", "LongTerm20", "LongTerm40", "LongTerm80"];
 paradigmStr = strrep(paradigmKeyword, '[^0]', '');
@@ -26,18 +26,18 @@ paradigmStr = strrep(paradigmKeyword, '[^0]', '');
 
 for id = idIdx
     rootPath = fullfile('E:\ECoG\matData', monkeyId(id));
-    matPath = getSubfoldPath(rootPath,'filterResHP1Hz.mat', strcat(paradigmKeyword(5), ".*", posStr(1)));
+    matPath = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(paradigmKeyword(5), ".*", posStr(1)));
 %       for recordCode = selectRecord
 
     for recordCode = 1 : length(matPath)
         temp = strsplit(matPath{recordCode}, '\');
         dateStr = temp{5};
-        savePath = fullfile("E:\ECoG\corelDraw\jpgHP1Hz\diffICIBase",dateStr);
-        savePath2 = fullfile("E:\ECoG\corelDraw\jpgHP1Hz\RegIrreg",dateStr);
+        savePath = fullfile("E:\ECoG\corelDraw\jpgHP0o1Hz\diffICIBase",dateStr);
+        savePath2 = fullfile("E:\ECoG\corelDraw\jpgHP0o1Hz\RegIrreg",dateStr);
         %     for pN = 1
         for pN = 1 : length(paradigmKeyword)
             for pos = posIndex
-                matPath = getSubfoldPath(rootPath,'filterResHP1Hz.mat', strcat(paradigmKeyword(pN), ".*", posStr(pos)));
+                matPath = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(paradigmKeyword(pN), ".*", posStr(pos)));
                 if ~exist(savePath, 'dir') || reprocess
                     load(matPath{recordCode});
                     plotFigure = 1;
@@ -55,11 +55,8 @@ for id = idIdx
                     t = filterRes(stimCode).t;
                     stimStr = filterRes(stimCode).stimStr;
                     if s1OnsetOrS2Onset == 1
-                        window = [0 11000];
                         t = filterRes(stimCode).t + filterRes(stimCode).S1Duration;
-                        selectWin = [0 diff(selectWin)];
-                    elseif s1OnsetOrS2Onset == 2
-                        window = [0 11000] - filterRes(stimCode).S1Duration;
+                        selectWin = [0 diff(selectWin)] - 200;
                     end
 
 
@@ -90,47 +87,6 @@ for id = idIdx
 
 
 
-%% Reg vs Irreg
-        if plotMultiFigure && plotFigure
-            ICIStr = ["4ms", "8ms", "20ms", "40ms", "80ms"];
-            if ~exist(savePath2, 'dir')
-                for posN = 1 : 2
-                    
-                        %         % reg vs irreg
-                        Fig_RegIrreg = plotRawWave(chMeanSel{1}{1 , posN}, [], selectWin, "Reg vs Irreg", [8, 8], (1 : 64)', "off");
-                        Fig_RegIrreg = plotRawWave2(Fig_RegIrreg, chMeanSel{1}{3, posN}, [], selectWin, 'k');
-                        % set axes
-
-                        scaleAxes(Fig_RegIrreg,'y', [-1 * yScale(posN) yScale(posN) ]);
-                        setAxes(Fig_RegIrreg, 'yticklabel', '');
-                        setAxes(Fig_RegIrreg, 'xticklabel', '');
-                        setAxes(Fig_RegIrreg, 'visible', 'off');
-                        % reset lineWidth, lineColor
-                        setLine(Fig_RegIrreg, "LineWidth", 1.5, "LineStyle", "-")
-                        %     setLine(Fig_MultiWave, "Color", "black" , "LineStyle", "-");
-                        setLine(Fig_RegIrreg, "YData", [-1 * yScale(posN) yScale(posN) ], "LineStyle", "--");
-                        setLine(Fig_RegIrreg, "LineWidth", 1, "LineStyle", "--");
-                        % reset figure size
-
-                        set(Fig_RegIrreg, "outerposition", [300, 100, 800, 670]);
-
-                        % plot layout
-                        if contains(matPath{recordCode}, 'cc')
-                            plotLayout(Fig_RegIrreg, posN, 0.3);
-                        else
-
-                            plotLayout(Fig_RegIrreg, posN + 2, 0.3);
-                        end
-
-                        % save
-                        mkdir(savePath2)
-                        print(Fig_RegIrreg, fullfile(savePath2, strcat(ICIStr(1), "_", posStr(posN))), "-djpeg", "-r300");
-                        close all
-                    
-                end
-            end
-        end
-
 
 %% 4,8,20,40,80
         if plotMultiFigure && plotFigure
@@ -143,11 +99,16 @@ for id = idIdx
 
 
                         Fig_MultiWave = plotRawWave(chMeanSel{1}{stimPlot , posN}, [], selectWin, "diffICI", [8, 8], (1 : 64)', "off");
-                        Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{5}{stimPlot, posN}, [], selectWin, '#AAAAAA');
-                        Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{4}{stimPlot, posN}, [], selectWin, '#000000');
-                        Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{3}{stimPlot, posN}, [], selectWin, '#0000FF');
-                        Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{2}{stimPlot, posN}, [], selectWin, '#FFA500');
-                        Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{1}{stimPlot, posN}, [], selectWin, '#FF0000');
+                        lineSetting.color = "#AAAAAA";
+                        Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{5}{stimPlot, posN}, [], selectWin, lineSetting);
+                        lineSetting.color = "#000000";
+                        Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{4}{stimPlot, posN}, [], selectWin, lineSetting);
+                        lineSetting.color = "#0000FF";
+                        Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{3}{stimPlot, posN}, [], selectWin, lineSetting);
+                        lineSetting.color = "#FFA500";
+                        Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{2}{stimPlot, posN}, [], selectWin, lineSetting);
+                        lineSetting.color = "#FF0000";
+                        Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{1}{stimPlot, posN}, [], selectWin, lineSetting);
 
                         % set axes
 

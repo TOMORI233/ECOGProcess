@@ -2,8 +2,9 @@ clear all; clc
 monkeyId = ["chouchou", "xiaoxiao"];
 posStr = ["LAuC", "LPFC"];
 plotFigure = 1;
-reprocess = 1;
+reprocess = 0;
 processCDR = 1;
+plotMultiFigure = 1;
 selectWin = [-200 600];
 yScale = [60 30];
 % idIdx = input('Monkey ID: 1-chouchou, 2-xiaoxiao \n');
@@ -11,14 +12,15 @@ idIdx = 1:2;
 % posIndex = input('recording area : 1-AC, 2-PFC \n');
 posIndex = 1:2;
 % s1OnsetOrS2Onset = input('zero is : 1-s1 onset, 2-s2 onset \n'); % 1: start, 2: trans
-s1OnsetOrS2Onset = 1; % 1: start, 2: trans
+s1OnsetOrS2Onset = 2; % 1: start, 2: trans
 
 % filterResDataPath = getSubfoldPath('E:\ECoG','Res.mat','^(?!.*Merge)');
 
 % paradigmKeyword = "Insert"; %Insert, RegInIrreg4o32, LowHigh43444546, ICIThr401234, Var3, offset, Tone
-% paradigmKeyword = ["LongTerm4[^0]", "LongTerm8[^0]", "LongTerm20", "LongTerm40", "LongTerm80"];
-% paradigmKeyword = ["NormSqrtLongTerm4[^0]", "NormLongTerm4[^0]", "LongTermNew4[^0]"];
-paradigmKeyword = ["ICIThr401234", "Insert", "RegInIrreg4o32", "LowHigh43444546", "Var3", "Tone"]; %Insert, RegInIrreg4o32, LowHigh43444546, ICIThr401234, Var3, offset, Tone
+paradigmKeyword = ["LongTerm4[^0]", "LongTerm8[^0]", "LongTerm20", "LongTerm40", "LongTerm80"];
+% paradigmKeyword = ["NormSqrtLongTerm4[^0]", "NormLongTerm4[^0]"];
+% paradigmKeyword = ["ratioDetectCommon", "ratioDetectSmall", "ratioDetectLarge", "ICIBind"];
+% paradigmKeyword = ["ICIThr401234", "Insert", "RegInIrreg4o32", "LowHigh43444546", "Var3", "Tone"]; %Insert, RegInIrreg4o32, LowHigh43444546, ICIThr401234, Var3, offset, Tone
 
 paradigmStr = strrep(paradigmKeyword, '[^0]', '');
 
@@ -34,8 +36,8 @@ matPath = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(paradigmKeyword
 % selectRecord = input('selected record ID: \n');
 % close(fig);
     for pN = 1 : length(paradigmKeyword)
-        matPath = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(paradigmKeyword(pN), ".*", posStr(1)));
-        for recordCode = 1 : length(matPath)
+        matPathTemp = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(paradigmKeyword(pN), ".*", posStr(1)));
+        for recordCode = 1 : length(matPathTemp)
 %                 for recordCode = selectRecord
             for pos = posIndex
                 matPath = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(paradigmKeyword(pN), ".*", posStr(pos)));
@@ -54,15 +56,16 @@ matPath = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(paradigmKeyword
                     continue
                 end
                 for stimCode = 1 : length(filterRes)
-                    clearvars -except processCDR savePath reprocess id monkeyId recordCode matPath selectWin selectRecord posStr pos posIndex pos stimCode paradigmKeyword paradigmStr pN filterRes rootPath cdrRes cdrPlot plotFigure dateStr plotCh chMeanSel yScale s1OnsetOrS2Onset 
+                    clearvars -except processCDR savePath reprocess id monkeyId recordCode matPath selectWin selectRecord posStr pos posIndex pos stimCode paradigmKeyword paradigmStr pN filterRes rootPath cdrRes cdrPlot plotFigure dateStr plotCh chMeanSel yScale s1OnsetOrS2Onset plotMultiFigure
                     % get data
                     chMean = filterRes(stimCode).chMean;
                     t = filterRes(stimCode).t;
                     stimStr = filterRes(stimCode).stimStr;
 
                     if s1OnsetOrS2Onset == 1
-                        t = filterRes(stimCode).t + filterRes(stimCode).S1Duration;
-                        selectWin = [0 diff(selectWin)] - 200;
+                        window = [0 11000];
+                    elseif s1OnsetOrS2Onset == 2
+                        window = [0 11000] - filterRes(stimCode).S1Duration;
                     end
 
                     tIndex = find(t > selectWin(1) & t < selectWin(2));
@@ -97,34 +100,41 @@ matPath = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(paradigmKeyword
 
 
             %% save
-            if  plotFigure
+            if plotMultiFigure && plotFigure
                 if ~exist(savePath, 'dir')
                     mkdir(savePath)
-                    % 4,8,20,40,80
-                    for posN = 1 : 2 % pfc
-
-                        if paradigmKeyword(pN) == "LowHigh4043444546" || paradigmKeyword(pN) == "ICIThr401234"
-                            Fig_MultiWave = plotRawWave(chMeanSel{pN}{1 , posN}, [], selectWin, paradigmKeyword(pN), [8, 8], (1 : 64)', "off");
-                            lineSetting.color = "#000000";
-                            Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{pN}{1, posN}, [], selectWin, lineSetting);
-                            lineSetting.color = "#0000FF";
-                            Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{pN}{2, posN}, [], selectWin, lineSetting);
-                            lineSetting.color = "#FFA500";
-                            Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{pN}{3, posN}, [], selectWin, lineSetting);
-                            lineSetting.color = "#FF0000";
-                            Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{pN}{4, posN}, [], selectWin, lineSetting);
-                        else
-                            Fig_MultiWave = plotRawWave(chMeanSel{pN}{1 , posN}, [], selectWin, paradigmKeyword(pN), [8, 8], (1 : 64)', "off");
-                            lineSetting.color = "#000000";
-                            Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{pN}{4, posN}, [], selectWin, lineSetting);
-                            lineSetting.color = "#0000FF";
-                            Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{pN}{3, posN}, [], selectWin, lineSetting);
-                            lineSetting.color = "#FFA500";
-                            Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{pN}{2, posN}, [], selectWin, lineSetting);
-                            lineSetting.color = "#FF0000";
-                            Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{pN}{1, posN}, [], selectWin, lineSetting);
+                    for posN = 1 : 2 % 1:ac, 2:pfc
+                        stimType = size(chMeanSel{pN}, 1);
+                        switch stimType
+                            case 5
+                                colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#AAAAAA"];
+                            case 6
+                                colors = ["#FF0000", "#B03060", "#FFA500", "#0000FF", "#000000", "#AAAAAA"];
                         end
+                        
+                        if paradigmKeyword(pN) == "ICIBind"
+                            % min order colored red
+                            for stimN = 1 : stimType
+                                if stimN == 1
+                                    Fig_MultiWave = plotRawWave(chMeanSel{pN}{stimN , posN}, [], selectWin, paradigmKeyword(pN), [8, 8], (1 : 64)', "on");
+                                else
+                                    lineSetting.color = colors(stimN);
+                                    Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{pN}{stimN, posN}, [], selectWin, lineSetting);
+                                end
+                            end
 
+                        else
+                                % max order colored red
+                            for stimN = 1 : stimType
+                                if stimN == 1
+                                    Fig_MultiWave = plotRawWave(chMeanSel{pN}{stimType - stimN + 1 , posN}, [], selectWin, paradigmKeyword(pN), [8, 8], (1 : 64)', "on");
+                                else
+                                    lineSetting.color = colors(stimN);
+                                    Fig_MultiWave = plotRawWave2(Fig_MultiWave, chMeanSel{pN}{stimType - stimN + 1, posN}, [], selectWin, lineSetting);
+                                end
+                            end
+                                        
+                        end
                         % get all axes
                         allAxes2 = findobj(Fig_MultiWave, "Type", "axes");
 
