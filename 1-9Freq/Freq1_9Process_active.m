@@ -111,7 +111,7 @@ scaleAxes(FigDM1, "y", [-80, 80]);
 cRange = scaleAxes(FigDM2, "c", [-20, 20]);
 
 %% Layout
-plotLayout([FigP(1), FigPE1, FigDM1], posIndex);
+% plotLayout([FigP(1), FigPE1, FigDM1], posIndex);
 
 %% Save
 AREANAME = ["AC", "PFC"];

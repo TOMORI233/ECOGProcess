@@ -6,11 +6,12 @@ function trialAll = ActiveProcess_7_10Freq(epocs, choiceWin)
     end
 
     %% Information extraction
-%     fixation 20220520 Block-1
-    for index = 1:length(unique(epocs.swee.data))
-        idx = find(epocs.swee.data == index);
-        epocs.num0.data(idx) = (1:length(idx))';
-    end
+
+%     % fixation 20220520 Block-1
+%     for index = 1:length(unique(epocs.swee.data))
+%         idx = find(epocs.swee.data == index);
+%         epocs.num0.data(idx) = (1:length(idx))';
+%     end
 
     trialOnsetIndex = find(epocs.num0.data == 1);
     trialOnsetTimeAll = epocs.num0.onset(trialOnsetIndex) * 1000; % ms
@@ -72,6 +73,11 @@ function trialAll = ActiveProcess_7_10Freq(epocs, choiceWin)
         %% Correct or not
         % Find first push time of this trial
         firstPush = pushTimeAll(find(pushTimeAll >= trialAll(tIndex, 1).soundOnsetSeq(end) & pushTimeAll <= trialOnsetTimeAll(tIndex + 1, 1), 1));
+
+        if isempty(firstPush)
+            trialAll(tIndex, 1).correct = false;
+            continue;
+        end
 
         % DEV: Whether push in choice window
         if strcmp(trialAll(tIndex, 1).oddballType, "DEV")

@@ -2,48 +2,48 @@ clear; clc; close all;
 
 %% 7-10Freq active
 disp("Exporting 7-10Freq active...");
-SAVEPATH = "E:\ECoG\MAT Data\CC\7-10Freq Active\";
+SAVEPATH = "D:\Education\Lab\Projects\ECOG\MAT Data\XX\7-10Freq Active\";
 BLOCKPATH = [];
-BLOCKPATH{1} = 'E:\ECoG\TDT Data\chouchou\cc20220517\Block-8';
-BLOCKPATH{2} = 'E:\ECoG\TDT Data\chouchou\cc20220518\Block-1';
-BLOCKPATH{3} = 'E:\ECoG\TDT Data\chouchou\cc20220519\Block-3';
-BLOCKPATH{4} = 'E:\ECoG\TDT Data\chouchou\cc20220520\Block-1';
-BLOCKPATH{5} = 'E:\ECoG\TDT Data\chouchou\cc20220525\Block-1';
-BLOCKPATH{6} = 'E:\ECoG\TDT Data\chouchou\cc20220530\Block-1';
+BLOCKPATH{1} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220627\Block-1';
+BLOCKPATH{2} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220706\Block-1';
+BLOCKPATH{3} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220711\Block-1';
+BLOCKPATH{4} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220715\Block-2';
+BLOCKPATH{5} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220720\Block-1';
+BLOCKPATH{6} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220808\Block-2';
+BLOCKPATH{7} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220812\Block-1';
 params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
-exportDataFcn(BLOCKPATH, SAVEPATH, params);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 6);
 
 %% 1-9Freq active
 disp("Exporting 1-9Freq active...");
-SAVEPATH = "E:\ECoG\MAT Data\CC\1-9Freq Active\";
+SAVEPATH = "D:\Education\Lab\Projects\ECOG\MAT Data\XX\1-9Freq Active\";
 BLOCKPATH = [];
-BLOCKPATH{1} = 'E:\ECoG\TDT Data\chouchou\cc20220523\Block-1';
-BLOCKPATH{2} = 'E:\ECoG\TDT Data\chouchou\cc20220524\Block-1';
-BLOCKPATH{3} = 'E:\ECoG\TDT Data\chouchou\cc20220601\Block-1';
-BLOCKPATH{4} = 'E:\ECoG\TDT Data\chouchou\cc20220605\Block-1';
-BLOCKPATH{5} = 'E:\ECoG\TDT Data\chouchou\cc20220609\Block-3';
-BLOCKPATH{6} = 'E:\ECoG\TDT Data\chouchou\cc20220613\Block-4';
+BLOCKPATH{1} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220628\Block-3';
+BLOCKPATH{2} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220707\Block-1';
+BLOCKPATH{3} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220712\Block-1';
+BLOCKPATH{4} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220716\Block-1';
+BLOCKPATH{5} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220721\Block-1';
+BLOCKPATH{6} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220726\Block-3';
 params.choiceWin = [100, 800];
 params.processFcn = @ActiveProcess_1_9Freq;
 exportDataFcn(BLOCKPATH, SAVEPATH, params, 6);
 
 %% LTST active
 disp("Exporting LTST active...");
-SAVEPATH = "E:\ECoG\MAT Data\CC\LTST Active\";
+SAVEPATH = "D:\Education\Lab\Projects\ECOG\MAT Data\XX\LTST Active\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'E:\ECoG\TDT Data\chouchou\cc20220521\Block-1';
 BLOCKPATH{2} = 'E:\ECoG\TDT Data\chouchou\cc20220531\Block-3';
-BLOCKPATH{3} = 'E:\ECoG\TDT Data\chouchou\cc20220606\Block-4';
-BLOCKPATH{4} = 'E:\ECoG\TDT Data\chouchou\cc20220608\Block-1';
-BLOCKPATH{5} = 'E:\ECoG\TDT Data\chouchou\cc20220610\Block-1';
+BLOCKPATH{3} = 'E:\ECoG\TDT Data\chouchou\cc20220608\Block-1';
+BLOCKPATH{4} = 'E:\ECoG\TDT Data\chouchou\cc20220610\Block-1';
 params.choiceWin = [100, 800];
 params.processFcn = @ActiveProcess_LTST;
 exportDataFcn(BLOCKPATH, SAVEPATH, params);
 
 %% What-When active
 disp("Exporting What-When active...");
-SAVEPATH = "E:\ECoG\MAT Data\CC\WhatWhen Active\";
+SAVEPATH = "D:\Education\Lab\Projects\ECOG\MAT Data\CC\WhatWhen Active\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'E:\ECoG\TDT Data\chouchou\cc20220612\Block-1';
 BLOCKPATH{2} = 'E:\ECoG\TDT Data\chouchou\cc20220614\Block-1';
@@ -54,8 +54,6 @@ BLOCKPATH{6} = 'E:\ECoG\TDT Data\chouchou\cc20220620\Block-1';
 params.choiceWin = [100, 800];
 params.processFcn = @ActiveProcess_WhatWhen;
 exportDataFcn(BLOCKPATH, SAVEPATH, params, 5);
-
-
 
 %% Fcn
 function exportDataFcn(BLOCKPATH, SAVEPATH, params, startIdx, endIdx)
@@ -69,6 +67,8 @@ function exportDataFcn(BLOCKPATH, SAVEPATH, params, startIdx, endIdx)
         endIdx = length(BLOCKPATH);
     end
 
+    fd = 500; % Hz
+
     for index = startIdx:endIdx
         AREANAME = ["AC", "PFC"];
         temp = string(split(BLOCKPATH{index}, '\'));
@@ -80,6 +80,8 @@ function exportDataFcn(BLOCKPATH, SAVEPATH, params, startIdx, endIdx)
         params.posIndex = 1;
         tic
         [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
+        ECOGDataset = ECOGDownsample(ECOGDataset, fd);
+        ECOGDataset = ECOGFilter(ECOGDataset);
         disp("Saving...");
         save(strcat(SAVEPATH, DateStr, "\", DateStr, "_", AREANAME(params.posIndex), ".mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");
         toc
@@ -89,6 +91,8 @@ function exportDataFcn(BLOCKPATH, SAVEPATH, params, startIdx, endIdx)
         params.posIndex = 2;
         tic
         [~, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
+        ECOGDataset = ECOGDownsample(ECOGDataset, fd);
+        ECOGDataset = ECOGFilter(ECOGDataset);
         disp("Saving...");
         save(strcat(SAVEPATH, DateStr, "\", DateStr, "_", AREANAME(params.posIndex), ".mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");
         toc

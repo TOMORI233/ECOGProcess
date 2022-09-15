@@ -19,6 +19,7 @@ choiceWin = choiceWin + soundDuration;
 %     epocs.ordr.data(epocs.ordr.data == 9) = 24;
 %     epocs.ordr.data(epocs.ordr.data == 10) = 30;
 
+
 trialOnsetIndex = find(epocs.num0.data == 1);
 trialOnsetTimeAll = epocs.num0.onset(trialOnsetIndex) * 1000; % ms
 soundOnsetTimeAll = epocs.num0.onset * 1000; % ms
@@ -88,6 +89,7 @@ for tIndex = 1:length(trialOnsetIndex) - 1
         % DEV: Whether push in choice window
         if strcmp(trialAll(tIndex, 1).oddballType, "DEV")
 
+
             if firstPush >= trialAll(tIndex, 1).soundOnsetSeq(end) + choiceWin(1) && firstPush <= trialAll(tIndex, 1).soundOnsetSeq(end) + choiceWin(2)
                 pushInWinFlag = true;
                 trialAll(tIndex, 1).firstPush = firstPush;
@@ -107,6 +109,7 @@ for tIndex = 1:length(trialOnsetIndex) - 1
                 trialAll(tIndex, 1).firstPush = firstPush;
             else
                 pushInWinFlag = false;
+
 
                 if firstPush > trialAll(tIndex, 1).soundOnsetSeq(end) +  + choiceWin(2)
                     trialAll(tIndex, 1).firstPush = [];

@@ -27,7 +27,6 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotS
         for cIndex = 1:plotSize(2)
             chNum = (rIndex - 1) * plotSize(2) + cIndex;
 
-
             if chNum > size(chMean1, 1)
                 continue;
             end

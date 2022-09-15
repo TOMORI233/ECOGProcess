@@ -7,8 +7,8 @@ params.processFcn = @ActiveProcess_7_10Freq;
 fs = 500; % Hz, for downsampling
 
 %% Processing
-% MATPATH = 'E:\ECoG\MAT Data\CC\7-10Freq Active\cc20220520\cc20220520_AC.mat';
-MATPATH = 'E:\ECoG\chouchou\cc20220520\Block-1';
+
+MATPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Active\cc20220520\cc20220520_AC.mat';
 ROOTPATH = "D:\Education\Lab\Projects\ECOG\Figures\7-10Freq\";
 temp = string(split(MATPATH, '\'));
 DateStr = temp(end - 1);
@@ -45,32 +45,25 @@ drawnow;
 
 %% MMN - PE
 window = [-2000, 2000];
-trialsC = trialAll([trialAll.correct] == true & [trialAll.oddballType] == "DEV");
-trialsW = trialAll([trialAll.correct] == false & [trialAll.interrupt] == false & [trialAll.oddballType] == "DEV");
-[resultDEVC, chMeanDEVC, ~] = selectEcog(ECOGDataset, trialsC, "dev onset", window);
-[resultSTDC, chMeanSTDC, ~] = selectEcog(ECOGDataset, trialsC, "last std", window);
-[resultDEVW, chMeanDEVW, ~] = selectEcog(ECOGDataset, trialsW, "dev onset", window);
-[resultSTDW, chMeanSTDW, ~] = selectEcog(ECOGDataset, trialsW, "last std", window);
+colors = generateColorGrad(4, "rgb");
 
-chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVC - resultSTDC), "UniformOutput", false));
-chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVW - resultSTDW), "UniformOutput", false));
+for dIndex = 2:length(dRatio)
+    trialsC = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex));
+    [resultDEVC, ~, ~] = selectEcog(ECOGDataset, trialsC, "dev onset", window);
+    [resultSTDC, ~, ~] = selectEcog(ECOGDataset, trialsC, "last std", window);
+    
+    chDataC(dIndex - 1).chMean = cell2mat(cellfun(@mean, changeCellRowNum(resultDEVC - resultSTDC), "UniformOutput", false));
+    chDataC(dIndex - 1).color = colors{dIndex - 1};
+    chDataC(dIndex - 1).legend = ['dRatio=', num2str(dRatio(dIndex))];
+end
 
-% chMeanC = cellfun(@(x, y) comp.unmixing * (x - y), resultDEVC, resultSTDC, "UniformOutput", false);
-% chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(chMeanC), "UniformOutput", false));
-% chMeanW = cellfun(@(x, y) comp.unmixing * (x - y), resultDEVW, resultSTDW, "UniformOutput", false);
-% chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(chMeanW), "UniformOutput", false));
+Fig1 = plotRawWaveMulti(chDataC, window, 'MMN(C)');
 
-Fig1(1) = plotRawWave(chMeanC, [], window, "C:DEV-last STD");
-Fig1(2) = plotRawWave(chMeanW, [], window, "W:DEV-last STD");
-Fig2(1) = plotTFACompare(chMeanDEVC, chMeanSTDC, fs0, fs, window, "C:DEV-last STD");
-Fig2(2) = plotTFACompare(chMeanDEVW, chMeanSTDW, fs0, fs, window, "W:DEV-last STD");
-scaleAxes([Fig1, Fig2], "x", [0, 500]);
-scaleAxes(Fig1, "y", [], [-60, 60], "max");
-scaleAxes(Fig2, "c", [], [-20, 20]);
+scaleAxes(Fig1, "x", [0, 500]);
+scaleAxes(Fig1, "y", [-50, 50]);
 
 %% Prediction
-window = [-2500, 6000]; % ms
-[~, chMean, ~] = joinSTD(trialAll([trialAll.correct] == true), ECOGDataset, window);
+[~, chMean, ~, window] = joinSTD(trialAll([trialAll.correct] == true), ECOGDataset);
 FigP(1) = plotRawWave(chMean, [], window);
 drawnow;
 FigP(2) = plotTFA(chMean, fs0, fs, window);
@@ -81,7 +74,12 @@ window = [-2000, 2000]; % ms
 
 for dIndex = 1:length(dRatio)
     trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex));
-    [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "dev onset", window);
+
+    if isempty([trials.firstPush])
+        continue;
+    end
+
+    [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "push onset", window);
     FigPE1(dIndex) = plotRawWave(chMean, chStd, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
     drawnow;
     FigPE2(dIndex) = plotTFA(chMean, fs0, fs, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);

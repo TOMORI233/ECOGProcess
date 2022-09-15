@@ -47,12 +47,13 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, behaviorOnly
     catch e
         disp(e.message);
         disp("Try loading data from TDT BLOCK...");
-        temp = TDTbin2mat(DATAPATH, 'TYPE', {'epocs'});
+        temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'epocs'});
         epocs = temp.epocs;
         trialAll = processFcn(epocs, choiceWin);
     
         if ~behaviorOnly
-            temp = TDTbin2mat(DATAPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
+
+            temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'streams'}, 'STORE', {char(posStr(posIndex))});
             streams = temp.streams;
             ECOGDataset = streams.(posStr(posIndex));
         else

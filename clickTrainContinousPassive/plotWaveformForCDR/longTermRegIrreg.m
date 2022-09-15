@@ -5,9 +5,7 @@ plotFigure = 0;
 reprocess = 0;
 selectWin = [-200 600];
 yScale = [60 30];
-% idIdx = input('Monkey ID: 1-chouchou, 2-xiaoxiao \n');
 idIdx = 1:2;
-% posIndex = input('recording area : 1-AC, 2-PFC \n');
 posIndex = 1:2;
 % s1OnsetOrS2Onset = input('zero is : 1-s1 onset, 2-s2 onset \n'); % 1: start, 2: trans
 s1OnsetOrS2Onset = 2; % 1: start, 2: trans
@@ -24,7 +22,6 @@ paradigmStr = strrep(paradigmKeyword, '[^0]', '');
 
 for id = idIdx
     rootPath = fullfile('E:\ECoG\matData', monkeyId(id));
-% display recording tabel
 matPath = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(paradigmKeyword(1), ".*", posStr(1)));
 % recordTable = cell2table([num2cell((1 : length(matPath))'), matPath], "VariableNames", {'recordingCode', 'matPath'});
 % fig = uifigure('Position', [500 100 800 600]);

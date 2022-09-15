@@ -27,26 +27,56 @@ choiceWin = [100, 600]; % ms
 % [Fig, mAxe] = plotBehaviorOnly(trials7_9, "r", "7 8 9", Fig, mAxe);
 
 % % % %% 7-10 
-%  trialAll = ActiveProcess_7_10Freq(epocs, choiceWin);
+
+% trialAll = ActiveProcess_7_10Freq(epocs, choiceWin);
 % plotBehaviorOnly(trialAll, "r", "7-10 Freq");
 
 
 % freqLoc
-trialAll = ActiveProcess_freqLoc(epocs, choiceWin);
-stdFreq = unique([trialAll([trialAll.oddballType] == "STD").devFreq]);
-stdLoc = unique([trialAll([trialAll.oddballType] == "STD").devLoc]);
-trialsFreq = trialAll([trialAll.devLoc] == stdLoc);
-trialsLoc = trialAll([trialAll.devFreq] == stdFreq);
-[Fig, mAxe] = plotBehaviorOnly(trialsFreq, "r", "frequency");
-[Fig, mAxe] = plotBehaviorOnly(trialsLoc, "b", "location", Fig, mAxe, "loc");
 
+% trialAll = ActiveProcess_freqLoc(epocs, choiceWin);
+% block1Idx = mod([trialAll.trialNum]', 80) >= 1 & mod([trialAll.trialNum]', 80) <= 20;
+% block2Idx = mod([trialAll.trialNum]', 80) >= 21 & mod([trialAll.trialNum]', 80) <= 40;
+% block3Idx = mod([trialAll.trialNum]' - 1, 80) >= 40 & mod([trialAll.trialNum]', 80) <= 79;
+% 
+% stdFreq = unique([trialAll([trialAll.oddballType]' == "STD").devFreq]);
+% stdLoc = unique([trialAll([trialAll.oddballType]' == "STD").devLoc]);
+% trialsBlkFreq = trialAll([trialAll.devLoc]' == stdLoc & block1Idx);
+% trialsRandFreq = trialAll([trialAll.devLoc]' == stdLoc & block3Idx);
+% trialsBlkLoc = trialAll([trialAll.devFreq]' == stdFreq & block2Idx);
+% trialsRandLoc = trialAll([trialAll.devFreq]' == stdFreq & block3Idx);
+% [Fig, mAxe] = plotBehaviorOnly(trialsBlkFreq, "r", "block freq");
+% [Fig, mAxe] = plotBehaviorOnly(trialsRandFreq, "m", "rand freq", Fig, mAxe, "freq");
+% [Fig, mAxe] = plotBehaviorOnly(trialsBlkLoc, "b", "block loc", Fig, mAxe, "loc");
+% [Fig, mAxe] = plotBehaviorOnly(trialsRandLoc, "k", "rand loc", Fig, mAxe, "loc");
 
-% click train compare
+% % click train compare
 % pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','FuzaTone-C','FuzaTone-D'};
 % trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin);
 % trialAll = trialAll(2:end);
 % trialsNoInterrupt = trialAll([trialAll.interrupt] == false);
 % trials = deleteWrongTrial(trialsNoInterrupt, "ClickTrainOddCompare");
+% 
+% [Fig, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'},pairStr);
+
+% 
+% click train compare tone
+pairStr = {'4-4.16RC','4-4.16RD','4-5RC','4-5RD','4-4.16IC','4-4.16ID','4-5IC','4-5ID','250-250Hz','250-240Hz','250-250Hz','250-200Hz'};
+pairStr = {'4-4.08RC','4-4.08RD','4-4.08IC','4-4.08ID','250-250Hz','250-240Hz','250-250Hz','250-500Hz'};
+
+trialAll = ActiveProcess_clickTrainWM(epocs, choiceWin);
+trialAll = trialAll(2:end);
+trialsNoInterrupt = trialAll([trialAll.interrupt] == false);
+trials = deleteWrongTrial(trialsNoInterrupt, "ClickTrainOddCompareTone");
+
+[Fig, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'},pairStr);
+
+% % % click train ICI Thr
+% trialAll = ActiveProcess_clickTrain1_9(epocs, choiceWin);
+% trialAll = trialAll(2:end);
+% [FigBehavior, mAxe] = plotBehaviorOnly(trialAll, "k", "7-10");
+
+% trials = deleteWrongTrial(trialsNoInterrupt, 'clickTrainCompare');
 % 
 % [Fig, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'},pairStr);
 

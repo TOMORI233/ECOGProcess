@@ -47,7 +47,7 @@ trialsRand = trialAll(randIdx);
 
 %% Plot behavior result
 
-[FigBehavior, mAxe] = plotBehaviorOnly(trialsConst, "r", "500ms ISI", FigBehavior, mAxe);
+[FigBehavior, mAxe] = plotBehaviorOnly(trialsConst, "r", "400ms ISI");
 [FigBehavior, mAxe] = plotBehaviorOnly(trialsRand, "b", "800ms ISI", FigBehavior, mAxe);
 set(mAxe(1),'xticklabel',{'control(4msReg)','deviant(4.03msReg)','deviant(4.06msReg)','deviant(4.09msReg)','deviant(4.12msReg)'});
 

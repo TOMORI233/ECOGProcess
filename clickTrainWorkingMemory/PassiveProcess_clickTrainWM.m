@@ -1,5 +1,15 @@
+<<<<<<< HEAD
+function trialAll = PassiveProcess_clickTrainWM(epocs)
+    %% Information extraction
+    % fixation 20220520 Block-2
+    for index = 1:length(unique(epocs.swee.data))
+        idx = find(epocs.swee.data == index);
+        epocs.num0.data(idx) = (1:length(idx))';
+    end
+=======
 function trialAll = PassiveProcess_clickTrainWM(epocs, choiceWin, soundDuration)
 narginchk(1, 3);
+>>>>>>> 9b985a0ace977fef21a5de6db691c21e38523fce
 
 if nargin < 2
     choiceWin = [0, 600];

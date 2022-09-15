@@ -44,8 +44,6 @@ for dIndex = 2:length(varargin)
         end
     end
 
-
-
 end
 
 %% Join blocks

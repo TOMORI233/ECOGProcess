@@ -1,32 +1,20 @@
-%% Data loading
 clear; clc; close all;
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220517\Block-9';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220518\Block-2';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220519\Block-4';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220520\Block-2';
-BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220525\Block-2';
-% BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220530\Block-2';
-posIndex = 1; % 1-AC, 2-PFC
-posStr = ["LAuC", "LPFC"];
-
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
-epocs = temp.epocs;
-
-temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'streams'}, 'STORE', posStr(posIndex));
-streams = temp.streams;
-
-ECOGDataset = streams.(posStr(posIndex));
-fs0 = ECOGDataset.fs;
-
-AREANAME = ["AC", "PFC"];
-temp = string(split(BLOCKPATH, '\'));
-DateStr = temp(end - 1);
 
 %% Parameter setting
-fs = 300; % Hz, for downsampling
+params.posIndex = 1; % 1-AC, 2-PFC
+params.choiceWin = [100, 600];
+params.processFcn = @ActiveProcess_7_10Freq;
+
+fs = 500; % Hz, for downsampling
 
 %% Processing
-trialAll = PassiveProcess_7_10Freq(epocs);
+MATPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Passive\cc20220520\cc20220520_AC.mat';
+% ROOTPATH = "D:\Education\Lab\Projects\ECOG\Figures\7-10Freq\";
+temp = string(split(MATPATH, '\'));
+DateStr = temp(end - 1);
+[trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
+fs0 = ECOGDataset.fs;
+
 devFreqAll = [trialAll.devFreq];
 stdFreqAll = cellfun(@(x) x(1), {trialAll.freqSeq});
 dRatioAll = roundn(devFreqAll ./ stdFreqAll, -2);
@@ -34,8 +22,7 @@ dRatio = unique(dRatioAll);
 dRatio(dRatio == 0) = [];
 
 %% Prediction
-window = [-2500, 6000]; % ms
-[chMean, ~] = joinSTD(trialAll, ECOGDataset, window);
+[~, chMean, ~, window] = joinSTD(trialAll, ECOGDataset);
 FigP(1) = plotRawWave(chMean, [], window);
 drawnow;
 FigP(2) = plotTFA(chMean, fs0, fs, window);

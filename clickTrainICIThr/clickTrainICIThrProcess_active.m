@@ -12,15 +12,15 @@ fs = 500; % Hz, for downsampling
 %% Processing
 
 % joinBlocks
-BLOCKPATH1 = 'E:\ECoG\chouchou\cc20220614\Block-3';
-BLOCKPATH2 = 'E:\ECoG\chouchou\cc20220614\Block-4';
-opts.sfNames = posStr(posIndex);
-opts.efNames = ["num0", "push", "erro", "ordr"];
-[trialAll, ECOGDataset] = ECOGPreprocessJoinBlock({BLOCKPATH1, BLOCKPATH2}, params, opts, [1817 0]);
+% BLOCKPATH1 = 'E:\ECoG\chouchou\cc20220614\Block-3';
+% BLOCKPATH2 = 'E:\ECoG\chouchou\cc20220614\Block-4';
+% opts.sfNames = posStr(posIndex);
+% opts.efNames = ["num0", "push", "erro", "ordr"];
+% [trialAll, ECOGDataset] = ECOGPreprocessJoinBlock({BLOCKPATH1, BLOCKPATH2}, params, opts, [1817 0]);
 
 % normal 
-% BLOCKPATH = 'E:\ECoG\chouchou\cc20220617\Block-1';
-% [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params, 1);
+BLOCKPATH = 'G:\ECoG\xiaoxiao\xx20220630\Block-2';
+[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params, 1);
 
 if ~isempty(ECOGDataset)
     fs0 = ECOGDataset.(posStr(posIndex)).fs;
@@ -28,7 +28,7 @@ end
 %% Data saving params
 
 
-temp = string(split(BLOCKPATH1, '\'));
+temp = string(split(BLOCKPATH, '\'));
 DateStr = temp(end - 1);
 Paradigm = 'ClickTrainOddICIThrActive';
 AREANAME = {'AC', 'PFC'};
