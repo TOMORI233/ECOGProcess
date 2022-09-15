@@ -1,6 +1,7 @@
 clear; clc; close all;
 %% Parameter settings
-BLOCKPATH = 'E:\ECoG\xiaoxiao\xx20220622\Block-7';
+% BLOCKPATH = 'E:\ECoG\xiaoxiao\xx20220622\Block-7';
+BLOCKPATH = 'E:\ECoG\TDT Data\chouchou\cc20220530\Block-3';
 
 params.posIndex = 1;
 params.processFcn = @CTScreeningProcess;

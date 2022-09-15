@@ -13,9 +13,9 @@ function ECOGDataset = ECOGFilter(ECOGDataset, fhp, flp)
     channels = ECOGDataset.channels;
 
     cfg = [];
-    cfg.trials = true;
-    data.trial = ECOGDataset.data;
-    data.time = (0:(size(ECOGDataset.data, 2) - 1)) / fs0;
+    cfg.trials = 'all';
+    data.trial = {ECOGDataset.data};
+    data.time = {(1:size(ECOGDataset.data, 2)) / fs0};
     data.label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
     data.fsample = fs0;
     data.trialinfo = 1;
@@ -34,6 +34,6 @@ function ECOGDataset = ECOGFilter(ECOGDataset, fhp, flp)
     cfg.dftfreq = [50 100 150]; % line noise frequencies in Hz for DFT filter (default = [50 100 150])
     data = ft_preprocessing(cfg, data);
 
-    ECOGDataset.data = data.avg;
+    ECOGDataset.data = data.trial{1};
     return;
 end

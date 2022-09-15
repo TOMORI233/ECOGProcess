@@ -1,7 +1,7 @@
 function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize, chs, visible)
     narginchk(3, 7);
 
-    if nargin < 4
+    if nargin < 4 || isempty(titleStr)
         titleStr = '';
     else
         titleStr = [' | ', char(titleStr)];
@@ -18,9 +18,6 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize, chs, visib
     if nargin < 7 
         visible = "on";
     end
-
-    
-
 
     if size(chs, 1) ~= plotSize(1) || size(chs, 2) ~= plotSize(2)
         disp("chs option not matched with plotSize. Resize chs...");

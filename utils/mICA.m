@@ -24,7 +24,7 @@ function comp = mICA(ECOGDataset, trials, window, segOption, fs)
     t = linspace(window(1), window(2), size(trialsECOG{1}, 2)) / 1000;
 
     cfg = [];
-    cfg.trials = true(length(trialsECOG), 1);
+    cfg.trials = 'all';
     data.trial = trialsECOG';
     data.time = repmat({t}, 1, length(trials));
     data.label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
@@ -50,7 +50,7 @@ function comp = mICA(ECOGDataset, trials, window, segOption, fs)
     if fs < fs0
         cfg = [];
         cfg.resamplefs = fs;
-        cfg.trials = (1:length(data.trial))';
+        cfg.trials = 'all';
         data = ft_resampledata(cfg, data);
     else
         warning("resamplefs should not be greater than fsample. Skip resampling.");
