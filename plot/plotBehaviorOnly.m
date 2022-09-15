@@ -1,4 +1,4 @@
-function [Fig, mAxe] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe, cueType)
+function [Fig, mAxe, nPush, nTotal] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe, cueType)
     narginchk(3, 6);
     margins = [0.1, 0.1, 0.1, 0.1];
 

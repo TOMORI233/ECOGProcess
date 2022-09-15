@@ -6,12 +6,6 @@ function trialAll = ActiveProcess_freqLoc(epocs, choiceWin)
     end
 
     %% Information extraction
-    % fixation 20220520 Block-1
-%     for index = 1:length(unique(epocs.swee.data))
-%         idx = find(epocs.swee.data == index);
-%         epocs.num0.data(idx) = (1:length(idx))';
-%     end
-
     trialOnsetIndex = find(epocs.num0.data == 1);
     trialOnsetTimeAll = epocs.num0.onset(trialOnsetIndex) * 1000; % ms
     soundOnsetTimeAll = epocs.num0.onset * 1000; % ms
@@ -58,12 +52,14 @@ function trialAll = ActiveProcess_freqLoc(epocs, choiceWin)
             if trialAll(tIndex, 1).freqSeq(end) ~= trialAll(tIndex, 1).freqSeq(1)
                 trialAll(tIndex, 1).devFreq = trialAll(tIndex, 1).freqSeq(end);
                 trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).soundOnsetSeq) - 1;
+                trialAll(tIndex, 1).devLoc = -1;
             elseif trialAll(tIndex, 1).locSeq(end) ~= trialAll(tIndex, 1).locSeq(1)
                 trialAll(tIndex, 1).devLoc = trialAll(tIndex, 1).locSeq(end);
+                trialAll(tIndex, 1).devFreq = 0;
                 trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).soundOnsetSeq) - 1;
             else
                 trialAll(tIndex, 1).devFreq = 0;
-                trialAll(tIndex, 1).devLoc = 0;
+                trialAll(tIndex, 1).devLoc = -1;
                 trialAll(tIndex, 1).devType = 0;
                 trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).soundOnsetSeq);
             end
