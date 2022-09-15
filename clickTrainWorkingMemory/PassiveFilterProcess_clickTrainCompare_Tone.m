@@ -7,6 +7,7 @@ blksActive = {...
     'E:\ECoG\xiaoxiao\xx20220730\Block-2';...
     'E:\ECoG\xiaoxiao\xx20220801\Block-2';...
     'E:\ECoG\xiaoxiao\xx20220806\Block-2';...
+    'E:\ECoG\chouchou\cc20220809\Block-4';...
     };
 
 for blkN = 1 : length(blksActive)
@@ -15,13 +16,13 @@ for blkN = 1 : length(blksActive)
         disp(strcat('processing...(', num2str((posIndex - 1) * length(blksActive) + blkN), '/', num2str(2 * length(blksActive)), ')'));
         SAVEPATH = 'E:\ECoG\matData\behavior\ClickTrainOddCompareTone\Passive';
         posStr = ["LAuC", "LPFC"];
-        reprocess = 1;
+        reprocess = 0;
         params.posIndex = posIndex; % 1-AC, 2-PFC
         params.choiceWin = [100, 800];
         params.processFcn = @PassiveProcess_clickTrainWM;
         fs = 500; % Hz, for downsampling
-        flp = 1;
-        fhp = 150;
+        flp = inf;
+        fhp = 0;
 
         %% process content
         conductICA = 1;

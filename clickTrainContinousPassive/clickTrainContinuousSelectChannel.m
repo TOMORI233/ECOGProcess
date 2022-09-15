@@ -48,6 +48,7 @@ for id = 1 : 2
             trials = trialAll([trialAll.devOrdr] == devType(1));
             trialsECOG = selectEcog(ECOGDataset, trials, "trial onset", window);
             trialsECOG = excludeTrials(trialsECOG, 0.1);
+            
             amp1 = [amp1 cell2mat(cellfun(@(x) waveAmp(x, selectWin1 + S1Duration(1) - window(1), fs0), trialsECOG, 'UniformOutput', false)')];
             amp2 = [amp2 cell2mat(cellfun(@(x) waveAmp(x, selectWin2 + S1Duration(1) - window(1), fs0), trialsECOG, 'UniformOutput', false)')];
         end

@@ -5,7 +5,7 @@ plotFigure = 0;
 reprocess = 0;
 processCDR = 1;
 plotMultiFigure = 1;
-selectWin = [-200 600];
+selectWin = [-200 600]
 yScale = [80 40];
 % idIdx = input('Monkey ID: 1-chouchou, 2-xiaoxiao \n');
 idIdx = 1:2;
@@ -15,6 +15,7 @@ posIndex = 1:2;
 s1OnsetOrS2Onset = 2; % 1: start, 2: trans
 
 paradigmKeyword = ["LongTerm4[^0]", "LongTerm8[^0]", "LongTerm20", "LongTerm40", "LongTerm80"];
+% paradigmKeyword = ["LongTerm4[^0]"];
 paradigmStr = strrep(paradigmKeyword, '[^0]', '');
 % display recording tabel
 % matPath = getSubfoldPath(rootPath,'filterRes.mat', strcat(paradigmKeyword(1), ".*", posStr(1)));
@@ -32,8 +33,8 @@ for id = idIdx
     for recordCode = 1 : length(matPath)
         temp = strsplit(matPath{recordCode}, '\');
         dateStr = temp{5};
-        savePath = fullfile("E:\ECoG\corelDraw\jpgHP1Hz\diffICIBase",dateStr);
-        savePath2 = fullfile("E:\ECoG\corelDraw\jpgHP1Hz\RegIrreg",dateStr);
+        savePath = fullfile("E:\ECoG\corelDraw\jpgHP1Hz\diffICIBaseFFT",dateStr);
+        savePath2 = fullfile("E:\ECoG\corelDraw\jpgHP1Hz\RegIrregFFT",dateStr);
         %     for pN = 1
         for pN = 1 : length(paradigmKeyword)
             for pos = posIndex
@@ -49,11 +50,8 @@ for id = idIdx
                     continue
                 end
                 for stimCode = 1 : length(filterRes)
-                    clearvars -except processCDR monkeyId id savePath savePath2 recordCode  matPath selectWin reprocess selectRecord posStr pos posIndex pos stimCode paradigmKeyword paradigmStr pN filterRes rootPath cdrRes cdrPlot plotFigure dateStr plotCh chMeanSel yScale s1OnsetOrS2Onset plotMultiFigure
-                    % get data
-                    chMean = filterRes(stimCode).chMean;
-                    t = filterRes(stimCode).t;
-                    stimStr = filterRes(stimCode).stimStr;
+                    clearvars -except fftMean powMean chMean processCDR monkeyId id savePath savePath2 recordCode  matPath selectWin reprocess selectRecord posStr pos posIndex pos stimCode paradigmKeyword paradigmStr pN filterRes rootPath cdrRes cdrPlot plotFigure dateStr plotCh yScale s1OnsetOrS2Onset plotMultiFigure
+                    % set window
                     if s1OnsetOrS2Onset == 1
                         window = [0 11000];
                         t = filterRes(stimCode).t + filterRes(stimCode).S1Duration;
@@ -61,25 +59,20 @@ for id = idIdx
                     elseif s1OnsetOrS2Onset == 2
                         window = [0 11000] - filterRes(stimCode).S1Duration;
                     end
+                    
+                    % get data from filterRes.mat
+                    fs = filterRes(stimCode).fs;
+                    FDZData = filterRes(stimCode).FDZData;
+                    FDZDataTemp = excludeTrials(FDZData, 0.1);
+                    temp = changeCellRowNum(FDZDataTemp);
+                    % FFT followed by mean
+                    [f, Pow, P] = cellfun(@(x) mFFT(x, fs), temp, 'UniformOutput', false);
+                    Fs = f{1};
+                    fftMean{pN}{stimCode, pos} = cell2mat(cellfun(@(x) mean(x), P, 'UniformOutput', false));
+                    powMean{pN}{stimCode, pos} = cell2mat(cellfun(@(x) mean(x), Pow, 'UniformOutput', false));  
+                    % mean followed by FFT and TFA
+                    chMean{pN}{stimCode, pos} = cell2mat(cellfun(@mean, temp, "UniformOutput", false));
 
-
-                    tIndex = find(t > selectWin(1) & t < selectWin(2));
-                    tIndex = tIndex(1 : floor(length(tIndex) / 10) * 10);
-                    chMeanSel{pN}{stimCode, pos} = chMean(:, tIndex);
-
-                    % data for corelDraw
-                    filterRes(stimCode).tCDR = t(tIndex);
-                    filterRes(stimCode).chMeanCDR = chMeanSel{pN}{stimCode, pos};
-
-                    cdrRes.(posStr(pos)).(paradigmStr(pN)).(dateStr)(stimCode).tCDR = t(tIndex);
-                    cdrRes.(posStr(pos)).(paradigmStr(pN)).(dateStr)(stimCode).chMeanCDR = chMeanSel{pN}{stimCode, pos};
-                    cdrRes.(posStr(pos)).(paradigmStr(pN)).(dateStr)(stimCode).stimStr = filterRes(stimCode).stimStr;
-                    % save(matPath{recordCode}, "filterRes");
-                    stimStr2 = ["RegOrd", "RegRev", "IrregOrd", "IrregRev"];
-                    for ch = 1 : size(chMeanSel{pN}{stimCode, pos}, 1)
-                        cdrPlot.(posStr(pos)).(strcat('ch', num2str(ch))).(dateStr).(stimStr2(stimCode))(:, 2*pN - 1) = t(tIndex);
-                        cdrPlot.(posStr(pos)).(strcat('ch', num2str(ch))).(dateStr).(stimStr2(stimCode))(:, 2*pN) = chMeanSel{pN}{stimCode, pos}(ch , :)';
-                    end
                     %             print(Fig_wave, strcat(PEPATH, AREANAME, "_PE_Raw_", num2str(dIndex), "_", DateStr), "-djpeg", "-r200");
                 end
 
@@ -95,21 +88,20 @@ for id = idIdx
             ICIStr = ["4ms", "8ms", "20ms", "40ms", "80ms"];
             if ~exist(savePath2, 'dir')
                 for posN = 1 : 2
-                    
                         %         % reg vs irreg
-                        Fig_RegIrreg = plotRawWave(chMeanSel{1}{1 , posN}, [], selectWin, "Reg vs Irreg", [8, 8], (1 : 64)', "off");
-                        Fig_RegIrreg = plotRawWave2(Fig_RegIrreg, chMeanSel{1}{3, posN}, [], selectWin, 'k');
+                        Fig_RegIrregFFT = plotFFT(fftMean{1}{1 , posN}, Fs, [min(Fs), max(Fs)], "FFT mean", [8, 8], (1 : 64)', "on");
+                        Fig_RegIrregFFT = plotFFT2(Fig_RegIrregFFT, fftMean{1}{3, posN}, Fs, [min(Fs), max(Fs)], 'k');
+                        Fig_RegIrregPow = plotFFT(powMean{1}{1 , posN}, Fs, [min(Fs), max(Fs)], "Pow mean", [8, 8], (1 : 64)', "on");
+                        Fig_RegIrregPow = plotFFT2(Fig_RegIrregPow, powMean{1}{3, posN}, Fs, [min(Fs), max(Fs)], 'k');
+                        Fig_RegTFA = plotTFA(chMean{1}{1 , posN}, fs, fs, window, 'mean reg TFA', [8, 8], "on");
+                        Fig_IrregTFA = plotTFA(chMean{1}{3 , posN}, fs, fs, window, 'mean irreg TFA', [8, 8], "on");
+
                         % set axes
 
-                        scaleAxes(Fig_RegIrreg,'y', [-1 * yScale(posN) yScale(posN) ]);
-                        setAxes(Fig_RegIrreg, 'yticklabel', '');
-                        setAxes(Fig_RegIrreg, 'xticklabel', '');
+
+                        scaleAxes([Fig_RegIrregFFT Fig_RegIrregPow],'x', [0 10]);
                         setAxes(Fig_RegIrreg, 'visible', 'off');
-                        % reset lineWidth, lineColor
-                        setLine(Fig_RegIrreg, "LineWidth", 1.5, "LineStyle", "-")
-                        %     setLine(Fig_MultiWave, "Color", "black" , "LineStyle", "-");
-                        setLine(Fig_RegIrreg, "YData", [-1 * yScale(posN) yScale(posN) ], "LineStyle", "--");
-                        setLine(Fig_RegIrreg, "LineWidth", 1, "LineStyle", "--");
+
                         % reset figure size
 
                         set(Fig_RegIrreg, "outerposition", [300, 100, 800, 670]);
