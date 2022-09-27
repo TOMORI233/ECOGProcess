@@ -15,6 +15,7 @@ function [Fig, mAxe] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe)
     else
         diffLevel = roundn(cellfun(@(x) x(end) / x(1), {trials.freqSeq}), -2);
     end
+    
     diffLevelUnique = unique(diffLevel);
 
     nPush = [];

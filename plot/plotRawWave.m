@@ -15,7 +15,7 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize, chs, visib
         chs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
     end
 
-    if nargin < 7 
+    if nargin < 7
         visible = "on";
     end
 

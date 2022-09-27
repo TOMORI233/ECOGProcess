@@ -1,4 +1,4 @@
-function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotSize, visible)
+function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotSize, chs)
     % Description: plot cwt difference between chMean1 and chMean2
 
     narginchk(5, 8);
@@ -14,10 +14,15 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotS
     end
 
     if nargin < 8
-        visible = "on";
+        chs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
     end
 
-    Fig = figure("Visible", visible);
+    if size(chs, 1) ~= plotSize(1) || size(chs, 2) ~= plotSize(2)
+        disp("chs option not matched with plotSize. Resize chs...");
+        chs = reshape(chs(1):(chs(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
+    end
+
+    Fig = figure;
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
     maximizeFig(Fig);
@@ -25,13 +30,13 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotS
     for rIndex = 1:plotSize(1)
 
         for cIndex = 1:plotSize(2)
-            chNum = (rIndex - 1) * plotSize(2) + cIndex;
 
-            if chNum > size(chMean1, 1)
+            if chs(rIndex, cIndex) > size(chMean1, 1)
                 continue;
             end
 
-            mSubplot(Fig, plotSize(1), plotSize(2), chNum, [1, 1], margins, paddings);
+            chNum = chs(rIndex, cIndex);
+            mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
             [t, Y, CData1, coi] = mCWT(double(chMean1(chNum, :)), fs0, 'morlet', fs);
             [~, ~, CData2, ~] = mCWT(double(chMean2(chNum, :)), fs0, 'morlet', fs);
             X = t * 1000 + window(1);
@@ -43,8 +48,10 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotS
             set(gca, "YScale", "log");
             yticks([0, 2.^(0:nextpow2(max(Y)) - 1)]);
             xlim(window);
+            ylim([min(Y), max(Y)]);
 
-            if ~mod((chNum - 1), plotSize(2)) == 0
+            if ~mod(((rIndex - 1) * plotSize(2) + cIndex - 1), plotSize(2)) == 0
+                yticks([]);
                 yticklabels('');
             end
 
@@ -59,7 +66,7 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotS
     colorbar('position', [1 - paddings(2),   0.1 , 0.5 * paddings(2), 0.8]);
 
     yRange = scaleAxes(Fig);
-    scaleAxes(Fig, "c");
+    scaleAxes(Fig, "c", [], [], "max");
     allAxes = findobj(Fig, "Type", "axes");
 
     for aIndex = 1:length(allAxes)

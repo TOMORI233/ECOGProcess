@@ -11,9 +11,14 @@ BLOCKPATH{4} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220715\Block-2';
 BLOCKPATH{5} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220720\Block-1';
 BLOCKPATH{6} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220808\Block-2';
 BLOCKPATH{7} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220812\Block-1';
+BLOCKPATH{8} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220820\Block-1';
+BLOCKPATH{9} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220822\Block-1';
+BLOCKPATH{10} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220913\Block-1';
+BLOCKPATH{11} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220914\Block-1';
+BLOCKPATH{12} = 'E:\ECoG\TDT Data\xiaoxiao\xx20220917\Block-1';
 params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 6);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 10);
 
 %% 1-9Freq active
 disp("Exporting 1-9Freq active...");

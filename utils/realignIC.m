@@ -14,14 +14,29 @@ function [comp, pw] = realignIC(comp, window, t1, t2)
     %     t2 = t1 + 200;
     %     comp1 = realignIC(comp, window, t1, t2);
 
+    narginchk(2, 4);
+
+    if nargin < 3
+        t1 = window(1);
+    end
+
+    if nargin < 4
+        t2 = repmat(window(2), 1, length(t1));
+    end
+
     ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
     fs = comp.fsample;
 
     tIdx1 = max(fix((t1 - window(1)) / 1000 * fs), 1);
     tIdx2 = min(fix((t2 - window(1)) / 1000 * fs), size(ICMean, 2));
-    pw = std(ICMean(:, tIdx1:tIdx2), [], 2);
 
-%     plotRawWave(ICMean(:, tIdx1:end), [], [0 100]);
+    temp = [];
+
+    for index = 1:numel(tIdx1)
+        temp = [temp, ICMean(:, tIdx1(index):tIdx2(index))];
+    end
+
+    pw = std(temp, [], 2);
     
     [~, idx] = sort(pw, "descend");
     comp.trial = cellfun(@(x) x(idx, :), comp.trial, "UniformOutput", false);

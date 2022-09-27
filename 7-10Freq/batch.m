@@ -12,6 +12,10 @@ for fIndex = 1:length(temp)
         continue;
     end
     
+%     if fIndex < 10
+%         continue;
+%     end
+
     MATFiles = what([rootPathMat, temp(fIndex).name]).mat;
 
     for mIndex = 1:length(MATFiles)
