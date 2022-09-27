@@ -1,7 +1,7 @@
 function deleteItem(rootPath, itemName, keyword)
 narginchk(2, 3);
 if nargin < 3
-    [Path, temp] = getSubfoldPath(rootPath, itemName, itemName);
+    [Path, temp] = getSubfoldPath(rootPath, itemName);
 else
     [Path, temp] = getSubfoldPath(rootPath, itemName, strcat(keyword, itemName));
 end

@@ -1,12 +1,9 @@
-load("E:\ECoG\matData\longTermContinuous\cdrPlot0.1Hz\amp.mat");
 
 %% population data
-opts.monkeyId = ["chouchou", "xiaoxiao"];
-opts.posStr = ["LAuC", "LPFC"];
 temp = cdrPlot.chouchou.LAuC;
 opts.protocol = string(fields(temp));
 opts.ampType = ["ampRMS", "ampAREA", "ampPeak", "ampTrough"];
-opts.savePath = "E:\ECoG\corelDraw\jpgHP0o1Hz\amp";
+opts.savePath = strcat(figSavePath, "amp");
 
 for pN = 1 : length(opts.protocol) % protocol
     cdrPlot_amp.(opts.protocol(pN)) = plotPopAmpFigure(cdrPlot, opts, pN);

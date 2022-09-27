@@ -7,7 +7,7 @@ for pos = 1 : 2
     posIndex = params.posIndex;
     replotFigure = 0;
     fs = 500;
-    reprocess = 1;
+    reprocess = 0;
     run("loadAllBlocks.m");
     for blks = 1:length(allBlocks)
         clear ampFiltered ampRms ampArea ampPeak ampTrough
@@ -22,7 +22,7 @@ for pos = 1 : 2
         DATAPATH = strcat(replace(BLOCKPATH, 'E:\ECoG', 'E:\ECoG\matData'), '_', Paradigm) ;
 
         if ~exist(fullfile(DATAPATH,strcat(posStr(posIndex), '_ampFiltered.mat')), "file") || reprocess
-            load(fullfile(DATAPATH,strcat(posStr(posIndex), '_filterResHP0o5Hz.mat')));
+            load(fullfile(DATAPATH,strcat(posStr(posIndex), '_filterResHP0o1Hz.mat')));
         else
             continue
         end
@@ -47,9 +47,9 @@ for pos = 1 : 2
         else
             window = [0 11000]; % ms
         end
-        selectWin = [50 200]; % ms
+        selectWin = [0 300]; % ms
         selectWin1 = [150 400]; % ms
-        selectWin2 = [-400 0]; % ms
+        selectWin2 = [-300 0]; % ms
         latencyWin = [0 1000];
         for dIndex = 1:length(filterRes)
             if filterRes(dIndex).fs0 == 300
@@ -85,7 +85,7 @@ for pos = 1 : 2
         end
         filterRes = addFieldToStruct(filterRes, [ampRms', ampArea', ampPeak', ampTrough', array2VectorCell(repmat(selectWin, length(filterRes), 1) ), array2VectorCell(repmat(selectWin1, length(filterRes), 1) ), array2VectorCell(repmat(selectWin2, length(filterRes), 1) )], ["ampRMS"; "ampAREA"; "ampPeak"; "ampTrough"; "ampSelWin"; "ampSelWin1"; "ampSelWin2"]);
         save(fullfile(DATAPATH,strcat(posStr(posIndex), '_ampFiltered.mat')), "ampRms", "ampArea", "ampPeak", "ampTrough");
-        save(fullfile(DATAPATH,strcat(posStr(posIndex), '_filterResHP0o5Hz.mat')), "filterRes");
+        save(fullfile(DATAPATH,strcat(posStr(posIndex), '_filterResHP0o1Hz.mat')), "filterRes");
     end
 end
 

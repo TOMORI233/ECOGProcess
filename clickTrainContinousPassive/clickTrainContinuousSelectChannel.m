@@ -1,4 +1,4 @@
-function [sigIndex, h, p] = clickTrainContinuousSelectChannel
+function [sigIndex, h, p] = clickTrainContinuousSelectChannel(matFile)
 clear; clc; close all;
 for id = 1 : 2
     for pos = 1 : 2
@@ -29,7 +29,7 @@ for id = 1 : 2
 
 
             %% ECoG data
-            load(fullfile(DATAPATH,strcat(posStr(posIndex), '_rawData.mat')));
+            load(fullfile(DATAPATH,strcat(posStr(posIndex), matFile)));
             devType = unique([trialAll.devOrdr]);
             if contains(Paradigm, 'offsetScreen')
                 window = [3000 5000]; % ms

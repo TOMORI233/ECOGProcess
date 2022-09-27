@@ -89,7 +89,7 @@ for id = idIdx
 
 
 %% 4,8,20,40,80
-        if plotMultiFigure && plotFigure
+        if  plotFigure
             if ~exist(savePath, 'dir')
                 regIrreg = ["RegOrd", "RegRev", "IrregOrd", "IrregRev"];
                 for posN = 1 : 2 

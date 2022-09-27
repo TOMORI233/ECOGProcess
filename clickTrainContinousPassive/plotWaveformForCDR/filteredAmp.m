@@ -18,7 +18,7 @@ for id = 1:2
     for pN = 1 : length(paradigmKeyword)
 
         for pos = 1:2
-            matPath = getSubfoldPath(rootPath,'filterResHP0o5Hz.mat', strcat(paradigmKeyword(pN), ".*", posStr(pos)));
+            matPath = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(paradigmKeyword(pN), ".*", posStr(pos)));
             recordN = 1;
             clear inteRes
             for recordCode = 1 : length(matPath)  
@@ -83,7 +83,7 @@ for id = 1:2
 end
 
 %%
-[sigIndex, h, p] = clickTrainContinuousSelectChannel;
+[sigIndex, h, p] = clickTrainContinuousSelectChannel("filterResHP0o1Hz.mat");
 
 %%
 monkeyId = ["chouchou", "xiaoxiao"];

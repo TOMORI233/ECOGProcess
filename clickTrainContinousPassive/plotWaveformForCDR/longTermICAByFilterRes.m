@@ -64,7 +64,7 @@ else
     print(Fig_AC_Topo, LAuC_ICATopo, "-djpeg", "-r300");
     print(Fig_PFC_Wave, LPFC_ICAWave, "-djpeg", "-r300");
     print(Fig_PFC_Topo, LPFC_ICATopo, "-djpeg", "-r300");
-    clos all;
+    close all;
 
 
     save(LAuC_ICAPath, "LAuC_comp", "-mat");

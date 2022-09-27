@@ -7,9 +7,9 @@ for pos = 1 : 2
     params.posIndex = pos; % 1-AC, 2-PFC
     posIndex = params.posIndex;
     replotFigure = 0;
-    reprocess = 0;
+    reprocess = 1;
     params.processFcn = @PassiveProcess_clickTrainContinuous;
-    fs = 300; % Hz, for downsampling
+    fs = 500; % Hz, for downsampling
     flp = 0.1;
     fhp = 150;
     run("loadAllBlocks.m");
@@ -60,7 +60,7 @@ for pos = 1 : 2
                 window = [winStart 11000];
             end
 
-            ECOGFDZ = mResample(ECOGDataset, trialAll, window, "trial onset", 300, flp, fhp);% filtered, dowmsampled, zoomed
+            ECOGFDZ = mResample(ECOGDataset, trialAll, window, "trial onset", fs, flp, fhp);% filtered, dowmsampled, zoomed
 
             for dIndex = 1:length(devType)
                 tIndex = [trialAll.devOrdr] == devType(dIndex);

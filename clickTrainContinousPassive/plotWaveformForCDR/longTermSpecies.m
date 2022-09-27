@@ -100,7 +100,7 @@ matPath = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(paradigmKeyword
 
 
             %% save
-            if plotMultiFigure && plotFigure
+            if  plotFigure
                 if ~exist(savePath, 'dir')
                     mkdir(savePath)
                     for posN = 1 : 2 % 1:ac, 2:pfc

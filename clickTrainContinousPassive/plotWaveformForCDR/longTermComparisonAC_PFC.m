@@ -8,15 +8,15 @@ s1OnsetOrS2Onset = 2; % 1: start, 2: trans
 paradigmKeyword = "LongTerm4[^0]";
 paradigmStr = strrep(paradigmKeyword, '[^0]', '');
 
-for id = 2
+for id = 1 : 2
     rootPath = fullfile('E:\ECoG\matData', monkeyId(id));
     FDZDataACAll.(monkeyId(id)) = cell(4, 1);
     FDZDataPFCAll.(monkeyId(id)) = cell(4, 1);
     for pN = 1 : length(paradigmKeyword)
-        date = "20220715";
+        date = "20220713";
         matPath = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(date, ".*", paradigmKeyword(pN), ".*", posStr(1)));
         for recordCode = 1 : length(matPath)
-            date = "xx20220715";
+            date = "cc20220713";
             matPathAC = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(date, ".*", paradigmKeyword(pN), ".*", posStr(1)));
             matPathPFC = getSubfoldPath(rootPath,'filterResHP0o1Hz.mat', strcat(date, ".*", paradigmKeyword(pN), ".*", posStr(2)));
             temp = strsplit(matPath{recordCode}, '\');
@@ -103,7 +103,8 @@ for id = 2
 
 
             bandStr = ["raw", "δ", "θ", "α", "β", "γ1", "γ2", "γ3"];
-            for bN = 1 : size(bpRanges, 1)
+            %             for bN = 1 : size(bpRanges, 1)
+            for bN = 1
                 bpRange = bpRanges(bN, :);
                 filtFs = tempReg1.fs;
 
@@ -234,7 +235,7 @@ for id = 2
 
 
                 % PFC
-%                 mSubplot(Fig(bN),4 ,columns, 2 * columns + 2, [1 1], margins, paddings);
+                %                 mSubplot(Fig(bN),4 ,columns, 2 * columns + 2, [1 1], margins, paddings);
                 for trialN = 1 : length(filtRegFDZ2)
                     envReg2 = envelope(filtRegFDZ2{trialN}(zoomS2OnsetIdx));
                     t = T(zoomS2OnsetIdx);
@@ -289,7 +290,7 @@ for id = 2
 
 
                 % PFC
-%                 mSubplot(Fig(bN),4 ,columns, 2 * columns + 2, [1 1], margins, paddings);
+                %                 mSubplot(Fig(bN),4 ,columns, 2 * columns + 2, [1 1], margins, paddings);
                 for trialN = 1 : length(filtRegFDZ2)
                     envReg2 = envelope(filtRegFDZ2{trialN}(zoomS1OnsetIdx));
                     t = T(zoomS1OnsetIdx);
@@ -347,20 +348,20 @@ for id = 2
                 [~, lagIdx] = max(abs(RS1')); % since AC and PFC differs in response pattern, use absolute cc index
                 for i = 1 : size(RS1, 1)
                     plot(lagsS1, RS1(i, :), 'b:', "LineWidth", 0.5); hold on;
-%                     stem(lagsS1(lagIdx(i)), RS1(i, lagIdx(i))); hold on
+                    %                     stem(lagsS1(lagIdx(i)), RS1(i, lagIdx(i))); hold on
                 end
                 plot(lagsS1, mean(RS1), 'r-', "LineWidth", 1.5); hold on;
                 stem([mean(lagsS1(lagIdx)) mean(lagsS1(lagIdx))], FS1.YLim, 'Color', 'red'); hold on
                 [~, lagIdxMean] = max(abs(mean(RS1))); % since AC and PFC differs in response pattern, use absolute cc index
                 stem([mean(lagsS1(lagIdxMean)) mean(lagsS1(lagIdxMean))], FS1.YLim, 'Color', 'green'); hold on
-                
+
                 title(strcat("AC S1 - PFC S1 response CCG, lag=", num2str(mean(lagsS1(lagIdx))), "ms"));
 
                 FS2 = mSubplot(Fig(bN),4 ,columns, columns + 4, [1 1], margins, paddings);
                 [~, lagIdx] = max(abs(RS2')); % since AC and PFC differs in response pattern, use absolute cc index
                 for i = 1 : size(RS2, 1)
                     plot(lagsS2, RS2(i, :), 'b:', "LineWidth", 0.5); hold on;
-%                     stem(lagsS2(lagIdx(i)), RS2(i, lagIdx(i))); hold on
+                    %                     stem(lagsS2(lagIdx(i)), RS2(i, lagIdx(i))); hold on
                 end
                 plot(lagsS2, mean(RS2), 'r-', "LineWidth", 1.5); hold on;
                 stem([mean(lagsS2(lagIdx)) mean(lagsS2(lagIdx))], FS2.YLim); hold on
@@ -372,16 +373,31 @@ for id = 2
 
                 %% %%%%%%%%%%% spectral gram of click train stimulus %%%%%%%%%%%%%
                 run("checkClickTrainLength.m");
-                % whole freq band
-                mSubplot(Fig(bN),4 ,columns, 2 * columns + 1, [1 1], margins, paddings);
-                plot(f,P1);
-                title('Single-Sided Amplitude Spectrum of X(t)');
+
+                % reg, whole freq band
+                mSubplot(Fig(bN),4 ,columns, 3 * columns + 1, [1 1], margins, paddings);
+                plot(fReg,P1Reg);
+                title('regular, Single-Sided Amplitude Spectrum of X(t)');
                 xlabel('f (Hz)');
                 ylabel('|P1(f)|');
-                % 0-500 Hz
-                mSubplot(Fig(bN),4 ,columns, 2 * columns + 2, [1 1], margins, paddings);
-                plot(f,P1);
-                title('Single-Sided Amplitude Spectrum of X(t)');
+                % reg, 0-500 Hz
+                mSubplot(Fig(bN),4 ,columns, 2 * columns + 1, [1 1], margins, paddings);
+                plot(fReg,P1Reg);
+                title('regular, Single-Sided Amplitude Spectrum of X(t)');
+                xlabel('f (Hz)');
+                ylabel('|P1(f)|');
+                xlim([0 500]);
+
+                % irreg, whole freq band
+                mSubplot(Fig(bN), 4, columns, 3 * columns + 2, [1 1], margins, paddings);
+                plot(fIrreg,P1Irreg);
+                title('irregular, Single-Sided Amplitude Spectrum of X(t)');
+                xlabel('f (Hz)');
+                ylabel('|P1(f)|');
+                % irreg, 0-500 Hz
+                mSubplot(Fig(bN), 4, columns, 2 * columns + 2, [1 1], margins, paddings);
+                plot(fIrreg,P1Irreg);
+                title('irregular, Single-Sided Amplitude Spectrum of X(t)');
                 xlabel('f (Hz)');
                 ylabel('|P1(f)|');
                 xlim([0 500]);
