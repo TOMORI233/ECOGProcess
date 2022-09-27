@@ -1,5 +1,5 @@
-function Fig = plotTFA(chMean, fs0, fs, window, titleStr, plotSize, visible)
-    narginchk(4, 7);
+function [Fig, res] = plotTFA(chMean, fs0, fs, window, titleStr, plotSize, chs, visible)
+    narginchk(4, 8);
     
     if nargin < 5
         titleStr = '';
@@ -12,7 +12,16 @@ function Fig = plotTFA(chMean, fs0, fs, window, titleStr, plotSize, visible)
     end
     
     if nargin < 7
+        chs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
+    end
+
+    if nargin < 8
         visible = "on";
+    end
+
+    if size(chs, 1) ~= plotSize(1) || size(chs, 2) ~= plotSize(2)
+        disp("chs option not matched with plotSize. Resize chs...");
+        chs = reshape(chs(1):(chs(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
     end
 
     Fig = figure("Visible", visible);
@@ -25,13 +34,13 @@ function Fig = plotTFA(chMean, fs0, fs, window, titleStr, plotSize, visible)
     for rIndex = 1:plotSize(1)
     
         for cIndex = 1:plotSize(2)
-            chNum = (rIndex - 1) * plotSize(2) + cIndex;
 
-            if chNum > size(chMean, 1)
+            if chs(rIndex, cIndex) > size(chMean, 1)
                 continue;
             end
-            
-            mSubplot(Fig, plotSize(1), plotSize(2), chNum, [1, 1], margins, paddings);
+
+            chNum = chs(rIndex, cIndex);
+            mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
             [t, Y, CData, coi] = mCWT(double(chMean(chNum, :)), fs0, 'morlet', fs);
             X = t * 1000 + window(1);
             imagesc('XData', X, 'YData', Y, 'CData', CData);
@@ -45,10 +54,10 @@ function Fig = plotTFA(chMean, fs0, fs, window, titleStr, plotSize, visible)
             xlim(window);
             ylim([min(Y), max(Y)]);
     
-            if ~mod((chNum - 1), plotSize(2)) == 0
+            if ~mod(((rIndex - 1) * plotSize(2) + cIndex - 1), plotSize(2)) == 0
                 yticklabels('');
             end
-    
+
             if chNum < (plotSize(1) - 1) * plotSize(2) + 1
                 xticklabels('');
             end

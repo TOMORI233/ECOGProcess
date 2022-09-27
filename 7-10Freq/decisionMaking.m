@@ -15,7 +15,13 @@ function [FigDM1, FigDM2] = decisionMaking(trialAll, ECOGDataset)
     
     chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultC), "UniformOutput", false));
     chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultW), "UniformOutput", false));
-    FigDM1 = plotRawWave(chMeanC - chMeanW, [], window, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
+    chData(1).chMean = chMeanC;
+    chData(1).color = "r";
+    chData(1).legend = "correct";
+    chData(2).chMean = chMeanW;
+    chData(2).color = "b";
+    chData(2).legend = "wrong";
+    FigDM1 = plotRawWaveMulti(chData, window, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
     drawnow;
     FigDM2 = plotTFACompare(chMeanC, chMeanW, ECOGDataset.fs, [], window, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
     drawnow;

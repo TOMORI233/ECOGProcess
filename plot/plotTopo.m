@@ -1,4 +1,4 @@
-function Fig = plotTopo(comp, topoSize, plotSize, visible)
+function Fig = plotTopo(comp, topoSize, plotSize, ICs)
     narginchk(1, 4);
 
     if nargin < 2
@@ -10,10 +10,15 @@ function Fig = plotTopo(comp, topoSize, plotSize, visible)
     end
 
     if nargin < 4
-        visible = "on";
+        ICs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
     end
 
-    Fig = figure("Visible", visible);
+    if size(ICs, 1) ~= plotSize(1) || size(ICs, 2) ~= plotSize(2)
+        disp("chs option not matched with plotSize. Resize chs...");
+        ICs = reshape(ICs(1):(ICs(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
+    end
+
+    Fig = figure;
     maximizeFig(Fig);
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
@@ -22,13 +27,14 @@ function Fig = plotTopo(comp, topoSize, plotSize, visible)
     for rIndex = 1:plotSize(1)
     
         for cIndex = 1:plotSize(2)
-            ICNum = (rIndex - 1) * plotSize(2) + cIndex;
+            ICNum = ICs(rIndex, cIndex);
 
-            if ICNum > size(topo, 2)
+
+            if ICs(rIndex, cIndex) > size(topo, 1)
                 continue;
             end
 
-            mSubplot(Fig, plotSize(1), plotSize(2), ICNum, 1, margins, paddings);
+            mAxe = mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
             N = 5;
             C = flipud(reshape(topo(:, ICNum), topoSize)');
             C = interp2(C, N);
@@ -43,6 +49,8 @@ function Fig = plotTopo(comp, topoSize, plotSize, visible)
             ylim([1 topoSize(2)]);
             xticklabels('');
             yticklabels('');
+            scaleAxes(mAxe, "c", [], [-10, 10], "max");
+            colorbar;
         end
     
     end

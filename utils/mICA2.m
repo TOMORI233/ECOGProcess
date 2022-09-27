@@ -1,11 +1,12 @@
-function comp = mICA(ECOGDataset, trials, window, segOption, fs)
+function comp = mICA2(trialsECOG, sampleinfo, channels, fs0, fs)
     % Description: Split data by trials, window and segOption. Filter and
     %              resample data. Perform ICA on data.
+    %              For joint data of serveral days.
     % Input:
-    %     ECOGDataset: TDT dataset of [LAuC] or [LPFC]
-    %     trials: n*1 struct array of trial information
-    %     window: time window of interest of each trial
-    %     segOption: "trial onset" | "dev onset" | "push onset" | "last std"
+    %     trialsECOG: n*1 cell array of trial data (64*m matrix)
+    %     sampleinfo: n*2 [startIdx, endIdx] of each trial
+    %     channels: ECOGDataset.channels
+    %     fs0: ECOGDataset.fs0
     %     fs: sample rate for downsampling, < fs0
     % Output:
     %     comp: result of ICA (FieldTrip)
@@ -18,9 +19,6 @@ function comp = mICA(ECOGDataset, trials, window, segOption, fs)
 
     %% Preprocessing
     disp("Preprocessing...");
-    fs0 = ECOGDataset.fs;
-    channels = ECOGDataset.channels;
-    [trialsECOG, ~, ~, sampleinfo] = selectEcog(ECOGDataset, trials, segOption, window);
     t = linspace(window(1), window(2), size(trialsECOG{1}, 2)) / 1000;
 
     cfg = [];

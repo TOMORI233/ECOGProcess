@@ -20,12 +20,11 @@ function [Fig, mAxe, nPush, nTotal] = plotBehaviorOnly(trials, color, legendStr,
     else
         diffLevel = roundn(cellfun(@(x) x(end) / x(1), {trials.freqSeq}), -2);
     end
-
-    
     
     if  cueType == "loc"
         diffLevel = cellfun(@(x) x(end), {trials.locSeq});
     end
+
     diffLevelUnique = unique(diffLevel);
     
     nPush = [];

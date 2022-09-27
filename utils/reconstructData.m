@@ -1,6 +1,7 @@
-function comp = reconstructData(comp, ICs)
+function [trialsECOG, chMean] = reconstructData(trialsECOG, comp, ICs)
     comp.topo(:, ~ismember(1:size(comp.topo, 2), ICs)) = 0;
-    comp.unmixing = comp.topo ^ (-1);
-    comp.trial = cellfun(@(x) comp.topo * x, comp.trial, "UniformOutput", false);
+    trialsICA = comp.unmixing * trialsECOG;
+    trialsECOG = cellfun(@(x) comp.topo * x, trialsICA, "UniformOutput", false);
+    chMean = cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG), "UniformOutput", false));
     return;
 end
