@@ -1,4 +1,4 @@
-addpath(genpath("..\..\ECOGProcess"));
+
 clear; clc; close all;
 %% Parameter setting
 
@@ -41,11 +41,13 @@ diffPairsUnique = unique(diffPairs, 'rows');
 stdType = unique(diffPairsUnique(:,1));
 devType = unique(diffPairsUnique(:,2));
 
+
 trials1_3 = trialAll([trialAll.stdNum] >= 1 & [trialAll.stdNum] <= 3);
 trials4_6 = trialAll([trialAll.stdNum] >= 4 & [trialAll.stdNum] <= 6);
 trials7_9 = trialAll([trialAll.stdNum] >= 7 & [trialAll.stdNum] <= 9);
 
 %% Plot behavior result
+
 
 [FigBehavior, mAxe] = plotBehaviorOnly(trials1_3, "k", "1 2 3");
 [FigBehavior, mAxe] = plotBehaviorOnly(trials4_6, "b", "4 5 6", FigBehavior, mAxe);
@@ -78,6 +80,7 @@ if ~exist(predictPath,"dir")
     mkdir(predictPath)
 end
 for figN = 1 : length(FigPWave)
+
     saveas(FigPWave(figN),strcat(predictPath, '_',  AREANAME{posIndex}, '_Waveform.jpg'));
     saveas(FigPTF(figN),strcat(predictPath, '_',  AREANAME{posIndex}, '_TimeFrequency.jpg'));
 end
@@ -111,6 +114,7 @@ for dIndex = 1:length(devType)
 end
 
 % Scale
+
 scaleAxes([FigDev_Wave1_3, FigDev_Wave4_6, FigDev_Wave7_9, FigDev_TFA1_3, FigDev_TFA4_6, FigDev_TFA7_9], "x", [-500, 1000]);
 scaleAxes([FigDev_Wave1_3, FigDev_Wave4_6, FigDev_Wave7_9], "y", [-80, 80]);
 scaleAxes([FigDev_TFA1_3, FigDev_TFA4_6, FigDev_TFA7_9], "c", [], [0, 20]);
@@ -123,6 +127,7 @@ devPath = fullfile(ROOTPATH,'deviantResponse');
 if ~exist(devPath,"dir")
     mkdir(devPath)
 end
+
 for figN = 1 : length(FigDev_Wave1_3)
     saveas(FigDev_Wave1_3(figN),strcat(fullfile(devPath, '1-3' ,diffStr{figN}), '_',  AREANAME{posIndex}, '_Waveform.jpg'));
     saveas(FigDev_TFA1_3(figN),strcat(fullfile(devPath, '1-3' ,diffStr{figN}), '_',  AREANAME{posIndex}, '_TimeFrequency.jpg'));
@@ -173,6 +178,7 @@ if ~exist(DMPath,"dir")
     mkdir(DMPath)
 end
 for figN = 1 : length(FigDM1)
+
     saveas(FigDM1(figN),strcat(fullfile(DMPath,diffStr{figN}), '_' , AREANAME{posIndex}, '_Waveform.jpg'));
     saveas(FigDM2(figN),strcat(fullfile(DMPath,diffStr{figN}), '_' , AREANAME{posIndex}, '_TimeFrequency.jpg'));
 end

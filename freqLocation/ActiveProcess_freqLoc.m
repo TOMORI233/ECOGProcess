@@ -1,4 +1,4 @@
-function trialAll = ActiveProcess_LTST(epocs, choiceWin)
+function trialAll = ActiveProcess_freqLoc(epocs, choiceWin)
     narginchk(1, 2);
 
     if nargin < 2
@@ -12,6 +12,9 @@ function trialAll = ActiveProcess_LTST(epocs, choiceWin)
     errorPushTimeAll = epocs.erro.onset(epocs.erro.data ~= 0) * 1000; % ms
     pushTimeAll = epocs.push.onset * 1000; % ms
     freqAll = epocs.freq.data; % Hz
+    locAll = epocs.locB.data;
+    freqType = unique(freqAll);
+    locType = unique(locAll);
 
     n = length(trialOnsetIndex) - 1;
     temp = cell(n, 1);
@@ -20,6 +23,9 @@ function trialAll = ActiveProcess_LTST(epocs, choiceWin)
                       'devOnset', temp, ...
                       'freqSeq', temp, ...
                       'devFreq', temp, ...
+                      'locSeq', temp, ...
+                      'devLoc', temp, ...
+                      'devType', temp, ...
                       'interrupt', temp, ...
                       'oddballType', temp, ...
                       'stdNum', temp, ...
@@ -36,7 +42,8 @@ function trialAll = ActiveProcess_LTST(epocs, choiceWin)
         trialAll(tIndex, 1).soundOnsetSeq = soundOnsetTimeAll(soundOnsetIndex);
         trialAll(tIndex, 1).devOnset = trialAll(tIndex, 1).soundOnsetSeq(end);
         trialAll(tIndex, 1).freqSeq = freqAll(soundOnsetIndex);
-
+        trialAll(tIndex, 1).locSeq = locAll(soundOnsetIndex);
+    
         %% Interrupt or not
         if ~isempty(find(errorPushTimeAll >= trialAll(tIndex, 1).soundOnsetSeq(end) & errorPushTimeAll < trialOnsetTimeAll(tIndex + 1), 1))
             trialAll(tIndex, 1).interrupt = true;
@@ -45,34 +52,36 @@ function trialAll = ActiveProcess_LTST(epocs, choiceWin)
             if trialAll(tIndex, 1).freqSeq(end) ~= trialAll(tIndex, 1).freqSeq(1)
                 trialAll(tIndex, 1).devFreq = trialAll(tIndex, 1).freqSeq(end);
                 trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).soundOnsetSeq) - 1;
+                trialAll(tIndex, 1).devLoc = -1;
+            elseif trialAll(tIndex, 1).locSeq(end) ~= trialAll(tIndex, 1).locSeq(1)
+                trialAll(tIndex, 1).devLoc = trialAll(tIndex, 1).locSeq(end);
+                trialAll(tIndex, 1).devFreq = 0;
+                trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).soundOnsetSeq) - 1;
             else
                 trialAll(tIndex, 1).devFreq = 0;
+                trialAll(tIndex, 1).devLoc = -1;
+                trialAll(tIndex, 1).devType = 0;
                 trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).soundOnsetSeq);
             end
 
         else
             trialAll(tIndex, 1).interrupt = false;
 
-            if trialAll(tIndex, 1).freqSeq(end) == trialAll(tIndex, 1).freqSeq(1)
+            if trialAll(tIndex, 1).freqSeq(end) == trialAll(tIndex, 1).freqSeq(1) && trialAll(tIndex, 1).locSeq(end) == trialAll(tIndex, 1).locSeq(1)
                 trialAll(tIndex, 1).oddballType = "STD";
             else
                 trialAll(tIndex, 1).oddballType = "DEV";
             end
 
             trialAll(tIndex, 1).devFreq = trialAll(tIndex, 1).freqSeq(end);
+            trialAll(tIndex, 1).devLoc = trialAll(tIndex, 1).locSeq(end);
+            trialAll(tIndex, 1).devType = max([find(freqType == trialAll(tIndex, 1).devFreq)  find(locType == trialAll(tIndex, 1).devLoc)]);
             trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).freqSeq) - 1;
         end
 
         %% Correct or not
         % Find first push time of this trial
         firstPush = pushTimeAll(find(pushTimeAll >= trialAll(tIndex, 1).soundOnsetSeq(end) & pushTimeAll <= trialOnsetTimeAll(tIndex + 1, 1), 1));
-        
-        if isempty(firstPush)
-            trialAll(tIndex, 1).correct = false;
-            trialAll(tIndex, 1).interrupt = true;
-            trialAll(tIndex, 1).oddballType = "ERROR";
-            continue;
-        end
 
         % DEV: Whether push in choice window
         if strcmp(trialAll(tIndex, 1).oddballType, "DEV")

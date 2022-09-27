@@ -1,11 +1,15 @@
-function trialAll = PassiveProcess_1_9Freq(epocs)
+function trialAll = PassiveProcess_freqLoc(epocs)
     %% Information extraction
+    % fixation 20220520 Block-2
+    for index = 1:length(unique(epocs.swee.data))
+        idx = find(epocs.swee.data == index);
+        epocs.num0.data(idx) = (1:length(idx))';
+    end
+
     trialOnsetIndex = find(epocs.num0.data == 1);
     soundOnsetTimeAll = epocs.num0.onset * 1000; % ms
     freqAll = epocs.freq.data; % ms
 
-    n = length(trialOnsetIndex) - 1;
-    temp = cell(n, 1);
     trialAll = struct('trialNum', temp, ...
                       'soundOnsetSeq', temp, ...
                       'devOnset', temp, ...

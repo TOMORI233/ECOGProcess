@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+
+addpath(genpath("..\..\ECOGProcess"));
+=======
+>>>>>>> 9b985a0ace977fef21a5de6db691c21e38523fce
 clear; clc; close all;
 %% Parameter setting
 blksActive = {'E:\ECoG\chouchou\cc20220531\Block-1';...
@@ -14,8 +19,16 @@ blksActive = {'E:\ECoG\chouchou\cc20220531\Block-1';...
 %     'E:\ECoG\xiaoxiao\xx20220628\Block-2';...
     'E:\ECoG\xiaoxiao\xx20220627\Block-2';...
 
+<<<<<<< HEAD
+%% Processing
+BLOCKPATH = 'G:\ECoG\xiaoxiao\xx20220701\Block-2';
+% BLOCKPATH = 'G:\ECoG\chouchou\cc20220701\Block-2';
+
+[trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params, 1);
+=======
     };
 % blksActive = {'E:\ECoG\chouchou\cc20220604\Block-1'};
+>>>>>>> 9b985a0ace977fef21a5de6db691c21e38523fce
 
 for blkN = 1 : length(blksActive)
     for posIndex = 1 : 2
@@ -29,6 +42,68 @@ for blkN = 1 : length(blksActive)
         params.processFcn = @ActiveProcess_clickTrainWM;
         fs = 500; % Hz, for downsampling
 
+<<<<<<< HEAD
+%% Data saving params
+temp = string(split(BLOCKPATH, '\'));
+DateStr = temp(end - 1);
+Paradigm = 'ClickTrainOddDiffSoundsActive';
+AREANAME = {'AC', 'PFC'};
+ROOTPATH = fullfile('E:\ECoG\ECoGBehaviorResult',Paradigm,DateStr);
+soundDuration = 200; % ms
+
+%% title & labels
+% pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','4-4.06InC','4-4.06InD','40-40.6RC','40-40.6RD','Tone-C','Tone-D'};
+pairStr = {'4-4.06RC','4-4.06RD','4-4.06IC','4-4.06ID','FuzaTone-C','FuzaTone-D'};
+typeStr = {'4-4.06Regular','4-4.06Irregular','ComplexTone'};
+posStr = ["LAuC", "LPFC"];
+
+
+
+%% Behavior processing
+trialAll = trialAll(2:end);
+trialsNoInterrupt = trialAll([trialAll.interrupt] == false);
+ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trialsNoInterrupt.soundOnsetSeq}, {trialsNoInterrupt.stdNum})));
+diffPairs = [[trialsNoInterrupt.stdOrdr]' [trialsNoInterrupt.devOrdr]'];
+diffPairsUnique = unique(diffPairs, 'rows');
+stdType = unique(diffPairsUnique(:,1));
+devType = unique(diffPairsUnique(:,2));
+
+%% Plot behavior result
+trials = trialsNoInterrupt;
+[Fig, mAxe] = plotClickTrainWMBehaviorOnly(trials, "k", {'control', 'dev'},pairStr);
+% saveFigures
+behavPath = fullfile(ROOTPATH,'behaviorResult');
+if ~exist(behavPath,"dir")
+    mkdir(behavPath)
+end
+saveas(FigBehavior,strcat(behavPath, '_',  AREANAME{posIndex}, 'behavResult.jpg'));
+
+%% Prediction
+window = [-2500, 6000]; % ms
+for sIndex = 1 : length(stdType)
+    trials = trialAll([trialAll.stdOrdr] == stdType(sIndex) & [trialAll.interrupt] == false);
+    [chMean, chStd] = joinSTD(trials, ECOGDataset, window);
+    FigPWave(sIndex) = plotRawWave(chMean, chStd, window, ['stiTyme: ', num2str(typeStr{sIndex}), '(N=', num2str(length(trials)), ')']);
+    drawnow;
+    FigPTF(sIndex) = plotTFA(double(chMean), fs0, fs, window, ['stiTyme: ', num2str(typeStr{sIndex}), '(N=', num2str(length(trials)), ')']);
+    drawnow;
+end
+scaleAxes(FigPWave, "y", [-60, 60]);
+scaleAxes(FigPTF, "c", [], [0, 20]);
+
+% Layout
+plotLayout(FigPWave, posIndex);
+
+% saveFigures
+predictPath = fullfile(ROOTPATH,'predictionResponse');
+if ~exist(predictPath,"dir")
+    mkdir(predictPath)
+end
+for figN = 1 : length(FigPWave)
+    saveas(FigPWave(figN),strcat(fullfile(predictPath,typeStr{figN}), '_',  AREANAME{posIndex}, '_Waveform.jpg'));
+    saveas(FigPTF(figN),strcat(fullfile(predictPath,typeStr{figN}), '_',  AREANAME{posIndex}, '_TimeFrequency.jpg'));
+end
+=======
         %% Processing
         activeOrPassive = 'Active';
         BLOCKPATH = blksActive{blkN};
@@ -51,6 +126,7 @@ for blkN = 1 : length(blksActive)
         else
             continue
         end
+>>>>>>> 9b985a0ace977fef21a5de6db691c21e38523fce
 
 
         if ~isempty(ECOGDataset)

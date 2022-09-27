@@ -1,4 +1,5 @@
 function trialAll = ActiveProcess_clickTrain1_9(epocs, choiceWin, soundDuration)
+
 narginchk(1, 3);
 
 if nargin < 2
@@ -89,11 +90,13 @@ for tIndex = 1:length(trialOnsetIndex) - 1
             else
                 pushInWinFlag = false;
 
+
                 if firstPush > trialAll(tIndex, 1).soundOnsetSeq(end) + choiceWinDev(2)
                     trialAll(tIndex, 1).firstPush = [];
                 end
 
             end
+
 
         else % STD
 
@@ -102,6 +105,7 @@ for tIndex = 1:length(trialOnsetIndex) - 1
                 trialAll(tIndex, 1).firstPush = firstPush;
             else
                 pushInWinFlag = false;
+
 
                 if firstPush > trialAll(tIndex, 1).soundOnsetSeq(end) +  choiceWin(2)
                     trialAll(tIndex, 1).firstPush = [];

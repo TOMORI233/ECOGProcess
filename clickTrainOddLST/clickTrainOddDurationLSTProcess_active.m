@@ -27,6 +27,7 @@ fs = 500; % Hz, for downsampling
 % normal 
 BLOCKPATH = 'E:\ECoG\chouchou\cc20220623\Block-2';
 [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH, params,1);
+
 if ~isempty(ECOGDataset)
     fs0 = ECOGDataset.fs;
 end
