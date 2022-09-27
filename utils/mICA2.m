@@ -1,4 +1,4 @@
-function comp = mICA2(trialsECOG, sampleinfo, channels, fs0, fs)
+function comp = mICA2(trialsECOG, sampleinfo, channels, window, fs0, fs)
     % Description: Split data by trials, window and segOption. Filter and
     %              resample data. Perform ICA on data.
     %              For joint data of serveral days.
@@ -11,10 +11,10 @@ function comp = mICA2(trialsECOG, sampleinfo, channels, fs0, fs)
     % Output:
     %     comp: result of ICA (FieldTrip)
 
-    narginchk(4, 5);
+    narginchk(5, 6);
 
-    if nargin < 5
-        fs = 500; % Hz, for downsampling
+    if nargin < 6
+        fs = fs0; % Hz, for downsampling
     end
 
     %% Preprocessing
