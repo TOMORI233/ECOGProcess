@@ -13,6 +13,7 @@ trialsBlkLoc = trialAll([trialAll.devFreq]' == stdFreq & block2Idx);
 
 window = [-2500, 6000]; % ms
 PETitle = ["block freq", "block loc", "rand"];
+
 % prediction raw
 [~, chMeanP(1).chMean, ~] = joinSTD(trialsBlkFreq([trialsBlkFreq.correct] == true), ECOGDataset);
 [~, chMeanP(2).chMean, ~] = joinSTD(trialsBlkLoc([trialsBlkLoc.correct] == true), ECOGDataset);

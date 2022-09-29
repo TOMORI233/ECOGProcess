@@ -1,4 +1,4 @@
-function [MMNBlkWaveFig, MMNRandWaveFig] = BFLMMN(trialAll, ECOGDataset)
+function [MMNBlkWaveFig, MMNRandWaveFig, MMNDiffWaveFig] = BFLMMN(trialAll, ECOGDataset)
 
 %% trial selection
 block1Idx = mod([trialAll.trialNum]', 80) >= 1 & mod([trialAll.trialNum]', 80) <= 20;
@@ -66,6 +66,15 @@ chMeanRandLocC(dIndex - 1).chMean = cell2mat(cellfun(@mean, changeCellRowNum(res
 chMeanRandLocW(dIndex - 1).chMean = cell2mat(cellfun(@mean, changeCellRowNum(resultRandLocDEVW - resultRandLocSTDW), "UniformOutput", false));
 chMeanRandLocC(dIndex - 1).color = colors(dIndex - 1);
 chMeanRandLocW(dIndex - 1).color = colors(dIndex - 1);
+
+
+    % compare of different blocks
+    temp(4).color = "r"; temp(3).color = "#FFA500"; temp(2).color = "b"; temp(1).color = "#AAAAFF";
+    temp(4).chMean = chMeanBlkFreqC(dIndex - 1).chMean;
+    temp(3).chMean = chMeanRandFreqC(dIndex - 1).chMean;
+    temp(2).chMean = chMeanBlkLocC(dIndex - 1).chMean;
+    temp(1).chMean = chMeanRandLocC(dIndex - 1).chMean;
+    MMNDiffWaveFig(dIndex - 1) = plotRawWaveMulti(temp, window, strcat("MMN: Diff Level ", num2str(dIndex))); drawnow;
 end
 
 % plot raw wave

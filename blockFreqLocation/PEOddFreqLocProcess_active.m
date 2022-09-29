@@ -17,8 +17,7 @@ fs0 = ECOGDataset.fs;
 
 %% ICA
 window  = [-2000, 2000];
-comp = mICA(ECOGDataset, trialAll(1:5:end), window, "dev onset", fs);
-
+comp = mICA(ECOGDataset, trialAll([trialAll.oddballType]' ~= "INTERRUPT"), window, "dev onset", fs);
 t1 = [-2000, -1500, -1000, -500, 0];
 t2 = t1 + 200;
 comp = realignIC(comp, window, t1, t2);

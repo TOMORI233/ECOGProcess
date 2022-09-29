@@ -1,5 +1,7 @@
 close all; clc; clear;
-MATPATH = 'E:\ECoG\MAT Data\XX\BlkFreqLoc Active\xx20220905\xx20220905_AC.mat';
+% MATPATH = 'E:\ECoG\MAT Data\XX\BlkFreqLoc Active\xx20220905\xx20220905_PFC.mat';
+MATPATH = 'E:\ECoG\MAT Data\cc\BlkFreqLoc Active\cc20220903\cc20220903_AC.mat';
+
 ROOTPATH = "E:\ECOG\Figures\BlkFreqLoc\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.choiceWin = [100, 600];
@@ -32,20 +34,23 @@ FigBehavior = BFLBehavior(trialAll);
 print(FigBehavior, strcat(BPATH, "Behavior_", DateStr), "-djpeg", "-r200");
 
 %% MMN 
-[MMNBlkWaveFig, MMNRandWaveFig] = BFLMMN(trialAll, ECOGDataset);
-scaleAxes([MMNBlkWaveFig, MMNRandWaveFig], "x", [-600, 1000]);
-scaleAxes([MMNBlkWaveFig, MMNRandWaveFig], "y", [], [-60, 60], "max");
+[MMNBlkWaveFig, MMNRandWaveFig, MMNDiffWaveFig] = BFLMMN(trialAll, ECOGDataset);
+scaleAxes([MMNBlkWaveFig, MMNRandWaveFig, MMNDiffWaveFig], "x", [-600, 1000]);
+scaleAxes([MMNBlkWaveFig, MMNRandWaveFig, MMNDiffWaveFig], "y", [], [-60, 60], "max");
 
 for fIndex = 1 : length(MMNBlkWaveFig)
 print(MMNBlkWaveFig(fIndex), strcat(MMNPATH, AREANAME, "_MMN_Block_", FEATRUE(fIndex), "_Correct_", DateStr), "-djpeg", "-r200");
 print(MMNRandWaveFig(fIndex), strcat(MMNPATH, AREANAME, "_MMN_Rand_", FEATRUE(fIndex), "_Correct_", DateStr), "-djpeg", "-r200");
+end
+for fIndex = 1 : length(MMNDiffWaveFig)
+print(MMNDiffWaveFig(fIndex), strcat(MMNPATH, AREANAME, "_MMN_Diff_", num2str(fIndex + 1), "_Correct_", DateStr), "-djpeg", "-r200");
 end
 
 %% Prediction
 [FigPWave, FigPTFA, FigPDiffWave, FigPDiffTFA] = BFLPrediction(trialAll, ECOGDataset);
 scaleAxes(FigPWave, "y", [-60, 60]);
 scaleAxes(FigPDiffWave, "y", [-20, 20]);
-scaleAxes(FigPTFA, "c", [0, 10]);
+scaleAxes(FigPTFA, "c", [0, 6]);
 scaleAxes(FigPDiffTFA, "c", [-5, 5]);
 
 PETitle = ["block freq", "block loc", "rand"];
