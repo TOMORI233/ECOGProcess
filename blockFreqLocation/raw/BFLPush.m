@@ -1,17 +1,7 @@
 function [PushBlkWaveFig, PushRandWaveFig, PushDiffWaveFig] = BFLPush(trialAll, ECOGDataset)
 
-%% trial select
-block1Idx = mod([trialAll.trialNum]', 80) >= 1 & mod([trialAll.trialNum]', 80) <= 20;
-block2Idx = mod([trialAll.trialNum]', 80) >= 21 & mod([trialAll.trialNum]', 80) <= 40;
-block3Idx = mod([trialAll.trialNum]' - 1, 80) >= 40 & mod([trialAll.trialNum]', 80) <= 79;
-stdFreq = unique([trialAll([trialAll.oddballType]' == "STD").devFreq]);
-stdLoc = unique([trialAll([trialAll.oddballType]' == "STD").devLoc]);
-trialsBlkFreq = trialAll([trialAll.devLoc]' == stdLoc & block1Idx);
-trialsRandFreq = trialAll([trialAll.devLoc]' == stdLoc & block3Idx);
-trialsBlkLoc = trialAll([trialAll.devFreq]' == stdFreq & block2Idx);
-trialsRandLoc = trialAll([trialAll.devFreq]' == stdFreq & block3Idx);
+run("trialSelect.m");
 
-devType = [trialAll.devType]';
 dRatio = unique(devType(([trialAll.devType]' > 0)));
 
 %% Prediction error

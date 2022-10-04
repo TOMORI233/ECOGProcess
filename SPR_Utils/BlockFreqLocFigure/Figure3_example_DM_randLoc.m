@@ -59,12 +59,13 @@ trialsRandLoc = trialAll([trialAll.devFreq]' == stdFreq & block3Idx);
 devType = [trialAll.devType]';
 dRatio = unique(devType(([trialAll.devType]' > 0)));
 
+cdrPlot(mIndex).info = strcat(AREANAME, "_", DateStr);
 %% decision making
 window = [-200,1000];
 t = linspace(window(1), window(2), diff(window) /1000 * ECOGDataset.fs + 1)';
 trialStr = ["trialsBlkFreq", "trialsRandFreq", "trialsBlkLoc", "trialsRandLoc"];
 chMeanDMCW = cell(length(trialStr), 1);
-
+cdrPlot(mIndex).info = strcat(AREANAME, "_", DateStr);
 for tIndex = 1 : length(trialStr)
 eval(strcat("trialTemp = ", trialStr(tIndex), ";"));  % value trial
 resultC = [];
@@ -81,8 +82,7 @@ end
 
 chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultC), "UniformOutput", false));
 chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultW), "UniformOutput", false));
-chMeanDM(tIndex).chMean = chMeanC - chMeanW;
-chMeanDM(tIndex).color = colors(tIndex);
+
 
 cdrPlot(mIndex).(trialStr(tIndex))(:, [1, 3]) = repmat(t, 1, 2);
 cdrPlot(mIndex).(trialStr(tIndex))(:, 2) = chMeanC(icSelect(mIndex), :)';

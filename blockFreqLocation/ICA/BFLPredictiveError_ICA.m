@@ -1,18 +1,7 @@
-function [PEBlkWaveFig, PERandWaveFig, PEDiffWaveFig] = BFLPredictiveError(trialAll, ECOGDataset)
+function [PEBlkWaveFig, PERandWaveFig, PEDiffWaveFig] = BFLPredictiveError_ICA(trialAll, ECOGDatasetTemp, comp)
 
-%% trial select
-block1Idx = mod([trialAll.trialNum]', 80) >= 1 & mod([trialAll.trialNum]', 80) <= 20;
-block2Idx = mod([trialAll.trialNum]', 80) >= 21 & mod([trialAll.trialNum]', 80) <= 40;
-block3Idx = mod([trialAll.trialNum]' - 1, 80) >= 40 & mod([trialAll.trialNum]', 80) <= 79;
-stdFreq = unique([trialAll([trialAll.oddballType]' == "STD").devFreq]);
-stdLoc = unique([trialAll([trialAll.oddballType]' == "STD").devLoc]);
-trialsBlkFreq = trialAll([trialAll.devLoc]' == stdLoc & block1Idx);
-trialsRandFreq = trialAll([trialAll.devLoc]' == stdLoc & block3Idx);
-trialsBlkLoc = trialAll([trialAll.devFreq]' == stdFreq & block2Idx);
-trialsRandLoc = trialAll([trialAll.devFreq]' == stdFreq & block3Idx);
-
-devType = [trialAll.devType]';
-dRatio = unique(devType(([trialAll.devType]' > 0)));
+run("trialSelect.m");
+ECOGDataset = ECOGDatasetTemp;
 
 %% Prediction error
 window = [-2000, 2000]; % ms
@@ -22,12 +11,20 @@ for dIndex = 2 : length(dRatio)
     trialsBlkLocC = trialsBlkLoc([trialsBlkLoc.devType]' == dIndex &  [trialsBlkLoc.correct]' == true);
     trialsRandFreqC = trialsRandFreq([trialsRandFreq.devType]' == dIndex &  [trialsRandFreq.correct]' == true);
     trialsRandLocC = trialsRandLoc([trialsRandLoc.devType]' == dIndex &  [trialsRandLoc.correct]' == true);
+
+    ECOGDataset.data = comp.trialsBlkFreq.unmixing * ECOGDatasetTemp.data;
     [~, chMeanBlkFreqC(dIndex - 1).chMean] = selectEcog(ECOGDataset, trialsBlkFreqC, "dev onset", window);
     chMeanBlkFreqC(dIndex - 1).color = colors(dIndex - 1);
+
+    ECOGDataset.data = comp.trialsRandFreq.unmixing * ECOGDatasetTemp.data;
     [~, chMeanRandFreqC(dIndex - 1).chMean] = selectEcog(ECOGDataset, trialsRandFreqC, "dev onset", window);
     chMeanRandFreqC(dIndex - 1).color = colors(dIndex - 1);
+
+    ECOGDataset.data = comp.trialsBlkLoc.unmixing * ECOGDatasetTemp.data;
     [~, chMeanBlkLocC(dIndex - 1).chMean] = selectEcog(ECOGDataset, trialsBlkLocC, "dev onset", window);
     chMeanBlkLocC(dIndex - 1).color = colors(dIndex - 1);
+
+    ECOGDataset.data = comp.trialsRandLoc.unmixing * ECOGDatasetTemp.data;
     [~, chMeanRandLocC(dIndex - 1).chMean] = selectEcog(ECOGDataset, trialsRandLocC, "dev onset", window);
     chMeanRandLocC(dIndex - 1).color = colors(dIndex - 1);
 

@@ -1,12 +1,7 @@
-function BFLSingleFcn(MATPATH, ROOTPATH, posIndex, doICA)
-narginchk(3, 4);
-if nargin < 4
-    doICA = false;
-end
+function BFLSingleFcn(MATPATH, ROOTPATH, posIndex)
+
 %% Parameter settings
-if doICA
-    ROOTPATH = strrep(ROOTPATH, "Figures", "ICAFigures");
-end
+
 params.posIndex = posIndex; % 1-AC, 2-PFC
 params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_freqLoc;
@@ -35,21 +30,6 @@ mkdir(PUSHPATH);
 %% Processing
 [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
 
-%% ICA
-yScale = [-60 60];
-if doICA
-    yScale = [-2 2];
-    ICAName = strcat(ICAPATH, "comp_", DateStr, "_", AREANAME, ".mat");
-    if ~exist(ICAName, "file")
-        [ECOGDataset, comp, FigICAWave, FigTopo] = toDoICA(ECOGDataset, trialAll, 500);
-        print(FigICAWave, strcat(ICAPATH, AREANAME, "_ICA_Wave_", DateStr), "-djpeg", "-r200");
-        print(FigTopo, strcat(ICAPATH, AREANAME, "_ICA_Topo_",  DateStr), "-djpeg", "-r200");
-        save(ICAName, "comp", "-mat");
-    else
-        load(ICAName);
-        ECOGDataset = comp.unmixing * ECOGDataset.data;
-    end
-end
 
 % %% Behavior
 % FigBehavior = BFLBehavior(trialAll);

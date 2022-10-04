@@ -1,4 +1,4 @@
-function BFLSingleFcnICA(MATPATH, ROOTPATH, posIndex)
+function BFLSingleFcnICATopo(MATPATH, ROOTPATH, posIndex)
 
 %% Parameter settings
 
@@ -14,13 +14,13 @@ DateStr = temp(end - 1);
 AREANAME = ["AC", "PFC"];
 FEATRUE = ["Freq", "Loc"];
 AREANAME = AREANAME(params.posIndex);
-ICAPATH =  strcat(ROOTPATH, DateStr, "\Single\ICA\");
-BPATH = strcat(ROOTPATH, DateStr, "\Single\Behavior\");
-PEPATH = strcat(ROOTPATH, DateStr, "\Single\Prediction error\");
-PPATH = strcat(ROOTPATH, DateStr, "\Single\Prediction\");
-DMPATH = strcat(ROOTPATH, DateStr, "\Single\Decision making\");
-MMNPATH = strcat(ROOTPATH, DateStr, "\Single\MMN\");
-PUSHPATH = strcat(ROOTPATH, DateStr, "\Single\Push\");
+ICAPATH =  strcat(ROOTPATH, DateStr, "\Topo\ICA\");
+BPATH = strcat(ROOTPATH, DateStr, "\Topo\Behavior\");
+PEPATH = strcat(ROOTPATH, DateStr, "\Topo\Prediction error\");
+PPATH = strcat(ROOTPATH, DateStr, "\Topo\Prediction\");
+DMPATH = strcat(ROOTPATH, DateStr, "\Topo\Decision making\");
+MMNPATH = strcat(ROOTPATH, DateStr, "\Topo\MMN\");
+PUSHPATH = strcat(ROOTPATH, DateStr, "\Topo\Push\");
 mkdir(ICAPATH);
 mkdir(BPATH);
 mkdir(PEPATH);
@@ -35,16 +35,26 @@ mkdir(PUSHPATH);
 %% ICA
 
 yScale = [-2 2];
+run("trialSelect.m");
+trialsToICA = trialTypes.All;
 ICAName = strcat(ICAPATH, "comp_", DateStr, "_", AREANAME, ".mat");
+
 if ~exist(ICAName, "file")
-    [ECOGDataset, comp, FigICAWave, FigTopo] = toDoICA(ECOGDataset, trialAll, 500);
-    print(FigICAWave, strcat(ICAPATH, AREANAME, "_ICA_Wave_", DateStr), "-djpeg", "-r200");
-    print(FigTopo, strcat(ICAPATH, AREANAME, "_ICA_Topo_",  DateStr), "-djpeg", "-r200");
+    for mIndex = 1 : length(trialsToICA)
+        FIGPATH =  strcat(ROOTPATH, DateStr, "\ICA\", trialsToICA(mIndex), "\");
+        eval("[~, compTemp, FigICAWave, FigTopo] = toDoICA(ECOGDataset, ", trialsToICA(mIndex), ", 500);");
+        print(FigICAWave, strcat(FIGPATH, AREANAME, "_ICA_Wave_", DateStr), "-djpeg", "-r200");
+        print(FigTopo, strcat(FIGPATH, AREANAME, "_ICA_Topo_",  DateStr), "-djpeg", "-r200");
+        close all;
+        comp.(trialsToICA(mIndex)) = compTemp;
+    end
     save(ICAName, "comp", "-mat");
 else
     load(ICAName);
-    ECOGDataset = comp.unmixing * ECOGDataset.data;
 end
+
+clear(trialsToICA);
+
 
 
 % %% Behavior
@@ -52,22 +62,28 @@ end
 % print(FigBehavior, strcat(BPATH, "Behavior_", DateStr), "-djpeg", "-r200");
 
 % %% MMN
+% if doICA
+%     [MMNBlkWaveFig, MMNRandWaveFig, MMNDiffWaveFig] = BFLMMN_ICA(trialAll, ECOGDataset, comp);
+% else
+%     [MMNBlkWaveFig, MMNRandWaveFig, MMNDiffWaveFig] = BFLMMN(trialAll, ECOGDataset);
+% end
 %
-% [MMNBlkWaveFig, MMNRandWaveFig, MMNDiffWaveFig] = BFLMMN(trialAll, ECOGDataset);
 % scaleAxes([MMNBlkWaveFig, MMNRandWaveFig, MMNDiffWaveFig], "x", [-600, 1000]);
 % scaleAxes([MMNBlkWaveFig, MMNRandWaveFig, MMNDiffWaveFig], "y", [], yScale, "max");
 %
 % for fIndex = 1 : length(MMNBlkWaveFig)
-% print(MMNBlkWaveFig(fIndex), strcat(MMNPATH, AREANAME, "_MMN_Block_", FEATRUE(fIndex), "_Correct_", DateStr), "-djpeg", "-r200");
-% print(MMNRandWaveFig(fIndex), strcat(MMNPATH, AREANAME, "_MMN_Rand_", FEATRUE(fIndex), "_Correct_", DateStr), "-djpeg", "-r200");
+%     print(MMNBlkWaveFig(fIndex), strcat(MMNPATH, AREANAME, "_MMN_Block_", FEATRUE(fIndex), "_Correct_", DateStr), "-djpeg", "-r200");
+%     print(MMNRandWaveFig(fIndex), strcat(MMNPATH, AREANAME, "_MMN_Rand_", FEATRUE(fIndex), "_Correct_", DateStr), "-djpeg", "-r200");
 % end
 % for fIndex = 1 : length(MMNDiffWaveFig)
-% print(MMNDiffWaveFig(fIndex), strcat(MMNPATH, AREANAME, "_MMN_Diff_", num2str(fIndex + 1), "_Correct_", DateStr), "-djpeg", "-r200");
+%     print(MMNDiffWaveFig(fIndex), strcat(MMNPATH, AREANAME, "_MMN_Diff_", num2str(fIndex + 1), "_Correct_", DateStr), "-djpeg", "-r200");
 % end
 
 %% Prediction
 try
-    [FigPWave, FigPTFA, FigPDiffWave, FigPDiffTFA] = BFLPrediction(trialAll, ECOGDataset);
+
+    [FigPWave, FigPTFA, FigPDiffWave, FigPDiffTFA] = BFLPrediction_ICA(trialAll, ECOGDataset, comp);
+
     scaleAxes(FigPWave, "y", [], yScale, "max");
     scaleAxes(FigPDiffWave, "y", [], yScale/2, "max");
     scaleAxes(FigPTFA, "c", [0, yScale(2)/6]);
@@ -89,7 +105,9 @@ end
 
 %% Predictive error
 try
-    [PEBlkWaveFig, PERandWaveFig, PEDiffWaveFig] = BFLPredictiveError(trialAll, ECOGDataset);
+
+    [PEBlkWaveFig, PERandWaveFig, PEDiffWaveFig] = BFLPredictiveError_ICA(trialAll, ECOGDataset, comp);
+
 
     % Scale
     scaleAxes([PEBlkWaveFig, PERandWaveFig, PEDiffWaveFig], "x", [-600, 1000]);
@@ -110,7 +128,9 @@ end
 %% Decision making
 try
     trialStr = ["trialsBlkFreq", "trialsRandFreq", "trialsBlkLoc", "trialsRandLoc"];
-    [FigDMCW, FigDMBlk, FigDMRand, FigDMDiff] = BFLDecisionMaking(trialAll, ECOGDataset);
+
+    [FigDMCW, FigDMBlk, FigDMRand, FigDMDiff] = BFLDecisionMaking_ICA(trialAll, ECOGDataset, comp);
+
     scaleAxes([FigDMCW, FigDMBlk, FigDMRand, FigDMDiff], "x", [-600, 1000]);
     scaleAxes([FigDMCW, FigDMBlk, FigDMRand, FigDMDiff], "y", [-1, 1]);
 
@@ -127,7 +147,9 @@ end
 
 %% push
 try
-    [PushBlkWaveFig, PushRandWaveFig, PushDiffWaveFig] = BFLPush(trialAll, ECOGDataset);
+
+    [PushBlkWaveFig, PushRandWaveFig, PushDiffWaveFig] = BFLPush_ICA(trialAll, ECOGDataset, comp);
+
 
     % Scale
     scaleAxes([PushBlkWaveFig, PushRandWaveFig, PushDiffWaveFig], "x", [-600, 1000]);

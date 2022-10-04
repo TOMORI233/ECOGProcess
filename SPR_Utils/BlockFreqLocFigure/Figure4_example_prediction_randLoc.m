@@ -10,7 +10,6 @@ icSelect = [3, 7, 2, 1];
 cScale = [0.15, 0.5, 0.4, 0.25];
 ROOTPATH = "E:\ECOG\ICAFigures\BlkFreqLoc\";
 FIGPATH = "E:\ECoG\corelDraw\PEOddBlkFreqLoc\Figure4\";
-
 for mIndex = 1 : 4
 params.posIndex = pos(mIndex); % 1-AC, 2-PFC
 params.choiceWin = [100, 600];
@@ -61,7 +60,7 @@ fs = 500;
 fs0 = ECOGDataset.fs;
 t = linspace(window(1), window(2), diff(window) /1000 * ECOGDataset.fs + 1)';
 PETitle = ["blockFreq", "blockLoc", "rand"];
-
+cdrPlot(mIndex).info = strcat(AREANAME, "_", DateStr);
 cdrPlot(mIndex).blockFreq(:, 1) = t;
 cdrPlot(mIndex).blockLoc(:, 1) = t;
 cdrPlot(mIndex).rand(:, 1) = t;

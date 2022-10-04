@@ -49,7 +49,7 @@ else
     trialsECOG = cell(length(segIndex), 1);
     sampleinfo = zeros(length(segIndex), 2);
 
-    for index = 1:length(segIndex)
+    for index = 1:length(segIndex)-1
         sampleinfo(index, :) = [segIndex(index) + windowIndex(1), segIndex(index) + windowIndex(2)];
         trialsECOG{index} = ECOGDataset.data(:, segIndex(index) + windowIndex(1):segIndex(index) + windowIndex(2));
     end
@@ -59,6 +59,7 @@ else
 
     % by channel
     nChs = length(ECOGDataset.channels);
+    trialsECOG = trialsECOG(1:end-1);
     temp = cell2mat(trialsECOG);
     chMean = zeros(nChs, size(trialsECOG{1}, 2));
     chStd = zeros(nChs, size(trialsECOG{1}, 2));

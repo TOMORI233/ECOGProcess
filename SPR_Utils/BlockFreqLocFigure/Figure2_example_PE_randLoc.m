@@ -1,5 +1,5 @@
 clc; clear; 
-mIndex = 2;
+
 % MATPATH = 'E:\ECoG\MAT Data\cc\BlkFreqLoc Active\cc20220903\cc20220903_PFC.mat';
 MATPATH = {'E:\ECoG\MAT Data\XX\BlkFreqLoc Active\xx20220905\xx20220905_AC.mat'...
            'E:\ECoG\MAT Data\XX\BlkFreqLoc Active\xx20220905\xx20220905_PFC.mat'...
@@ -11,6 +11,7 @@ icSelect = [2, 12, 1, 1];
 ROOTPATH = "E:\ECOG\ICAFigures\BlkFreqLoc\";
 FIGPATH = "E:\ECoG\corelDraw\PEOddBlkFreqLoc\Figure2\";
 
+for mIndex = 1 : 4
 params.posIndex = pos(mIndex); % 1-AC, 2-PFC
 params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_freqLoc;
@@ -60,10 +61,12 @@ dRatio = unique(devType(([trialAll.devType]' > 0)));
 %% Prediction error
 window = [-200, 800]; % ms
 t = linspace(window(1), window(2), diff(window) /1000 * ECOGDataset.fs + 1)';
+cdrPlot(mIndex).info = strcat(AREANAME, "_", DateStr);
 cdrPlot(mIndex).blkFreqCdr = zeros(length(t), 2 * length(dRatio));
 cdrPlot(mIndex).randFreqCdr = zeros(length(t), 2 * length(dRatio));  
 cdrPlot(mIndex).blkLocCdr =  zeros(length(t), 2 * length(dRatio));
 cdrPlot(mIndex).randLocCdr = zeros(length(t), 2 * length(dRatio));
+
 colors = ["k", "b", "#FFA500", "r"];
 for dIndex = 2 : length(dRatio)
     trialsBlkFreqC = trialsBlkFreq([trialsBlkFreq.devType]' == dIndex &  [trialsBlkFreq.correct]' == true);
@@ -87,7 +90,7 @@ for dIndex = 2 : length(dRatio)
     cdrPlot(mIndex).randLocCdr(:, 2 * dIndex - 1) = t;
     cdrPlot(mIndex).randLocCdr(:, 2 * dIndex) = chMeanRandLocC(dIndex - 1).chMean(icSelect(mIndex), :)';
 end
-
+end
 
 
 

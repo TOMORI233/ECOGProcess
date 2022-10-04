@@ -1,25 +1,20 @@
-function [FigPWave, FigPTFA, FigPDiffWave, FigPDiffTFA] = BFLPrediction(trialAll, ECOGDataset)
+function [FigPWave, FigPTFA, FigPDiffWave, FigPDiffTFA] = BFLPrediction_ICA(trialAll, ECOGDatasetTemp, comp)
 
-%% trial selection
-
-block1Idx = mod([trialAll.trialNum]', 80) >= 5 & mod([trialAll.trialNum]', 80) <= 20;
-block2Idx = mod([trialAll.trialNum]', 80) >= 25 & mod([trialAll.trialNum]', 80) <= 40;
-block3Idx = mod([trialAll.trialNum]' - 1, 80) >= 50 & mod([trialAll.trialNum]', 80) <= 79;
-stdFreq = unique([trialAll([trialAll.oddballType]' == "STD").devFreq]);
-stdLoc = unique([trialAll([trialAll.oddballType]' == "STD").devLoc]);
-trialsBlkFreq = trialAll([trialAll.devLoc]' == stdLoc & block1Idx);
-trialsRand = trialAll([trialAll.oddballType]' ~= "INTERRUPT" & block3Idx);
-trialsBlkLoc = trialAll([trialAll.devFreq]' == stdFreq & block2Idx);
+run("trialSelect.m");
+ECOGDataset = ECOGDatasetTemp;
 
 window = [-2500, 6000]; % ms
 PETitle = ["block freq", "block loc", "rand"];
 
 % prediction raw
-[~, chMeanP(1).chMean, ~] = joinSTD(trialsBlkFreq([trialsBlkFreq.correct] == true), ECOGDataset);
-[~, chMeanP(2).chMean, ~] = joinSTD(trialsBlkLoc([trialsBlkLoc.correct] == true), ECOGDataset);
-[~, chMeanP(3).chMean, ~] = joinSTD(trialsRand([trialsRand.correct] == true), ECOGDataset);
+ECOGDataset.data = comp.trialsBlkFreqP.unmixing * ECOGDatasetTemp.data;
+[~, chMeanP(1).chMean, ~] = joinSTD(trialsBlkFreqP([trialsBlkFreqP.correct] == true), ECOGDataset);
+ECOGDataset.data = comp.trialsBlkLocP.unmixing * ECOGDatasetTemp.data;
+[~, chMeanP(2).chMean, ~] = joinSTD(trialsBlkLocP([trialsBlkLocP.correct] == true), ECOGDataset);
+ECOGDataset.data = comp.trialsRandP.unmixing * ECOGDatasetTemp.data;
+[~, chMeanP(3).chMean, ~] = joinSTD(trialsRandP([trialsRandP.correct] == true), ECOGDataset);
 chMeanP(1).color = "r"; chMeanP(2).color = "b"; chMeanP(3).color = "k"; 
-trialN = [sum([trialsBlkFreq.correct] == true), sum([trialsBlkLoc.correct] == true), sum([trialsRand.correct] == true)];
+trialN = [sum([trialsBlkFreqP.correct] == true), sum([trialsBlkLocP.correct] == true), sum([trialsRandP.correct] == true)];
 FigPWave = plotRawWaveMulti(chMeanP, window, strcat("prediction, Nbf=", num2str(trialN(1)), ",Nbl=", num2str(trialN(2)), ",Nr=", num2str(trialN(3))));
 drawnow;
 

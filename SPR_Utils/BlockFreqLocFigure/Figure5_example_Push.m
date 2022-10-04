@@ -59,6 +59,7 @@ dRatio = unique(devType(([trialAll.devType]' > 0)));
 %% Push
 window = [-1000, 1000]; % ms
 t = linspace(window(1), window(2), diff(window) /1000 * ECOGDataset.fs + 1)';
+cdrPlot(mIndex).info = strcat(AREANAME, "_", DateStr);
 cdrPlot(mIndex).blkFreqCdr = zeros(length(t), 2 * length(dRatio));
 cdrPlot(mIndex).randFreqCdr = zeros(length(t), 2 * length(dRatio));  
 cdrPlot(mIndex).blkLocCdr =  zeros(length(t), 2 * length(dRatio));
