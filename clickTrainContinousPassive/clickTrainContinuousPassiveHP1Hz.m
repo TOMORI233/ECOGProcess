@@ -11,7 +11,7 @@ for pos = 1 : 2
     params.processFcn = @PassiveProcess_clickTrainContinuous;
     fs = 500; % Hz, for downsampling
     flp = 0.1;
-    fhp = 150;
+    fhp = 500;
     run("loadAllBlocks.m");
     for blks = 1:length(allBlocks)
         clear chMean chStd trials t stimStr S1Duration FDZData

@@ -15,21 +15,22 @@ function ECOGDataset = mResample(ECOGDataset, trials, window, segOption, fs, fhp
     if nargin < 5
         fs = 500; % Hz, for downsampling
         fhp = 0.5;
-        flp = 100;
+        flp = 500;
     end
     
     if nargin < 6
         fhp = 0.5;
-        flp = 100;
+        flp = 500;
     end
 
     if nargin < 7
-        flp = 100;
+        flp = 500;
     end
     %% Preprocessing
     disp("Preprocessing...");
     fs0 = ECOGDataset.fs;
     channels = ECOGDataset.channels;
+
     [trialsECOG, ~, ~, sampleinfo] = selectEcog(ECOGDataset, trials, segOption, window);
     t = linspace(window(1), window(2), size(trialsECOG{1}, 2)) / 1000;
 

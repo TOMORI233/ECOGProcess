@@ -42,8 +42,8 @@ ICAPATH = strcat(ROOTPATH, DateStr, "\ICA\");
         ECOGDataset.data = comp.unmixing * ECOGDataset.data;
     end
 % 
-%     FigTopo = plotTopo(comp, [8, 8], [1, 1], icSelect(mIndex));
-% print(FigTopo, strcat(FIGPATH, AREANAME, "_IC_example_", DateStr), "-djpeg", "-r200");
+    FigTopo = plotTopo(comp, [8, 8], [1, 1], icSelect(mIndex));
+print(FigTopo, strcat(FIGPATH, AREANAME, "_IC_example_", DateStr), "-djpeg", "-r200");
 
 %% trial select
 block1Idx = mod([trialAll.trialNum]', 80) >= 1 & mod([trialAll.trialNum]', 80) <= 20;
@@ -70,7 +70,10 @@ for tIndex = 1 : length(trialStr)
 eval(strcat("trialTemp = ", trialStr(tIndex), ";"));  % value trial
 resultC = [];
 resultW = [];
-
+selectRawICC = [];
+selectRawICW = [];
+labelC = [];
+labelW = [];
 
 for dIndex = devSel{mIndex}
     trials = trialTemp([trialTemp.devType]' == dRatio(dIndex));
@@ -80,9 +83,21 @@ for dIndex = devSel{mIndex}
     resultW = [resultW; result([trials.correct] == false & [trials.interrupt] == false)];
 end
 
+% for anova
+tempC = changeCellRowNum(resultC);
+tempW = changeCellRowNum(resultW);
+selectRawICC = [selectRawICC; cell2mat(tempC(icSelect(mIndex)))];
+selectRawICW = [selectRawICW; cell2mat(tempW(icSelect(mIndex)))];
+labelC = [labelC; ones(length(resultC), 1)];
+labelW = [labelW; zeros(length(resultW), 1)];
+
+[P, H] = mAnova1([selectRawICC; selectRawICW], [labelC; labelW], 0.05);
+anovaRes(mIndex).(trialStr(tIndex))(:, 1) = t;
+anovaRes(mIndex).(trialStr(tIndex))(:, 2) = H;
+anovaRes(mIndex).(trialStr(tIndex))(:, 3) = P;
+
 chMeanC = cell2mat(cellfun(@mean, changeCellRowNum(resultC), "UniformOutput", false));
 chMeanW = cell2mat(cellfun(@mean, changeCellRowNum(resultW), "UniformOutput", false));
-
 
 cdrPlot(mIndex).(trialStr(tIndex))(:, [1, 3]) = repmat(t, 1, 2);
 cdrPlot(mIndex).(trialStr(tIndex))(:, 2) = chMeanC(icSelect(mIndex), :)';

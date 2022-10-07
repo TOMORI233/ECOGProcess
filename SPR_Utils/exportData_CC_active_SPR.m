@@ -12,7 +12,7 @@ BLOCKPATH{5} = 'E:\ECoG\chouchou\cc20220909\Block-1';
 BLOCKPATH{6} = 'E:\ECoG\chouchou\cc20220914\Block-1';
 
 params.choiceWin = [100, 600];
-params.processFcn = @ActiveProcess_freqLoc;
+params.processFcn = @PassiveProcess_clickTrainContinuous;
 exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
 
 %% Fcn

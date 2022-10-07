@@ -36,7 +36,7 @@ mkdir(PUSHPATH);
 yScale = [-2 2];
 ICAName = strcat(ICAPATH, "comp_", DateStr, "_", AREANAME, ".mat");
 if ~exist(ICAName, "file")
-    [ECOGDataset, comp, FigICAWave, FigTopo] = toDoICA(ECOGDataset, trialAll, 500);
+    [ECOGDataset, comp, FigICAWave, FigTopo] = CTLToDoICA(ECOGDataset, trialAll, 500);
     print(FigICAWave, strcat(ICAPATH, AREANAME, "_ICA_Wave_", DateStr), "-djpeg", "-r200");
     print(FigTopo, strcat(ICAPATH, AREANAME, "_ICA_Topo_",  DateStr), "-djpeg", "-r200");
     save(ICAName, "comp", "-mat");

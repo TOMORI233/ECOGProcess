@@ -8,6 +8,7 @@ MATPATH = {'E:\ECoG\MAT Data\XX\BlkFreqLoc Active\xx20220905\xx20220905_AC.mat'.
            };
 pos = [1, 2, 1 ,2];
 icSelect = [2, 12, 1, 1];
+sigVal = [2, 2, 6, 6];
 ROOTPATH = "E:\ECOG\ICAFigures\BlkFreqLoc\";
 FIGPATH = "E:\ECoG\corelDraw\PEOddBlkFreqLoc\Figure2\";
 
@@ -62,34 +63,80 @@ dRatio = unique(devType(([trialAll.devType]' > 0)));
 window = [-200, 800]; % ms
 t = linspace(window(1), window(2), diff(window) /1000 * ECOGDataset.fs + 1)';
 cdrPlot(mIndex).info = strcat(AREANAME, "_", DateStr);
-cdrPlot(mIndex).blkFreqCdr = zeros(length(t), 2 * length(dRatio));
-cdrPlot(mIndex).randFreqCdr = zeros(length(t), 2 * length(dRatio));  
-cdrPlot(mIndex).blkLocCdr =  zeros(length(t), 2 * length(dRatio));
-cdrPlot(mIndex).randLocCdr = zeros(length(t), 2 * length(dRatio));
+cdrPlot(mIndex).BlkFreqCdr = zeros(length(t), 2 * length(dRatio));
+cdrPlot(mIndex).RandFreqCdr = zeros(length(t), 2 * length(dRatio));  
+cdrPlot(mIndex).BlkLocCdr =  zeros(length(t), 2 * length(dRatio));
+cdrPlot(mIndex).RandLocCdr = zeros(length(t), 2 * length(dRatio));
 
-colors = ["k", "b", "#FFA500", "r"];
+resultBlkFreqC = [];
+resultBlkLocC = [];
+resultRandFreqC = [];
+resultRandLocC = [];
+labelBlkFreqC = [];
+labelBlkLocC = [];
+labelRandFreqC = [];
+labelRandLocC = [];
 for dIndex = 2 : length(dRatio)
     trialsBlkFreqC = trialsBlkFreq([trialsBlkFreq.devType]' == dIndex &  [trialsBlkFreq.correct]' == true);
     trialsBlkLocC = trialsBlkLoc([trialsBlkLoc.devType]' == dIndex &  [trialsBlkLoc.correct]' == true);
     trialsRandFreqC = trialsRandFreq([trialsRandFreq.devType]' == dIndex &  [trialsRandFreq.correct]' == true);
     trialsRandLocC = trialsRandLoc([trialsRandLoc.devType]' == dIndex &  [trialsRandLoc.correct]' == true);
-    [~, chMeanBlkFreqC(dIndex - 1).chMean] = selectEcog(ECOGDataset, trialsBlkFreqC, "dev onset", window);
-    [~, chMeanRandFreqC(dIndex - 1).chMean] = selectEcog(ECOGDataset, trialsRandFreqC, "dev onset", window);
-    [~, chMeanBlkLocC(dIndex - 1).chMean] = selectEcog(ECOGDataset, trialsBlkLocC, "dev onset", window);
-    [~, chMeanRandLocC(dIndex - 1).chMean] = selectEcog(ECOGDataset, trialsRandLocC, "dev onset", window);
+    % block freq
+    [tempC, chMeanBlkFreqC(dIndex - 1).chMean] = selectEcog(ECOGDataset, trialsBlkFreqC, "dev onset", window);
+    resultBlkFreqC = [resultBlkFreqC; tempC];
+    labelBlkFreqC = [labelBlkFreqC; ones(length(tempC), 1) * dIndex];
+    cdrPlot(mIndex).BlkFreqCdr(:, 2 * dIndex - 1) = t;
+    cdrPlot(mIndex).BlkFreqCdr(:, 2 * dIndex) = chMeanBlkFreqC(dIndex - 1).chMean(icSelect(mIndex), :)';
+    % rand freq
+    [tempC, chMeanRandFreqC(dIndex - 1).chMean] = selectEcog(ECOGDataset, trialsRandFreqC, "dev onset", window);
+    resultRandFreqC = [resultRandFreqC; tempC];
+    labelRandFreqC = [labelRandFreqC; ones(length(tempC), 1) * dIndex];
+     cdrPlot(mIndex).RandFreqCdr(:, 2 * dIndex - 1) = t;
+    cdrPlot(mIndex).RandFreqCdr(:, 2 * dIndex) = chMeanRandFreqC(dIndex - 1).chMean(icSelect(mIndex), :)';
+    % block loc
+    [tempC, chMeanBlkLocC(dIndex - 1).chMean] = selectEcog(ECOGDataset, trialsBlkLocC, "dev onset", window);
+    resultBlkLocC = [resultBlkLocC; tempC];
+    labelBlkLocC = [labelBlkLocC; ones(length(tempC), 1) * dIndex];
+    cdrPlot(mIndex).BlkLocCdr(:, 2 * dIndex - 1) = t;
+    cdrPlot(mIndex).BlkLocCdr(:, 2 * dIndex) = chMeanBlkLocC(dIndex - 1).chMean(icSelect(mIndex), :)';
+    % rand loc
+    [tempC, chMeanRandLocC(dIndex - 1).chMean] = selectEcog(ECOGDataset, trialsRandLocC, "dev onset", window);
+    resultRandLocC = [resultRandLocC; tempC];
+    labelRandLocC = [labelRandLocC; ones(length(tempC), 1) * dIndex];
+    cdrPlot(mIndex).RandLocCdr(:, 2 * dIndex - 1) = t;
+    cdrPlot(mIndex).RandLocCdr(:, 2 * dIndex) = chMeanRandLocC(dIndex - 1).chMean(icSelect(mIndex), :)';
 
-    cdrPlot(mIndex).blkFreqCdr(:, 2 * dIndex - 1) = t;
-    cdrPlot(mIndex).blkFreqCdr(:, 2 * dIndex) = chMeanBlkFreqC(dIndex - 1).chMean(icSelect(mIndex), :)';
-
-    cdrPlot(mIndex).randFreqCdr(:, 2 * dIndex - 1) = t;
-    cdrPlot(mIndex).randFreqCdr(:, 2 * dIndex) = chMeanRandFreqC(dIndex - 1).chMean(icSelect(mIndex), :)';
-
-    cdrPlot(mIndex).blkLocCdr(:, 2 * dIndex - 1) = t;
-    cdrPlot(mIndex).blkLocCdr(:, 2 * dIndex) = chMeanBlkLocC(dIndex - 1).chMean(icSelect(mIndex), :)';
-
-    cdrPlot(mIndex).randLocCdr(:, 2 * dIndex - 1) = t;
-    cdrPlot(mIndex).randLocCdr(:, 2 * dIndex) = chMeanRandLocC(dIndex - 1).chMean(icSelect(mIndex), :)';
 end
+temp = changeCellRowNum(resultBlkFreqC);
+selectRawICBlkFreq = cell2mat(temp(icSelect(mIndex)));
+[P, H] = mAnova1(selectRawICBlkFreq, labelBlkFreqC, 0.05, sigVal(mIndex));
+anovaRes(mIndex).BlkFreq(:, 1) = t;
+anovaRes(mIndex).BlkFreq(:, 2) = H;
+anovaRes(mIndex).BlkFreq(:, 3) = P;
+
+temp = changeCellRowNum(resultRandFreqC);
+selectRawICRandFreq = cell2mat(temp(icSelect(mIndex)));
+[P, H] = mAnova1(selectRawICRandFreq, labelRandFreqC, 0.05, sigVal(mIndex));
+anovaRes(mIndex).RandFreq(:, 1) = t;
+anovaRes(mIndex).RandFreq(:, 2) = H;
+anovaRes(mIndex).RandFreq(:, 3) = P;
+
+temp = changeCellRowNum(resultBlkLocC);
+selectRawICBlkLoc = cell2mat(temp(icSelect(mIndex)));
+[P, H] = mAnova1(selectRawICBlkLoc, labelBlkLocC, 0.05, sigVal(mIndex));
+anovaRes(mIndex).BlkLoc(:, 1) = t;
+anovaRes(mIndex).BlkLoc(:, 2) = H;
+anovaRes(mIndex).BlkLoc(:, 3) = P;
+
+temp = changeCellRowNum(resultRandLocC);
+selectRawICRandLoc = cell2mat(temp(icSelect(mIndex)));
+[P, H] = mAnova1(selectRawICRandLoc, labelRandLocC, 0.05, sigVal(mIndex));
+anovaRes(mIndex).RandLoc(:, 1) = t;
+anovaRes(mIndex).RandLoc(:, 2) = H;
+anovaRes(mIndex).RandLoc(:, 3) = P;
+
+
+
 end
 
 
