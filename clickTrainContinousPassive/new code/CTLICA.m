@@ -26,8 +26,6 @@ ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", 
 % plotRawWave(ICMean, [], window, "ICA", [8, 8]);
 % % plotTFA(ICMean, fs, [], window, "ICA", [8, 8]);
 % plotTopo(comp, [8, 8]);
-% 
-% 
 % comp = reverseIC(comp, input("IC to reverse: "));
 % ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
 FigICAWave = plotRawWave(ICMean, [], Window, "ICA", [8, 8]);

@@ -1,8 +1,10 @@
 close all; clc; clear;
-% MATPATH = 'E:\ECoG\MAT Data\XX\BlkFreqLoc Active\xx20220905\xx20220905_PFC.mat';
-MATPATH = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_0o1_0o2\cc20220927\cc20220927_AC.mat';
-ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_0o1_0o2\";
 
+% MATPATH = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_0o1_0o2\cc20220927\cc20220927_AC.mat';
+% ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_0o1_0o2\";
+
+MATPATH = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI4\cc20220610\cc20220610_AC.mat';
+ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\Basic_ICI4\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
@@ -16,7 +18,8 @@ opts.flp = 400;
 opts.fhp = 0.1;
 opts.Protocol = Protocol;
 opts.segOption = ["trial onset", "dev onset"];
-opts.s1OnsetOrS2Onset = 1; % 1, s1onset; 2, s2Onset
+
+opts.s1OnsetOrS2Onset = 2; % 1, s1onset; 2, s2Onset
 
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
@@ -27,22 +30,39 @@ mkdir(WAVEPATH);
 mkdir(FFTPATH);
 
 
-%% Processing
+%% segregate trials
 [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
 
+%% series of Successive ...
 if contains(Protocol, "successive")
+    opts.s1OnsetOrS2Onset = 1; % 1, s1onset; 2, s2Onset
     [FigWave, FigFFT, filterRes] = CTLSucFcn(trialAll, ECOGDataset, opts);
     scaleAxes(FigWave, "y", [-60 60]);
     scaleAxes(FigFFT, "y", [0 8]);
     scaleAxes(FigFFT, "x", [0 20]);
-    set([FigWave, FigFFT], "outerposition", [300, 100, 800, 670]);
+    plotLayout([FigWave, FigFFT], posIndex);
+    for fIndex = 1 : length(FigFFT)
+        print(FigFFT(fIndex), strcat(FFTPATH, AREANAME, "_Wave_Order", num2str(fIndex), "_", Protocol), "-djpeg", "-r200");
+        print(FigWave(fIndex), strcat(WAVEPATH, AREANAME, "_FFT_Order", num2str(fIndex), "_", Protocol), "-djpeg", "-r200");
+    end
+%% series of Basic ...
+elseif contains(Protocol, "Basic")
+    opts.s1OnsetOrS2Onset = 2; % 1, s1onset; 2, s2Onset
+    [FigWave, FigFFT, filterRes] = CTLBasicFcn(trialAll, ECOGDataset, opts);
+    scaleAxes(FigWave, "y", [-60 60]);
+    scaleAxes(FigWave, "x", [-10 600]);
+    scaleAxes(FigFFT, "y", [0 8]);
+    scaleAxes(FigFFT, "x", [0 300]);
+    if contains(DateStr, "cc")
+        plotLayout([FigWave, FigFFT], posIndex);
+    elseif contains(DateStr, "xx")
+        plotLayout([FigWave, FigFFT], posIndex + 2);
+    end
     for fIndex = 1 : length(FigFFT)
         print(FigFFT(fIndex), strcat(FFTPATH, AREANAME, "_Wave_Order", num2str(fIndex), "_", Protocol), "-djpeg", "-r200");
         print(FigWave(fIndex), strcat(WAVEPATH, AREANAME, "_FFT_Order", num2str(fIndex), "_", Protocol), "-djpeg", "-r200");
     end
 
-elseif contains(Protocol, "speciesRatio")
-    
 end
 
 close all

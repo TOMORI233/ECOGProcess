@@ -3,6 +3,7 @@ close all; clc; clear;
 MATPATH = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_0o1_0o2\cc20220927\cc20220927_AC.mat';
 ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_0o1_0o2\";
 
+
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
@@ -47,7 +48,11 @@ if contains(Protocol, "successive")
     scaleAxes(FigWave, "y", [-10 10]);
     scaleAxes(FigFFT, "y", [0 1]);
     scaleAxes(FigFFT, "x", [0 20]);
-    set([FigWave, FigFFT], "outerposition", [300, 100, 800, 670]);
+    if contains(DateStr, "cc")
+        plotLayout([FigWave, FigFFT], posIndex);
+    elseif contains(DateStr, "xx")
+        plotLayout([FigWave, FigFFT], posIndex + 2);
+    end
     for fIndex = 1 : length(FigFFT)
         print(FigFFT(fIndex), strcat(FFTPATH, AREANAME, "_Wave_Order", num2str(fIndex), "_", Protocol), "-djpeg", "-r200");
         print(FigWave(fIndex), strcat(WAVEPATH, AREANAME, "_FFT_Order", num2str(fIndex), "_", Protocol), "-djpeg", "-r200");

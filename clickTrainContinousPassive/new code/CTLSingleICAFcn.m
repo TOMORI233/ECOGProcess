@@ -20,8 +20,8 @@ opts.s1OnsetOrS2Onset = 1; % 1, s1onset; 2, s2Onset
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
 ICAPATH = strcat(ROOTPATH, DateStr, "\ICA\");
-WAVEPATH = strcat(ICAPATH, "Wave\");
-FFTPATH = strcat(ICAPATH, "FFT\");
+WAVEPATH = strcat(ROOTPATH, DateStr, "\Wave\");
+FFTPATH = strcat(ROOTPATH, DateStr, "\FFT\");
 mkdir(ICAPATH);
 mkdir(WAVEPATH);
 mkdir(FFTPATH);
@@ -41,11 +41,17 @@ else
 end
 
 if contains(Protocol, "successive")
+    waveYScale = [-10 10; -1.5 1.5];
+    fftYScale = [-1 1; -0.4 0.4];
     [FigWave, FigFFT] = CTLSucICAFcn(trialAll, ECOGDataset, opts);
-    scaleAxes(FigWave, "y", [-10 10]);
-    scaleAxes(FigFFT, "y", [0 1]);
+    scaleAxes(FigWave, "y", waveYScale(posIndex, :));
+    scaleAxes(FigFFT, "y", [0 fftYScale(posIndex, 2)]);
     scaleAxes(FigFFT, "x", [0 20]);
-    set([FigWave, FigFFT], "outerposition", [300, 100, 800, 670]);
+    if contains(DateStr, "cc")
+        plotLayout([FigWave, FigFFT], posIndex);
+    elseif contains(DateStr, "xx")
+        plotLayout([FigWave, FigFFT], posIndex + 2);
+    end
     for fIndex = 1 : length(FigFFT)
         print(FigFFT(fIndex), strcat(FFTPATH, AREANAME, "_Wave_Order", num2str(fIndex), "_", Protocol), "-djpeg", "-r200");
         print(FigWave(fIndex), strcat(WAVEPATH, AREANAME, "_FFT_Order", num2str(fIndex), "_", Protocol), "-djpeg", "-r200");

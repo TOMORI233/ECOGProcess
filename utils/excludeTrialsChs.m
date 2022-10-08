@@ -1,6 +1,16 @@
-function [trialsEEG, chIdx] = excludeTrialsChs(trialsEEG, th, window, testWin)
+function [trialsECoG, chIdx] = excludeTrialsChs(trialsECoG, th, window, testWin)
+    % Description: exclude trials away from mean level, and return index of
+    %              bad channels
+    % Input:
+    %     trialsECoG: n*1 cell array of trial data (64*m matrix)
+    %     th: trials whose proportion of sample points that the value is
+    %         above th will be labeled as bad trial
+    %     window: window that corresponds to size of trialsECoG
+    %     testWin: the range should be in the window, for channel excluding
+    % Output:
+    %     chIdx: the index of bad channels
 narginchk(2, 4);
-temp = changeCellRowNum(trialsEEG);
+temp = changeCellRowNum(trialsECoG);
 chMean = cell2mat(cellfun(@mean, temp, "UniformOutput", false));
 
 if nargin > 3
@@ -23,7 +33,7 @@ while length(deleteCh) ~= length(curDel)
 end
 
 
-temp = changeCellRowNum(trialsEEG);
+temp = changeCellRowNum(trialsECoG);
 temp = temp(chIdx);
 trialsEEGTemp = changeCellRowNum(temp);
 chMean = cell2mat(cellfun(@mean, temp, "UniformOutput", false));
@@ -35,7 +45,7 @@ if ~isempty(find(~idx, 1))
 else
     disp('All pass');
 end
-trialsEEG = trialsEEG(idx);
+trialsECoG = trialsECoG(idx);
 
 return;
 end

@@ -1,14 +1,11 @@
 clc; clear; close all force;
 
 
-% rootPathMat = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_0o1_0o2\';
-% ROOTPATH = "E:\ECOG\ICAFigures\ClickTrainLongTerm\successive_0o1_0o2\";
+rootPathMat = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\successive_0o1_0o2\';
+ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_0o1_0o2\";
 
 % rootPathMat = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_0o3_0o5\';
-% ROOTPATH = "E:\ECOG\ICAFigures\ClickTrainLongTerm\successive_0o3_0o5\";
-
-rootPathMat = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_1_2\';
-ROOTPATH = "E:\ECOG\ICAFigures\ClickTrainLongTerm\successive_1_2\";
+% ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_0o3_0o5\";
 temp = dir(rootPathMat);
 MATPATHs = [];
 
@@ -25,9 +22,9 @@ for fIndex = 1:length(temp)
         splitName = split(name, '_');
 
         if strcmp(splitName{end}, 'AC')
-            CTLSingleICAFcn([rootPathMat, temp(fIndex).name, '\', MATFiles{mIndex}], ROOTPATH, 1);
+            CTLSingleFcn([rootPathMat, temp(fIndex).name, '\', MATFiles{mIndex}], 1);
         elseif strcmp(splitName{end}, 'PFC')
-            CTLSingleICAFcn([rootPathMat, temp(fIndex).name, '\', MATFiles{mIndex}], ROOTPATH, 2);
+            CTLSingleFcn([rootPathMat, temp(fIndex).name, '\', MATFiles{mIndex}], 2);
         end
         close all;
     end

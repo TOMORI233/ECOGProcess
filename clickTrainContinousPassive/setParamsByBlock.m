@@ -72,7 +72,7 @@ switch BLOCKPATH
 %         S1Duration = [5005, 5080.1, 5000.2, 5075.2];
     case regICIThr4msBlk
         stimStr = {'4ms -4.01ms Reg','4ms -4.02ms Reg' ,'4ms -4.03ms Reg','4ms -4.04ms Reg'};
-        S1Duration = [5005+4.01, 5005+4.02, 5005+4.03, 5005+4.04] + 4;
+        S1Duration = [5005+4.01, 5005+4.02, 5005+4.03, 5005+4.04];
         Paradigm = 'ClickTrainSSALongTermICIThr401234';
     case ratioDetectCommonBlk % 4-4,4.05,4.1,4.15,4.2
         stimStr = {'4ms -4ms Reg','4ms -4.05ms Reg' ,'4ms -4.1ms Reg','4ms -4.15ms Reg','4ms -4.2ms Reg'};

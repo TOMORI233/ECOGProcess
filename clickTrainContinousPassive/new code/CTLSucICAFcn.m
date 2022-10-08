@@ -18,7 +18,7 @@ trialAll(1) = [];
 devType = unique([trialAll.devOrdr]);
 devTemp = {trialAll.devOnset}';
 ordTemp = {trialAll.ordrSeq}';
-temp = cellfun(@(x, y) x + S1Duration(y)/1000, devTemp, ordTemp, "UniformOutput", false);
+temp = cellfun(@(x, y) x + S1Duration(y), devTemp, ordTemp, "UniformOutput", false);
 trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 
 
@@ -28,8 +28,12 @@ FFTWin = Window;
 for dIndex = 1:length(devType)
     tIndex = [trialAll.devOrdr] == devType(dIndex);
     trials{dIndex} = trialAll(tIndex);
-    FDZData{dIndex} = ECOGFDZ.data(tIndex);
-    [trialsECOG{dIndex}, chMean{dIndex}, chStd{dIndex}] = selectEcog(ECOGFDZ, trials{dIndex}, segOption(s1OnsetOrS2Onset), Window);
+    
+    trialsECOG{dIndex} = selectEcog(ECOGFDZ, trials{dIndex}, segOption(s1OnsetOrS2Onset), Window);
+    % exclude trial
+    trialsECOG{dIndex} = excludeTrialsChs(trialsECOG{dIndex}, 0.1);
+    chMean{dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG{dIndex}), 'UniformOutput', false));
+    chStd{dIndex} = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG{dIndex}), 'UniformOutput', false));
     t{dIndex} = linspace(Window(1), Window(2), size(chMean{dIndex}, 2));
     tIdx = find(t{dIndex} > FFTWin(1) & t{dIndex} < FFTWin(2));
     [ff, PMean, ~]  = trialsECOGFFT(trialsECOG{dIndex}, fs, tIdx);
@@ -39,29 +43,17 @@ for dIndex = 1:length(devType)
     setLine(FigFFT(dIndex), "Color", colors(dIndex), "LineStyle", "-");
     lines(1).X = cursor(dIndex); lines(1).color = "r";
     addLines2Axes(FigFFT(dIndex), lines);
-    drawnow;
 
     % PLOT RAW WAVE
     chMeanSuc(1).chMean = chMean{dIndex}; chMeanSuc(1).color = chMean{dIndex}; 
     FigWave(dIndex) = plotRawWave(chMean{dIndex}, [], Window, stimStr{dIndex}, [8, 8]);
     setLine(FigWave(dIndex), "Color", colors(dIndex), "LineStyle", "-");
-    drawnow;
 end
 
-% chMeanSuc1(1).chMean = chMean{1}; chMeanSuc1(1).color = "r";
-% chMeanSuc1(2).chMean = chMean{2}; chMeanSuc1(2).color = "b";
-% chMeanSuc1(3).chMean = chMean{3}; chMeanSuc1(3).color = "k";
-% FigWave(1) = plotRawWaveMulti(chMeanSuc1, Window, titleStr(1), [8, 8]);
-% drawnow;
-% chMeanSuc2(1).chMean = chMean{1}; chMeanSuc2(1).color = "r";
-% chMeanSuc2(2).chMean = chMean{2}; chMeanSuc2(2).color = "b";
-% chMeanSuc2(3).chMean = chMean{3}; chMeanSuc2(3).color = "k";
-% FigWave(2) = plotRawWaveMulti(chMeanSuc2, Window, titleStr(2), [8, 8]);
-% drawnow;
 
 
 % save result data
-filterRes = struct('chMean', chMean, 'chStd', chStd, 'trials', trials, 't', t, 'stimStr', stimStr, 'S1Duration', num2cell(S1Duration), 'FDZData', FDZData);
+filterRes = struct('chMean', chMean, 'chStd', chStd, 'trials', trials, 't', t, 'stimStr', stimStr, 'S1Duration', num2cell(S1Duration));
 
 
 end

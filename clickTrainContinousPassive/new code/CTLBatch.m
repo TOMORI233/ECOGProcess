@@ -4,8 +4,11 @@ clc; clear; close all force;
 % rootPathMat = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\successive_0o1_0o2\';
 % ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_0o1_0o2\";
 
-rootPathMat = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_0o3_0o5\';
-ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_0o3_0o5\";
+% rootPathMat = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\successive_0o3_0o5\';
+% ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_0o3_0o5\";
+
+rootPathMat = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_1_2\';
+ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_1_2\";
 temp = dir(rootPathMat);
 MATPATHs = [];
 
