@@ -1,34 +1,57 @@
 switch Protocol
 
+    case "successive_Tone_250-246_240_200"
+        titleStr = ["0.025s successive", "0.05s successive"];
+        stimStr = {'0.025s 200Hz', '0.025s 240Hz', '0.025 246Hz', ...
+            '0.05s 200Hz', '0.05s 240Hz', '0.05s 246Hz'};
+        S1Duration = zeros(1, 6);
+        cursor = [40, 40, 40, 20, 20, 20];
+        winStart = -1000;
+        Window = [winStart 11000];
+        ICAWin = [-1000 10000];
+        FFTWin = [1000 10000];
+    case "successive_0o025_0o05"
+        titleStr = ["0.025s successive", "0.05s successive"];
+        stimStr = {'0.025s change Reg 4-4.06', '0.025s frozen Irreg 4-4.06', '0.025 rand Irreg 4-4.06', ...
+            '0.05s change Reg 4-4.06', '0.05s frozen Irreg 4-4.06', '0.05s rand Irreg 4-4.06'};
+        S1Duration = zeros(1, 6);
+        cursor = [40, 40, 40, 20, 20, 20];
+        winStart = -1000;
+        Window = [winStart 11000];
+        ICAWin = [-1000 10000];
+        FFTWin = [1000 10000];
     case "successive_0o1_0o2"
         titleStr = ["0.1s successive", "0.2s successive"];
         stimStr = {'0.1s change Reg 4-4.06', '0.1s frozen Irreg 4-4.06', '0.1s rand Irreg 4-4.06', ...
-            '0.2s change Reg 4-4.06', '0.2s frozen Irreg 4-4.06', '0.2s rand Irreg 4-4.06',};
+            '0.2s change Reg 4-4.06', '0.2s frozen Irreg 4-4.06', '0.2s rand Irreg 4-4.06'};
         S1Duration = zeros(1, 6);
         cursor = [10, 10, 10, 5, 5, 5];
         winStart = -1000;
         Window = [winStart 11000];
-        ICAWin = [-1000 11000];
+        ICAWin = [-1000 10000];
+        FFTWin = [1000 10000];
 
     case "successive_0o3_0o5"
         titleStr = ["0.3s successive", "0.5s successive"];
         stimStr = {'0.3s change Reg 4-4.06', '0.3s frozen Irreg 4-4.06', '0.3s rand Irreg 4-4.06', ...
-            '0.5s change Reg 4-4.06', '0.5s frozen Irreg 4-4.06', '0.5s fix rand 4-4.06',};
+            '0.5s change Reg 4-4.06', '0.5s frozen Irreg 4-4.06', '0.5s rand Irreg 4-4.06'};
         S1Duration = zeros(1, 6);
         cursor = [10/3, 10/3, 10/3, 2, 2, 2];
         winStart = -1000;
         Window = [winStart 11000];
-        ICAWin = [-1000 11000];
+        ICAWin = [-1000 10000];
+        FFTWin = [1000 10000];
 
     case "successive_1_2"
         titleStr = ["1s successive", "2s successive"];
         stimStr = {'1s change Reg 4-4.06', '1s frozen Irreg 4-4.06', '1s rand Irreg 4-4.06', ...
-            '2s change Reg 4-4.06', '2s frozen Irreg 4-4.06', '2s fix rand 4-4.06',};
+            '2s change Reg 4-4.06', '2s frozen Irreg 4-4.06', '2s rand Irreg 4-4.06'};
         S1Duration = zeros(1, 6);
         cursor = [1, 1, 1, 0.5, 0.5, 0.5];
         winStart = -1000;
         Window = [winStart 11000];
-        ICAWin = [-1000 11000];
+        ICAWin = [-1000 10000];
+        FFTWin = [1000 10000];
 
     case "Basic_ICI4"
         titleStr = "4-4.06 RegIrreg";
@@ -36,8 +59,8 @@ switch Protocol
         S1Duration = [5005, 5080.1, 5000.2, 5075.2] + 4;
         cursor = [250, 250, 250 ,250];
         winStart = -5500;
-        Window = [winStart 3000];
-        ICAWin = [-1500 1500];
+        Window = [winStart 5500];
+        ICAWin = [1000 1500];
 
     case "Basic_ICI8"
         titleStr = "8-8.12 RegIrreg";
@@ -45,7 +68,7 @@ switch Protocol
         S1Duration = [5005, 5080.1, 5000.2, 5075.2] + 8;
         cursor = [125, 125, 125 ,125];
         winStart = -5500;
-        Window = [winStart 3000];
+        Window = [winStart 5500];
         ICAWin = [-1500 1500];
 
     case "Basic_ICI20"
@@ -54,7 +77,7 @@ switch Protocol
         S1Duration = [5005, 5080.1, 5000.2, 5075.2] + 20;
         cursor = [50, 50, 50, 50];
         winStart = -5500;
-        Window = [winStart 3000];
+        Window = [winStart 5500];
         ICAWin = [-1500 1500];
 
     case "Basic_ICI40"
@@ -63,7 +86,7 @@ switch Protocol
         S1Duration = [5005, 5080.1, 5000.2, 5075.2] + 40;
         cursor = [25, 25, 25 ,25];
         winStart = -5500;
-        Window = [winStart 3000];
+        Window = [winStart 5500];
         ICAWin = [-1500 1500];
 
     case "Basic_ICI80"
@@ -72,16 +95,16 @@ switch Protocol
         S1Duration = [4965, 4958.2, 4935.7, 4969] + 80;
         cursor = [12.5, 12.5, 12.5 ,12.5];
         winStart = -5500;
-        Window = [winStart 3000];
+        Window = [winStart 5500];
         ICAWin = [-1500 1500];
 
     case "Basic_ICIThr"
         titleStr = "4ms ICIThr";
-        stimStr = {'4ms -4.01ms Reg','4ms -4.02ms Reg' ,'4ms -4.03ms Reg','4ms -4.04ms Reg'};
-        S1Duration = [5005+4.01, 5005+4.02, 5005+4.03, 5005+4.04];
+        stimStr = {'4ms -4.04ms Reg','4ms -4.02ms Reg' ,'4ms -4.03ms Reg','4ms -4.01ms Reg'};
+        S1Duration = [5005+4.04, 5005+4.02, 5005+4.03, 5005+4.01];
         cursor = [12.5, 12.5, 12.5 ,12.5];
         winStart = -5500;
-        Window = [winStart 3000];
+        Window = [winStart 5500];
         ICAWin = [-1500 1500];
 
     case "Basic_IrregVar"
@@ -90,6 +113,6 @@ switch Protocol
         S1Duration = [5000.2, 5000.2, 5000.2, 5000.2] + 4;
         cursor = [250, 250, 250 ,250];
         winStart = -5500;
-        Window = [winStart 3000];
+        Window = [winStart 5500];
         ICAWin = [-1500 1500];
 end

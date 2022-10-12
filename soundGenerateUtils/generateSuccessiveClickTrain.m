@@ -1,4 +1,5 @@
-clear ; clc
+clearvars -except singleDuration ; 
+clc
 
 %% important parameters
 % basic
@@ -9,13 +10,13 @@ mkdir(opts.rootPath);
 
 % for decode
 decodeICI = [4 4.03 4.04 4.06 4.08  4.09 4.12 4.16 3 5 4.2 4.4 4.6 4.8];
-decodeDuration = 200; % ms
+decodeDuration = 300; % ms
 
 % for continuous / seperated
 s1ICI = [4, 4]; % ms
 s2ICI = [4, 4.06];
 
-singleDuration = 100; % ms
+singleDuration = 200; % ms
 successiveDuration = 10000; % ms
 s2CutOff = []; % if empty, do not cut
 interval = 500; % ms
@@ -112,9 +113,15 @@ exportSoundFile({longTermRegWaveSepatatedNorm2.s1s2}, opts)
 
 %%  frozen irregular
 % generate irregular click train
+opts.singleDuration = singleDuration;
 opts.baseICI =  4; % ms
 opts.sigmaPara = 2; % sigma = μ / sigmaPara
-opts.irregICISampNBase = cell2mat(irregICISampN(opts));
+load("standardIrregBase.mat");
+load("first100ms_Base.mat");
+standardIrregBase = [first100ms_IrregBase, standardIrregBase];
+idx = find(cumsum(standardIrregBase) < ceil(opts.soundLength * opts.fs / 1000));
+% opts.irregICISampNBase = cell2mat(irregICISampN(opts));
+opts.irregICISampNBase = standardIrregBase(idx);
 opts.irregLongTermSampN = opts.irregICISampNBase;
 [~, ~, ~, irregSampN] = generateIrregClickTrain(opts);
 
@@ -171,11 +178,16 @@ exportSoundFile({longTermIrregWaveStdDevSeperatedNorm2.s1s2}, opts)
 
 %%  rand irregular
 % generate irregular click train
+if singleDuration < 100
+    singleDuration = 100;
+end
+opts.soundLength = singleDuration; % 
 segN = ceil(successiveDuration / singleDuration);
 randIregTemp = cell(2, segN);
 opts.baseICI =  4; % ms
 opts.sigmaPara = 2; % sigma = μ / sigmaPara
 intWave = zeros(ceil(interval / 1000 * opts.fs), 1);
+
 
 for sIndex = 1 : segN
 opts.irregICISampNBase = cell2mat(irregICISampN(opts));

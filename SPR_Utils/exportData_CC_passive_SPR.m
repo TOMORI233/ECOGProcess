@@ -1,12 +1,33 @@
 clear; clc; close all;
 
+
+
+%% successive tone 250-246,240,200
+disp("Exporting ClickTrainLongTerm successive...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\successive_Tone_250-246_240_200\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'F:\ECoG\chouchou\cc20221011\Block-5'; % 20221011 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+
+%% clickTrainLongTerm successive 0.025_0.05
+disp("Exporting ClickTrainLongTerm successive...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\successive_0o025_0o05\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'F:\ECoG\chouchou\cc20221011\Block-4'; % 20221011 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
 %% clickTrainLongTerm successive 0.1_0.2
 disp("Exporting ClickTrainLongTerm successive...");
 SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\successive_0o1_0o2\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'E:\ECoG\chouchou\cc20220927\Block-3';
 BLOCKPATH{2} = 'E:\ECoG\chouchou\cc20220928\Block-5';
-BLOCKPATH{3} = 'E:\ECoG\chouchou\cc20221004\Block-3'; % 20221007 export
+BLOCKPATH{3} = 'E:\ECoG\chouchou\cc20221004\Block-3'; % 20221011 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);

@@ -15,10 +15,15 @@ run("CTLconfig.m");
 
 %% Processing
 [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
-
 trialAll(1) = [];
+devType = unique([trialAll.devOrdr]);
 devTemp = {trialAll.devOnset}';
-ordTemp = {trialAll.ordrSeq}';
+if contains(Protocol, "successive")
+    ordTemp = {trialAll.ordrSeq}';
+elseif contains(Protocol, "Basic")
+    [~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
+    ordTemp = num2cell(ordTemp);
+end
 temp = cellfun(@(x, y) x + S1Duration(y), devTemp, ordTemp, "UniformOutput", false);
 trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 

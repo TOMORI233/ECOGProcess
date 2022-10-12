@@ -1,4 +1,4 @@
-function [FigWave, FigFFT, filterRes] = CTLSucFcn(trialAll, ECOGDataset, opts)
+function [FigWave, FigFFT, FigTFA, filterRes] = CTLSucFcn(trialAll, ECOGDataset, opts)
 
 optsNames = fieldnames(opts);
 
@@ -20,7 +20,7 @@ trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 
 
 ECOGFDZ = mFTHP(ECOGDataset, 0.1, 400);% filtered, dowmsampled, zoomed
-FFTWin = Window;
+
 
 for dIndex = 1:length(devType)
     tIndex = [trialAll.devOrdr] == devType(dIndex);
@@ -46,6 +46,9 @@ for dIndex = 1:length(devType)
     chMeanSuc(1).chMean = chMean{dIndex}; chMeanSuc(1).color = chMean{dIndex}; 
     FigWave(dIndex) = plotRawWave(chMean{dIndex}, [], Window, stimStr{dIndex}, [8, 8]);
     setLine(FigWave(dIndex), "Color", colors(dIndex), "LineStyle", "-");
+
+    % PLOT TFA
+    FigTFA(dIndex) = plotTFA(chMean{dIndex}, fs, fs, Window, stimStr{dIndex}, [8, 8]);
 end
 
 

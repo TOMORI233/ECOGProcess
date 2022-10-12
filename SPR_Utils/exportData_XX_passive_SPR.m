@@ -1,5 +1,25 @@
 clear; clc; close all;
 
+
+%% successive tone 250-246,240,200
+disp("Exporting ClickTrainLongTerm successive...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\successive_Tone_250-246_240_200\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'F:\ECoG\xiaoxiao\xx20221011\Block-4'; % 20221011 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+
+%% clickTrainLongTerm successive 0.025_0.05
+disp("Exporting ClickTrainLongTerm successive...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\successive_0o025_0o05\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'F:\ECoG\xiaoxiao\xx20221011\Block-3'; % 20221011 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
 % %% clickTrainLongTerm successive 0.1_0.2
 % disp("Exporting ClickTrainLongTerm successive...");
 % SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\successive_0o1_0o2\";

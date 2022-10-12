@@ -1,4 +1,4 @@
-function [FigWave, FigFFT, filterRes] = CTLSucICAFcn(trialAll, ECOGDataset, opts)
+function [FigWave, FigFFT, FigTFA, filterRes] = CTLSucICAFcn(trialAll, ECOGDataset, opts)
 
 optsNames = fieldnames(opts);
 
@@ -7,8 +7,6 @@ for index = 1:size(optsNames, 1)
 end
 
 run("CTLconfig.m");
-
-
 
 colors = ["r", "b", "k", "r", "b", "k"];
 fs = ECOGDataset.fs;
@@ -48,6 +46,9 @@ for dIndex = 1:length(devType)
     chMeanSuc(1).chMean = chMean{dIndex}; chMeanSuc(1).color = chMean{dIndex}; 
     FigWave(dIndex) = plotRawWave(chMean{dIndex}, [], Window, stimStr{dIndex}, [8, 8]);
     setLine(FigWave(dIndex), "Color", colors(dIndex), "LineStyle", "-");
+
+    % PLOT TFA
+    FigTFA(dIndex) = plotTFA(chMean{dIndex}, fs, fs, Window, stimStr{dIndex}, [8, 8]);
 end
 
 

@@ -1,17 +1,13 @@
-clc; clear; close all force;
-
-
-clear; clc
-rootPathMat = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\successive_0o1_0o2\';
-ROOTPATH = "E:\ECOG\ICAFigures\ClickTrainLongTerm\successive_0o1_0o2\";
-
+function [trialAll_merge, trialsECOG_Merge, trialsECOG_MergeICA] = CTL_Pop_SingleProt_ICA(rootPathMat, ROOTPATH)
+% rootPathMat = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\successive_0o1_0o2\';
+% ROOTPATH = "E:\ECOG\ICAFigures\ClickTrainLongTerm\successive_0o1_0o2\";
 % rootPathMat = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_0o3_0o5\';
 % ROOTPATH = "E:\ECOG\ICAFigures\ClickTrainLongTerm\successive_0o3_0o5\";
-
 compPath = strcat(ROOTPATH, "Merge_ICA\");
 mkdir(compPath);
 
 temp = dir(rootPathMat);
+MATPATHs = [];
 temp(ismember(string({temp.name}'), [".", ".."])) = [];
 
 trialAll = cell(length(temp), 1);
@@ -36,8 +32,8 @@ for fIndex = 1:length(temp)
 end
 
 trialAll_merge = mergeSameFieldStruct(trialAll);
-trialsECOG_ACMerge = mergeSameContentCell(trialsECOG.AC);
-trialsECOG_PFCMerge = mergeSameContentCell(trialsECOG.PFC);
+trialsECOG_Merge.AC = mergeSameContentCell(trialsECOG.AC);
+trialsECOG_Merge.PFC = mergeSameContentCell(trialsECOG.PFC);
 sampleinfo = [zeros(length(trialAll_merge), 1) ones(length(trialAll_merge), 1)];
 window = [0 10000];
 
@@ -51,7 +47,7 @@ save(ICAName, "comp", "-mat");
 else
     load(ICAName);
 end
-trialsECOG_ACMergeICA = cellfun(@(x) comp.unmixing * x, trialsECOG_ACMerge, "UniformOutput", false);
+trialsECOG_MergeICA.AC = cellfun(@(x) comp.unmixing * x, trialsECOG_Merge.AC, "UniformOutput", false);
 
 
 %% PFC 
@@ -64,7 +60,7 @@ save(ICAName, "comp", "-mat");
 else
     load(ICAName);
 end
-trialsECOG_PFCMergeICA = cellfun(@(x) comp.unmixing * x, trialsECOG_PFCMerge, "UniformOutput", false);
+trialsECOG_MergeICA.PFC = cellfun(@(x) comp.unmixing * x, trialsECOG_Merge.PFC, "UniformOutput", false);
 
 
 

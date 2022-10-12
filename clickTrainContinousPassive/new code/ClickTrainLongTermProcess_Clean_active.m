@@ -2,9 +2,11 @@ close all; clc; clear;
 
 % MATPATH = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_0o1_0o2\cc20220927\cc20220927_AC.mat';
 % ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_0o1_0o2\";
+MATPATH = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_Tone_250-246_240_200\cc20221011\cc20221011_AC.mat';
+ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_Tone_250-246_240_200\";
 
-MATPATH = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI4\cc20220610\cc20220610_AC.mat';
-ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\Basic_ICI4\";
+% MATPATH = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI4\cc20220610\cc20220610_AC.mat';
+% ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\Basic_ICI4\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
@@ -39,8 +41,12 @@ if contains(Protocol, "successive")
     [FigWave, FigFFT, filterRes] = CTLSucFcn(trialAll, ECOGDataset, opts);
     scaleAxes(FigWave, "y", [-60 60]);
     scaleAxes(FigFFT, "y", [0 8]);
-    scaleAxes(FigFFT, "x", [0 20]);
-    plotLayout([FigWave, FigFFT], posIndex);
+    scaleAxes(FigFFT, "x", [0 50]);
+    if contains(DateStr, "cc")
+        plotLayout([FigWave, FigFFT], params.posIndex);
+    elseif contains(DateStr, "xx")
+        plotLayout([FigWave, FigFFT], params.posIndex + 2);
+    end
     for fIndex = 1 : length(FigFFT)
         print(FigFFT(fIndex), strcat(FFTPATH, AREANAME, "_Wave_Order", num2str(fIndex), "_", Protocol), "-djpeg", "-r200");
         print(FigWave(fIndex), strcat(WAVEPATH, AREANAME, "_FFT_Order", num2str(fIndex), "_", Protocol), "-djpeg", "-r200");
@@ -54,9 +60,9 @@ elseif contains(Protocol, "Basic")
     scaleAxes(FigFFT, "y", [0 8]);
     scaleAxes(FigFFT, "x", [0 300]);
     if contains(DateStr, "cc")
-        plotLayout([FigWave, FigFFT], posIndex);
+        plotLayout([FigWave, FigFFT], params.posIndex);
     elseif contains(DateStr, "xx")
-        plotLayout([FigWave, FigFFT], posIndex + 2);
+        plotLayout([FigWave, FigFFT], params.posIndex + 2);
     end
     for fIndex = 1 : length(FigFFT)
         print(FigFFT(fIndex), strcat(FFTPATH, AREANAME, "_Wave_Order", num2str(fIndex), "_", Protocol), "-djpeg", "-r200");
