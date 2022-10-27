@@ -1,18 +1,18 @@
-function [t, f, TFR, coi] = computeTFA(chMean, fs0, fs, freqLimits)
-narginchk(3, 4);
-if nargin < 4
-    freqLimits = [0 256];
-end
-    TFR = [];
+function [TFR, t, f, coi] = computeTFA(chMean, fs, fsD, freqLimits)
+    narginchk(2, 4);
+
+    if nargin < 3
+        fsD = [];
+    end
+
+    if nargin < 4
+        freqLimits = [0, 128];
+    end
+
+    TFR = cell(size(chMean, 1), 1);
     
     for chNum = 1:size(chMean, 1)
-        [t, f, CData, coi] = mCWT(double(chMean(chNum, :)), fs0, 'morlet', fs, freqLimits);
-
-        if isempty(TFR)
-            TFR = zeros(length(f), length(t), size(chMean, 1));
-        end
-
-        TFR(:, :, chNum) = CData;
+        [t, f, TFR{chNum}, coi] = mCWT(double(chMean(chNum, :)), fs, 'morlet', fsD, freqLimits);
     end
 
     return;

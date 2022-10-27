@@ -1,7 +1,7 @@
 function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible)
     % Description: plot serveral raw waves in one subplot
     % Input:
-    %     chData: n*1 struct with fields [chMean], [color] and [legend]
+    %     chData: n*1 struct with fields [chMean], [color], [lines] and [legend]
     %     window: xlim
     %     titleStr: title of subplot
     %     plotSize: [nRows, nColumns]
@@ -101,5 +101,6 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
         set(get(get(h, 'Annotation'), 'LegendInformation'), 'IconDisplayStyle', 'off');
     end
 
+    drawnow;
     return;
 end

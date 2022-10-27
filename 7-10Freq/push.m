@@ -1,18 +1,19 @@
-function [FigPush1, FigPush2] = push(trialAll, ECOGDataset)
+function [FigWave_Push, FigTFA_Push] = push(trialAll, ECOGDataset)
     [dRatioAll, dRatio] = computeDevRatio(trialAll);
+    dRatio(dRatio == 1) = [];
 
     window = [-2000, 2000]; % ms
+    colors = cellfun(@(x) x / 255, {[0 0 0], [0 0 255], [255 128 0], [255 0 0]}, "UniformOutput", false);
 
-    for dIndex = 2:length(dRatio)
+    for dIndex = 1:length(dRatio)
         trials = trialAll([trialAll.correct] == true & dRatioAll == dRatio(dIndex));
-        [~, chMean, chStd] = selectEcog(ECOGDataset, trials, "push onset", window);
-        FigPush1(dIndex - 1) = plotRawWave(chMean, chStd, window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
-        drawnow;
-        FigPush2(dIndex - 1) = plotTFA(chMean, ECOGDataset.fs, [], window, ['dRatio=', num2str(dRatio(dIndex)), '(N=', num2str(length(trials)), ')']);
-        drawnow;
+        [~, chData(dIndex).chMean, chData(dIndex).chStd] = selectEcog(ECOGDataset, trials, "push onset", window);
+        chData(dIndex).color = colors{dIndex};
+        FigTFA_Push(dIndex) = plotTFA(chData(dIndex).chMean, ECOGDataset.fs, [], window, ['dRatio=', num2str(dRatio(dIndex))]);
     end
 
-    scaleAxes([FigPush1, FigPush2], "x", [-1500, 2000]);
+    FigWave_Push = plotRawWaveMulti(chData, window, 'Push');
+    scaleAxes([FigWave_Push, FigTFA_Push], "x", [-500, 500]);
     
     return;
 end

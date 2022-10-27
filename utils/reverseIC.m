@@ -3,9 +3,13 @@ function comp = reverseIC(comp, ICs)
 
     for index = 1:length(ICs)
         comp.topo(:, ICs(index)) = -comp.topo(:, ICs(index));
-        temp = changeCellRowNum(ICAres);
-        temp(ICs(index)) = {-temp{ICs(index)}};
-        ICAres = changeCellRowNum(temp);
+
+        if ~isempty(ICAres)
+            temp = changeCellRowNum(ICAres);
+            temp(ICs(index)) = {-temp{ICs(index)}};
+            ICAres = changeCellRowNum(temp);
+        end
+        
     end
 
     comp.trial = ICAres;
