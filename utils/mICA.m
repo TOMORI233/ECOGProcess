@@ -1,34 +1,66 @@
-function comp = mICA(ECOGDataset, trials, window, segOption, fs)
+function comp = mICA(dataset, windowICA, arg3, varargin)
     % Description: Split data by trials, window and segOption. Filter and
     %              resample data. Perform ICA on data.
     % Input:
-    %     ECOGDataset: TDT dataset of [LAuC] or [LPFC]
-    %     trials: n*1 struct array of trial information
-    %     window: time window of interest of each trial
+    %     dataset:
+    %         1. ECOGDataset: TDT dataset of [LAuC] or [LPFC]
+    %         2. trialsECOG: n*1 cell array of trial data (64*m matrix)
+    %     windowICA: 2*1 vector of time window of trial data, in ms
+    %     arg3:
+    %         1. trials: n*1 struct array of trial information
+    %         2. fs: ECOGDataset.fs, Hz
+    %     fsD: sample rate for downsampling, < fs
     %     segOption: "trial onset" | "dev onset" | "push onset" | "last std"
-    %     fs: sample rate for downsampling, < fs0
     % Output:
     %     comp: result of ICA (FieldTrip)
+    % Example:
+    %     comp = mICA(ECOGDataset, windowICA, trials, [fsD], [segOption]);
+    %     comp = mICA(trialsECOG, windowICA, fs, [fsD]);
 
-    narginchk(4, 5);
+    mInputParser = inputParser;
+    mInputParser.addRequired("dataset");
+    mInputParser.addRequired("windowICA", @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
+    mInputParser.addRequired("arg3");
+    mInputParser.addOptional("fsD", 500, @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
+    mInputParser.addOptional("segOption", "trial onset", @(x) validatestring(x, ["trial onset", "dev onset", "push onset", "last std"]));
+    mInputParser.parse(dataset, windowICA, arg3, varargin{:});
 
-    if nargin < 5
-        fs = 500; % Hz, for downsampling
+    fsD = mInputParser.Results.fsD;
+    segOption = mInputParser.Results.segOption;
+
+    switch class(arg3)
+        case 'double'
+            fs = arg3;
+        case 'struct'
+            trials = arg3;
+        otherwise
+            error("Invalid syntax");
+    end
+
+    switch class(dataset)
+        case 'cell'
+            trialsECOG = dataset;
+            channels = 1:size(trialsECOG{1}, 1);
+            sampleinfo = ones(length(trialsECOG), 2);
+        case 'struct'
+            ECOGDataset = dataset;
+            fs = ECOGDataset.fs;
+            channels = ECOGDataset.channels;
+            [trialsECOG, ~, ~, sampleinfo] = selectEcog(ECOGDataset, trials, segOption, windowICA);
+        otherwise
+            error("Invalid syntax");
     end
 
     %% Preprocessing
     disp("Preprocessing...");
-    fs0 = ECOGDataset.fs;
-    channels = ECOGDataset.channels;
-    [trialsECOG, ~, ~, sampleinfo] = selectEcog(ECOGDataset, trials, segOption, window);
-    t = linspace(window(1), window(2), size(trialsECOG{1}, 2)) / 1000;
+    t = linspace(windowICA(1), windowICA(2), size(trialsECOG{1}, 2)) / 1000;
 
     cfg = [];
     cfg.trials = 'all';
     data.trial = trialsECOG';
     data.time = repmat({t}, 1, length(trialsECOG));
     data.label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
-    data.fsample = fs0;
+    data.fsample = fs;
     data.trialinfo = ones(length(trialsECOG), 1);
     data.sampleinfo = sampleinfo;
     data = ft_selectdata(cfg, data);
@@ -41,19 +73,19 @@ function comp = mICA(ECOGDataset, trials, window, segOption, fs)
     cfg.hpfilter = 'yes';
     cfg.hpfreq = 0.5;
     cfg.hpfiltord = 3;
-    cfg.dftfreq       = [50 100 150]; % line noise frequencies in Hz for DFT filter (default = [50 100 150])
+    cfg.dftfreq = [50 100 150]; % line noise frequencies in Hz for DFT filter (default = [50 100 150])
     data = ft_preprocessing(cfg, data);
 
     %% Resampling
     disp("Resampling...");
 
-    if fs < fs0
+    if ~isempty(fsD) && fsD < fs
         cfg = [];
-        cfg.resamplefs = fs;
+        cfg.resamplefs = fsD;
         cfg.trials = 'all';
         data = ft_resampledata(cfg, data);
     else
-        warning("resamplefs should not be greater than fsample. Skip resampling.");
+        warning("Sample rate [fsD] for resampling should not be greater than raw sample rate [fs]. Skip resampling.");
     end
 
     %% ICA

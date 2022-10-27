@@ -1,0 +1,37 @@
+{
+    "_schemaVersion": "1.0.0",
+
+    "mICA": {
+        "inputs": [
+            {"name": "trialsECOG", "kind": "required", "type": ["cell"], "purpose": "data by trials"},
+            {"name": "windowICA", "kind": "required", "type": ["numeric", "numel=2"]},
+            {"name": "fs", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "sample rate"},
+            {"name": "fsD", "kind": "ordered", "type": ["numeric", "positive", "numel=1"]}
+        ]
+    },
+
+    "mICA": {
+        "inputs": [
+            {"name": "ECOGDataset", "kind": "required", "type": ["struct"], "purpose": "TDT dataset"},
+            {"name": "windowICA", "kind": "required", "type": ["numeric", "numel=2"]},
+            {"name": "trials", "kind": "required", "type": ["struct"]},
+            {"name": "fsD", "kind": "ordered", "type": ["numeric", "positive", "numel=1"]},
+            {"name": "segOption", "kind": "ordered", "type": ["char", "choices={'trial onset', 'dev onset', 'push onset', 'last std'}"]}
+        ]
+    },
+
+    "joinSTD": {
+        "inputs": [
+            {"name": "trials", "kind": "required", "type": ["struct"]},
+            {"name": "trialsECOG", "kind": "required", "type": ["cell"], "purpose": "data by trials"},
+            {"name": "fs", "kind": "ordered", "type": ["numeric", "positive", "numel=1"]}
+        ]
+    },
+
+    "joinSTD": {
+        "inputs": [
+            {"name": "trials", "kind": "required", "type": ["struct"]},
+            {"name": "ECOGDataset", "kind": "required", "type": ["struct"], "purpose": "TDT dataset"}
+        ]
+    }
+}
