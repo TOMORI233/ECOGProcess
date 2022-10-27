@@ -25,9 +25,9 @@ ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
-CRIMethod = 2; 
+CRIMethod = 2;
 CRIMethodStr = ["Resp_devided_by_Spon", "R_minus_S_devide_R_plus_S"];
-CRIScale = [0.8, 2; -0.1 0.3];
+CRIScale = [0.8, 2; -0.1 0.2];
 CRITest = [1, 0];
 
 
@@ -54,8 +54,8 @@ for mIndex = 1 : 5
     DateStr{mIndex} = temp(end - 1);
     Protocol = temp(end - 2);
     Protocols{mIndex} = Protocol;
-FIGPATH = strcat(ROOTPATH, "\Figure3\", DateStr{1}, "\", CRIMethodStr(CRIMethod), "\", stimStrs(stimSelect), "\");
-mkdir(FIGPATH);
+    FIGPATH = strcat(ROOTPATH, "\Figure3\", DateStr{1}, "\", CRIMethodStr(CRIMethod), "\", stimStrs(stimSelect), "\");
+    mkdir(FIGPATH);
     %% process
     [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH{mIndex}, params);
     fs = ECOGDataset.fs;
@@ -100,9 +100,9 @@ mkdir(FIGPATH);
         ampNorm(dIndex).(strcat(protStr(mIndex), "_raw")) = changeCellRowNum(temp);
 
         % quantization latency
-%         [latency_mean, latency_se, latency_raw] = waveLatency_trough(trialsECOG, Window, quantWin, 10, fs); %
-thr = 0.5;
-        [latency_mean, latency_se, latency_raw] = waveLatency_cumThreshold(trialsECOG, Window, quantWin, thr, fs, sponWin); %
+        [latency_mean, latency_se, latency_raw] = waveLatency_trough(trialsECOG, Window, quantWin, 5, fs); %
+        % thr = 0.5;
+        %         [latency_mean, latency_se, latency_raw] = waveLatency_cumThreshold(trialsECOG, Window, quantWin, thr, fs, sponWin); %
         latency(dIndex).(strcat(protStr(mIndex), "_mean")) = latency_mean;
         latency(dIndex).(strcat(protStr(mIndex), "_se")) = latency_se;
         latency(dIndex).(strcat(protStr(mIndex), "_raw")) = latency_raw;
@@ -112,7 +112,7 @@ thr = 0.5;
 
 
 
-        %% plot  CRI value topo
+    %% plot  CRI value topo
     topo = ampNorm(stimSelect).(strcat(protStr(mIndex), "_mean"));
     if ~isempty(badCh{monkeyId})
         topo(badCh{monkeyId}) = CRITest(CRIMethod);
@@ -140,8 +140,8 @@ setAxes(FigWave, 'visible', 'off');
 setLine(FigWave, "YData", [-yScale(monkeyId) yScale(monkeyId)], "LineStyle", "--");
 set(FigWave, "outerposition", [300, 100, 800, 670]);
 plotLayout(FigWave, params.posIndex + 2 * (monkeyId - 1), 0.3);
- print(FigWave, strcat(FIGPATH, Protocol, "_Wave_", stimStrs(stimSelect)), "-djpeg", "-r200");
- close(FigWave);
+print(FigWave, strcat(FIGPATH, Protocol, "_Wave_", stimStrs(stimSelect)), "-djpeg", "-r200");
+close(FigWave);
 
 %% p-value of different base ICI
 toPlot_Wave = zeros(length(t), 2 * length(MATPATH));
@@ -156,10 +156,12 @@ for mIndex = 1 : length(MATPATH)
     [sponH{mIndex}, sponP{mIndex}] = cellfun(@(x, y) ttest2(x, y), temp, OneArray, "UniformOutput", false);
 
     % plot p-value topo
-    topo = logg(2, logg(0.05, cell2mat(sponP{mIndex})));
-    FigTopo(mIndex) = plotTopo_Raw(topo, [8, 8]);
-    colormap(FigTopo(mIndex), "jet");
-    scaleAxes(FigTopo(mIndex), "c", [0 3]);
+    topo = logg(0.05, cell2mat(sponP{mIndex}) / 0.05);
+    topo(isinf(topo)) = 5;
+    topo(topo > 5) = 5;
+    FigTopo= plotTopo_Raw(topo, [8, 8]);
+    colormap(FigTopo, "jet");
+    scaleAxes(FigTopo, "c", [-5 5]);
     set(FigTopo(mIndex), "outerposition", [300, 100, 800, 670]);
     print(FigTopo(mIndex), strcat(FIGPATH, Protocols{mIndex}, "_pValue_Topo_", protStr(mIndex), "_", stimStrs(stimSelect)), "-djpeg", "-r200");
 end
@@ -182,38 +184,41 @@ temp = reshape([ampNorm(stimSelect).(strcat(protStr(1), "_mean"))(sigCh)'; ampNo
 compare.amp_mean_se = [[1; 2; 3; 4; 5], temp];
 
 
-
-
-
-    %% plot latency value topo
-    for mIndex = 1 : length(MATPATH)
-        sigCh = find(cell2mat(sponH{mIndex}) == 1);
-%         latency(stimSelect).(strcat(protStr(mIndex), "_mean"))(~ismember(1 : 64, sigCh)) = quantWin(2);
-%         latency(stimSelect).(strcat(protStr(mIndex), "_se"))(~ismember(1 : 64, sigCh)) = 0;
-        topo = latency(stimSelect).(strcat(protStr(mIndex), "_mean"));
-        if ~isempty(badCh{monkeyId})
-            topo(badCh{monkeyId}) = 300;
-            latency(stimSelect).(strcat(protStr(mIndex), "_mean"))(badCh{monkeyId}) = quantWin(2);
-            latency(stimSelect).(strcat(protStr(mIndex), "_se"))(badCh{monkeyId}) = 0;
-        end
-%         topo(~ismember(1 : 64, sigCh)) = quantWin(2);
-        topo = quantWin(2) * thr - topo;
-        FigTopo = plotTopo_Raw(topo, [8, 8]);
-        colormap(FigTopo, "jet");
-        scaleAxes(FigTopo, "c", [0 40]);
-        set(FigTopo, "outerposition", [300, 100, 800, 670]);
-        print(FigTopo, strcat(FIGPATH, Protocol, "_latency_Topo_", protStr(mIndex), "_", stimStrs(stimSelect)), "-djpeg", "-r200");
-        close(FigTopo);
-    end
-
 %% Diff ICI latency comparison
-sigCh = find(cell2mat(sponH{1}) == 1 & cell2mat(sponH{2}) == 1);
+if stimSelect <= 2
+    %     sigCh = find(cell2mat(sponH{1}) == 1 & cell2mat(sponH{2}) == 1 );
+    sigCh = find(cell2mat(sponH{1}) == 1);
+else
+    sigCh = 1 : 64;
+end
 temp = reshape([latency(stimSelect).(strcat(protStr(1), "_mean"))(sigCh)'; latency(stimSelect).(strcat(protStr(2), "_mean"))(sigCh)';...
     latency(stimSelect).(strcat(protStr(3), "_mean"))(sigCh)'; latency(stimSelect).(strcat(protStr(4), "_mean"))(sigCh)';...
     latency(stimSelect).(strcat(protStr(5), "_mean"))(sigCh)'; latency(stimSelect).(strcat(protStr(1), "_se"))(sigCh)';...
     latency(stimSelect).(strcat(protStr(2), "_se"))(sigCh)'; latency(stimSelect).(strcat(protStr(3), "_se"))(sigCh)';...
     latency(stimSelect).(strcat(protStr(4), "_se"))(sigCh)'; latency(stimSelect).(strcat(protStr(5), "_se"))(sigCh)'], 5, []) ;
 compare.latency_mean_se = [[1; 2; 3; 4; 5], temp];
+
+
+
+%% plot latency value topo
+for mIndex = 1 : length(MATPATH)
+    sigCh = cell2mat(sponH{mIndex}) == 1;
+    %         latency(stimSelect).(strcat(protStr(mIndex), "_mean"))(~ismember(1 : 64, sigCh)) = quantWin(2);
+    %         latency(stimSelect).(strcat(protStr(mIndex), "_se"))(~ismember(1 : 64, sigCh)) = 0;
+    topo = latency(stimSelect).(strcat(protStr(mIndex), "_mean"));
+    if ~isempty(badCh{monkeyId})
+        topo(badCh{monkeyId}) = quantWin(2);
+    end
+    topo(~sigCh) = quantWin(2);
+    topo = ((quantWin(2) - topo)/quantWin(2)).^2;
+    FigTopo = plotTopo_Raw(topo, [8, 8]);
+    colormap(FigTopo, "jet");
+    scaleAxes(FigTopo, "c", [0 0.5]);
+    set(FigTopo, "outerposition", [300, 100, 800, 670]);
+    print(FigTopo, strcat(FIGPATH, Protocol, "_latency_Topo_", protStr(mIndex), "_", stimStrs(stimSelect)), "-djpeg", "-r200");
+    close(FigTopo);
+end
+
 
 % clearvars -except toPlot_Wave compare sigch cdrPlot ampNorm latency temp
 close all

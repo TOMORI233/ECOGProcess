@@ -1,9 +1,9 @@
 close all; clc; clear;
 
-% MATPATH = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_0o1_0o2\cc20220927\cc20220927_AC.mat';
-% ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_0o1_0o2\";
-MATPATH = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_Tone_250-246_240_200\cc20221011\cc20221011_AC.mat';
-ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_Tone_250-246_240_200\";
+MATPATH = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Successive_0o3_0o5\xx20220929\xx20220929_AC.mat';
+ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\Successive_0o3_0o5\";
+% MATPATH = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\successive_Tone_250-246_240_200\cc20221011\cc20221011_AC.mat';
+% ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\successive_Tone_250-246_240_200\";
 
 % MATPATH = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI4\cc20220610\cc20220610_AC.mat';
 % ROOTPATH = "E:\ECOG\Figures\ClickTrainLongTerm\Basic_ICI4\";
@@ -36,12 +36,12 @@ mkdir(FFTPATH);
 [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
 
 %% series of Successive ...
-if contains(Protocol, "successive")
+if contains(Protocol, "Successive")
     opts.s1OnsetOrS2Onset = 1; % 1, s1onset; 2, s2Onset
     [FigWave, FigFFT, filterRes] = CTLSucFcn(trialAll, ECOGDataset, opts);
     scaleAxes(FigWave, "y", [-60 60]);
-    scaleAxes(FigFFT, "y", [0 8]);
-    scaleAxes(FigFFT, "x", [0 50]);
+    scaleAxes(FigFFT, "y", [20 60]);
+    scaleAxes(FigFFT, "x", [0 20]);
     if contains(DateStr, "cc")
         plotLayout([FigWave, FigFFT], params.posIndex);
     elseif contains(DateStr, "xx")

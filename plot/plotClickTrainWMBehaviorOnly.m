@@ -1,4 +1,4 @@
-function [Fig, mAxe] = plotClickTrainWMBehaviorOnly(trials, color, legendStr, xticklabelStr,  Fig, mAxe)
+function [Fig, mAxe, nPush, nTotal] = plotClickTrainWMBehaviorOnly(trials, color, legendStr, xticklabelStr,  Fig, mAxe)
 narginchk(3, 6);
 margins = [0.1, 0.1, 0.1, 0.1];
 if nargin < 4

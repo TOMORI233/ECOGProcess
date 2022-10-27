@@ -1,7 +1,9 @@
 close all; clc; clear;
 
-MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI4\cc20220713\cc20220713_AC.mat';
-MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI4\xx20220711\xx20220711_AC.mat';
+% MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI4\cc20220713\cc20220713_AC.mat';
+% MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI4\xx20220711\xx20220711_AC.mat';
+MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_ICI4\cc20221015\cc20221015_AC.mat';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_ICI4\xx20221015\xx20221015_AC.mat';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\";
 params.posIndex = 1; % 1-AC, 2-PFC
@@ -9,7 +11,7 @@ params.processFcn = @PassiveProcess_clickTrainContinuous;
 
 CRIMethod = 2; 
 CRIMethodStr = ["Resp_devided_by_Spon", "R_minus_S_devide_R_plus_S"];
-CRIScale = [0.8, 2; -0.1 0.3];
+CRIScale = [0.8, 2; -0.1 0.8];
 CRITest = [1, 0];
 
 flp = 400;
@@ -25,7 +27,7 @@ AREANAME = AREANAME(params.posIndex);
 
 selectCh = [13 9];
 badCh = {[], []};
-yScale = [60, 90];
+yScale = [40, 90];
 quantWin = [0 300];
 sponWin = [-300 0];
 for mIndex =  1 : 2
@@ -38,8 +40,24 @@ mkdir(FIGPATH);
     %% process
     [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH{mIndex}, params);
 
+    % ICA
+    opts.Protocol = Protocol;
+    ICAName = strcat(FIGPATH, "comp_", AREANAME, ".mat");
+    if ~exist(ICAName, "file")
+        [~, comp] = CTLICA(ECOGDataset, trialAll, 500, opts);
+        compT = comp;
+        ICs = input("ICs to delete: ");
+        compT.topo(:, ismember(1:size(compT.topo, 2), ICs)) = 0;
+        ECOGDataset.data = compT.topo * (comp.unmixing * ECOGDataset.data);
+        save(ICAName, "compT", "comp", "ICs", "-mat");
+    else
+        load(ICAName);
+        ECOGDataset.data = compT.topo * (comp.unmixing * ECOGDataset.data);
+    end
+
     % align to certain duration
     run("CTLconfig.m");
+    trialAll([trialAll.devOrdr] == 0) = [];
     trialAll(1) = [];
     devType = unique([trialAll.devOrdr]);
     devTemp = {trialAll.devOnset}';
@@ -74,16 +92,34 @@ mkdir(FIGPATH);
         end
 
         % quantization
-        temp = cellfun(@(x) waveAmp_Norm(x, Window, quantWin, CRIMethod, sponWin), trialsECOG, 'UniformOutput', false);
+        [temp, amp, rmsSpon] = cellfun(@(x) waveAmp_Norm(x, Window, quantWin, CRIMethod, sponWin), trialsECOG, 'UniformOutput', false);
         ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = cellfun(@mean, changeCellRowNum(temp));
         ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_se")) = cellfun(@(x) std(x)/sqrt(length(x)), changeCellRowNum(temp));
         ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_raw")) = changeCellRowNum(temp);
+        ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_amp")) = amp;
+        ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_rmsSpon")) = rmsSpon;
+
     end
 
-    %% plot rawWave 
-    RegIrreg(1).chMean = chMean{1}; RegIrreg(1).color = "r";
-    RegIrreg(2).chMean = chMean{3}; RegIrreg(2).color = "k";
-    FigWave(mIndex) = plotRawWaveMulti_SPR(RegIrreg, Window, titleStr, [8, 8]);
+        %% significance of s1 onset response
+        s1Win = [-2000 2000];
+        trialsECOG_S1 = selectEcog(ECOGFDZ, trialAll, "trial onset", s1Win);
+        trialsECOG_S1 = excludeTrialsChs(trialsECOG_S1, 0.1);
+        
+       [temp, amp, rmsSpon] = cellfun(@(x) waveAmp_Norm(x, s1Win, quantWin, CRIMethod, sponWin), trialsECOG_S1, 'UniformOutput', false);
+        ampNormS1.(strcat(monkeyStr(mIndex), "_S1_mean")) = cellfun(@mean, changeCellRowNum(temp));
+        ampNormS1.(strcat(monkeyStr(mIndex), "_S1_se")) = cellfun(@(x) std(x)/sqrt(length(x)), changeCellRowNum(temp));
+        ampNormS1.(strcat(monkeyStr(mIndex), "_S1_raw")) = changeCellRowNum(temp);
+        % compare S1 Response and spon
+        [S1H, S1P] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(amp), changeCellRowNum(rmsSpon), "UniformOutput", false);
+
+
+
+     %% plot rawWave 
+
+    FigWave_Reg(mIndex) = plotRawWave(chMean{1}, [], Window, titleStr, [8, 8]);
+    FigWave_Irreg(mIndex) = plotRawWave(chMean{3}, [], Window, titleStr, [8, 8]);
+    setLine(FigWave_Irreg, "Color", [0 0 0], "Color", [1 0 0]);
 
     topo_Reg = ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"));
     topo_Irreg = ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"));
@@ -100,29 +136,34 @@ mkdir(FIGPATH);
 
     %% change figure scale
     scaleAxes([FigTopo_Reg(mIndex), FigTopo_Irreg(mIndex)], "c", CRIScale(CRIMethod, :));
-    scaleAxes(FigWave(mIndex), "y", [-yScale(mIndex) yScale(mIndex)]);
-    scaleAxes(FigWave(mIndex), "x", [-10 600]);
-    setAxes(FigWave(mIndex), 'yticklabel', '');
-    setAxes(FigWave(mIndex), 'xticklabel', '');
-    setAxes(FigWave(mIndex), 'visible', 'off');
-    setLine(FigWave(mIndex), "YData", [-yScale(mIndex) yScale(mIndex)], "LineStyle", "--");
-    set([FigTopo_Reg(mIndex), FigTopo_Irreg(mIndex), FigWave(mIndex)], "outerposition", [300, 100, 800, 670]);
-    if contains(DateStr, "cc")
-        plotLayout(FigWave(mIndex), params.posIndex, 0.3);
-    elseif contains(DateStr, "xx")
-        plotLayout(FigWave(mIndex), params.posIndex + 2, 0.3);
-    end
+    scaleAxes([FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "y", [-yScale(mIndex) yScale(mIndex)]);
+    scaleAxes([FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "x", [-10 600]);
+    setAxes([FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], 'yticklabel', '');
+    setAxes([FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], 'xticklabel', '');
+    setAxes([FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], 'visible', 'off');
+    setLine([FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "YData", [-yScale(mIndex) yScale(mIndex)], "LineStyle", "--");
+    set([FigTopo_Reg(mIndex), FigTopo_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "outerposition", [300, 100, 800, 670]);
+   
+    plotLayout([FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], params.posIndex + 2 * (mIndex - 1), 0.3);
 
-    print(FigWave(mIndex), strcat(FIGPATH, DateStr, "_", Protocol, "_Wave"), "-djpeg", "-r200");
-    print(FigTopo_Reg(mIndex), strcat(FIGPATH, DateStr, "_", Protocol, "_Topo_Reg"), "-djpeg", "-r200");
-    print(FigTopo_Irreg(mIndex), strcat(FIGPATH, DateStr, "_", Protocol, "_Topo_Irreg"), "-djpeg", "-r200");
+  
+    print(FigWave_Reg(mIndex), strcat(FIGPATH, Protocol, "_Reg_Wave"), "-djpeg", "-r200");
+    print(FigWave_Irreg(mIndex), strcat(FIGPATH, Protocol, "_Irreg_Wave"), "-djpeg", "-r200");
+    print(FigTopo_Reg(mIndex), strcat(FIGPATH, Protocol, "_Topo_Reg"), "-djpeg", "-r200");
+    print(FigTopo_Irreg(mIndex), strcat(FIGPATH, Protocol, "_Topo_Irreg"), "-djpeg", "-r200");
+
+    
 
     %% Reg Irreg comparison, for Reg-Irreg tuning and topo
     % ttest between 4ms Reg and 4ms Irreg
     temp1 = ampNorm(1).(strcat(monkeyStr(mIndex), "_raw")); % 4ms Reg
     temp2 = ampNorm(3).(strcat(monkeyStr(mIndex), "_raw")); % 4ms Irreg
     [H, P] = cellfun(@(x, y) ttest2(x, y), temp1, temp2, "UniformOutput", false);
-    sigCh{mIndex} = find(cell2mat(H) == 1);
+
+    sigCh{mIndex} = find(cell2mat(S1H));
+    nSigCh{mIndex} = find(~cell2mat(S1H));
+%     sigCh{mIndex} = find(cell2mat(H));
+% nSigCh{mIndex} = find(~cell2mat(H));
 
     compare(mIndex).info = monkeyStr(mIndex);
     temp = reshape([ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))'; ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))';...
@@ -131,10 +172,14 @@ mkdir(FIGPATH);
     compare(mIndex).mean_scatter = [[1; 2] [ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))'; ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))']];
     compare(mIndex).H = cell2mat(H);
     compare(mIndex).P = cell2mat(P);
+
     temp = reshape([ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))(sigCh{mIndex})'; ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))(sigCh{mIndex})';...
         ampNorm(1).(strcat(monkeyStr(mIndex), "_se"))(sigCh{mIndex})'; ampNorm(3).(strcat(monkeyStr(mIndex), "_se"))(sigCh{mIndex})'], 2, []) ;
+    compare(mIndex).selectMean_SE_S1Sig = [[1; 2], temp];
 
-    compare(mIndex).selectMean_SE = [[1; 2], temp];
+    temp = reshape([ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh{mIndex})'; ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh{mIndex})';...
+        ampNorm(1).(strcat(monkeyStr(mIndex), "_se"))(nSigCh{mIndex})'; ampNorm(3).(strcat(monkeyStr(mIndex), "_se"))(nSigCh{mIndex})'], 2, []) ;
+    compare(mIndex).selectMean_SE_S1nSig = [[1; 2], temp];
 
     % plot reg vs irreg topo
     topo = logg(2, logg(0.05, compare(mIndex).P));
@@ -146,21 +191,25 @@ mkdir(FIGPATH);
     print(FigTopo, strcat(FIGPATH, DateStr, "_", Protocol, "Reg_Irreg_pValue_Topo_Reg"), "-djpeg", "-r200");
     close(FigTopo);
 
-    %% p-value of CRI and 1
+    %% p-value of CRI 
     stiStr = ["4_4o06msReg", "4o06_4msReg", "4_4o06msIrreg", "4o06_4msIrreg"];
     for dIndex = [1 3]
-        % compare change resp and spon resp
-        %     [sponH{mIndex}, sponP{mIndex}] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(amp(1).(protStr(mIndex))), changeCellRowNum(rmsSpon(1).(protStr(mIndex))), "UniformOutput", false);
-        % compare ampNorm and 1
-        temp = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_raw"));
-        OneArray = repmat({ones(length(temp{1}) , 1) * CRITest(CRIMethod)}, length(temp), 1);
-        [sponH, sponP] = cellfun(@(x, y) ttest2(x, y), temp, OneArray, "UniformOutput", false);
+       % compare change resp and spon resp
+        amp = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_amp"));
+        rmsSpon = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_rmsSpon"));
+        [sponH, sponP] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(amp), changeCellRowNum(rmsSpon), "UniformOutput", false);
+%         % compare ampNorm and 1
+%         temp = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_raw"));
+%         OneArray = repmat({ones(length(temp{1}) , 1) * CRITest(CRIMethod)}, length(temp), 1);
+%         [sponH, sponP] = cellfun(@(x, y) ttest2(x, y), temp, OneArray, "UniformOutput", false);
 
         % plot p-value topo
-        topo = logg(2, logg(0.05, cell2mat(sponP)));
+        topo = logg(0.05, cell2mat(sponP) / 0.05);
+        topo(isinf(topo)) = 5;
+        topo(topo > 5) = 5;
         FigTopo= plotTopo_Raw(topo, [8, 8]);
         colormap(FigTopo, "jet");
-        scaleAxes(FigTopo, "c", [0 3]);
+        scaleAxes(FigTopo, "c", [-5 5]);
         set(FigTopo, "outerposition", [300, 100, 800, 670]);
 %         title("p-value (log(log(0.05, p)) distribution of [0 300] response and baseline");
         print(FigTopo, strcat(FIGPATH, DateStr, "_", Protocol, "_", stiStr(dIndex), "_pValue_Topo_Reg"), "-djpeg", "-r200");

@@ -29,16 +29,7 @@ mkdir(FFTPATH);
 %% Processing
 [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
 
-ICAName = strcat(ICAPATH, "comp_", AREANAME, ".mat");
-if ~exist(ICAName, "file")
-    [ECOGDataset, comp, FigICAWave, FigTopo] = CTLICA(ECOGDataset, trialAll, 500, opts);
-    print(FigICAWave, strcat(ICAPATH, AREANAME, "_ICA_Wave_", DateStr), "-djpeg", "-r200");
-    print(FigTopo, strcat(ICAPATH, AREANAME, "_ICA_Topo_",  DateStr), "-djpeg", "-r200");
-    save(ICAName, "comp", "-mat");
-else
-    load(ICAName);
-    ECOGDataset.data = comp.unmixing * ECOGDataset.data;
-end
+
 %% series of successive ...
 if contains(Protocol, "successive")
     waveYScale = [-10 10; -1.5 1.5];
