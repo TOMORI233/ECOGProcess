@@ -1,4 +1,4 @@
-function [f, Pow, P] = mFFT(signal, Fs)
+function [f, Pow, P] = mFFT_Base(signal, Fs)
 rowN = size(signal, 1);
 L = size(signal, 2);
 fL = length(0:ceil(L/2));
@@ -7,12 +7,12 @@ P = zeros(rowN, fL);
 for i = 1 : rowN
     signalTemp = signal(i, :);
     Y = fft(signalTemp);
-    P2 = abs(Y/L);
+    P2 = abs(Y/sqrt(L));
     P1 = P2(1:ceil(L/2)+1);
     P1(2:end-1) = 2*P1(2:end-1);
-    f = Fs*(0:ceil(L/2))/L;
-    Pow(i, :) = pow2db(P1);
-    P(i, :) = P1;
-end
-end
+    f = Fs*(0 : ceil(L/2))/L;
+    P(i, :) = P1(1 : ceil(L/2) + 1);
+    Pow(i, :) = pow2db(P(i, :));
 
+end
+end

@@ -40,7 +40,7 @@ amp = rms(temp, 2);
 switch method
     case 1 % Resp_devided_by_Spon
         normAmp = amp./rmsSpon;
-    case 2 % Resp_devided_by_Spon
-        normAmp = (amp - rmsSpon) ./ (amp + rmsSpon);
+    case 2 % R_minus_S_devide_R_plus_S
+        normAmp = (amp - rmsSpon) ./ rmsSpon;
 end
 

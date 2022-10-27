@@ -1,4 +1,4 @@
-function [trialsECoG, chIdx] = excludeTrialsChs(trialsECoG, th, window, testWin)
+function [trialsECoG, chIdx, idx] = excludeTrialsChs(trialsECoG, th, window, testWin)
     % Description: exclude trials away from mean level, and return index of
     %              bad channels
     % Input:
