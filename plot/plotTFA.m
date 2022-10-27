@@ -3,8 +3,10 @@ function [Fig, res] = plotTFA(chMean, fs0, fs, window, titleStr, plotSize, chs, 
     
     if nargin < 5
         titleStr = '';
-    else
+    elseif ~isempty(titleStr) && ~strcmp(titleStr, '')
         titleStr = [' | ', char(titleStr)];
+    else
+        titleStr = '';
     end
 
     if nargin < 6
@@ -44,7 +46,7 @@ function [Fig, res] = plotTFA(chMean, fs0, fs, window, titleStr, plotSize, chs, 
             [t, Y, CData, coi] = mCWT(double(chMean(chNum, :)), fs0, 'morlet', fs);
             X = t * 1000 + window(1);
             imagesc('XData', X, 'YData', Y, 'CData', CData);
-            res.TFR = [res.TFR; CData'];
+            res.TFR = [res.TFR; {CData}];
             colormap("jet");
             hold on;
             plot(X, coi, 'w--', 'LineWidth', 0.6);

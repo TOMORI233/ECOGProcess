@@ -36,7 +36,8 @@ function Figs = plotLayout(Figs, posIndex, alphaValue)
         set(layAx, 'visible', 'off');
 
         % Set as background
-        allAxes = findobj(Figs(fIndex), "Type", "axes");
+%         allAxes = findobj(Figs(fIndex), "Type", "axes");
+        allAxes = get(Figs(fIndex), "child");
         set(Figs(fIndex), 'child', [allAxes; layAx]);
         drawnow;
     end
