@@ -440,7 +440,8 @@ end
             [~, chMeanIrregC, ~] = selectEcog(ECOGDataset, trialsIrregC, "dev onset", window);
             [~, chMeanIrregD, ~] = selectEcog(ECOGDataset, trialsIrregD, "dev onset", window);
             FigDevVSControl1(2) = plotRawWave(chMeanIrregD - chMeanIrregC, [], window, "Irreg:DEV-Control");
-            FigDevVSControl = plotRawWave2(FigDevVSControl, chMeanIrregD - chMeanIrregC, [], window, "b");
+            lineSetting.color = "k";
+            FigDevVSControl = plotRawWave2(FigDevVSControl, chMeanIrregD - chMeanIrregC, [], window, lineSetting);
             FigDevVSControl2(2) = plotTFACompare(chMeanIrregD, chMeanIrregC, fs0, fs, window, "Irreg:DEV-Control");
         end
 
@@ -453,7 +454,8 @@ end
             [~, chMeanToneC, ~] = selectEcog(ECOGDataset, trialsToneC, "dev onset", window);
             [~, chMeanToneD, ~] = selectEcog(ECOGDataset, trialsToneD, "dev onset", window);
             FigDevVSControl1(3) = plotRawWave(chMeanToneD - chMeanToneC, [], window, "FuzaTone:DEV-Control");
-            FigDevVSControl = plotRawWave2(FigDevVSControl, chMeanToneD - chMeanToneC, [], window, "k");
+            lineSetting.color = "k";
+            FigDevVSControl = plotRawWave2(FigDevVSControl, chMeanToneD - chMeanToneC, [], window, lineSetting);
             FigDevVSControl2(3) = plotTFACompare(chMeanToneD, chMeanToneC, fs0, fs, window, "FuzaTone:DEV-Control");
         end
         allAxes = findobj(FigDevVSControl1, "Type", "axes");

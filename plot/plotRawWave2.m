@@ -1,4 +1,4 @@
-function Fig = plotRawWave2(Fig, chMean, chStd, window, lineColor, plotSize)
+function Fig = plotRawWave2(Fig, chMean, chStd, window, lineSetting, plotSize)
     narginchk(5, 6);
 
 
@@ -7,7 +7,9 @@ function Fig = plotRawWave2(Fig, chMean, chStd, window, lineColor, plotSize)
     end
 
     allAxes = findobj(Fig, "Type", "axes");
-
+color = getOr(lineSetting, "color", "red");
+width = getOr(lineSetting, "width", 1);
+style = getOr(lineSetting, "style", "-");
 
     for rIndex = 1:plotSize(1)
 
@@ -27,7 +29,7 @@ function Fig = plotRawWave2(Fig, chMean, chStd, window, lineColor, plotSize)
                 hold on;
             end
 
-            plot(allAxes(length(allAxes) - chNum + 1), t, chMean(chNum, :), 'color', lineColor, "LineWidth", 1.5); 
+            plot(allAxes(length(allAxes) - chNum + 1), t, chMean(chNum, :), "color", color, "LineWidth", width, "LineStyle", style); 
             hold on;
 
             xlim(window);

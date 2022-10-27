@@ -6,6 +6,7 @@ function trialAll = ActiveProcess_7_10Freq(epocs, choiceWin)
     end
 
     %% Information extraction
+
 %     % fixation 20220520 Block-1
 %     for index = 1:length(unique(epocs.swee.data))
 %         idx = find(epocs.swee.data == index);

@@ -1,4 +1,4 @@
-function [sigIndex, h, p] = clickTrainContinuousSelectChannel
+function [sigIndex, h, p] = clickTrainContinuousSelectChannel(matFile)
 clear; clc; close all;
 for id = 1 : 2
     for pos = 1 : 2
@@ -29,7 +29,7 @@ for id = 1 : 2
 
 
             %% ECoG data
-            load(fullfile(DATAPATH,strcat(posStr(posIndex), '_rawData.mat')));
+            load(fullfile(DATAPATH,strcat(posStr(posIndex), matFile)));
             devType = unique([trialAll.devOrdr]);
             if contains(Paradigm, 'offsetScreen')
                 window = [3000 5000]; % ms
@@ -49,11 +49,18 @@ for id = 1 : 2
             trialsECOG = selectEcog(ECOGDataset, trials, "trial onset", window);
             trialsECOG = excludeTrials(trialsECOG, 0.1);
             
+            % to determine if response is evoked at change detection
             amp1 = [amp1 cell2mat(cellfun(@(x) waveAmp(x, selectWin1 + S1Duration(1) - window(1), fs0), trialsECOG, 'UniformOutput', false)')];
             amp2 = [amp2 cell2mat(cellfun(@(x) waveAmp(x, selectWin2 + S1Duration(1) - window(1), fs0), trialsECOG, 'UniformOutput', false)')];
+
         end
         amp = array2VectorCell([array2VectorCell(amp1) array2VectorCell(amp2)]);
+        % to determine if response is evoked at change detection
         [h, p] = cellfun(@(x) ttest(x{1}, x{2}), amp, 'UniformOutput', false);
-        sigIndex.(monkeyId(id)).(posStr(posIndex)) = find(cell2mat(h) == 1);
+
+        % to detect if the channel is not bad according to resting activity 
+        ampRest = changeCellRowNum(array2VectorCell(amp2));
+        [~, chIdx] = excludeTrials(ampRest, 0.1);
+        sigIndex.(monkeyId(id)).(posStr(posIndex)) = find((cell2mat(h) == 1 & chIdx));
     end
 end

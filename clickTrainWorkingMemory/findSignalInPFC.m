@@ -17,8 +17,9 @@ for dIndex = 1 : length(MMNData)
         setLine(devCompare_Wave(ceil(dIndex / 2)), "Color", "blue", "LineStyle", "-");
 
     else
-%         devCompare_Wave(ceil(dIndex / 2)) = plotRawWave2(devCompare_Wave(ceil(dIndex / 2)), MMNData(dIndex).chMeanDEV, [], MMNData(dIndex).window, 'red');
-        devCompare_Wave(ceil(dIndex / 2)) = plotRawWave2(devCompare_Wave(ceil(dIndex / 2)), MMNData(dIndex).chMeanDEVICA, [], MMNData(dIndex).window, 'red');
+    lineSetting.color = "red";
+%         devCompare_Wave(ceil(dIndex / 2)) = plotRawWave2(devCompare_Wave(ceil(dIndex / 2)), MMNData(dIndex).chMeanDEV, [], MMNData(dIndex).window, lineSetting);
+        devCompare_Wave(ceil(dIndex / 2)) = plotRawWave2(devCompare_Wave(ceil(dIndex / 2)), MMNData(dIndex).chMeanDEVICA, [], MMNData(dIndex).window, lineSetting);
     end
 end
 

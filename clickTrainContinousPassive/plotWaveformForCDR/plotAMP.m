@@ -1,4 +1,4 @@
-load("E:\ECoG\matData\longTermContinuous\amp.mat");
+load("E:\ECoG\matData\longTermContinuous\cdrPlot0.1Hz\amp.mat");
 
 %% population data
 opts.monkeyId = ["chouchou", "xiaoxiao"];
@@ -6,19 +6,20 @@ opts.posStr = ["LAuC", "LPFC"];
 temp = cdrPlot.chouchou.LAuC;
 opts.protocol = string(fields(temp));
 opts.ampType = ["ampRMS", "ampAREA", "ampPeak", "ampTrough"];
-opts.savePath = "E:\ECoG\corelDraw\jpgHP1Hz";
+opts.savePath = "E:\ECoG\corelDraw\jpgHP0o1Hz\amp";
 
 for pN = 1 : length(opts.protocol) % protocol
-    plotPopAmpFigure(cdrPlot, opts, pN);
+    cdrPlot_amp.(opts.protocol(pN)) = plotPopAmpFigure(cdrPlot, opts, pN);
 end
 
 
 
 
 
-function plotPopAmpFigure(cdrPlot, opts, pN)
+function cdrPlot_amp = plotPopAmpFigure(cdrPlot, opts, pN)
 run("ampStrConfig.m");
 optsNames = fieldnames(opts);
+mkdir(opts.savePath);
 for index = 1:size(optsNames, 1)
     eval([optsNames{index}, '=opts.', optsNames{index}, ';']);
 end
@@ -39,17 +40,22 @@ for id = 1 : length(monkeyId)
             tempIrreg = cdrPlot.(monkeyId(id)).LAuC.diffICI(2).ampSel.(ampType(typeN))(1, :);
             temp = [tempReg; tempInsert; tempIrreg];
             h1 = plot(1 : size(temp, 1), temp', "r-", "DisplayName", "AC"); hold on;
+            cdrPlot_amp.(monkeyId(id)).(ampType(typeN)).LAuC = temp;
             
-            tempInsert = cdrPlot.(monkeyId(id)).LPFC.(curProt)(1).ampEx.(ampType(typeN))(1, :);
-            tempReg = cdrPlot.(monkeyId(id)).LPFC.diffICI(1).ampEx.(ampType(typeN))(1, :);
-            tempIrreg = cdrPlot.(monkeyId(id)).LPFC.diffICI(2).ampEx.(ampType(typeN))(1, :);
+            tempInsert = cdrPlot.(monkeyId(id)).LPFC.(curProt)(1).ampRaw.(ampType(typeN))(1, :);
+            tempReg = cdrPlot.(monkeyId(id)).LPFC.diffICI(1).ampRaw.(ampType(typeN))(1, :);
+            tempIrreg = cdrPlot.(monkeyId(id)).LPFC.diffICI(2).ampRaw.(ampType(typeN))(1, :);
             temp = [tempReg; tempInsert; tempIrreg];            
             h3 = plot(1 : size(temp, 1), temp', "b-", "DisplayName", "PFC"); hold on;
+            cdrPlot_amp.(monkeyId(id)).(ampType(typeN)).LPFC = temp;
         else
             temp = cdrPlot.(monkeyId(id)).LAuC.(curProt)(1).ampSel.(ampType(typeN));
             h1 = plot(1 : size(temp, 1), temp', "r-", "DisplayName", "AC"); hold on;
+            cdrPlot_amp.(monkeyId(id)).(ampType(typeN)).LAuC = temp;
+
             temp = cdrPlot.(monkeyId(id)).LPFC.(curProt)(1).ampEx.(ampType(typeN));
             h3 = plot(1 : size(temp, 1), temp', "b-", "DisplayName", "PFC"); hold on;
+            cdrPlot_amp.(monkeyId(id)).(ampType(typeN)).LPFC = temp;
         end
 
         set(gca, "xtick", 1 : 5);
@@ -59,7 +65,7 @@ for id = 1 : length(monkeyId)
     end
 end
 
-print(Fig, fullfile(savePath, curProt), "-djpeg", "-r300");
+% print(Fig, fullfile(savePath, curProt), "-djpeg", "-r300");
 close(Fig);
 end
 

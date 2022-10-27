@@ -29,6 +29,7 @@ function Fig = plotTopo(comp, topoSize, plotSize, ICs)
         for cIndex = 1:plotSize(2)
             ICNum = ICs(rIndex, cIndex);
 
+
             if ICs(rIndex, cIndex) > size(topo, 1)
                 continue;
             end
