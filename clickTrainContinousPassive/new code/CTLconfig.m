@@ -30,14 +30,14 @@ switch Protocol
         stimStr = {'4-4.06ms Reg','4.06-4ms Reg','4-4.06ms Irreg','4.06-4ms Irreg'};
         S1Duration = [5004.8, 5008.4, 5000, 5000] + 4;
         winStart = -5500;
-        Window = [winStart 2500];
+        Window = [winStart 5500];
         ICAWin = [-1000 1000];
     case "Add_on_Basic_Tone"
         titleStr = "Add_on_Basic_Tone";
         stimStr = {'250_246Hz','246_250Hz','250_200Hz','200_250Hz'};
         S1Duration = [5000, 5000, 5000, 5000];
         winStart = -5500;
-        Window = [winStart 2500];
+        Window = [winStart 5500];
         ICAWin = [-1000 1000];
      case "Add_on_Basic_NormSqrt_ICI4"
         titleStr = "Add_on_Basic_NormSqrt_ICI4";

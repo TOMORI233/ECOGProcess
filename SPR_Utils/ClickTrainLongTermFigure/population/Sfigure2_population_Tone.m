@@ -1,7 +1,7 @@
 close all; clc; clear;
 
-MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI4\';
-MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI4\';
+MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_Tone\';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_Tone\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\";
 params.posIndex = 1; % 1-AC, 2-PFC
@@ -11,7 +11,6 @@ CRIMethod = 2;
 CRIMethodStr = ["Resp_devided_by_Spon", "R_minus_S_devide_R_plus_S"];
 CRIScale = [0.8, 2; -0.1 0.7];
 CRITest = [1, 0];
-pBase = 0.01;
 
 colors = ["#FF0000", "#FFA500", "#0000FF", "#000000"];
 
@@ -19,7 +18,7 @@ AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
 fs = 500;
 
-
+pBase = 0.01;
 selectCh = [13 9];
 badCh = {[], []};
 yScale = [40, 90];
@@ -29,7 +28,7 @@ for mIndex =  1 : length(MATPATH)
  
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
-    FIGPATH = strcat(ROOTPATH, "\Pop_Figure2\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+    FIGPATH = strcat(ROOTPATH, "\Pop_Sfigure2_Tone\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
     mkdir(FIGPATH);
     
     %% merge population data
@@ -40,14 +39,14 @@ for mIndex =  1 : length(MATPATH)
         load(strcat(FIGPATH, "PopulationData.mat"));
     end
 
-
+    
     %% ICA
     % align to certain duration
     run("CTLconfig.m");
     ICAName = strcat(FIGPATH, "comp_", AREANAME, ".mat");
+    
     trialsECOG_MergeTemp = trialsECOG_Merge;
     trialsECOG_S1_MergeTemp = trialsECOG_S1_Merge;
-
     if ~exist(ICAName, "file")
         [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG_MergeTemp, fs, Window);
         compT = comp;
@@ -58,10 +57,16 @@ for mIndex =  1 : length(MATPATH)
         save(ICAName, "compT", "comp", "ICs", "-mat");
     else
         load(ICAName);
+%         [~, ICs, FigTopoICA] = ICA_Exclude(trialsECOG_MergeTemp, comp, Window);
         trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
     end
-    %% process
+
+    
+
+
+
+%% process
     devType = unique([trialAll.devOrdr]);
 
 
@@ -104,12 +109,12 @@ for mIndex =  1 : length(MATPATH)
                 
 
 
-       %% plot rawWave
+    %% plot rawWave
     FigWave_Reg(mIndex) = plotRawWave(chMean{1}, [], Window, titleStr, [8, 8]);
     FigWave_Irreg(mIndex) = plotRawWave(chMean{3}, [], Window, titleStr, [8, 8]);
     FigWave_Whole_Reg(mIndex) = plotRawWave(chMean{1}, [], Window, titleStr, [8, 8]);
     FigWave_Whole_Irreg(mIndex) = plotRawWave(chMean{3}, [], Window, titleStr, [8, 8]);
-    setLine([FigWave_Whole_Irreg, FigWave_Irreg], "Color", [0 0 0], "Color", [1 0 0]);
+    setLine([FigWave_Whole_Reg, FigWave_Reg], "Color", [0 0 0], "Color", [1 0 0]);
 
 
     topo_Reg = ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"));
@@ -185,11 +190,12 @@ for mIndex =  1 : length(MATPATH)
     scaleAxes(FigTopo, "c", [-5, 5]);
     set(FigTopo, "outerposition", [300, 100, 800, 670]);
     %     title("p-value (log(log(0.05, p)) distribution of Reg vs Irreg");
+
     print(FigTopo, strcat(FIGPATH, Protocol, "Reg_Irreg_pValue_Topo_Reg"), "-djpeg", "-r200");
     close(FigTopo);
 
     %% p-value of CRI and sponRes
-    stiStr = ["4_4o06msReg", "4o06_4msReg", "4_4o06msIrreg", "4o06_4msIrreg"];
+    stiStr = ["250_246Hz", "246_250Hz", "250_240Hz", "240_250Hz"];
     for dIndex = [1 3]
         % compare change resp and spon resp
         amp = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_amp"));
@@ -209,7 +215,7 @@ for mIndex =  1 : length(MATPATH)
         scaleAxes(FigTopo, "c", [-5 5]);
         set(FigTopo, "outerposition", [300, 100, 800, 670]);
         %         title("p-value (log(log(0.05, p)) distribution of [0 300] response and baseline");
-        
+
         print(FigTopo, strcat(FIGPATH, Protocol, "_", stiStr(dIndex), "_pValue_Topo_Reg"), "-djpeg", "-r200");
         close(FigTopo);
     end
