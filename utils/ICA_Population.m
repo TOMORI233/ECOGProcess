@@ -1,5 +1,5 @@
 function [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA)
-    comp0 = mICA2(trialsECOG, windowICA, fs);
+    comp0 = mICA(trialsECOG, windowICA, fs);
     comp = realignIC(comp0, windowICA);
 
     ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
