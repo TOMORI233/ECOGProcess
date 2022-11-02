@@ -27,6 +27,9 @@ elseif contains(Protocol, "Basic")
 elseif contains(Protocol, "Duration")
     [~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
     ordTemp = num2cell(ordTemp);
+elseif contains(Protocol, "Species")
+    [~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
+    ordTemp = num2cell(ordTemp);
 end
 temp = cellfun(@(x, y) x + S1Duration(y), devTemp, ordTemp, "UniformOutput", false);
 trialAll = addFieldToStruct(trialAll, temp, "devOnset");

@@ -22,7 +22,7 @@ function comp = mICA(dataset, windowICA, arg3, varargin)
     mInputParser.addRequired("windowICA", @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
     mInputParser.addRequired("arg3");
     mInputParser.addOptional("fsD", 500, @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mInputParser.addOptional("segOption", "trial onset", @(x) validatestring(x, ["trial onset", "dev onset", "push onset", "last std"]));
+    mInputParser.addOptional("segOption", "trial onset", @(x) any(validatestring(x, {'trial onset', 'dev onset', 'push onset', 'last std'})));
     mInputParser.parse(dataset, windowICA, arg3, varargin{:});
 
     fsD = mInputParser.Results.fsD;

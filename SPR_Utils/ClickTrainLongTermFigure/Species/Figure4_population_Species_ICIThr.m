@@ -1,53 +1,52 @@
 close all; clc; clear;
 
-MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_Var_50_2\';
-MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_Var_50_2\';
+MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICIThr\';
+% MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICIThr\';
 monkeyStr = ["CC", "XX"];
-ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
+ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Species\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
-CRIMethod = 2; 
+CRIMethod = 2;
 CRIMethodStr = ["Resp_devided_by_Spon", "R_minus_S_devide_R_plus_S"];
-CRIScale = [0.8, 2; -0.1, 0.6];
+CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.3]};
 CRITest = [1, 0];
 pBase = 0.01;
 
-
-colors = ["#FF0000", "#FFA500", "#0000FF", "#000000"];
-stimStrs = ["u_50", "u_25", "u_10", "u_2"];
-
+colors = ["#000000", "#FFA500", "#0000FF", "#FF0000"];
+stimStrs = ["4_4o01", "4_4o03", "4_4o02", "4_4o04"];
+cdrPlotIdx = [8, 4, 6, 2];
 
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
 fs = 500;
-cdrPlotIdx = [2, 4, 6 ,8];
-latencyWin = [80 200];
 
-selectCh = [13 37];
 badCh = {[], []};
-yScale = [40, 40];
+yScale = [50, 50];
 quantWin = [0 300];
 sponWin = [-300 0];
+latencyWin = [80, 200];
 for mIndex = 1 : length(MATPATH)
 
     temp = string(split(MATPATH{mIndex}, '\'));
-   
     Protocol = temp(end - 1);
-    FIGPATH = strcat(ROOTPATH, "\Pop_Sfigure5_Var_50_2\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+    FIGPATH = strcat(ROOTPATH, "Pop_Figure4\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
     mkdir(FIGPATH);
-
     %% process
+    disp("loading data...");
+    tic
     if ~exist(strcat(FIGPATH, "PopulationData.mat"), "file")
         [trialsECOG_Merge, trialsECOG_S1_Merge , ~, ~, trialAll] = mergeECOGPreprocess(MATPATH{mIndex}, AREANAME);
         save(strcat(FIGPATH, "PopulationData.mat"), "trialsECOG_S1_Merge", "trialsECOG_Merge", "trialAll");
     else
         load(strcat(FIGPATH, "PopulationData.mat"));
     end
-       %% ICA
+    toc
+
+        %% ICA
     % align to certain duration
     run("CTLconfig.m");
-    ICAName = strcat(FIGPATH, "comp_", AREANAME,  ".mat");
+    ICAName = strcat(FIGPATH, "comp_", AREANAME, ".mat");
     trialsECOG_MergeTemp = trialsECOG_Merge;
     trialsECOG_S1_MergeTemp = trialsECOG_S1_Merge;
 
@@ -58,16 +57,15 @@ for mIndex = 1 : length(MATPATH)
         trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
         close(FigTopoICA);
+        close(FigWave);
         save(ICAName, "compT", "comp", "ICs", "-mat");
     else
         load(ICAName);
-%         [~, ICs, FigTopoICA, FigWave] = ICA_Exclude(trialsECOG_MergeTemp, comp, Window);
+%         [~, ICs, FigTopoICA] = ICA_Exclude(trialsECOG_MergeTemp, comp, Window);
         trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
     end
 
-
-    %% process
 
     devType = unique([trialAll.devOrdr]);
 
@@ -114,21 +112,22 @@ for mIndex = 1 : length(MATPATH)
         end
         FigTopo(dIndex) = plotTopo_Raw(topo_Reg, [8, 8]);
         colormap(FigTopo(dIndex), "jet");
-        scaleAxes(FigTopo(dIndex), "c", CRIScale(CRIMethod, :));
+        scaleAxes(FigTopo(dIndex), "c", CRIScale{mIndex}(CRIMethod, :));
         pause(1);
         set(FigTopo(dIndex), "outerposition", [300, 100, 800, 670]);
         print(FigTopo(dIndex), strcat(FIGPATH,  Protocol, "_", stimStrs(dIndex), "_Topo_Reg"), "-djpeg", "-r200");
+
+
+
     end
 
-        %% significance of s1 onset response
-        [temp, ampS1, rmsSponS1] = cellfun(@(x) waveAmp_Norm(x, Window, quantWin, CRIMethod, sponWin), trialsECOG_S1_Merge, 'UniformOutput', false);
-        ampNormS1.(strcat(monkeyStr(mIndex), "_S1_mean")) = cellfun(@mean, changeCellRowNum(temp));
-        ampNormS1.(strcat(monkeyStr(mIndex), "_S1_se")) = cellfun(@(x) std(x)/sqrt(length(x)), changeCellRowNum(temp));
-        ampNormS1.(strcat(monkeyStr(mIndex), "_S1_raw")) = changeCellRowNum(temp);
-        % compare S1Res and spon
-        [S1H, S1P] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(ampS1), changeCellRowNum(rmsSponS1), "UniformOutput", false);
-         S1H = num2cell(cell2mat(S1H) & cellfun(@mean, changeCellRowNum(amp)) > cellfun(@mean, changeCellRowNum(rmsSpon)));
-
+    %% significance of s1 onset response
+    [temp, ampS1, rmsSponS1] = cellfun(@(x) waveAmp_Norm(x, Window, quantWin, CRIMethod, sponWin), trialsECOG_S1_Merge, 'UniformOutput', false);
+    ampNormS1.(strcat(monkeyStr(mIndex), "_S1_mean")) = cellfun(@mean, changeCellRowNum(temp));
+    ampNormS1.(strcat(monkeyStr(mIndex), "_S1_se")) = cellfun(@(x) std(x)/sqrt(length(x)), changeCellRowNum(temp));
+    ampNormS1.(strcat(monkeyStr(mIndex), "_S1_raw")) = changeCellRowNum(temp);
+    % compare S1Res and spon
+    [S1H, S1P] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(ampS1), changeCellRowNum(rmsSponS1), "UniformOutput", false);
 
     %% plot rawWave
     FigWave(mIndex) = plotRawWaveMulti_SPR(RegRatio, Window, titleStr, [8, 8]);
@@ -142,21 +141,19 @@ for mIndex = 1 : length(MATPATH)
     set(FigWave(mIndex), "outerposition", [300, 100, 800, 670]);
     plotLayout(FigWave(mIndex), params.posIndex + 2 * (mIndex - 1), 0.3);
 
-
-    print(FigWave(mIndex), strcat(FIGPATH,  Protocol, "_Wave"), "-djpeg", "-r200");
-
+    print(FigWave(mIndex), strcat(FIGPATH, Protocol, "_Wave"), "-djpeg", "-r200");
 
 
-   %% p-value of CRI and sponRes
+
+    %% p-value of CRI and sponRes
     for dIndex = 1:length(devType)
         % compare change resp and spon resp
         amp = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_amp"));
         rmsSpon = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_rmsSpon"));
         [sponH{dIndex}, sponP{dIndex}] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(amp), changeCellRowNum(rmsSpon), "UniformOutput", false);%         % compare ampNorm and 1
-%         % compare ampNorm and 1
-%         temp = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_raw"));
-%         OneArray = repmat({ones(length(temp{1}), 1) * CRITest(CRIMethod)}, length(temp), 1);
-%         [sponH{dIndex}, sponP{dIndex}] = cellfun(@(x, y) ttest2(x, y), temp, OneArray, "UniformOutput", false);
+        %         temp = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_raw"));
+        %         OneArray = repmat({ones(length(temp{1}), 1) * CRITest(CRIMethod)}, length(temp), 1);
+        %         [sponH{dIndex}, sponP{dIndex}] = cellfun(@(x, y) ttest2(x, y), temp, OneArray, "UniformOutput", false);
 
         % plot p-value topo
         topo = logg(pBase, cell2mat(sponP{dIndex}) / pBase);
@@ -167,45 +164,48 @@ for mIndex = 1 : length(MATPATH)
         scaleAxes(FigTopo, "c", [-5 5]);
         pause(1);
         set(FigTopo, "outerposition", [300, 100, 800, 670]);
-        %         title("p-value (log(log(pBase, p)) distribution of [0 300] response and baseline");
+        %         title("p-value (log(log(0.05, p)) distribution of [0 300] response and baseline");
         print(FigTopo, strcat(FIGPATH, Protocol, "_", stimStrs(dIndex), "_pValue_Topo_Reg"), "-djpeg", "-r200");
         close(FigTopo);
     end
 
 
-    %% Diff ICI amplitude comparison
-        sigCh = find(cell2mat(S1H));
-    nSigCh = find(~cell2mat(S1H));
-%     sigCh = find(cell2mat(H));
-% nSigCh = find(~cell2mat(H));
 
-    temp = reshape([ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)'; ampNorm(2).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)';...
-        ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)'; ampNorm(4).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)';...
-        ampNorm(1).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'; ampNorm(2).(strcat(monkeyStr(mIndex), "_se"))(sigCh)';...
-        ampNorm(3).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'; ampNorm(4).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'], 4, []) ;
+
+    %% Diff ICI amplitude comparison
+    sigCh= find(cell2mat(S1H));
+    nSigCh = find(~cell2mat(S1H));
+    %     sigCh = find(cell2mat(H));
+    % nSigCh = find(~cell2mat(H));
+
+    temp = reshape([ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)'; ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)';...
+        ampNorm(2).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)'; ampNorm(4).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)';...
+        ampNorm(1).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'; ampNorm(3).(strcat(monkeyStr(mIndex), "_se"))(sigCh)';...
+        ampNorm(2).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'; ampNorm(4).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'], 4, []) ;
     compare.amp_mean_se_S1Sig = [[1; 2; 3; 4], temp];
 
-    temp = reshape([ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)'; ampNorm(2).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)';...
-        ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)'; ampNorm(4).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)';...
-        ampNorm(1).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)'; ampNorm(2).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)';...
-        ampNorm(3).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)'; ampNorm(4).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)'], 4, []) ;
+    temp = reshape([ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)'; ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)';...
+        ampNorm(2).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)'; ampNorm(4).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)';...
+        ampNorm(1).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)'; ampNorm(3).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)';...
+        ampNorm(2).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)'; ampNorm(4).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)'], 4, []) ;
     compare.amp_mean_se_S1nSig = [[1; 2; 3; 4], temp];
 
     %% Diff ICI latency comparison
 
-    temp = reshape([latency(1).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)'; latency(2).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)';...
-        latency(3).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)'; latency(4).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)';...
-        latency(1).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'; latency(2).(strcat(monkeyStr(mIndex), "_se"))(sigCh)';...
-        latency(3).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'; latency(4).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'], 4, []) ;
+    temp = reshape([latency(1).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)'; latency(3).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)';...
+        latency(2).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)'; latency(4).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)';...
+        latency(1).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'; latency(3).(strcat(monkeyStr(mIndex), "_se"))(sigCh)';...
+        latency(2).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'; latency(4).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'], 4, []) ;
     compare.latency_mean_se_S1Sig = [[1; 2; 3; 4], temp];
 
-    temp = reshape([latency(1).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)'; latency(2).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)';...
-        latency(3).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)'; latency(4).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)';...
-        latency(1).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)'; latency(2).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)';...
-        latency(3).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)'; latency(4).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)'], 4, []) ;
+    temp = reshape([latency(1).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)'; latency(3).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)';...
+        latency(2).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)'; latency(4).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh)';...
+        latency(1).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)'; latency(3).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)';...
+        latency(2).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)'; latency(4).(strcat(monkeyStr(mIndex), "_se"))(nSigCh)'], 4, []) ;
     compare.latency_mean_se_S1nSig = [[1; 2; 3; 4], temp];
-    
+
     %% latency topo
+
     for dIndex = 1:length(devType)
         sigCh = cell2mat(sponH{dIndex}) == 1;
         topo_Latency = latency(dIndex).(strcat(monkeyStr(mIndex), "_mean"));
@@ -221,7 +221,9 @@ for mIndex = 1 : length(MATPATH)
         set(FigTopo_Latency(dIndex), "outerposition", [300, 100, 800, 670]);
         print(FigTopo_Latency(dIndex), strcat(FIGPATH,  Protocol, "_", stimStrs(dIndex), "_Latency_Topo_Reg"), "-djpeg", "-r200");
     end
-    ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
+
+    drawnow
+ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
 save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
 
 end

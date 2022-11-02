@@ -5,7 +5,7 @@ close all; clc; clear;
 MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_ICI4\cc20221015\cc20221015_AC.mat';
 MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_ICI4\xx20221015\xx20221015_AC.mat';
 monkeyStr = ["CC", "XX"];
-ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\";
+ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 

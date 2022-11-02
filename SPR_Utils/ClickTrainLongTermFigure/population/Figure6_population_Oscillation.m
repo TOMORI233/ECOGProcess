@@ -3,7 +3,7 @@ close all; clc; clear;
 MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_Oscillation_control_500_250_125_60_30\';
 MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_Oscillation_control_500_250_125_60_30\';
 monkeyStr = ["CC", "XX"];
-ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\";
+ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
@@ -12,6 +12,7 @@ SRIMethod = 2;
 SRIMethodStr = ["Resp_devided_by_Spon", "R_minus_S_devide_R_plus_S"];
 SRIScale = [0.8, 2; 0 0.2];
 SRITest = [1, 0];
+pBase = 0.05;
 
 % FFT method
 FFTMethod = 2; %1: power(dB); 2: magnitude
@@ -31,11 +32,11 @@ AREANAME = AREANAME(params.posIndex);
 fs = 500;
 
 badCh = {[], []};
-yScale = [60, 90];
+
 quantWin = [0 300];
 latencyWin = [80 200];
 sponWin = [-300 0];
-for mIndex = 1 : length(MATPATH)
+for mIndex = 2 : length(MATPATH)
 
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
@@ -51,17 +52,31 @@ for mIndex = 1 : length(MATPATH)
         load(strcat(FIGPATH, "PopulationData.mat"));
     end
     toc
-
+    %% ICA
     % align to certain duration
     run("CTLconfig.m");
-    trialAll(1) = [];
-    devType = unique([trialAll.devOrdr]);
-    devTemp = {trialAll.devOnset}';
-    [~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
-    temp = cellfun(@(x, y) x + S1Duration(y), devTemp, num2cell(ordTemp), "UniformOutput", false);
-    trialAll = addFieldToStruct(trialAll, temp, "devOnset");
+    ICAName = strcat(FIGPATH, "comp_", AREANAME, ".mat");
+    trialsECOG_MergeTemp = trialsECOG_Merge;
+    trialsECOG_S1_MergeTemp = trialsECOG_S1_Merge;
 
-   
+    if ~exist(ICAName, "file")
+        [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG_MergeTemp, fs, Window);
+        compT = comp;
+        compT.topo(:, ~ismember(1:size(compT.topo, 2), ICs)) = 0;
+        trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
+        trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
+        close(FigTopoICA);
+        save(ICAName, "compT", "comp", "ICs", "-mat");
+    else
+        load(ICAName);
+        trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
+        trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
+    end
+
+
+    %% process
+    devType = unique([trialAll.devOrdr]);
+    % initialize
     t = linspace(Window(1), Window(2), diff(Window) /1000 * fs + 1)';
 
 %% diff stim type
@@ -110,6 +125,7 @@ for mIndex = 1 : length(MATPATH)
         setAxes(FigWave, 'xticklabel', '');
         setAxes(FigWave, 'visible', 'off');
         setLine(FigWave, "YData", [-fftScale(FFTMethod, mIndex) fftScale(FFTMethod, mIndex)], "LineStyle", "--");
+        pause(1);
         set(FigWave, "outerposition", [300, 100, 800, 670]);
         plotLayout(FigWave, params.posIndex + 2 * (mIndex - 1), 0.3);
         print(FigWave, strcat(FIGPATH, Protocol, "_FFT_", stimStrs(dIndex)), "-djpeg", "-r200");
@@ -121,18 +137,23 @@ for mIndex = 1 : length(MATPATH)
 for dIndex = 1 : length(devType) - 1
     % plot p-value topo
     temp = fftPValue(dIndex).(strcat(stimStrs(dIndex), "_pValue"));
-    topo = logg(0.05, temp / 0.05);
+    topo = logg(pBase, temp / pBase);
     topo(isinf(topo)) = 5;
     topo(topo > 5) = 5;
     FigTopo(dIndex) = plotTopo_Raw(topo, [8, 8]);
     colormap(FigTopo(dIndex), "jet");
     scaleAxes(FigTopo(dIndex), "c", [-5 5]);
+    pause(1);
     set(FigTopo(dIndex), "outerposition", [300, 100, 800, 670]);
     print(FigTopo(dIndex), strcat(FIGPATH, stimStrs(dIndex), "_pValue_Topo"), "-djpeg", "-r200");
 end
 
-
-
+ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
+FFT_60ms = trialsFFT{4};
+FFT_30ms = trialsFFT{5};
+save(ResName, "cdrPlot", "PMean", "Protocol", "FFT_60ms", "FFT_30ms", "-mat");
 end
-
+if ~isempty(gcp('nocreate'))
+    delete(gcp('nocreate'));
+end
 close all

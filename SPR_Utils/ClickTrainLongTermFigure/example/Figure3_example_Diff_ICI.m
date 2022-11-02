@@ -21,7 +21,7 @@ selectCh = 9;
 stimStrs = ["RegOrd", "RegRev", "IrregOrd", "IrregRev"];
 
 protStr = ["ICI4", "ICI8", "ICI20", "ICI40", "ICI80"];
-ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\";
+ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 

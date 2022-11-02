@@ -3,25 +3,25 @@ close all; clc; clear;
 monkeyId = 1;  % 1：chouchou; 2：xiaoxiao
 
 if monkeyId == 1
-    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI4\';
-    MATPATH{2} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI8\';
-    MATPATH{3} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI20\';
-    MATPATH{4} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI40\';
-    MATPATH{5} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI80\';
+    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Species_Ratio_ICI16\';
+    MATPATH{2} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Species_Ratio_ICI12\';
+    MATPATH{3} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Species_Ratio_ICI8\';
+    %     MATPATH{4} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI40\';
+    %     MATPATH{5} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI80\';
 elseif monkeyId == 2
-    MATPATH{1} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI4\';
-    MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI8\';
-    MATPATH{3} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI20\';
-    MATPATH{4} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI40\';
-    MATPATH{5} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI80\';
+    MATPATH{1} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI16\';
+    MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI12\';
+    MATPATH{3} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI8\';
+    %     MATPATH{4} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI40\';
+    %     MATPATH{5} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI80\';
 end
 
-stimSelect = 1; % "RegOrd", "RegRev", "IrregOrd", "IrregRev"
+stimSelect = 5; % "control", "1o005", "1o01", "1o015", "1o1"
 selectCh = 9;
-stimStrs = ["RegOrd", "RegRev", "IrregOrd", "IrregRev"];
+stimStrs = ["control", "1o005", "1o01", "1o015", "1o1"];
 
-protStr = ["ICI4", "ICI8", "ICI20", "ICI40", "ICI80"];
-ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
+protStr = ["ICI16", "ICI12", "ICI8", "ICI4", "ICI2"];
+ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Species\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
@@ -31,18 +31,19 @@ CRIScale = [0.8, 2; -0.1 0.5];
 CRITest = [1, 0];
 pBase = 0.01;
 
-colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#AAAAAA"];
-
+% colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#AAAAAA"];
+% colors = ["#AAAAAA", "#000000", "#0000FF", "#FFA500", "#FF0000"];
+colors = ["#0000FF", "#FFA500", "#FF0000"];
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
 fs = 500;
 
 badCh = {[], []};
-yScale = [50, 60];
+yScale = [50, 40];
 quantWin = [0 300];
 sponWin = [-300 0];
 latencyWin = [80 200];
-
+correspFreq = 1000./[16, 12, 8, 4, 2];
 for mIndex = 1 : length(MATPATH)
     disp(strcat("processing ", protStr(mIndex), "..."));
     temp = string(split(MATPATH{mIndex}, '\'));
@@ -77,6 +78,7 @@ for mIndex = 1 : length(MATPATH)
         save(ICAName, "compT", "comp", "ICs", "-mat");
     else
         load(ICAName);
+%         [~, ICs, FigTopoICA] = ICA_Exclude(trialsECOG_MergeTemp, comp, Window);
         trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
     end
@@ -125,7 +127,7 @@ for mIndex = 1 : length(MATPATH)
         latency(dIndex).(strcat(protStr(mIndex), "_se")) = latency_se;
         latency(dIndex).(strcat(protStr(mIndex), "_raw")) = latency_raw;
 
-        
+
     end
     % for raw wave
     DiffICI(mIndex).chMean = chMean{stimSelect};
@@ -140,7 +142,27 @@ for mIndex = 1 : length(MATPATH)
     % compare S1Res and spon
     [S1H{mIndex}, S1P{mIndex}] = cellfun(@(x, y) ttest2(x, y), changeCellRowNum(ampS1{mIndex}), changeCellRowNum(rmsSponS1{mIndex}), "UniformOutput", false);
 
+    %% plot FFT
+    FigFFT = plotRawWave(PMean{stimSelect}, [], [ff(1), ff(end)], strcat("FFT ", stimStrs(stimSelect)));
+    deleteLine(FigFFT, "LineStyle", "--");
+    lines(1).X = correspFreq(mIndex); lines(1).color = "k";
+    addLines2Axes(FigFFT, lines);
+    orderLine(FigFFT, "LineStyle", "--", "bottom");
+    % rescale FFT Plot
+    scaleAxes(FigFFT, "y", [0 400]);
+    scaleAxes(FigFFT, "x", [0 250]);
+    setAxes(FigFFT, 'yticklabel', '');
+    setAxes(FigFFT, 'xticklabel', '');
+    setAxes(FigFFT, 'visible', 'off');
+    setLine(FigFFT, "YData", [0 400], "LineStyle", "--");
+    set(FigFFT, "outerposition", [300, 100, 800, 670]);
+    pause(0.1);
+    plotLayout(FigFFT, params.posIndex + 2 * (monkeyId - 1), 0.3);
+    print(FigFFT, strcat(FIGPATH, Protocol, "_FFT_", stimStrs(stimSelect)), "-djpeg", "-r200");
+    close(FigFFT);
+
 end
+
 
 %% plot raw wave
 FigWave = plotRawWaveMulti_SPR(DiffICI, Window, titleStr, [8, 8]);
@@ -155,6 +177,8 @@ set(FigWave, "outerposition", [300, 100, 800, 670]);
 plotLayout(FigWave, params.posIndex + 2 * (monkeyId - 1), 0.3);
 print(FigWave, strcat(FIGPATH, Protocol, "_Wave_", stimStrs(stimSelect)), "-djpeg", "-r200");
 close(FigWave);
+
+
 
 %% p-value of different base ICI
 toPlot_Wave = zeros(length(t), 2 * length(MATPATH));
@@ -179,22 +203,22 @@ for mIndex = 1 : length(MATPATH)
     DiffICI(mIndex).chMean = chMean{stimSelect};
     DiffICI(mIndex).color = colors(mIndex);
     toPlot_Wave(:, [2 * mIndex - 1, 2 * mIndex]) = cdrPlot(selectCh).(strcat(protStr(mIndex), "Wave"))(:, [2 * stimSelect - 1, 2 * stimSelect]);
-    
+
     % compare change resp and spon resp
     amp = ampNorm(1).(strcat(protStr(mIndex), "_amp"));
     rmsSpon = ampNorm(1).(strcat(protStr(mIndex), "_rmsSpon"));
     [sponH{mIndex}, sponP{mIndex}] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(amp), changeCellRowNum(rmsSpon), "UniformOutput", false);
 
     % compare ampNorm and 1
-%     temp = ampNorm(stimSelect).(strcat(protStr(mIndex), "_raw"));
-%     OneArray = repmat({ones(length(temp{1}), 1) * CRITest(CRIMethod)}, length(temp), 1);
-%     [sponH{mIndex}, sponP{mIndex}] = cellfun(@(x, y) ttest2(x, y), temp, OneArray, "UniformOutput", false);
+    %     temp = ampNorm(stimSelect).(strcat(protStr(mIndex), "_raw"));
+    %     OneArray = repmat({ones(length(temp{1}), 1) * CRITest(CRIMethod)}, length(temp), 1);
+    %     [sponH{mIndex}, sponP{mIndex}] = cellfun(@(x, y) ttest2(x, y), temp, OneArray, "UniformOutput", false);
 
     % plot p-value topo
     topo = logg(pBase, cell2mat(sponP{mIndex}) / pBase);
-        topo(isinf(topo)) = 5;
-        topo(topo > 5) = 5;
-        FigTopo(mIndex) = plotTopo_Raw(topo, [8, 8]);
+    topo(isinf(topo)) = 5;
+    topo(topo > 5) = 5;
+    FigTopo(mIndex) = plotTopo_Raw(topo, [8, 8]);
     colormap(FigTopo(mIndex), "jet");
     scaleAxes(FigTopo(mIndex), "c", [-5 5]);
     pause(1);
@@ -205,64 +229,64 @@ end
 
 
 
-%% Diff ICI amplitude comparison
-sigCh = find(cell2mat(S1H{1}));
-nSigCh = find(~cell2mat(S1H{1}));
+% %% Diff ICI amplitude comparison
+% sigCh = find(cell2mat(S1H{1}));
+% nSigCh = find(~cell2mat(S1H{1}));
+% 
+% temp = reshape([ampNorm(stimSelect).(strcat(protStr(1), "_mean"))(sigCh)'; ampNorm(stimSelect).(strcat(protStr(2), "_mean"))(sigCh)';...
+%     ampNorm(stimSelect).(strcat(protStr(3), "_mean"))(sigCh)'; ampNorm(stimSelect).(strcat(protStr(4), "_mean"))(sigCh)';...
+%     ampNorm(stimSelect).(strcat(protStr(5), "_mean"))(sigCh)'; ampNorm(stimSelect).(strcat(protStr(1), "_se"))(sigCh)';...
+%     ampNorm(stimSelect).(strcat(protStr(2), "_se"))(sigCh)'; ampNorm(stimSelect).(strcat(protStr(3), "_se"))(sigCh)';...
+%     ampNorm(stimSelect).(strcat(protStr(4), "_se"))(sigCh)'; ampNorm(stimSelect).(strcat(protStr(5), "_se"))(sigCh)'], 5, []) ;
+% compare.amp_mean_se_S1Sig = [[1; 2; 3; 4; 5], temp];
+% 
+% temp = reshape([ampNorm(stimSelect).(strcat(protStr(1), "_mean"))(nSigCh)'; ampNorm(stimSelect).(strcat(protStr(2), "_mean"))(nSigCh)';...
+%     ampNorm(stimSelect).(strcat(protStr(3), "_mean"))(nSigCh)'; ampNorm(stimSelect).(strcat(protStr(4), "_mean"))(nSigCh)';...
+%     ampNorm(stimSelect).(strcat(protStr(5), "_mean"))(nSigCh)'; ampNorm(stimSelect).(strcat(protStr(1), "_se"))(nSigCh)';...
+%     ampNorm(stimSelect).(strcat(protStr(2), "_se"))(nSigCh)'; ampNorm(stimSelect).(strcat(protStr(3), "_se"))(nSigCh)';...
+%     ampNorm(stimSelect).(strcat(protStr(4), "_se"))(nSigCh)'; ampNorm(stimSelect).(strcat(protStr(5), "_se"))(nSigCh)'], 5, []) ;
+% compare.amp_mean_se_S1nSig = [[1; 2; 3; 4; 5], temp];
+% 
+% %% Diff ICI latency comparison
+% sigCh = find(cell2mat(S1H{1}));
+% nSigCh = find(~cell2mat(S1H{1}));
+% 
+% temp = reshape([latency(stimSelect).(strcat(protStr(1), "_mean"))(sigCh)'; latency(stimSelect).(strcat(protStr(2), "_mean"))(sigCh)';...
+%     latency(stimSelect).(strcat(protStr(3), "_mean"))(sigCh)'; latency(stimSelect).(strcat(protStr(4), "_mean"))(sigCh)';...
+%     latency(stimSelect).(strcat(protStr(5), "_mean"))(sigCh)'; latency(stimSelect).(strcat(protStr(1), "_se"))(sigCh)';...
+%     latency(stimSelect).(strcat(protStr(2), "_se"))(sigCh)'; latency(stimSelect).(strcat(protStr(3), "_se"))(sigCh)';...
+%     latency(stimSelect).(strcat(protStr(4), "_se"))(sigCh)'; latency(stimSelect).(strcat(protStr(5), "_se"))(sigCh)'], 5, []) ;
+% compare.latency_mean_se_S1Sig = [[1; 2; 3; 4; 5], temp];
+% 
+% temp = reshape([latency(stimSelect).(strcat(protStr(1), "_mean"))(nSigCh)'; latency(stimSelect).(strcat(protStr(2), "_mean"))(nSigCh)';...
+%     latency(stimSelect).(strcat(protStr(3), "_mean"))(nSigCh)'; latency(stimSelect).(strcat(protStr(4), "_mean"))(nSigCh)';...
+%     latency(stimSelect).(strcat(protStr(5), "_mean"))(nSigCh)'; latency(stimSelect).(strcat(protStr(1), "_se"))(nSigCh)';...
+%     latency(stimSelect).(strcat(protStr(2), "_se"))(nSigCh)'; latency(stimSelect).(strcat(protStr(3), "_se"))(nSigCh)';...
+%     latency(stimSelect).(strcat(protStr(4), "_se"))(nSigCh)'; latency(stimSelect).(strcat(protStr(5), "_se"))(nSigCh)'], 5, []) ;
+% compare.latency_mean_se_S1nSig = [[1; 2; 3; 4; 5], temp];
 
-temp = reshape([ampNorm(stimSelect).(strcat(protStr(1), "_mean"))(sigCh)'; ampNorm(stimSelect).(strcat(protStr(2), "_mean"))(sigCh)';...
-    ampNorm(stimSelect).(strcat(protStr(3), "_mean"))(sigCh)'; ampNorm(stimSelect).(strcat(protStr(4), "_mean"))(sigCh)';...
-    ampNorm(stimSelect).(strcat(protStr(5), "_mean"))(sigCh)'; ampNorm(stimSelect).(strcat(protStr(1), "_se"))(sigCh)';...
-    ampNorm(stimSelect).(strcat(protStr(2), "_se"))(sigCh)'; ampNorm(stimSelect).(strcat(protStr(3), "_se"))(sigCh)';...
-    ampNorm(stimSelect).(strcat(protStr(4), "_se"))(sigCh)'; ampNorm(stimSelect).(strcat(protStr(5), "_se"))(sigCh)'], 5, []) ;
-compare.amp_mean_se_S1Sig = [[1; 2; 3; 4; 5], temp];
 
-temp = reshape([ampNorm(stimSelect).(strcat(protStr(1), "_mean"))(nSigCh)'; ampNorm(stimSelect).(strcat(protStr(2), "_mean"))(nSigCh)';...
-    ampNorm(stimSelect).(strcat(protStr(3), "_mean"))(nSigCh)'; ampNorm(stimSelect).(strcat(protStr(4), "_mean"))(nSigCh)';...
-    ampNorm(stimSelect).(strcat(protStr(5), "_mean"))(nSigCh)'; ampNorm(stimSelect).(strcat(protStr(1), "_se"))(nSigCh)';...
-    ampNorm(stimSelect).(strcat(protStr(2), "_se"))(nSigCh)'; ampNorm(stimSelect).(strcat(protStr(3), "_se"))(nSigCh)';...
-    ampNorm(stimSelect).(strcat(protStr(4), "_se"))(nSigCh)'; ampNorm(stimSelect).(strcat(protStr(5), "_se"))(nSigCh)'], 5, []) ;
-compare.amp_mean_se_S1nSig = [[1; 2; 3; 4; 5], temp];
+% %% plot latency value topo
+% for mIndex = 1 : length(MATPATH)
+%     sigCh = cell2mat(sponH{mIndex}) == 1;
+%     %         latency(stimSelect).(strcat(protStr(mIndex), "_mean"))(~ismember(1 : 64, sigCh)) = quantWin(2);
+%     %         latency(stimSelect).(strcat(protStr(mIndex), "_se"))(~ismember(1 : 64, sigCh)) = 0;
+%     topo = latency(stimSelect).(strcat(protStr(mIndex), "_mean"));
+%     if ~isempty(badCh{monkeyId})
+%         topo(badCh{monkeyId}) = quantWin(2);
+%     end
+%     topo(~sigCh) = quantWin(2);
+%     topo = ((quantWin(2) - topo)/quantWin(2)).^2;
+%     FigTopo = plotTopo_Raw(topo, [8, 8]);
+%     colormap(FigTopo, "jet");
+%     scaleAxes(FigTopo, "c", [0 0.5]);
+%     pause(1);
+%     set(FigTopo, "outerposition", [300, 100, 800, 670]);
+%     print(FigTopo, strcat(FIGPATH, "_latency_Topo_", protStr(mIndex), "_", stimStrs(stimSelect)), "-djpeg", "-r200");
+%     close(FigTopo);
+% end
 
-%% Diff ICI latency comparison
-sigCh = find(cell2mat(S1H{1}));
-nSigCh = find(~cell2mat(S1H{1}));
-
-temp = reshape([latency(stimSelect).(strcat(protStr(1), "_mean"))(sigCh)'; latency(stimSelect).(strcat(protStr(2), "_mean"))(sigCh)';...
-    latency(stimSelect).(strcat(protStr(3), "_mean"))(sigCh)'; latency(stimSelect).(strcat(protStr(4), "_mean"))(sigCh)';...
-    latency(stimSelect).(strcat(protStr(5), "_mean"))(sigCh)'; latency(stimSelect).(strcat(protStr(1), "_se"))(sigCh)';...
-    latency(stimSelect).(strcat(protStr(2), "_se"))(sigCh)'; latency(stimSelect).(strcat(protStr(3), "_se"))(sigCh)';...
-    latency(stimSelect).(strcat(protStr(4), "_se"))(sigCh)'; latency(stimSelect).(strcat(protStr(5), "_se"))(sigCh)'], 5, []) ;
-compare.latency_mean_se_S1Sig = [[1; 2; 3; 4; 5], temp];
-
-temp = reshape([latency(stimSelect).(strcat(protStr(1), "_mean"))(nSigCh)'; latency(stimSelect).(strcat(protStr(2), "_mean"))(nSigCh)';...
-    latency(stimSelect).(strcat(protStr(3), "_mean"))(nSigCh)'; latency(stimSelect).(strcat(protStr(4), "_mean"))(nSigCh)';...
-    latency(stimSelect).(strcat(protStr(5), "_mean"))(nSigCh)'; latency(stimSelect).(strcat(protStr(1), "_se"))(nSigCh)';...
-    latency(stimSelect).(strcat(protStr(2), "_se"))(nSigCh)'; latency(stimSelect).(strcat(protStr(3), "_se"))(nSigCh)';...
-    latency(stimSelect).(strcat(protStr(4), "_se"))(nSigCh)'; latency(stimSelect).(strcat(protStr(5), "_se"))(nSigCh)'], 5, []) ;
-compare.latency_mean_se_S1nSig = [[1; 2; 3; 4; 5], temp];
-
-
-%% plot latency value topo
-for mIndex = 1 : length(MATPATH)
-    sigCh = cell2mat(sponH{mIndex}) == 1;
-    %         latency(stimSelect).(strcat(protStr(mIndex), "_mean"))(~ismember(1 : 64, sigCh)) = quantWin(2);
-    %         latency(stimSelect).(strcat(protStr(mIndex), "_se"))(~ismember(1 : 64, sigCh)) = 0;
-    topo = latency(stimSelect).(strcat(protStr(mIndex), "_mean"));
-    if ~isempty(badCh{monkeyId})
-        topo(badCh{monkeyId}) = quantWin(2);
-    end
-    topo(~sigCh) = quantWin(2);
-    topo = ((quantWin(2) - topo)/quantWin(2)).^2;
-    FigTopo = plotTopo_Raw(topo, [8, 8]);
-    colormap(FigTopo, "jet");
-    scaleAxes(FigTopo, "c", [0 0.5]);
-    pause(1);
-    set(FigTopo, "outerposition", [300, 100, 800, 670]);
-    print(FigTopo, strcat(FIGPATH, "_latency_Topo_", protStr(mIndex), "_", stimStrs(stimSelect)), "-djpeg", "-r200");
-    close(FigTopo);
-end
-
-ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
-save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
+% ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
+% save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
 % clearvars -except toPlot_Wave compare sigch cdrPlot ampNorm latency temp
 close all

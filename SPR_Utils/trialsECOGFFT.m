@@ -22,14 +22,30 @@ end
 temp = changeCellRowNum(trialsECoG);
 
 
-for ch = chIdx
-    chTemp = array2VectorCell(temp{ch});
-    switch method % power, dB
-        case 1
-            [f, P{ch, 1}, ~] = cellfun(@(x) mFFT_Pow(x(tIdx), fs), chTemp, 'UniformOutput', false);
-        case 2 % magnitude
-            [f, ~,  P{ch, 1}] = cellfun(@(x) mFFT_Base(x(tIdx), fs), chTemp, 'UniformOutput', false);
-    end
-    ff = f{1};
-    PMean(ch, :) = smoothdata(mean(cell2mat(P{ch, 1})),'gaussian', 1);
+mParpool = gcp;
+chTemp = cellfun(@(x) array2VectorCell(x), temp, "uni", false);
+P = cell(length(chTemp), 1);
+for ch = 1 : length(chTemp)
+switch method % power, dB
+    case 1
+        %             [f, P{ch, 1}, ~] = cellfun(@(x) mFFT_Pow(x(tIdx), fs), chTemp, 'UniformOutput', false);
+        F = parfeval(mParpool, @cellfun, 2, @(x) mFFT_Pow(x(tIdx), fs), chTemp{ch, 1}, 'UniformOutput', false);
+        P{ch, 1} = F.OutputArguments{2};
+    case 2 % magnitude
+        %             [f, ~,  P{ch, 1}] = cellfun(@(x) mFFT_Base(x(tIdx), fs), chTemp, 'UniformOutput', false);
+        F = parfeval(mParpool, @cellfun, 3, @(x) mFFT_Base(x(tIdx), fs), chTemp{ch, 1}, 'UniformOutput', false);
+        while isempty(F.OutputArguments)
+            pause(0.1);
+        end
+        P{ch, 1} = F.OutputArguments{3};
 end
+end
+ff = F.OutputArguments{1}{1};
+PMean = cell2mat(cellfun(@(x) smoothdata(mean(cell2mat(x)),'gaussian', 1), P, "uni", false));
+
+end
+
+
+
+
+

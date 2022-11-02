@@ -1,4 +1,4 @@
-function [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA)
+function [comp, ICs, FigTopoICA, FigWave] = ICA_Population(trialsECOG, fs, windowICA)
     comp0 = mICA(trialsECOG, windowICA, fs);
     comp = realignIC(comp0, windowICA);
 

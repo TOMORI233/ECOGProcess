@@ -1,4 +1,49 @@
 switch Protocol
+    case "Species_Ratio_ICI16"
+        titleStr = "Species_Ratio_ICI16";
+        stimStr = {'control', '1o005', '1o01', '1o015', '1o1'};
+        S1Duration = [3009+16, 3009+16.08, 3009+16.16, 3009+16.24, 3009+17.6];
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -3500;
+        Window = [winStart 1500];
+        FFTWin = [-2900 -100];
+        ICAWin = [-1000 1000];
+    case "Species_Ratio_ICI12"
+        titleStr = "Species_Ratio_ICI12";
+        stimStr = {'control', '1o005', '1o01', '1o015', '1o1'};
+        S1Duration = [3003+12, 3003+12.06, 3003+12.12, 3003+12.18, 3003+13.2];
+        cursor = [83.33, 83.33, 83.33 ,83.33];
+        winStart = -3500;
+        Window = [winStart 1500];
+        FFTWin = [-2900 -100];
+        ICAWin = [-1000 1000];
+    case "Species_Ratio_ICI8"
+        titleStr = "Species_Ratio_ICI8";
+        stimStr = {'control', '1o005', '1o01', '1o015', '1o1'};
+        S1Duration = [3002.9+8, 3002.9+8.04, 3002.9+8.08, 3002.9+8.12, 3002.9+8.8];
+        cursor = [125, 125, 125 ,125];
+        winStart = -3500;
+        Window = [winStart 1500];
+        FFTWin = [-2900 -100];
+        ICAWin = [-1000 1000];
+    case "Species_Ratio_ICI4"
+        titleStr = "Species_Ratio_ICI4";
+        stimStr = {'control', '1o005', '1o01', '1o015', '1o1'};
+        S1Duration = [3002.9+4, 3002.9+4.02, 3002.9+4.04, 3002.9+4.06, 3002.9+4.4];
+        cursor = [250, 250, 250 ,250];
+        winStart = -3500;
+        Window = [winStart 1500];
+        FFTWin = [-2900 -100];
+        ICAWin = [-1000 1000];
+    case "Species_Ratio_ICI2"
+        titleStr = "Species_Ratio_ICI2";
+        stimStr = {'control', '1o005', '1o01', '1o015', '1o1'};
+        S1Duration = [3010.6+2, 3010.6+2.01, 3010.6+2.02, 3010.6+2.03, 3010.6+2.2];
+        cursor = [200, 200, 200 ,200];
+        winStart = -3500;
+        Window = [winStart 1500];
+        FFTWin = [-2900 -100];
+        ICAWin = [-1000 1000];
     case "Add_on_Basic_Var_50_2"
         titleStr = "4ms IrregVar";
         stimStr = {'normalize SD = 1/50','normalize SD = 1/25' ,'normalize SD = 1/10','normalize SD = 1/2'};
@@ -39,21 +84,21 @@ switch Protocol
         winStart = -5500;
         Window = [winStart 5500];
         ICAWin = [-1000 1000];
-     case "Add_on_Basic_NormSqrt_ICI4"
+    case "Add_on_Basic_NormSqrt_ICI4"
         titleStr = "Add_on_Basic_NormSqrt_ICI4";
         stimStr = {'4-4.06ms Reg','4.06-4ms Reg','4-4.06ms Irreg','4.06-4ms Irreg'};
         S1Duration = [5004.8, 5008.4, 5003.2, 5000.5] + 4;
         winStart = -5500;
         Window = [winStart 2500];
         ICAWin = [-1000 1000];
-     case "Add_on_Basic_NormSqrt_ICI8"
+    case "Add_on_Basic_NormSqrt_ICI8"
         titleStr = "Add_on_Basic_NormSqrt_ICI8";
         stimStr = {'8-8.12ms Reg','8.12-8ms Reg','8-8.12ms Irreg','8.12-8ms Irreg'};
         S1Duration = [5004.8, 5002.1, 5001.2, 4993] + 8;
         winStart = -5500;
         Window = [winStart 2500];
         ICAWin = [-1000 1000];
-     case "Add_on_Basic_Duration_0o5_5"
+    case "Add_on_Basic_Duration_0o5_5"
         titleStr = "Duration0o5-5s_1s_4_4o06";
         stimStr = {'0o5s_1s', '1s_1s', '2s_1s', '3s_1s', '4s_1s', '5s_1s'};
         S1Duration = [500, 1000.1, 2004.2, 3004.2, 4004.3, 5008.4] + 4;
@@ -69,7 +114,7 @@ switch Protocol
         Window = [winStart 7000];
         ICAWin = [-1000 7000];
         FFTWin = [1000 7000];
-     case "Duration1-5s_1s_4_4o06"
+    case "Duration1-5s_1s_4_4o06"
         titleStr = "Duration1-5s_1s_4_4o06";
         stimStr = {'1s_1s', '2s_1s', '3s_1s', '4s_1s', '5s_1s'};
         S1Duration = [1001, 2001.9, 3002.9, 4003.9, 5004.8] + 4;

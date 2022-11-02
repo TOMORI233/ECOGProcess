@@ -1,7 +1,10 @@
-function [comp, ICs, FigTopoICA] = ICA_Exclude(trialsECOG, comp, windowICA)
-        ICs = 1 : size(trialsECOG, 1);
-        [~, temp] = reconstructData(trialsECOG, comp, ICs);
-        FigWave(1) = plotRawWave(temp, [], windowICA, "reconstruct");
+function [comp, ICs, FigTopoICA, FigWave] = ICA_Exclude(trialsECOG, comp, windowICA)
+     ICs = 1 : size(trialsECOG{1}, 1);
+    trialsICs = cellfun(@(x) comp.unmixing * x, trialsECOG, "uni", false);
+    ICMean = cell2mat(cellfun(@mean, changeCellRowNum(trialsICs), "UniformOutput", false));
+    ICStd = cell2mat(cellfun(@(x) std(x, [], 1), changeCellRowNum(trialsICs), "UniformOutput", false));
+    plotRawWave(ICMean, ICStd, windowICA, "ICA");
+   
     FigTopoICA = plotTopo(comp, [8, 8], [8, 8]);
 
     FigWave(1) = plotRawWave(cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG), "UniformOutput", false)), [], windowICA, "origin");

@@ -3,7 +3,7 @@ close all; clc; clear;
 MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_NormSqrt_ICI4\';
 MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_NormSqrt_ICI4\';
 monkeyStr = ["CC", "XX"];
-ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\";
+ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
@@ -137,7 +137,7 @@ for mIndex =  1 : length(MATPATH)
     setAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], 'xticklabel', '');
     setAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], 'visible', 'off');
     setLine([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "YData", [-yScale(mIndex) yScale(mIndex)], "LineStyle", "--");
-    
+    pause(1);
     set([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigTopo_Reg(mIndex), FigTopo_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "outerposition", [300, 100, 800, 670]);
    
     scaleAxes([FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "x", [-10 600]);    
@@ -181,14 +181,15 @@ for mIndex =  1 : length(MATPATH)
     compare(mIndex).selectMean_SE_S1nSig = [[1; 2], temp];
 
     % plot reg vs irreg topo
-    topo = logg(0.05, compare(mIndex).P / 0.05);
+    topo = logg(pBase, compare(mIndex).P / pBase);
         topo(isinf(topo)) = 5;
         topo(topo > 5) = 5;
         FigTopo = plotTopo_Raw(topo, [8, 8]);
     colormap(FigTopo, "jet");
     scaleAxes(FigTopo, "c", [-5, 5]);
+    pause(1);
     set(FigTopo, "outerposition", [300, 100, 800, 670]);
-    %     title("p-value (log(log(0.05, p)) distribution of Reg vs Irreg");
+    %     title("p-value (log(log(pBase, p)) distribution of Reg vs Irreg");
 
     print(FigTopo, strcat(FIGPATH, Protocol, "Reg_Irreg_pValue_Topo_Reg"), "-djpeg", "-r200");
     close(FigTopo);
@@ -212,13 +213,16 @@ for mIndex =  1 : length(MATPATH)
         FigTopo= plotTopo_Raw(topo, [8, 8]);
         colormap(FigTopo, "jet");
         scaleAxes(FigTopo, "c", [-5 5]);
+        pause(1);
         set(FigTopo, "outerposition", [300, 100, 800, 670]);
-        %         title("p-value (log(log(0.05, p)) distribution of [0 300] response and baseline");
+        %         title("p-value (log(log(pBase, p)) distribution of [0 300] response and baseline");
 
         print(FigTopo, strcat(FIGPATH, Protocol, "_", stiStr(dIndex), "_pValue_Topo_Reg"), "-djpeg", "-r200");
         close(FigTopo);
     end
 drawnow
+ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
+save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
 end
 
 close all

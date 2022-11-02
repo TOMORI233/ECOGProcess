@@ -1,5 +1,33 @@
 clear; clc; close all;
 
+%% species, Base ICI & Ratio 16ms
+disp("Exporting ClickTrainLongTerm species_ICI 16ms, ratio ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI16\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221101\Block-3'; % 20221101 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% species, Base ICI & Ratio 12ms
+disp("Exporting ClickTrainLongTerm species_ICI 12ms, ratio ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI12\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221101\Block-4'; % 20221101 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+
+%% species, Base ICI & Ratio 8ms
+disp("Exporting ClickTrainLongTerm species_ICI 8ms, ratio ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI8\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221101\Block-5'; % 20221101 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
 %% add_on, part1, reg vs irreg, no reg in irreg
 disp("Exporting ClickTrainLongTerm add_on part 1, reg VS irreg ...");
 SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_ICI4\";
