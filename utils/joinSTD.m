@@ -1,4 +1,20 @@
 function [resultSTD, chMean, chStd, window] = joinSTD(trials, varargin)
+    % Description: average wave of std sounds in trials with different std number
+    % Input:
+    %     trials: n*1 struct containing trial data
+    %     dataset:
+    %         1. trialsECOG: n*1 cell with each element of nChs*m data
+    %         2. ECOGDataset: TDT dataset
+    %     fs: raw sample rate, in Hz
+    % Output:
+    %     resultSTD: nStd*1 cell, mean wave of trials with std number >= nStd(i)
+    %     chMean: joint mean wave of trials of all std number
+    %     chStd: std
+    %     window: [-2500, ISI * max(stdNumAll) + 2000], in ms
+    % Example:
+    %     [resultSTD, chMean, chStd, window] = joinSTD(trials, trialsECOG, fs);
+    %     [resultSTD, chMean, chStd, window] = joinSTD(trials, ECOGDataset);
+
     mInputParser = inputParser;
     mInputParser.addRequired('trials', @isstruct);
     mInputParser.addRequired('dataset');
@@ -16,6 +32,11 @@ function [resultSTD, chMean, chStd, window] = joinSTD(trials, varargin)
     switch class(dataset)
         case 'cell'
             trialsECOG = data;
+
+            if isempty(fs)
+                error('Required input fs is empty!');
+            end
+
         case 'struct'
             fs = dataset.fs;
             trialsECOG = selectEcog(dataset, trials, "trial onset", window);

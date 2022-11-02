@@ -1,4 +1,14 @@
 function [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA)
+    % Description: perform ICA on data and loop reconstructing data with input ICs until you are satisfied
+    % Input:
+    %     trialsECOG: n*1 cell array of trial data (64*m matrix)
+    %     fs: raw sample rate for [trialsECOG], in Hz
+    %     windowICA: time window for [trialsECOG], in ms
+    % Output:
+    %     comp: result of ICA (FieldTrip) without field [trial]
+    %     ICs: the input IC number array for data reconstruction
+    %     FigTopoICA: figure of topo of all ICs
+
     comp0 = mICA(trialsECOG, windowICA, fs);
     comp = realignIC(comp0, windowICA);
 
@@ -21,7 +31,7 @@ function [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA)
         ICs(badICs) = [];
         [~, temp] = reconstructData(trialsECOG, comp, ICs);
         FigWave(2) = plotRawWave(temp, [], windowICA, "reconstruct");
-        k = validateInput("string", "Press Y to continue or N to reselect ICs: ", [], ["y", "n", "Y", "N"]);
+        k = validateInput("Press Y to continue or N to reselect ICs: ", @(x) validatestring(x, {'y', 'n', 'Y', 'N'}), "s");
     end
 
     comp.trial = [];
