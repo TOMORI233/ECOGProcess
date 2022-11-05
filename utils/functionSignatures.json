@@ -5,18 +5,17 @@
         "inputs": [
             {"name": "trialsECOG", "kind": "required", "type": ["cell"], "purpose": "data by trials"},
             {"name": "windowICA", "kind": "required", "type": ["numeric", "numel=2"]},
-            {"name": "fs", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "sample rate"},
-            {"name": "fsD", "kind": "ordered", "type": ["numeric", "positive", "numel=1"]}
-        ]
-    },
-
-    "mICA": {
-        "inputs": [
-            {"name": "ECOGDataset", "kind": "required", "type": ["struct"], "purpose": "TDT dataset"},
-            {"name": "windowICA", "kind": "required", "type": ["numeric", "numel=2"]},
-            {"name": "trials", "kind": "required", "type": ["struct"]},
-            {"name": "fsD", "kind": "ordered", "type": ["numeric", "positive", "numel=1"]},
-            {"name": "segOption", "kind": "ordered", "type": ["char", "choices={'trial onset', 'dev onset', 'push onset', 'last std'}"]}
+            {"mutuallyExclusiveGroup": [
+                [
+                    {"name": "fs", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "sample rate"},
+                    {"name": "fsD", "kind": "ordered", "type": ["numeric", "positive", "numel=1"]}
+                ],
+                [
+                    {"name": "trials", "kind": "required", "type": ["struct"]},
+                    {"name": "fsD", "kind": "ordered", "type": ["numeric", "positive", "numel=1"]},
+                    {"name": "segOption", "kind": "ordered", "type": ["char", "choices={'trial onset', 'dev onset', 'push onset', 'last std'}"]}
+                ]
+            ]}
         ]
     },
 
@@ -29,27 +28,19 @@
         ]
     },
 
-    "mECOGFilter": {
-        "inputs": [
-            {"name": "ECOGDataset", "kind": "required", "type": ["struct"], "purpose": "TDT dataset"},
-            {"name": "fhp", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "high pass cutoff frequency"},
-            {"name": "flp", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "low pass cutoff frequency"},
-            {"name": "fs", "kind": "ordered", "type": ["numeric", "positive", "numel=1"], "purpose": "sample rate"}
-        ]
-    },
 
     "joinSTD": {
         "inputs": [
             {"name": "trials", "kind": "required", "type": ["struct"]},
-            {"name": "trialsECOG", "kind": "required", "type": ["cell"], "purpose": "data by trials"},
-            {"name": "fs", "kind": "ordered", "type": ["numeric", "positive", "numel=1"]}
-        ]
-    },
-
-    "joinSTD": {
-        "inputs": [
-            {"name": "trials", "kind": "required", "type": ["struct"]},
-            {"name": "ECOGDataset", "kind": "required", "type": ["struct"], "purpose": "TDT dataset"}
+            {"mutuallyExclusiveGroup": [
+                [
+                    {"name": "trialsECOG", "kind": "required", "type": ["cell"], "purpose": "data by trials"},
+                    {"name": "fs", "kind": "ordered", "type": ["numeric", "positive", "numel=1"]}
+                ],
+                [
+                    {"name": "ECOGDataset", "kind": "required", "type": ["struct"], "purpose": "TDT dataset"}
+                ]
+            ]}
         ]
     }
 }
