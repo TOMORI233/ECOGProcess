@@ -101,7 +101,7 @@ for mIndex = 1 : length(MATPATH)
         chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG), 'UniformOutput', false));
         % FFT during S1
         tIdx = find(t > FFTWin(1) & t < FFTWin(2));
-        [ff, PMean{dIndex}, trialsFFT]  = trialsECOGFFT(trialsECOG, fs, tIdx, [], 2);
+        [ff, PMean{dIndex}, trialsFFT]  = trialsECOGFFT(trialsECOG, fs);
         for ch = 1 : size(chMean{dIndex}, 1)
             cdrPlot(ch).(strcat(protStr(mIndex), "Wave"))(:, 2 * dIndex - 1) = t';
             cdrPlot(ch).(strcat(protStr(mIndex), "Wave"))(:, 2 * dIndex) = chMean{dIndex}(ch, :)';

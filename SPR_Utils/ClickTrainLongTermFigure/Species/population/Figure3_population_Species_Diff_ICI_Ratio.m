@@ -3,24 +3,24 @@ close all; clc; clear;
 monkeyId = 1;  % 1：chouchou; 2：xiaoxiao
 
 if monkeyId == 1
-    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Species_Ratio_ICI16\';
-    MATPATH{2} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Species_Ratio_ICI12\';
-    MATPATH{3} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Species_Ratio_ICI8\';
-    %     MATPATH{4} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI40\';
+    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Species_Ratio_ICI20\';
+    MATPATH{2} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Species_Ratio_ICI16\';
+    MATPATH{3} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Species_Ratio_ICI12\';
+    MATPATH{4} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Species_Ratio_ICI8\';
     %     MATPATH{5} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI80\';
 elseif monkeyId == 2
-    MATPATH{1} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI16\';
-    MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI12\';
-    MATPATH{3} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI8\';
-    %     MATPATH{4} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI40\';
+    MATPATH{1} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI20\';
+    MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI16\';
+    MATPATH{3} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI12\';
+    MATPATH{4} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI8\';
     %     MATPATH{5} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI80\';
 end
 
 stimSelect = 5; % "control", "1o005", "1o01", "1o015", "1o1"
 selectCh = 9;
-stimStrs = ["control", "1o005", "1o01", "1o015", "1o1"];
+stimStrs = ["control", "1o005", "1o01", "1o015", "1o1", "1o5"];
 
-protStr = ["ICI16", "ICI12", "ICI8", "ICI4", "ICI2"];
+protStr = ["ICI20", "ICI16", "ICI12", "ICI8", "ICI4", "ICI2"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Species\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
@@ -43,11 +43,12 @@ yScale = [50, 40];
 quantWin = [0 300];
 sponWin = [-300 0];
 latencyWin = [80 200];
-correspFreq = 1000./[16, 12, 8, 4, 2];
+correspFreq = 1000./([20, 16, 12, 8, 4, 2]' * [1, 1.005, 1.01, 1.015, 1.1, 1.5]);
 for mIndex = 1 : length(MATPATH)
     disp(strcat("processing ", protStr(mIndex), "..."));
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
+    Protocols(mIndex) = Protocol;
     FIGPATH = strcat(ROOTPATH, "Pop_Figure3\", CRIMethodStr(CRIMethod), "\", temp(4), "\");
     mkdir(FIGPATH);
     %% process
@@ -99,16 +100,16 @@ for mIndex = 1 : length(MATPATH)
         trials = trialAll(tIndex);
         trialsECOG = trialsECOG_Merge(tIndex);
 
-        chMean{dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG), 'UniformOutput', false));
+        chMean{mIndex, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG), 'UniformOutput', false));
         chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG), 'UniformOutput', false));
         % FFT during S1
         tIdx = find(t > FFTWin(1) & t < FFTWin(2));
-        [ff, PMean{dIndex}, trialsFFT]  = trialsECOGFFT(trialsECOG, fs, tIdx, [], 2);
-        for ch = 1 : size(chMean{dIndex}, 1)
+        [ff, PMean{mIndex, dIndex}, trialsFFT]  = trialsECOGFFT(trialsECOG, fs, tIdx, [], 2);
+        for ch = 1 : size(chMean{mIndex, dIndex}, 1)
             cdrPlot(ch).(strcat(protStr(mIndex), "Wave"))(:, 2 * dIndex - 1) = t';
-            cdrPlot(ch).(strcat(protStr(mIndex), "Wave"))(:, 2 * dIndex) = chMean{dIndex}(ch, :)';
+            cdrPlot(ch).(strcat(protStr(mIndex), "Wave"))(:, 2 * dIndex) = chMean{mIndex, dIndex}(ch, :)';
             cdrPlot(ch).(strcat(protStr(mIndex), "FFT"))(:, 2 * dIndex - 1) =ff;
-            cdrPlot(ch).(strcat(protStr(mIndex), "FFT"))(:, 2 * dIndex) = PMean{dIndex}(ch, :)';
+            cdrPlot(ch).(strcat(protStr(mIndex), "FFT"))(:, 2 * dIndex) = PMean{mIndex, dIndex}(ch, :)';
         end
 
         % quantization amplitude
@@ -129,9 +130,7 @@ for mIndex = 1 : length(MATPATH)
 
 
     end
-    % for raw wave
-    DiffICI(mIndex).chMean = chMean{stimSelect};
-    DiffICI(mIndex).color = colors(mIndex);
+
 
 
     %% significance of s1 onset response
@@ -142,10 +141,14 @@ for mIndex = 1 : length(MATPATH)
     % compare S1Res and spon
     [S1H{mIndex}, S1P{mIndex}] = cellfun(@(x, y) ttest2(x, y), changeCellRowNum(ampS1{mIndex}), changeCellRowNum(rmsSponS1{mIndex}), "UniformOutput", false);
 
+end
+
     %% plot FFT
-    FigFFT = plotRawWave(PMean{stimSelect}, [], [ff(1), ff(end)], strcat("FFT ", stimStrs(stimSelect)));
+for mIndex = 1 : length(MATPATH)
+    for dIndex = 1 : length(devType)
+    FigFFT = plotRawWave(PMean{mIndex, dIndex}, [], [ff(1), ff(end)], strcat("FFT ", stimStrs(dIndex)));
     deleteLine(FigFFT, "LineStyle", "--");
-    lines(1).X = correspFreq(mIndex); lines(1).color = "k";
+    lines(1).X = correspFreq(mIndex, dIndex); lines(1).color = "k";
     addLines2Axes(FigFFT, lines);
     orderLine(FigFFT, "LineStyle", "--", "bottom");
     % rescale FFT Plot
@@ -158,25 +161,32 @@ for mIndex = 1 : length(MATPATH)
     set(FigFFT, "outerposition", [300, 100, 800, 670]);
     pause(0.1);
     plotLayout(FigFFT, params.posIndex + 2 * (monkeyId - 1), 0.3);
-    print(FigFFT, strcat(FIGPATH, Protocol, "_FFT_", stimStrs(stimSelect)), "-djpeg", "-r200");
+    print(FigFFT, strcat(FIGPATH, Protocols(mIndex), "_FFT_", stimStrs(dIndex)), "-djpeg", "-r200");
     close(FigFFT);
-
+    end
 end
 
 
 %% plot raw wave
-FigWave = plotRawWaveMulti_SPR(DiffICI, Window, titleStr, [8, 8]);
-scaleAxes(FigWave, "y", [-yScale(monkeyId) yScale(monkeyId)]);
-scaleAxes(FigWave, "x", [-10 600]);
-setAxes(FigWave, 'yticklabel', '');
-setAxes(FigWave, 'xticklabel', '');
-setAxes(FigWave, 'visible', 'off');
-setLine(FigWave, "YData", [-yScale(monkeyId) yScale(monkeyId)], "LineStyle", "--");
-pause(1);
-set(FigWave, "outerposition", [300, 100, 800, 670]);
-plotLayout(FigWave, params.posIndex + 2 * (monkeyId - 1), 0.3);
-print(FigWave, strcat(FIGPATH, Protocol, "_Wave_", stimStrs(stimSelect)), "-djpeg", "-r200");
-close(FigWave);
+for dIndex = 1 : length(devType)
+    for mIndex = 1 : length(MATPATH)
+        % for raw wave
+        DiffICI(mIndex).chMean = chMean{mIndex, dIndex};
+        DiffICI(mIndex).color = colors(mIndex);
+        FigWave = plotRawWaveMulti_SPR(DiffICI, Window, titleStr, [8, 8]);
+        scaleAxes(FigWave, "y", [-yScale(monkeyId) yScale(monkeyId)]);
+        scaleAxes(FigWave, "x", [-10 600]);
+        setAxes(FigWave, 'yticklabel', '');
+        setAxes(FigWave, 'xticklabel', '');
+        setAxes(FigWave, 'visible', 'off');
+        setLine(FigWave, "YData", [-yScale(monkeyId) yScale(monkeyId)], "LineStyle", "--");
+        pause(1);
+        set(FigWave, "outerposition", [300, 100, 800, 670]);
+        plotLayout(FigWave, params.posIndex + 2 * (monkeyId - 1), 0.3);
+        print(FigWave, strcat(FIGPATH, Protocols(mIndex), "_Wave_", stimStrs(dIndex)), "-djpeg", "-r200");
+        close(FigWave);
+    end
+end
 
 
 
@@ -199,9 +209,7 @@ for mIndex = 1 : length(MATPATH)
     close(FigTopo);
 
 
-    % for raw wave
-    DiffICI(mIndex).chMean = chMean{stimSelect};
-    DiffICI(mIndex).color = colors(mIndex);
+
     toPlot_Wave(:, [2 * mIndex - 1, 2 * mIndex]) = cdrPlot(selectCh).(strcat(protStr(mIndex), "Wave"))(:, [2 * stimSelect - 1, 2 * stimSelect]);
 
     % compare change resp and spon resp

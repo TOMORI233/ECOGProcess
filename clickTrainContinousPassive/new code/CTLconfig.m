@@ -1,48 +1,104 @@
 switch Protocol
-    case "Species_Ratio_ICI16"
-        titleStr = "Species_Ratio_ICI16";
-        stimStr = {'control', '1o005', '1o01', '1o015', '1o1'};
-        S1Duration = [3009+16, 3009+16.08, 3009+16.16, 3009+16.24, 3009+17.6];
+    case "Rhythm_Offset"
+        titleStr = "Rhythm_Offset";
+        stimStr = ["100", "120", "140", "160", "180", "200", "220", "240", "260"];
+%         S1Duration = [2900.1, 2880.1, 2800, 2880, 2880.2, 2800.1, 2860.1, 2880.1, 2860];
+        S1Duration = zeros(1, 9);
+        winStart = -500;
+        Window = [winStart 3500];
+        FFTWin = [0 2000];
+        ICAWin = [0 2000];
+    case "Rhythm_Ratio_Rev"
+        titleStr = "Rhythm_Ratio_Rev";
+        stimStr = ["26o4_24", "36_24", "48_24", "39o6_36", "54_36", "72_36", "72_48"];
+%         S1Duration = [3024.3+48, 3024.3+52.8, 3024.3+72, 3024.3+96, 3024.3+192, 3024.3+384, 3024.3];
+        S1Duration = [3010.6, 3088.3, 3024.3, 3010.2, 3024.3, 3024.3, 3024.3];
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -3500;
+        Window = [winStart 2500];
+        FFTWin = [300 1900];
+        ICAWin = [-1000 1000];
+    case "Rhythm_Ratio_ICI48"
+        titleStr = "Rhythm_Ratio_ICI48";
+        stimStr = {'control', '1o1', '1o5', '2', '3', '8', 'offset'};
+%         S1Duration = [3024.3+48, 3024.3+52.8, 3024.3+72, 3024.3+96, 3024.3+192, 3024.3+384, 3024.3];
+        S1Duration = [3024.3, 3024.3, 3024.3, 3024.3, 3024.3, 3024.3, 3024.3-48];
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -3500;
+        Window = [winStart 2500];
+        FFTWin = [300 1900];
+        ICAWin = [-1000 1000];
+    case "Rhythm_Ratio_ICI36"
+        titleStr = "Rhythm_Ratio_ICI36";
+        stimStr = {'control', '1o1', '1o5', '2', '3', '8', 'offset'};
+        S1Duration = [2988.3, 2988.3, 2988.3, 2988.3, 2988.3, 2988.3, 2988.3-36];
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -3500;
+        Window = [winStart 2500];
+        FFTWin = [300 1900];
+        ICAWin = [-1000 1000];
+    case "Rhythm_Ratio_ICI24"
+        titleStr = "Rhythm_Ratio_ICI24";
+        stimStr = {'control', '1o1', '1o5', '2', '3', '8', 'offset'};
+        S1Duration = [3000.3, 3000.3, 3000.3, 3000.3, 3000.3, 3000.3, 3000.3-24];
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -3500;
+        Window = [winStart 2500];
+        FFTWin = [300 1900];
+        ICAWin = [-1000 1000];
+    case "Species_Ratio_ICI20"
+        titleStr = "Species_Ratio_ICI20";
+        stimStr = {'control', '1o005', '1o01', '1o015', '1o1', '1.5'};
+        S1Duration = [3001.4+20, 3001.4+20.1, 3001.4+20.2, 3001.4+20.3, 3001.4+22, 3001.4+30];
         cursor = [62.5, 62.5, 62.5 ,62.5];
         winStart = -3500;
         Window = [winStart 1500];
-        FFTWin = [-2900 -100];
+        FFTWin = [0 1000];
+        ICAWin = [-1000 1000];
+    case "Species_Ratio_ICI16"
+        titleStr = "Species_Ratio_ICI16";
+        stimStr = {'control', '1o005', '1o01', '1o015', '1o1', '1.5'};
+        S1Duration = [3009+16, 3009+16.08, 3009+16.16, 3009+16.24, 3009+17.6, 3009+24];
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -3500;
+        Window = [winStart 1500];
+        FFTWin = [0 1000];
         ICAWin = [-1000 1000];
     case "Species_Ratio_ICI12"
         titleStr = "Species_Ratio_ICI12";
-        stimStr = {'control', '1o005', '1o01', '1o015', '1o1'};
-        S1Duration = [3003+12, 3003+12.06, 3003+12.12, 3003+12.18, 3003+13.2];
+        stimStr = {'control', '1o005', '1o01', '1o015', '1o1', '1.5'};
+        S1Duration = [3003+12, 3003+12.06, 3003+12.12, 3003+12.18, 3003+13.2, 3003+18];
         cursor = [83.33, 83.33, 83.33 ,83.33];
         winStart = -3500;
         Window = [winStart 1500];
-        FFTWin = [-2900 -100];
+        FFTWin = [0 1000];
         ICAWin = [-1000 1000];
     case "Species_Ratio_ICI8"
         titleStr = "Species_Ratio_ICI8";
-        stimStr = {'control', '1o005', '1o01', '1o015', '1o1'};
-        S1Duration = [3002.9+8, 3002.9+8.04, 3002.9+8.08, 3002.9+8.12, 3002.9+8.8];
+        stimStr = {'control', '1o005', '1o01', '1o015', '1o1', '1.5'};
+        S1Duration = [3002.9+8, 3002.9+8.04, 3002.9+8.08, 3002.9+8.12, 3002.9+8.8, 3002.9+12];
         cursor = [125, 125, 125 ,125];
         winStart = -3500;
         Window = [winStart 1500];
-        FFTWin = [-2900 -100];
+        FFTWin = [0 1000];
         ICAWin = [-1000 1000];
     case "Species_Ratio_ICI4"
         titleStr = "Species_Ratio_ICI4";
-        stimStr = {'control', '1o005', '1o01', '1o015', '1o1'};
-        S1Duration = [3002.9+4, 3002.9+4.02, 3002.9+4.04, 3002.9+4.06, 3002.9+4.4];
+        stimStr = {'control', '1o005', '1o01', '1o015', '1o1', '1.5'};
+        S1Duration = [3002.9+4, 3002.9+4.02, 3002.9+4.04, 3002.9+4.06, 3002.9+4.4, 3002.9+6];
         cursor = [250, 250, 250 ,250];
         winStart = -3500;
         Window = [winStart 1500];
-        FFTWin = [-2900 -100];
+        FFTWin = [0 1000];
         ICAWin = [-1000 1000];
     case "Species_Ratio_ICI2"
         titleStr = "Species_Ratio_ICI2";
-        stimStr = {'control', '1o005', '1o01', '1o015', '1o1'};
-        S1Duration = [3010.6+2, 3010.6+2.01, 3010.6+2.02, 3010.6+2.03, 3010.6+2.2];
+        stimStr = {'control', '1o005', '1o01', '1o015', '1o1', '1.5'};
+        S1Duration = [3010.6+2, 3010.6+2.01, 3010.6+2.02, 3010.6+2.03, 3010.6+2.2, 3010.6+3];
         cursor = [200, 200, 200 ,200];
         winStart = -3500;
         Window = [winStart 1500];
-        FFTWin = [-2900 -100];
+        FFTWin = [0 1000];
         ICAWin = [-1000 1000];
     case "Add_on_Basic_Var_50_2"
         titleStr = "4ms IrregVar";

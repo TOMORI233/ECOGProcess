@@ -20,6 +20,24 @@
         ]
     },
 
+    "mECOGFilter": {
+        "inputs": [
+            {"name": "trialsECOG", "kind": "required", "type": ["cell"], "purpose": "data by trials"},
+            {"name": "fhp", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "high pass cutoff frequency"},
+            {"name": "flp", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "low pass cutoff frequency"},
+            {"name": "fs", "kind": "ordered", "type": ["numeric", "positive", "numel=1"], "purpose": "sample rate"}
+        ]
+    },
+
+    "mECOGFilter": {
+        "inputs": [
+            {"name": "ECOGDataset", "kind": "required", "type": ["struct"], "purpose": "TDT dataset"},
+            {"name": "fhp", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "high pass cutoff frequency"},
+            {"name": "flp", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "low pass cutoff frequency"},
+            {"name": "fs", "kind": "ordered", "type": ["numeric", "positive", "numel=1"], "purpose": "sample rate"}
+        ]
+    },
+
     "joinSTD": {
         "inputs": [
             {"name": "trials", "kind": "required", "type": ["struct"]},

@@ -1,5 +1,4 @@
 function [trialAll, trialsECOG, trialsECOG_S1] = mergeCTLTrialsECOG(MATPATH, posIndex)
-
 %% Parameter settings
 params.posIndex = posIndex; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
@@ -30,8 +29,15 @@ elseif contains(Protocol, "Duration")
 elseif contains(Protocol, "Species")
     [~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
     ordTemp = num2cell(ordTemp);
+elseif contains(Protocol, "Rhythm")
+    [~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
+    ordTemp = num2cell(ordTemp);
 end
-temp = cellfun(@(x, y) x + S1Duration(y), devTemp, ordTemp, "UniformOutput", false);
+if max(devType) > 100
+    temp = cellfun(@(x, y) x + S1Duration(y), devTemp, ordTemp, "UniformOutput", false);
+else
+    temp = cellfun(@(x, y) x + S1Duration(y), devTemp, {trialAll.ordrSeq}', "UniformOutput", false);
+end
 trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 
 
