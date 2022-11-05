@@ -1,6 +1,5 @@
 function varargout = mECOGFilter(dataset, fhp, flp, varargin)
-    % Description: Split data by trials, window and segOption. Filter and
-    %              resample data. Perform ICA on data.
+    % Description: Split data by trials, perform band pass filter on data
     % Input:
     %     dataset:
     %         1. ECOGDataset: TDT dataset of [LAuC] or [LPFC]
@@ -16,7 +15,7 @@ function varargout = mECOGFilter(dataset, fhp, flp, varargin)
     %     comp: result of filter
     % Example:
     %     ECOGDataset = mECOGFilter(ECOGDataset, 0.1, 10);
-    %     comp = mECOGFilter(ECOGDataset, 0.1, 10, [fs]);
+    %     trialsECOG = mECOGFilter(trialsECOG, 0.1, 10, [fs]);
 
     mInputParser = inputParser;
     mInputParser.addRequired("dataset");
