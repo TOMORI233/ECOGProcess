@@ -20,7 +20,7 @@ stimStrs = ["changed reg", "frozen irreg", "rand irreg", "changed reg", "frozen 
 correspFreq = [repmat([1000/300; 1000/100; 1000/25], 1, 3), repmat([1000/500; 1000/200; 1000/50], 1, 3)];
 protStr = [repmat(["C300"; "C100"; "C25"], 1, 3), repmat(["C500"; "C200"; "C50"], 1, 3)];
 
-ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\";
+ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 

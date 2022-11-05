@@ -1,4 +1,6 @@
-function [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA)
+
+function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs, windowICA)
+
     % Description: perform ICA on data and loop reconstructing data with input ICs until you are satisfied
     % Input:
     %     trialsECOG: n*1 cell array of trial data (64*m matrix)
@@ -9,12 +11,13 @@ function [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA)
     %     ICs: the input IC number array for data reconstruction
     %     FigTopoICA: figure of topo of all ICs
 
+
     comp0 = mICA(trialsECOG, windowICA, fs);
     comp = realignIC(comp0, windowICA);
 
     ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
     ICStd = cell2mat(cellfun(@(x) std(x, [], 1), changeCellRowNum(comp.trial), "UniformOutput", false));
-    plotRawWave(ICMean, ICStd, windowICA, "ICA");
+    FigIC = plotRawWave(ICMean, ICStd, windowICA, "ICA");
     FigTopoICA = plotTopo(comp, [8, 8], [8, 8]);
 
     FigWave(1) = plotRawWave(cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG), "UniformOutput", false)), [], windowICA, "origin");

@@ -21,15 +21,15 @@ selectCh = 9;
 stimStrs = ["RegOrd", "RegRev", "IrregOrd", "IrregRev"];
 
 protStr = ["ICI4", "ICI8", "ICI20", "ICI40", "ICI80"];
-ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\";
+ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
 CRIMethod = 2;
 CRIMethodStr = ["Resp_devided_by_Spon", "R_minus_S_devide_R_plus_S"];
-CRIScale = [0.8, 2; -0.1 0.6];
+CRIScale = [0.8, 2; -0.1 0.5];
 CRITest = [1, 0];
-
+pBase = 0.01;
 
 colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#AAAAAA"];
 
@@ -38,7 +38,7 @@ AREANAME = AREANAME(params.posIndex);
 fs = 500;
 
 badCh = {[], []};
-yScale = [60, 90];
+yScale = [50, 60];
 quantWin = [0 300];
 sponWin = [-300 0];
 latencyWin = [80 200];
@@ -47,7 +47,6 @@ for mIndex = 1 : length(MATPATH)
     disp(strcat("processing ", protStr(mIndex), "..."));
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
-    Protocols{mIndex} = Protocol;
     FIGPATH = strcat(ROOTPATH, "Pop_Figure3\", CRIMethodStr(CRIMethod), "\", temp(4), "\");
     mkdir(FIGPATH);
     %% process
@@ -59,9 +58,30 @@ for mIndex = 1 : length(MATPATH)
         load(strcat(FIGPATH, protStr(mIndex), "_PopulationData.mat"));
     end
     toc
+
+    %% ICA
     % align to certain duration
     run("CTLconfig.m");
+    ICAName = strcat(FIGPATH, "comp_", AREANAME, "_", protStr(mIndex), ".mat");
+    trialsECOG_MergeTemp = trialsECOG_Merge;
+    trialsECOG_S1_MergeTemp = trialsECOG_S1_Merge;
 
+    if ~exist(ICAName, "file")
+        [comp, ICs, FigTopoICA, FigWave] = ICA_Population(trialsECOG_MergeTemp, fs, Window);
+        compT = comp;
+        compT.topo(:, ~ismember(1:size(compT.topo, 2), ICs)) = 0;
+        trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
+        trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
+        close(FigTopoICA);
+        close(FigWave);
+        save(ICAName, "compT", "comp", "ICs", "-mat");
+    else
+        load(ICAName);
+        trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
+        trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
+    end
+
+    %% process
     devType = unique([trialAll.devOrdr]);
 
     % initialize
@@ -81,7 +101,7 @@ for mIndex = 1 : length(MATPATH)
         chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG), 'UniformOutput', false));
         % FFT during S1
         tIdx = find(t > FFTWin(1) & t < FFTWin(2));
-        [ff, PMean{dIndex}, trialsFFT]  = trialsECOGFFT(trialsECOG, fs, tIdx, [], 2);
+        [ff, PMean{dIndex}, trialsFFT]  = trialsECOGFFT(trialsECOG, fs);
         for ch = 1 : size(chMean{dIndex}, 1)
             cdrPlot(ch).(strcat(protStr(mIndex), "Wave"))(:, 2 * dIndex - 1) = t';
             cdrPlot(ch).(strcat(protStr(mIndex), "Wave"))(:, 2 * dIndex) = chMean{dIndex}(ch, :)';
@@ -118,7 +138,7 @@ for mIndex = 1 : length(MATPATH)
     ampNormS1.(strcat(protStr(mIndex), "_S1_se")) = cellfun(@(x) std(x)/sqrt(length(x)), changeCellRowNum(temp));
     ampNormS1.(strcat(protStr(mIndex), "_S1_raw")) = changeCellRowNum(temp);
     % compare S1Res and spon
-    [S1H{mIndex}, S1P{mIndex}] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(ampS1{mIndex}), changeCellRowNum(rmsSponS1{mIndex}), "UniformOutput", false);
+    [S1H{mIndex}, S1P{mIndex}] = cellfun(@(x, y) ttest2(x, y), changeCellRowNum(ampS1{mIndex}), changeCellRowNum(rmsSponS1{mIndex}), "UniformOutput", false);
 
 end
 
@@ -130,6 +150,7 @@ setAxes(FigWave, 'yticklabel', '');
 setAxes(FigWave, 'xticklabel', '');
 setAxes(FigWave, 'visible', 'off');
 setLine(FigWave, "YData", [-yScale(monkeyId) yScale(monkeyId)], "LineStyle", "--");
+pause(1);
 set(FigWave, "outerposition", [300, 100, 800, 670]);
 plotLayout(FigWave, params.posIndex + 2 * (monkeyId - 1), 0.3);
 print(FigWave, strcat(FIGPATH, Protocol, "_Wave_", stimStrs(stimSelect)), "-djpeg", "-r200");
@@ -148,6 +169,7 @@ for mIndex = 1 : length(MATPATH)
     FigTopo = plotTopo_Raw(topo, [8, 8]);
     colormap(FigTopo, "jet");
     scaleAxes(FigTopo, "c", CRIScale(CRIMethod, :));
+    pause(1);
     set(FigTopo, "outerposition", [300, 100, 800, 670]);
     print(FigTopo, strcat(FIGPATH, "_CRI_Topo_", protStr(mIndex), "_", stimStrs(stimSelect)), "-djpeg", "-r200");
     close(FigTopo);
@@ -169,12 +191,13 @@ for mIndex = 1 : length(MATPATH)
 %     [sponH{mIndex}, sponP{mIndex}] = cellfun(@(x, y) ttest2(x, y), temp, OneArray, "UniformOutput", false);
 
     % plot p-value topo
-    topo = logg(0.05, cell2mat(sponP{mIndex}) / 0.05);
+    topo = logg(pBase, cell2mat(sponP{mIndex}) / pBase);
         topo(isinf(topo)) = 5;
         topo(topo > 5) = 5;
         FigTopo(mIndex) = plotTopo_Raw(topo, [8, 8]);
     colormap(FigTopo(mIndex), "jet");
     scaleAxes(FigTopo(mIndex), "c", [-5 5]);
+    pause(1);
     set(FigTopo(mIndex), "outerposition", [300, 100, 800, 670]);
     print(FigTopo(mIndex), strcat(FIGPATH, "_pValue_Topo_", protStr(mIndex), "_", stimStrs(stimSelect)), "-djpeg", "-r200");
 end
@@ -233,11 +256,13 @@ for mIndex = 1 : length(MATPATH)
     FigTopo = plotTopo_Raw(topo, [8, 8]);
     colormap(FigTopo, "jet");
     scaleAxes(FigTopo, "c", [0 0.5]);
+    pause(1);
     set(FigTopo, "outerposition", [300, 100, 800, 670]);
     print(FigTopo, strcat(FIGPATH, "_latency_Topo_", protStr(mIndex), "_", stimStrs(stimSelect)), "-djpeg", "-r200");
     close(FigTopo);
 end
 
-
+ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
+save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
 % clearvars -except toPlot_Wave compare sigch cdrPlot ampNorm latency temp
 close all

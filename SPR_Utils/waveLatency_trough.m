@@ -19,10 +19,12 @@ smthSample = ceil(smthBin * fs / 1000);
 %            ( 64 * n to n * 64)
 smthWave = cellfun(@(x) smoothdata(x(:, tIndex)','gaussian',smthSample)', wave, "UniformOutput", false);
 [~, minIdx] = cellfun(@(x) min(x, [], 2), smthWave, "UniformOutput", false);
-for mIndex= 1 : length(minIdx)
-    minIdx{mIndex}(minIdx{mIndex} == 1) = [];
+[~, maxIdx] = cellfun(@(x) max(x, [], 2), smthWave, "UniformOutput", false);
+targetIdx = cellfun(@(x, y) min([x, y], [], 2), minIdx, maxIdx, "uni", false);
+for mIndex= 1 : length(targetIdx)
+    targetIdx{mIndex}(targetIdx{mIndex} == 1) = [];
 end
-tMin = cellfun(@(x) tTest(x), minIdx, "UniformOutput", false);
+tMin = cellfun(@(x) tTest(x), targetIdx, "UniformOutput", false);
 latency_raw = tMin;
 latency_mean = cell2mat(cellfun(@(x) mean(x), tMin, "UniformOutput", false));
 latency_se = cell2mat(cellfun(@(x) std(x) / sqrt(length(x)), tMin, "UniformOutput", false));

@@ -7,6 +7,8 @@ temp(ismember(string({temp.name}'), [".", ".."])) = [];
 trialAll = cell(length(temp), 1);
 trialsECOG.AC = cell(length(temp), 1);
 trialsECOG.PFC = cell(length(temp), 1);
+trialsECOG_S1.AC = cell(length(temp), 1);
+trialsECOG_S1.PFC = cell(length(temp), 1);
 
 for fIndex = 1:length(temp)
 
@@ -29,8 +31,8 @@ selIdx = ~cellfun(@isempty, trialAll);
 trialAll_merge = mergeSameFieldStruct(trialAll(selIdx));
 trialsECOG_ACMerge = mergeSameContentCell(trialsECOG.AC(selIdx));
 trialsECOG_PFCMerge = mergeSameContentCell(trialsECOG.PFC(selIdx));
-trialsECOG_S1_ACMerge = mergeSameContentCell(trialsECOG.AC(selIdx));
-trialsECOG_S1_PFCMerge = mergeSameContentCell(trialsECOG.PFC(selIdx));
+trialsECOG_S1_ACMerge = mergeSameContentCell(trialsECOG_S1.AC(selIdx));
+trialsECOG_S1_PFCMerge = mergeSameContentCell(trialsECOG_S1.PFC(selIdx));
 
 
 

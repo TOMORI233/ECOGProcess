@@ -13,6 +13,5 @@ for i = 1 : rowN
     f = Fs*(0 : ceil(L/2))/L;
     P(i, :) = P1(1 : ceil(L/2) + 1);
     Pow(i, :) = pow2db(P(i, :));
-
 end
 end
