@@ -10,9 +10,9 @@ if nargin < 3
 end
 choiceWinDev = choiceWin + soundDuration;
 %% Information extraction
-trialOnsetIndex = 1:length(epocs.num0.data);
-trialOnsetTimeAll = epocs.num0.onset(trialOnsetIndex) * 1000; % ms
-soundOnsetTimeAll = epocs.num0.onset * 1000; % ms
+trialOnsetIndex = 1:length(epocs.ordr.data);
+trialOnsetTimeAll = epocs.ordr.onset(trialOnsetIndex) * 1000; % ms
+soundOnsetTimeAll = epocs.ordr.onset * 1000; % ms
 ordrAll = epocs.ordr.data; % Hz
 
 n = length(trialOnsetIndex);
@@ -34,7 +34,7 @@ for tIndex = 1:length(trialOnsetIndex)
     if tIndex < length(trialOnsetIndex)
     soundOnsetIndex = trialOnsetIndex(tIndex):(trialOnsetIndex(tIndex + 1) - 1);
     else
-         soundOnsetIndex = trialOnsetIndex(tIndex):length(epocs.num0.data);
+         soundOnsetIndex = trialOnsetIndex(tIndex):length(epocs.ordr.data);
     end
     trialAll(tIndex, 1).soundOnsetSeq = soundOnsetTimeAll(soundOnsetIndex);
     trialAll(tIndex, 1).devOnset = trialAll(tIndex, 1).soundOnsetSeq(end);

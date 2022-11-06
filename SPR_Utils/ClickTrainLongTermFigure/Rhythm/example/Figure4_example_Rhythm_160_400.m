@@ -3,17 +3,17 @@ close all; clc; clear;
 monkeyId = 1;  % 1：chouchou; 2：xiaoxiao
 
 if monkeyId == 1
-    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Rhythm_Ratio_Rev\cc20221104\cc20221104_AC.mat';
+    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TITS_160_400\cc20221105\cc20221105_AC.mat';
     
 elseif monkeyId == 2
 
 end
 
 fhp = 0.1;
-flp = 10;
-stimStrs = ["26o4_24", "36_24", "48_24", "39o6_36", "54_36", "72_36", "72_48"];
+flp = 2;
+stimStrs = ["Reg_160_400", "Reg_400_160"];
 
-protStr = "Rev";
+protStr = "TITS";
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Rhythm\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
@@ -24,21 +24,19 @@ CRIScale = [0.8, 2; -0.1 0.5];
 CRITest = [1, 0];
 pBase = 0.01;
 
-% colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#AAAAAA"];
-% colors = ["#AAAAAA", "#000000", "#0000FF", "#FFA500", "#FF0000"];
-colors = ["#FF0000", "#FFA500","#00FF00" , "#0000FF", "#556B2F", "#000000", "#AAAAAA"];
-% colors = ["#FF0000", "#FFA500","#00FF00" , "#0000FF", "#556B2F", "#0000FF", "#000000"];
+colors = ["#FF0000", "#0000FF"];
+
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
 fs = 500;
 
 badCh = {[], []};
-yScale = [30, 40];
+yScale = [10, 40];
 quantWin = [0 300];
 sponWin = [-300 0];
 latencyWin = [80 200];
-baseICI = [26.4, 36, 48, 39.6, 54, 72, 72];
-ICI2 = [24, 24, 24, 36, 36, 36, 48];
+baseICI = [160, 400];
+ICI2 = [400, 160];
 correspFreq = 1000./ICI2;
 
 for mIndex = 1 : length(MATPATH)
@@ -47,7 +45,7 @@ for mIndex = 1 : length(MATPATH)
     dateStr = temp(end - 1);
     Protocol = temp(end - 2);
     Protocols(mIndex) = Protocol;
-    FIGPATH = strcat(ROOTPATH, "Figure3_Rev\", dateStr, "\", temp(4), "\");
+    FIGPATH = strcat(ROOTPATH, "Figure4_Reg_160_400\", dateStr, "\", temp(4), "\");
     mkdir(FIGPATH);
     %% process
     tic
@@ -84,8 +82,6 @@ for mIndex = 1 : length(MATPATH)
     %% filter
      trialsECOG_Merge_Filtered = mECOGFilter(trialsECOG_Merge, fhp, flp, fs);
     
-    
-
     %% process
     devType = unique([trialAll.devOrdr]);
 
@@ -206,7 +202,7 @@ for dIndex = devType
         FigWave = plotRawWaveMulti_SPR(diff, Window, titleStr, [8, 8]);
         FigWaveFilted = plotRawWaveMulti_SPR(diffFilter, Window, titleStr, [8, 8]);
         scaleAxes([FigWave, FigWaveFilted], "y", [-yScale(monkeyId) yScale(monkeyId)]);
-        scaleAxes([FigWave, FigWaveFilted], "x", [-150 600]);
+        scaleAxes([FigWave, FigWaveFilted], "x", [-2000 2000]);
         setLine([FigWave, FigWaveFilted], "YData", [-yScale(monkeyId) yScale(monkeyId)], "LineStyle", "--");
         for lIndex = 1 : 5
             lines(lIndex).X = lIndex * ICI2(dIndex);

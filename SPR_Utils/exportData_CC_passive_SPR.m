@@ -1,5 +1,37 @@
 clear; clc; close all;
 
+%% Rhythm, TITS_Offset_Irreg
+disp("Exporting ClickTrainLongTerm TITS_Offset_Irreg ...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_Irreg\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221105\Block-6'; % 20221105 export
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm, TITS_24_60_Tone
+disp("Exporting ClickTrainLongTerm TITS_Tone ...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Tone\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221105\Block-5'; % 20221105 export
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm, TITS_Reg_Irreg  
+disp("Exporting ClickTrainLongTerm TITS_Reg_Irreg ...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Reg_Irreg\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221105\Block-4'; % 20221105 export
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm, TITS 160_400     
+disp("Exporting ClickTrainLongTerm TITS 160_400 ...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_160_400\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221105\Block-3'; % 20221105 export, use offset2 20221105 sound
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
 %% Rhythm, Offset
 disp("Exporting ClickTrainLongTerm Offset, ratio ...");
 SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\Rhythm_Offset\";

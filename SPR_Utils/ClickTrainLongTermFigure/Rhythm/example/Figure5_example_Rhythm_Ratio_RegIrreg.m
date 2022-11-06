@@ -3,7 +3,7 @@ close all; clc; clear;
 monkeyId = 1;  % 1：chouchou; 2：xiaoxiao
 
 if monkeyId == 1
-    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Rhythm_Ratio_Rev\cc20221104\cc20221104_AC.mat';
+    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TITS_Reg_Irreg\cc20221105\cc20221105_AC.mat';
     
 elseif monkeyId == 2
 
@@ -11,9 +11,9 @@ end
 
 fhp = 0.1;
 flp = 10;
-stimStrs = ["26o4_24", "36_24", "48_24", "39o6_36", "54_36", "72_36", "72_48"];
+stimStrs = ["36_24Reg", "36_24Irreg", "60_24Reg", "60_24Irreg"];
 
-protStr = "Rev";
+protStr = "TITS_Reg_Irreg";
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Rhythm\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
@@ -24,10 +24,8 @@ CRIScale = [0.8, 2; -0.1 0.5];
 CRITest = [1, 0];
 pBase = 0.01;
 
-% colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#AAAAAA"];
-% colors = ["#AAAAAA", "#000000", "#0000FF", "#FFA500", "#FF0000"];
-colors = ["#FF0000", "#FFA500","#00FF00" , "#0000FF", "#556B2F", "#000000", "#AAAAAA"];
-% colors = ["#FF0000", "#FFA500","#00FF00" , "#0000FF", "#556B2F", "#0000FF", "#000000"];
+colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#AAAAAA"];
+
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
 fs = 500;
@@ -37,8 +35,8 @@ yScale = [30, 40];
 quantWin = [0 300];
 sponWin = [-300 0];
 latencyWin = [80 200];
-baseICI = [26.4, 36, 48, 39.6, 54, 72, 72];
-ICI2 = [24, 24, 24, 36, 36, 36, 48];
+baseICI = [36, 36, 60, 60];
+ICI2 = [24, 24, 24, 24];
 correspFreq = 1000./ICI2;
 
 for mIndex = 1 : length(MATPATH)
@@ -47,7 +45,7 @@ for mIndex = 1 : length(MATPATH)
     dateStr = temp(end - 1);
     Protocol = temp(end - 2);
     Protocols(mIndex) = Protocol;
-    FIGPATH = strcat(ROOTPATH, "Figure3_Rev\", dateStr, "\", temp(4), "\");
+    FIGPATH = strcat(ROOTPATH, "Figure5_TITS_Reg_Irreg\", dateStr, "\", temp(4), "\");
     mkdir(FIGPATH);
     %% process
     tic
@@ -84,8 +82,6 @@ for mIndex = 1 : length(MATPATH)
     %% filter
      trialsECOG_Merge_Filtered = mECOGFilter(trialsECOG_Merge, fhp, flp, fs);
     
-    
-
     %% process
     devType = unique([trialAll.devOrdr]);
 
@@ -187,7 +183,7 @@ for mIndex = 1 : length(MATPATH)
     pause(1);
     set(FigFFT, "outerposition", [300, 100, 800, 670]);
     plotLayout(FigFFT, params.posIndex + 2 * (monkeyId - 1), 0.3);
-    print(FigFFT, strcat(FIGPATH, Protocols(mIndex), "_FFT_", strrep(num2str(baseICI(dIndex)), ".", "o"), "_", strrep(num2str(ICI2(dIndex)), ".", "o")), "-djpeg", "-r200");
+    print(FigFFT, strrep(strcat(FIGPATH, Protocols(mIndex), "_", stimStrs(dIndex),  "_FFT_", num2str(baseICI(dIndex)), "_", num2str(ICI2(dIndex))), ".", "o"), "-djpeg", "-r200");
     close(FigFFT);
     end
 end
@@ -222,8 +218,8 @@ for dIndex = devType
         set([FigWave, FigWaveFilted], "outerposition", [300, 100, 800, 670]);
         plotLayout(FigWave, params.posIndex + 2 * (monkeyId - 1), 0.3);
         plotLayout(FigWaveFilted, params.posIndex + 2 * (monkeyId - 1), 0.3);
-        print(FigWave, strcat(FIGPATH, Protocols(mIndex), "_Wave_", strrep(num2str(baseICI(dIndex)), ".", "o"), "_", strrep(num2str(ICI2(dIndex)), ".", "o")), "-djpeg", "-r200");
-        print(FigWaveFilted, strrep(strcat(FIGPATH, Protocols(mIndex), "_Wave_Filted", num2str(fhp), "_", num2str(flp), "Hz_", num2str(baseICI(dIndex)), "_", num2str(ICI2(dIndex))), ".", "o"), "-djpeg", "-r200");
+        print(FigWave, strrep(strcat(FIGPATH, Protocols(mIndex), "_", stimStrs(dIndex),  "_Wave_", num2str(baseICI(dIndex)), "_", num2str(ICI2(dIndex))), ".", "o"), "-djpeg", "-r200");
+        print(FigWaveFilted, strrep(strcat(FIGPATH, Protocols(mIndex), "_", stimStrs(dIndex),  "_Wave_Filtered_", num2str(fhp), "_", num2str(flp), "Hz_", num2str(baseICI(dIndex)), "_", num2str(ICI2(dIndex))), ".", "o"), "-djpeg", "-r200");
         close(FigWave);
     end
 end

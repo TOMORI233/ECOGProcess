@@ -1,4 +1,4 @@
-function [rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOG, varargin)
+function [rhoMean, trialsMeanECOG, chSort, rhoSort] = mECOGCorr(trialsECOG, varargin)
 % Description: Calculate correlation matrix trial-by-trial and dicide
 %              the most similar channel to a reference channel
 % Input:
@@ -10,16 +10,20 @@ function [rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOG, varargin)
 %         1. pearson; 2. kendall; 3. spearman
 %     refCh:
 %         reference channel that you think is the most ideal one
-%     ch: channel index
+%     ch: 
+%         channel index
+%     selNum:
+%         number of selected channels to be averaged
+%     
 %
 % Output:
 %     rhoMean: mean of correlation matrix
 %     chSort: sorted by the correlate to the reference channel
 %     rhoSort: sorted version of rhoMean corresponding to chSort
+%     trialsMeanECOG: the average of selected channels
 % Example:
-%     [rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOGFilterd, Window, [0 1000], "method", "pearson", "refCh", 4);
-%     [rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOGFilterd, [], [], "method", "pearson", "refCh", 4);
-
+%     [rhoMean, trialsMeanECOG, chSort, rhoSort] = mECOGCorr(trialsECOG, Window, [0 1000], "method", "pearson", "refCh", 4, "selNum", 10);
+%     rhoMean = mECOGCorr(trialsECOG, "method", "pearson");
 
 %% Validate input
 mInputParser = inputParser;
@@ -29,6 +33,7 @@ mInputParser.addOptional("target", [], @(x) validateattributes(x, {'numeric'}, {
 mInputParser.addParameter("method", "pearson", @(x) any(validatestring(x, {'pearson','kendall','spearman'})));
 mInputParser.addParameter("refCh", [], @(x) validateattributes(x, {'numeric'}, {'numel', 1}));
 mInputParser.addParameter("ch", 1 : size(trialsECOG{1}, 2), @(x) validateattributes(x, {'numeric'}));
+mInputParser.addParameter("selNum", 10, @(x) validateattributes(x, {'numeric'}, {'numel', 1}));
 mInputParser.parse(trialsECOG, varargin{:});
 
 
@@ -38,6 +43,7 @@ target = mInputParser.Results.target;
 METHOD = mInputParser.Results.method;
 REFCH = mInputParser.Results.refCh;
 CH = mInputParser.Results.ch;
+selNum = mInputParser.Results.selNum;
 
 
 if ~isempty(range) && ~isempty(target)
@@ -55,17 +61,17 @@ temp = cellfun(@(x) x(:, tTarget), trialsECOG, "UniformOutput", false);
 [rho, ~] = cellfun(@(x) corr(x', "type", METHOD), temp, "UniformOutput", false);
 
 rhoMean = cell2mat(cellfun(@mean, changeCellRowNum(rho), "UniformOutput", false));
-if ~isempty(REFCH)
-    [rhoSort, idx] = sortrows(rhoMean, REFCH, "descend");
-    chSort = CH(idx)';
-else
+if isempty(REFCH)
     rhoSort = rhoMean;
     idx = [];
     chSort = [];
+    trialsMeanECOG = [];
+else
+    [rhoSort, idx] = sortrows(rhoMean, REFCH, "descend");
+    chSort = CH(idx)';
+    temp = cellfun(@(x) x(idx(1 : selNum), :), trialsECOG, "UniformOutput", false);
+    trialsMeanECOG = cellfun(@mean, temp, "UniformOutput", false);
 end
-
-
-
 
 
 

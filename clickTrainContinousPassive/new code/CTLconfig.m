@@ -1,9 +1,51 @@
 switch Protocol
+    case "TITS_160_400"
+        titleStr = "TITS_160_400";
+        stimStr = ["Reg_160_400", "Reg_400_160"];
+        %         S1Duration = [3024.3+48, 3024.3+52.8, 3024.3+72, 3024.3+96, 3024.3+192, 3024.3+384, 3024.3];
+        S1Duration = [4000, 4001];
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -4500;
+        Window = [winStart 4500];
+        FFTWin = [300 1900];
+        ICAWin = [-1000 1000];
+    case "TITS_Reg_Irreg"
+        titleStr = "TITS_Reg_Irreg";
+        stimStr = ["36_24Reg", "36_24Irreg", "60_24Reg", "60_24Irreg"];
+        %         S1Duration = [3024.3+48, 3024.3+52.8, 3024.3+72, 3024.3+96, 3024.3+192, 3024.3+384, 3024.3];
+        S1Duration = [2988.3, 3008.3,  3000.3, 2961.8];
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -3500;
+        Window = [winStart 2500];
+        FFTWin = [300 1900];
+        ICAWin = [-1000 1000];
+    case "TITS_Tone"
+        titleStr = "TITS_Tone";
+        % S1: 24_60, S2: 60_24
+        stimStr = ["S1_Amp1", "S1_Amp2", "S1_Amp3", "S1_Amp4", "S1_Amp5", "S2_Amp1", "S2_Amp2", "S2_Amp3", "S2_Amp4", "S2_Amp5"];
+        %         S1Duration = [3024.3+48, 3024.3+52.8, 3024.3+72, 3024.3+96, 3024.3+192, 3024.3+384, 3024.3];
+        S1Duration = ones(1, 10) * 3000.3;
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -3500;
+        Window = [winStart 4000];
+        FFTWin = [300 1900];
+        ICAWin = [-1000 1000];
+    case "TITS_Offset_Irreg"
+        titleStr = "TITS_Offset_Irreg";
+        stimStr = ["60", "80", "100", "120", "140", "160"];
+        %         S1Duration = [2900.1, 2880.1, 2800, 2880, 2880.2, 2800.1, 2860.1, 2880.1, 2860];
+        S1Duration = zeros(1, 6);
+        S1Dur = [3039.6, 3034.4, 3049.1, 3072.8, 2947.3, 2907.2];
+        winStart = -500;
+        Window = [winStart 4000];
+        FFTWin = [0 2000];
+        ICAWin = [0 2000];
     case "Rhythm_Offset"
         titleStr = "Rhythm_Offset";
         stimStr = ["100", "120", "140", "160", "180", "200", "220", "240", "260"];
-%         S1Duration = [2900.1, 2880.1, 2800, 2880, 2880.2, 2800.1, 2860.1, 2880.1, 2860];
+
         S1Duration = zeros(1, 9);
+        S1Dur = [2800.1, 2760.1, 2660.1];
         winStart = -500;
         Window = [winStart 3500];
         FFTWin = [0 2000];
@@ -11,7 +53,7 @@ switch Protocol
     case "Rhythm_Ratio_Rev"
         titleStr = "Rhythm_Ratio_Rev";
         stimStr = ["26o4_24", "36_24", "48_24", "39o6_36", "54_36", "72_36", "72_48"];
-%         S1Duration = [3024.3+48, 3024.3+52.8, 3024.3+72, 3024.3+96, 3024.3+192, 3024.3+384, 3024.3];
+        %         S1Duration = [3024.3+48, 3024.3+52.8, 3024.3+72, 3024.3+96, 3024.3+192, 3024.3+384, 3024.3];
         S1Duration = [3010.6, 3088.3, 3024.3, 3010.2, 3024.3, 3024.3, 3024.3];
         cursor = [62.5, 62.5, 62.5 ,62.5];
         winStart = -3500;
@@ -21,7 +63,7 @@ switch Protocol
     case "Rhythm_Ratio_ICI48"
         titleStr = "Rhythm_Ratio_ICI48";
         stimStr = {'control', '1o1', '1o5', '2', '3', '8', 'offset'};
-%         S1Duration = [3024.3+48, 3024.3+52.8, 3024.3+72, 3024.3+96, 3024.3+192, 3024.3+384, 3024.3];
+        %         S1Duration = [3024.3+48, 3024.3+52.8, 3024.3+72, 3024.3+96, 3024.3+192, 3024.3+384, 3024.3];
         S1Duration = [3024.3, 3024.3, 3024.3, 3024.3, 3024.3, 3024.3, 3024.3-48];
         cursor = [62.5, 62.5, 62.5 ,62.5];
         winStart = -3500;
