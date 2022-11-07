@@ -85,8 +85,7 @@ for mIndex = 1 : length(MATPATH)
      trialsECOG_Merge_Filtered = mECOGFilter(trialsECOG_Merge, fhp, flp, fs);
 
     %% select certain channels to reduce interference via corr matrix
-
-    [rhoMean, trialsMeanECOG, chSort, rhoSort] = mECOGCorr(trialsECOG_Merge_Filtered, Window, [0 1000], "method", "pearson", "refCh", 4, "selNum", 10);
+    [trialsECOG_Merge_Mean, rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOG_Merge, Window, [0 1000], "method", "pearson", "refCh", 4, "selNum", 10);
 
 
     %% process
@@ -104,11 +103,14 @@ for mIndex = 1 : length(MATPATH)
     chMean = cell(length(MATPATH), length(devType));
     chMeanFilterd = cell(length(MATPATH), length(devType));
     trialsECOGFilterd = cell(length(MATPATH), length(devType));
+    trialsECOGMean = cell(length(devType), length(MATPATH));
     for dIndex = devType
         tIndex = [trialAll.devOrdr] == dIndex;
         trials = trialAll(tIndex);
         trialsECOG = trialsECOG_Merge(tIndex);
         trialsECOGFilterd = trialsECOG_Merge_Filtered(tIndex);
+        trialsECOGMean = trialsECOG_Merge_Mean(tIndex);
+
         % FFT during S1
         tIdx = find(t > FFTWin(1) & t < FFTWin(2));
         [ff, PMean{mIndex, dIndex}, trialsFFT]  = trialsECOGFFT(trialsECOG, fs, tIdx, [], 2);
@@ -122,7 +124,9 @@ for mIndex = 1 : length(MATPATH)
         chMeanFilterd{mIndex, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOGFilterd), 'UniformOutput', false));
         chStdFilter = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOGFilterd), 'UniformOutput', false));
 
-       
+        % Mean wave
+        trialMean{dIndex, mIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOGMean), 'UniformOutput', false));
+        trialStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOGMean), 'UniformOutput', false));
 
         for ch = 1 : size(chMean{mIndex, dIndex}, 1)
             cdrPlot(ch).(strcat(protStr(mIndex), "Wave"))(:, 2 * dIndex - 1) = t';
@@ -229,6 +233,21 @@ for dIndex = devType
         close(FigWave);
     end
 end
+
+
+
+%%  plot trialMean result
+for mIndex = 1 : length(MATPATH)
+    temp = trialMean(:, mIndex);
+    temp = cell2mat(temp);
+    Fig = plotRawWave(temp, [], Window, "TITS_Tone", [2, 5]);
+    titles = strrep(stimStrs, "_", " ");
+    setTitle(Fig, titles);
+end
+
+
+
+
 ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
 save(ResName, "cdrPlot", "PMean", "chMean", "baseICI", "ICI2", "-mat");
 

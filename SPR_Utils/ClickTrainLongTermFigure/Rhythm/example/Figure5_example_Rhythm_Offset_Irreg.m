@@ -147,8 +147,6 @@ for mIndex = 1 : length(MATPATH)
 
     end
 
-%% pearson correlation matrix
-[rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOGFilterd, Window, [0 1000], "method", "pearson", "refCh", 4);
 
     %% significance of s1 onset response
     [temp, ampS1{mIndex}, rmsSponS1{mIndex}] = cellfun(@(x) waveAmp_Norm(x, Window, quantWin, CRIMethod, sponWin), trialsECOG_S1_Merge, 'UniformOutput', false);

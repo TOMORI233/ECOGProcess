@@ -1,4 +1,4 @@
-function [rhoMean, trialsMeanECOG, chSort, rhoSort] = mECOGCorr(trialsECOG, varargin)
+function [trialsMeanECOG, rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOG, varargin)
 % Description: Calculate correlation matrix trial-by-trial and dicide
 %              the most similar channel to a reference channel
 % Input:

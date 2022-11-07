@@ -1,5 +1,5 @@
 switch Protocol
-    case "TITS_160_400"
+    case "TITS_160_400"  % prediction based 400-700,/ 400-700 Irreg 6s-4s
         titleStr = "TITS_160_400";
         stimStr = ["Reg_160_400", "Reg_400_160"];
         %         S1Duration = [3024.3+48, 3024.3+52.8, 3024.3+72, 3024.3+96, 3024.3+192, 3024.3+384, 3024.3];
@@ -9,7 +9,7 @@ switch Protocol
         Window = [winStart 4500];
         FFTWin = [300 1900];
         ICAWin = [-1000 1000];
-    case "TITS_Reg_Irreg"
+    case "TITS_Reg_Irreg"  % No reg in irreg / check distribution of clicks
         titleStr = "TITS_Reg_Irreg";
         stimStr = ["36_24Reg", "36_24Irreg", "60_24Reg", "60_24Irreg"];
         %         S1Duration = [3024.3+48, 3024.3+52.8, 3024.3+72, 3024.3+96, 3024.3+192, 3024.3+384, 3024.3];
@@ -19,10 +19,10 @@ switch Protocol
         Window = [winStart 2500];
         FFTWin = [300 1900];
         ICAWin = [-1000 1000];
-    case "TITS_Tone"
+    case "TITS_Tone"  % fix Tone Amp to 10, click train SPL 
         titleStr = "TITS_Tone";
         % S1: 24_60, S2: 60_24
-        stimStr = ["S1_Amp1", "S1_Amp2", "S1_Amp3", "S1_Amp4", "S1_Amp5", "S2_Amp1", "S2_Amp2", "S2_Amp3", "S2_Amp4", "S2_Amp5"];
+        stimStr = ["S1_Amp1", "S1_Amp2", "S1_Amp4", "S1_Amp7", "S1_Amp10", "S2_Amp1", "S2_Amp2", "S2_Amp3", "S2_Amp4", "S2_Amp5"];
         %         S1Duration = [3024.3+48, 3024.3+52.8, 3024.3+72, 3024.3+96, 3024.3+192, 3024.3+384, 3024.3];
         S1Duration = ones(1, 10) * 3000.3;
         cursor = [62.5, 62.5, 62.5 ,62.5];
@@ -30,7 +30,7 @@ switch Protocol
         Window = [winStart 4000];
         FFTWin = [300 1900];
         ICAWin = [-1000 1000];
-    case "TITS_Offset_Irreg"
+    case "TITS_Offset_Irreg"  % mix Reg and Irreg 40, 60, 80,  100, 120
         titleStr = "TITS_Offset_Irreg";
         stimStr = ["60", "80", "100", "120", "140", "160"];
         %         S1Duration = [2900.1, 2880.1, 2800, 2880, 2880.2, 2800.1, 2860.1, 2880.1, 2860];
@@ -40,7 +40,7 @@ switch Protocol
         Window = [winStart 4000];
         FFTWin = [0 2000];
         ICAWin = [0 2000];
-    case "Rhythm_Offset"
+    case "Rhythm_Offset" % 降低单个click声强，24ms ICI，能不能没有跟随但有offset
         titleStr = "Rhythm_Offset";
         stimStr = ["100", "120", "140", "160", "180", "200", "220", "240", "260"];
 
