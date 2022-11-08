@@ -3,7 +3,7 @@ close all; clc; clear;
 monkeyId = 1;  % 1：chouchou; 2：xiaoxiao
 
 if monkeyId == 1
-    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TITS_160_400\cc20221105\cc20221105_AC.mat';
+    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TITS_400_700\cc20221107\cc20221107_AC.mat';
 
 elseif monkeyId == 2
 
@@ -11,7 +11,7 @@ end
 
 fhp = 0.1;
 flp = 20;
-stimStrs = ["Reg_160_400", "Reg_400_160"];
+stimStrs = ["Reg_400_700", "Irreg_400_700", "Reg_700_400", "Irreg_700_400"];
 
 protStr = "TITS";
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Rhythm\";
@@ -24,7 +24,7 @@ CRIScale = [0.8, 2; -0.1 0.5];
 CRITest = [1, 0];
 pBase = 0.01;
 
-colors = ["#FF0000", "#0000FF"];
+colors = ["#FF0000", "#FFA500", "#0000FF", "#000000"];
 
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
@@ -35,8 +35,8 @@ yScale = [20, 40];
 quantWin = [0 300];
 sponWin = [-300 0];
 latencyWin = [80 200];
-baseICI = [160, 400];
-ICI2 = [400, 160];
+baseICI = [400, 400, 700, 700];
+ICI2 = [700, 700, 400, 400];
 correspFreq = 1000./ICI2;
 
 for mIndex = 1 : length(MATPATH)
@@ -45,7 +45,7 @@ for mIndex = 1 : length(MATPATH)
     dateStr = temp(end - 1);
     Protocol = temp(end - 2);
     Protocols(mIndex) = Protocol;
-    FIGPATH = strcat(ROOTPATH, "Figure4_Reg_160_400\", dateStr, "\", temp(4), "\");
+    FIGPATH = strcat(ROOTPATH, "Figure4_Reg_400_700\", dateStr, "\");
     mkdir(FIGPATH);
     %% process
     tic
@@ -193,15 +193,15 @@ end
 
 %% plot raw wave
 for dIndex = devType
-    diff = [];
+    diffRaw = [];
     diffFilter = [];
     for mIndex = 1 : length(MATPATH)
         % for raw wave
-        diff(1).chMean = chMean{mIndex, dIndex};
+        diffRaw(1).chMean = chMean{mIndex, dIndex};
         diffFilter(1).chMean = chMeanFilterd{mIndex, dIndex};
-        diff(1).color = colors(dIndex);
+        diffRaw(1).color = colors(dIndex);
         diffFilter(1).color = colors(dIndex);
-        FigWave = plotRawWaveMulti_SPR(diff, Window, titleStr, [8, 8]);
+        FigWave = plotRawWaveMulti_SPR(diffRaw, Window, titleStr, [8, 8]);
         FigWaveFilted = plotRawWaveMulti_SPR(diffFilter, Window, titleStr, [8, 8]);
         scaleAxes([FigWave, FigWaveFilted], "y", [-yScale(monkeyId) yScale(monkeyId)]);
         scaleAxes([FigWave, FigWaveFilted], "x", [-2000 4000]);
@@ -220,9 +220,10 @@ for dIndex = devType
         set([FigWave, FigWaveFilted], "outerposition", [300, 100, 800, 670]);
         plotLayout(FigWave, params.posIndex + 2 * (monkeyId - 1), 0.3);
         plotLayout(FigWaveFilted, params.posIndex + 2 * (monkeyId - 1), 0.3);
-                print(FigWave, strcat(FIGPATH, Protocols(mIndex), "_Wave_", strrep(num2str(baseICI(dIndex)), ".", "o"), "_", strrep(num2str(ICI2(dIndex)), ".", "o")), "-djpeg", "-r200");
-                print(FigWaveFilted, strrep(strcat(FIGPATH, Protocols(mIndex), "_Wave_Filted", num2str(fhp), "_", num2str(flp), "Hz_", num2str(baseICI(dIndex)), "_", num2str(ICI2(dIndex))), ".", "o"), "-djpeg", "-r200");
+                print(FigWave, strrep(strcat(FIGPATH, Protocols(mIndex), "_", stimStrs(dIndex),  "_Wave_", num2str(baseICI(dIndex)), "_", num2str(ICI2(dIndex))), ".", "o"), "-djpeg", "-r200");
+                print(FigWaveFilted, strrep(strcat(FIGPATH, Protocols(mIndex), "_", stimStrs(dIndex),  "_Wave_Filtered_", num2str(fhp), "_", num2str(flp), "Hz_", num2str(baseICI(dIndex)), "_", num2str(ICI2(dIndex))), ".", "o"), "-djpeg", "-r200");
                 close(FigWave);
+                close(FigWaveFilted);
     end
 end
 
@@ -246,10 +247,10 @@ for mIndex = 1 : length(MATPATH)
     meanTemp = cell2mat(trialMean(:, mIndex));
     stdTemp = cell2mat(trialStd(:, mIndex));
 
-    Fig = plotRawWave(meanTemp, stdTemp, Window, "TITS_160_400", autoPlotSize(length(devType)));
+    Fig = plotRawWave(meanTemp, stdTemp, Window, "TITS_400_700", autoPlotSize(length(devType)));
     titles = strrep(stimStrs, "_", " ");
     setTitle(Fig, titles(devType));
-    Axes = findobj(Fig, "Type", "Axes");
+    Axes = findobj(Fig, "Type", "axes");
 
     % add cursors of  S2 clicks
     for dIndex = devType
@@ -273,9 +274,10 @@ for mIndex = 1 : length(MATPATH)
     end
     orderLine(Fig, "Color", waves(1).color, "bottom");
     set(findobj(Fig, "Type", "patch"), "FaceAlpha", 1, "FaceColor", [0.42, 0.35, 1]);
-    scaleAxes(Fig, "x", [-4500 4000]);
-    scaleAxes(Fig, "y", [-20 20]);
+    scaleAxes(Fig, "x", [-4000 4000]);
+    scaleAxes(Fig, "y", [-70 70]);
 end
+
 %%
 ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
 save(ResName, "cdrPlot", "PMean", "chMean", "baseICI", "ICI2", "-mat");

@@ -195,15 +195,15 @@ end
 
 %% plot raw wave
 for dIndex = devType
-    diff = [];
+    diffRaw = [];
     diffFilter = [];
     for mIndex = 1 : length(MATPATH)
         % for raw wave
-        diff(1).chMean = chMean{mIndex, dIndex};
+        diffRaw(1).chMean = chMean{mIndex, dIndex};
         diffFilter(1).chMean = chMeanFilterd{mIndex, dIndex};
-        diff(1).color = colors(dIndex);
+        diffRaw(1).color = colors(dIndex);
         diffFilter(1).color = colors(dIndex);
-        FigWave = plotRawWaveMulti_SPR(diff, Window, titleStr, [8, 8]);
+        FigWave = plotRawWaveMulti_SPR(diffRaw, Window, titleStr, [8, 8]);
         FigWaveFilted = plotRawWaveMulti_SPR(diffFilter, Window, titleStr, [8, 8]);
         scaleAxes([FigWave, FigWaveFilted], "y", [-yScale(monkeyId) yScale(monkeyId)]);
         scaleAxes([FigWave, FigWaveFilted], "x", [-150 600]);
@@ -227,6 +227,59 @@ for dIndex = devType
         close(FigWave);
     end
 end
+
+
+
+%% select certain channels to reduce noise via corr matrix
+[trialsECOG_Merge_Mean, rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOG_Merge, Window, [0 400], "method", "pearson", "refCh", 2, "selNum", 10);
+
+%  plot trialMean result
+trialMean = cell(length(MATPATH), length(devType));
+trialStd = cell(length(MATPATH), length(devType));
+trialsECOGMean = cell(length(MATPATH), length(devType));
+for mIndex = 1 : length(MATPATH)
+    for dIndex = devType
+        tIndex = [trialAll.devOrdr] == dIndex;
+        trialsECOGMean{dIndex, mIndex} = trialsECOG_Merge_Mean(tIndex);
+        
+        % Mean wave
+        trialMean{dIndex, mIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOGMean{dIndex, mIndex}), 'UniformOutput', false));
+        trialStd{dIndex, mIndex} = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOGMean{dIndex, mIndex}), 'UniformOutput', false));
+    end
+
+    meanTemp = cell2mat(trialMean(:, mIndex));
+    stdTemp = cell2mat(trialStd(:, mIndex));
+
+    Fig = plotRawWave(meanTemp, [], Window, "TITS_Rev", autoPlotSize(length(devType)));
+    titles = strrep(stimStrs, "_", " ");
+    setTitle(Fig, titles(devType));
+    Axes = findobj(Fig, "Type", "axes");
+
+    % add cursors of  S2 clicks
+    for dIndex = devType
+        idx = find(devType == dIndex);
+        for lIndex = 1 : 5
+            lines(lIndex).X = lIndex * ICI2(idx);
+            lines(lIndex).Y = [-10, 10];
+            lines(lIndex).color = "b";
+        end
+        addLines2Axes(Axes(end - idx + 1), lines);
+
+        waves(1).X = t;
+        waves(1).Y = cell2mat(trialsECOGMean{dIndex, mIndex});
+        waves(1).color = "#AAAAAA";
+        waves(1).width = 0.5;
+        waves(1).style = "-";
+        addLines2Axes(Axes(end - idx + 1), waves);
+        
+    end
+    orderLine(Fig, "Color", [2/3, 2/3, 2/3], "bottom");
+    scaleAxes(Fig, "x", [-100 600]);
+    scaleAxes(Fig, "y", [-70 70]);
+end
+
+
+%%
 ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
 save(ResName, "cdrPlot", "PMean", "chMean", "baseICI", "ICI2", "-mat");
 
