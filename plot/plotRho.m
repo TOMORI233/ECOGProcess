@@ -4,7 +4,10 @@ if nargin < 2
     chSort = 1 : size(rho, 1);
 end
 Fig = figure;
+
+
 maximizeFig(Fig);
+
 margins = [0, 0, 0, 0];
 paddings = [0.015, 0.015, 0.015, 0.015];
 mAxe = mSubplot(Fig, 1, 1, 1, [1, 1], margins, paddings);
@@ -23,5 +26,12 @@ else
 end
 colormap("jet");
 colorbar;
+
+imgObj = findobj(Fig, "Type", "Image");
+imgObj.ButtonDownFcn = {@mCompareCorrCh, Fig};
+cm = uicontextmenu(Fig);
+m = uimenu(cm, 'Text', 'select trial type');
+imgObj.ContextMenu = cm;
+set(m, "MenuSelectedFcn", {@mSelectDevType, Fig});
 return;
 end

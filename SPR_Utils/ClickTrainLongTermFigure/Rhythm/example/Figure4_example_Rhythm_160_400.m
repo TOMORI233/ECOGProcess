@@ -228,7 +228,11 @@ for dIndex = devType
 end
 
 %% select certain channels to reduce noise via corr matrix
-[trialsECOG_Merge_Mean, rhoMean, chSort, rhoSort, FigRho] = mECOGCorr(trialsECOG_Merge, Window, [0 400], "method", "pearson", "refCh", 2, "selNum", 10);
+
+params.stimDlg = ["1.Reg_160_400", "2.Reg_400_160"];
+params.trialAll = trialAll;
+params.ICI2 = ICI2;
+[trialsECOG_Merge_Mean, rhoMean, chSort, rhoSort, FigRho] = mECOGCorr(trialsECOG_Merge, Window, [0 400], "method", "pearson", "refCh", 2, "selNum", 10, "params", params);
 
 %  plot trialMean result
 trialMean = cell(length(MATPATH), length(devType));
