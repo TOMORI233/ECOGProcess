@@ -1,4 +1,4 @@
-function [trialsMeanECOG, rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOG, varargin)
+function [trialsMeanECOG, rhoMean, chSort, rhoSort, FigRho] = mECOGCorr(trialsECOG, varargin)
 % Description: Calculate correlation matrix trial-by-trial and dicide
 %              the most similar channel to a reference channel
 % Input:
@@ -57,22 +57,46 @@ temp = cellfun(@(x) x(:, tTarget), trialsECOG, "UniformOutput", false);
 
 
 %% correlation
-
 [rho, ~] = cellfun(@(x) corr(x', "type", METHOD), temp, "UniformOutput", false);
 
 rhoMean = cell2mat(cellfun(@mean, changeCellRowNum(rho), "UniformOutput", false));
+
 if isempty(REFCH)
     rhoSort = rhoMean;
     idx = [];
     chSort = [];
     trialsMeanECOG = [];
+    FigRho = plotRho(rhoMean);
 else
     [rhoSort, idx] = sortrows(rhoMean, REFCH, "descend");
+    rhoSort = rhoSort(:, idx);
     chSort = CH(idx)';
     temp = cellfun(@(x) x(idx(1 : selNum), :), trialsECOG, "UniformOutput", false);
     trialsMeanECOG = cellfun(@mean, temp, "UniformOutput", false);
+    FigRho = plotRho(rhoSort, chSort);
 end
 
+
+    k = validateInput("string", "Press Y to continue or N to reselect chs: ");
+
+    while ~strcmp(k, 'y') && ~strcmp(k, 'Y')
+
+        REFCH = input('Input reference channel for rho restruction: ');
+
+        [rhoSort, idx] = sortrows(rhoMean, REFCH, "descend");
+        rhoSort = rhoSort(:, idx);
+        chSort = CH(idx)';
+        FigRho = plotRho(rhoSort, chSort);
+
+        selNum = input('Input number of channels to be averaged: ');
+        try
+            close(FigRho(2));
+        end
+        temp = cellfun(@(x) x(idx(1 : selNum), :), trialsECOG, "UniformOutput", false);
+        trialsMeanECOG = cellfun(@mean, temp, "UniformOutput", false);
+
+        k = validateInput("string", "Press Y to continue or N to reselect chs: ");
+    end
 
 
 

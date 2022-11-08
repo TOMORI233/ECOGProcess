@@ -22,7 +22,6 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
 
     FigWave(1) = plotRawWave(cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG), "UniformOutput", false)), [], windowICA, "origin");
     k = 'N';
-
     while ~strcmp(k, 'y') && ~strcmp(k, 'Y')
 
         try

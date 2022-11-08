@@ -83,10 +83,6 @@ for mIndex = 1 : length(MATPATH)
     %% filter
      trialsECOG_Merge_Filtered = mECOGFilter(trialsECOG_Merge, fhp, flp, fs);
 
-    %% select certain channels to reduce interference via corr matrix
-    [trialsECOG_Merge_Mean, rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOG_Merge, Window, [0 1000], "method", "pearson", "refCh", 4, "selNum", 10);
-
-
     %% process
     devType = unique([trialAll.devOrdr]);
 

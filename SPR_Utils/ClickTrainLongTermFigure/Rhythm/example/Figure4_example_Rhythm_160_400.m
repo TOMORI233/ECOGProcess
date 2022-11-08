@@ -3,7 +3,7 @@ close all; clc; clear;
 monkeyId = 1;  % 1：chouchou; 2：xiaoxiao
 
 if monkeyId == 1
-    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TITS_160_400\cc20221105\cc20221105_AC.mat';
+    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TITS_160_400\cc20221105\cc20221105_PFC.mat';
 
 elseif monkeyId == 2
 
@@ -15,7 +15,7 @@ stimStrs = ["Reg_160_400", "Reg_400_160"];
 
 protStr = "TITS";
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Rhythm\";
-params.posIndex = 1; % 1-AC, 2-PFC
+params.posIndex = 2; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
 CRIMethod = 2;
@@ -45,7 +45,7 @@ for mIndex = 1 : length(MATPATH)
     dateStr = temp(end - 1);
     Protocol = temp(end - 2);
     Protocols(mIndex) = Protocol;
-    FIGPATH = strcat(ROOTPATH, "Figure4_Reg_160_400\", dateStr, "\", temp(4), "\");
+    FIGPATH = strcat(ROOTPATH, "Figure4_Reg_160_400\", dateStr, "\", AREANAME, "\");
     mkdir(FIGPATH);
     %% process
     tic
@@ -206,6 +206,7 @@ for dIndex = devType
         scaleAxes([FigWave, FigWaveFilted], "y", [-yScale(monkeyId) yScale(monkeyId)]);
         scaleAxes([FigWave, FigWaveFilted], "x", [-2000 4000]);
         setLine([FigWave, FigWaveFilted], "YData", [-yScale(monkeyId) yScale(monkeyId)], "LineStyle", "--");
+        setLine([FigWave, FigWaveFilted], "LineWidth", 1, "LineStyle", "-");
         for lIndex = 1 : 5
             lines(lIndex).X = lIndex * ICI2(dIndex);
             lines(lIndex).Y = [-10, 10];
@@ -216,8 +217,8 @@ for dIndex = devType
         setAxes([FigWave, FigWaveFilted], 'xticklabel', '');
         setAxes([FigWave, FigWaveFilted], 'visible', 'off');
 
-        pause(1);
-        set([FigWave, FigWaveFilted], "outerposition", [300, 100, 800, 670]);
+%         pause(1);
+%         set([FigWave, FigWaveFilted], "outerposition", [300, 100, 800, 670]);
         plotLayout(FigWave, params.posIndex + 2 * (monkeyId - 1), 0.3);
         plotLayout(FigWaveFilted, params.posIndex + 2 * (monkeyId - 1), 0.3);
                 print(FigWave, strcat(FIGPATH, Protocols(mIndex), "_Wave_", strrep(num2str(baseICI(dIndex)), ".", "o"), "_", strrep(num2str(ICI2(dIndex)), ".", "o")), "-djpeg", "-r200");
@@ -227,7 +228,7 @@ for dIndex = devType
 end
 
 %% select certain channels to reduce noise via corr matrix
-[trialsECOG_Merge_Mean, rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOG_Merge, Window, [0 400], "method", "pearson", "refCh", 2, "selNum", 10);
+[trialsECOG_Merge_Mean, rhoMean, chSort, rhoSort, FigRho] = mECOGCorr(trialsECOG_Merge, Window, [0 400], "method", "pearson", "refCh", 2, "selNum", 10);
 
 %  plot trialMean result
 trialMean = cell(length(MATPATH), length(devType));
@@ -274,7 +275,7 @@ for mIndex = 1 : length(MATPATH)
     orderLine(Fig, "Color", waves(1).color, "bottom");
     set(findobj(Fig, "Type", "patch"), "FaceAlpha", 1, "FaceColor", [0.42, 0.35, 1]);
     scaleAxes(Fig, "x", [-4500 4000]);
-    scaleAxes(Fig, "y", [-20 20]);
+    scaleAxes(Fig, "y", [-30 30]);
 end
 %%
 ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
