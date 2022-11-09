@@ -8,7 +8,7 @@ if event.Button == 1
         UserData = get(Fig, "UserData");
         trialsECOGSel = UserData.trialsECOGSel;
         devSel = getOr(UserData, "devSel", 0);
-        stimDlg = UserData.params.stimDlg;
+        stimDlg = getOr(UserData.params, "stimDlg", "0. all trials");
         trialType = unique(UserData.trialType);
 
         %% parse selected channel

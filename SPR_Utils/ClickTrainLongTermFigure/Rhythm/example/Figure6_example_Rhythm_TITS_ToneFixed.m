@@ -231,10 +231,12 @@ end
 
 
 %% select certain channels to reduce noise via corr matrix
+stimStrs = ["24_60_0o1", "24_60_0o2", "24_60_0o4", "24_60_0o7", "24_60_1", "60_24_0o1", "60_24_0o2", "60_24_0o4", "60_24_0o7", "60_24_1"];
 params.stimDlg = string(cellfun(@(x, y) strrep(strcat(string(x), ". ", y), "_", "-"), num2cell(1:length(stimStrs)), stimStrs, "uni", false));
 params.trialAll = trialAll;
 params.ICI2 = ICI2;
 FigRho = mECOGCorr(trialsECOG_Merge, Window, [0 400], "method", "pearson", "refCh", 2, "selNum", 10, "params", params);
+
 
 %  plot trialMean result
 trialMean = cell(length(MATPATH), length(devType));

@@ -22,8 +22,12 @@ function Fig = mECOGCorr(trialsECOG, Window, varargin)
 %     rhoSort: sorted version of rhoMean corresponding to chSort
 %     trialsMeanECOG: the average of selected channels
 % Example:
-%     [rhoMean, trialsMeanECOG, chSort, rhoSort] = mECOGCorr(trialsECOG, Window, [0 1000], "method", "pearson", "refCh", 4, "selNum", 10);
-%     rhoMean = mECOGCorr(trialsECOG, "method", "pearson");
+%     stimStrs = ["24_60_0o1", "24_60_0o2", "24_60_0o4", "24_60_0o7", "24_60_1", "60_24_0o1", "60_24_0o2", "60_24_0o4", "60_24_0o7", "60_24_1"];
+%     params.stimDlg = string(cellfun(@(x, y) strrep(strcat(string(x), ". ", y), "_", "-"), num2cell(1:length(stimStrs)), stimStrs, "uni", false));
+%     params.trialAll = trialAll; % contain field "devOrdr"
+%     params.ICI2 = ICI2;
+%     FigRho = mECOGCorr(trialsECOG_Merge, Window, [0 400], "method", "pearson", "refCh", 2, "selNum", 10, "params", params);
+
 
 %% Validate input
 mInputParser = inputParser;
