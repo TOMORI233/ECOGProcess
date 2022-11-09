@@ -1,10 +1,35 @@
 clear; clc; close all;
 
+%% Rhythm,TITS_Offset_SPL 
+disp("Exporting ClickTrainLongTerm TITS_Offset_SPL  ...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_SPL\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221108\Block-5'; % 20221108 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+
+%% Rhythm,TITS_Offset_Irreg_15_120 
+disp("Exporting ClickTrainLongTerm TITS_Offset_Reg_Irreg_15_120 ...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_Reg_Irreg_15_120\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221108\Block-4'; % 20221108 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm,TITS_X_24_Reg_Irreg    
+disp("Exporting ClickTrainLongTerm TITS_X_24_Reg_Irreg ...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_X_24_Reg_Irreg\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221108\Block-3'; % 20221108 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
 %% Rhythm,TITS_ToneFixed    
 disp("Exporting ClickTrainLongTerm TITS_ToneFixed ...");
 SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_ToneFixed\";
 BLOCKPATH = [];
-BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221107\Block-2'; % 20221107 export, use offset2 20221105 sound
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221107\Block-2'; % 20221107 export, 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
 
@@ -12,7 +37,7 @@ exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
 disp("Exporting ClickTrainLongTerm TITS 400_700 ...");
 SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_400_700\";
 BLOCKPATH = [];
-BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221107\Block-1'; % 20221107 export, use offset2 20221105 sound
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221107\Block-1'; % 20221107 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
 

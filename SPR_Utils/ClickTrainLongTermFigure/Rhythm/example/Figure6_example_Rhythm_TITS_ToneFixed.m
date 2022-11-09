@@ -231,7 +231,10 @@ end
 
 
 %% select certain channels to reduce noise via corr matrix
-[trialsECOG_Merge_Mean, rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOG_Merge, Window, [0 400], "method", "pearson", "refCh", 2, "selNum", 10);
+params.stimDlg = string(cellfun(@(x, y) strrep(strcat(string(x), ". ", y), "_", "-"), num2cell(1:length(stimStrs)), stimStrs, "uni", false));
+params.trialAll = trialAll;
+params.ICI2 = ICI2;
+FigRho = mECOGCorr(trialsECOG_Merge, Window, [0 400], "method", "pearson", "refCh", 2, "selNum", 10, "params", params);
 
 %  plot trialMean result
 trialMean = cell(length(MATPATH), length(devType));
@@ -286,7 +289,7 @@ end
 %% compare offset and change 
 changeIdx = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 offsetIdx = [6, 7, 8, 9, 10, 1, 2, 3, 4, 5];
-devIdx = 1;
+devIdx = 9;
 selWin = [-100 600];
 [~, tIndex] = findWithinInterval(t, selWin);
 changeOffset(1).chMean = chMean{1, changeIdx(devIdx)}(:, tIndex);

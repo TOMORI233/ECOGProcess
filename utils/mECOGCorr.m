@@ -1,4 +1,4 @@
-function [trialsMeanECOG, rhoMean, chSort, rhoSort, FigRho] = mECOGCorr(trialsECOG, Window, varargin)
+function Fig = mECOGCorr(trialsECOG, Window, varargin)
 % Description: Calculate correlation matrix trial-by-trial and dicide
 %              the most similar channel to a reference channel
 % Input:
@@ -29,15 +29,17 @@ function [trialsMeanECOG, rhoMean, chSort, rhoSort, FigRho] = mECOGCorr(trialsEC
 mInputParser = inputParser;
 mInputParser.addRequired("trialsECOG");
 mInputParser.addRequired("Window", @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
-mInputParser.addOptional("selWin", [], @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
+mInputParser.addOptional("selWin", Window, @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
+mInputParser.addOptional("Fig", []);
 mInputParser.addParameter("method", "pearson", @(x) any(validatestring(x, {'pearson','kendall','spearman'})));
-mInputParser.addParameter("refCh", [], @(x) validateattributes(x, {'numeric'}, {'numel', 1}));
+mInputParser.addParameter("refCh", 0, @(x) validateattributes(x, {'numeric'}, {'numel', 1}));
 mInputParser.addParameter("ch", 1 : size(trialsECOG{1}, 2), @(x) validateattributes(x, {'numeric'}));
-mInputParser.addParameter("selNum", 10, @(x) validateattributes(x, {'numeric'}, {'numel', 1}));
+mInputParser.addParameter("selNum", 0.7, @(x) validateattributes(x, {'numeric'}, {'numel', 1}));
 mInputParser.addParameter("params", []);
 
 mInputParser.parse(trialsECOG, Window, varargin{:});
 
+Fig = mInputParser.Results.Fig; 
 selWin = mInputParser.Results.selWin;
 METHOD = mInputParser.Results.method;
 REFCH = mInputParser.Results.refCh;
@@ -52,7 +54,61 @@ else
     tTarget = 1 : size(trialsECOG{1}, 2);
 end
 
-temp = cellfun(@(x) x(:, tTarget), trialsECOG, "UniformOutput", false);
+
+%% select devType
+devSel = 0;
+try
+    trialAll = params.trialAll;
+    if isfield(trialAll, "devOrdr")
+        trialType = [trialAll.devOrdr];
+    end
+    if isfield(params, "stimDlg")
+        stimStr = strjoin(params.stimDlg, ", ");
+    else
+        stimStr = strjoin(string(trialType), ", ");
+    end
+catch
+    trialType = zeros(length(trialsECOG), 1);
+    stimStr = "trial info is not supplied, only 0(all trials) works";
+    disp("trial info is not supplied, changed to display all input trials");
+end
+
+if ~isempty(Fig)
+    UserData = get(Fig, "UserData");
+    devSel = getOr(UserData, "devSel", 0);
+else
+    Fig = figure;
+    maximizeFig(Fig);
+    UserData = get(Fig, "UserData");
+    UserData.trialsECOG = trialsECOG;
+    UserData.Window = Window;
+    UserData.selWin = selWin;
+    UserData.devSel = devSel;
+    UserData.REFCH = REFCH;
+    UserData.selNum = selNum;
+    UserData.params = params;
+    UserData.trialType = trialType;
+    UserData.stimStr = stimStr;
+    UserData.XLim = Window;
+    UserData.YLim = [-40 40];
+    Fig.UserData = UserData;
+end
+
+
+if ~isequal(devSel, 0)
+    tIndex = find(ismember(trialType, devSel))';
+    if any(~ismember(devSel, trialType))
+        tIndex = 1 : length(trialsECOG);
+        errorIdx = devSel(~ismember(devSel, trialType));
+        message(strcat("current trials do not contain type", strjoin(string(errorIdx), ", "), "use 0 (all)"));
+    end
+else
+    tIndex = 1 : length(trialsECOG);
+end
+
+trialsECOGSel = trialsECOG(tIndex);
+
+temp = cellfun(@(x) x(:, tTarget), trialsECOGSel, "UniformOutput", false);
 
 
 
@@ -62,57 +118,45 @@ temp = cellfun(@(x) x(:, tTarget), trialsECOG, "UniformOutput", false);
 
 rhoMean = cell2mat(cellfun(@mean, changeCellRowNum(rho), "UniformOutput", false));
 
-if isempty(REFCH)
-    rhoSort = rhoMean;
-    idx = 1 : size(trialsECOG{1}, 2);
-    chSort = CH(idx)';
+% refCh method
+if isempty(REFCH) || REFCH < 1
+    selectMethod = "auto";
 else
-    [rhoSort, idx] = sortrows(rhoMean, REFCH, "descend");
-    rhoSort = rhoSort(:, idx);
-    chSort = CH(idx)';
+    selectMethod = "refCh";
 end
-    temp = cellfun(@(x) x(idx(1 : selNum), :), trialsECOG, "UniformOutput", false);
-    trialsMeanECOG = cellfun(@mean, temp, "UniformOutput", false);
-    FigRho = plotRho(rhoSort, chSort);
+
+% selNum method
+if selNum == 0
+    numMethod = "threshold";
+else
+    numMethod = "selNum";
+end
+
+% sort
+if strcmpi(selectMethod, "auto")
+    [~, idx] = max(mean(rhoMean));
+    REFCH = CH(idx);
+end
+[rhoSort, idx] = sortrows(rhoMean, REFCH, "descend");
+rhoSort = rhoSort(:, idx);
+chSort = CH(idx)';
+
+
+if strcmpi(numMethod, "threshold")
+    selNum = sum(rhoSort(1, :) > selNum);
+end
+temp = cellfun(@(x) x(idx(1 : selNum), :), trialsECOGSel, "UniformOutput", false);
+trialsMeanECOG = cellfun(@mean, temp, "UniformOutput", false);
+Fig = plotRho(rhoSort, chSort, Fig);
 
 %% set userdata
-UserData.trialsECOG = trialsECOG;
-UserData.Window = Window;
-UserData.selWin = selWin;
+UserData = get(Fig, "UserData");
+UserData.trialsMeanECOG = trialsMeanECOG;
 UserData.chSort = chSort;
-UserData.params = params;
-
-%% set callbackFcn
-UserData.chSort = chSort;
-FigRho.UserData = UserData;
-
-    k = validateInput("string", "Press Y to continue or N to reselect chs: ");
-
-    while ~strcmp(k, 'y') && ~strcmp(k, 'Y')
-
-        REFCH = input('Input reference channel for rho restruction: ');
-
-        [rhoSort, idx] = sortrows(rhoMean, REFCH, "descend");
-        rhoSort = rhoSort(:, idx);
-        chSort = CH(idx)';
-        FigRho = plotRho(rhoSort, chSort);
-
-        % reset callbackFcn
-        UserData.chSort = chSort;
-        FigRho.UserData = UserData;
-        
-
-        selNum = input('Input number of channels to be averaged: ');
-        try
-            close(FigRho);
-        end
-        temp = cellfun(@(x) x(idx(1 : selNum), :), trialsECOG, "UniformOutput", false);
-        trialsMeanECOG = cellfun(@mean, temp, "UniformOutput", false);
-
-        k = validateInput("string", "Press Y to continue or N to reselect chs: ");
-    end
-
-
-
+UserData.rhoMean = rhoMean;
+UserData.rhoSort = rhoSort;
+UserData.method = METHOD;
+UserData.trialsECOGSel = trialsECOGSel;
+Fig.UserData = UserData;
 
 end

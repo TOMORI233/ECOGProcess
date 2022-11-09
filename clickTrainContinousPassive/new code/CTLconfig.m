@@ -1,4 +1,31 @@
 switch Protocol
+    case "TITS_Offset_SPL" 
+        titleStr = "TITS_Offset_SPL";
+        stimStr = ["Reg30_0o1", "Reg30_0o2", "Reg30_0o4", "Reg30_0o7", "Reg30_1", "Reg60_0o1", "Reg60_0o2", "Reg60_0o4", "Reg60_0o7", "Reg60_1", ];
+        S1Duration = ones(1, 10) * 3000.5;
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -3500;
+        Window = [winStart 2500];
+        FFTWin = [-2000 0];
+        ICAWin = [-1000 1000];
+    case "TITS_Offset_Reg_Irreg_15_120" 
+        titleStr = "TITS_Offset_Reg_Irreg_15_120";
+        stimStr = ["Reg15", "Irreg15", "Reg30", "Irreg30", "Reg60", "Irreg60", "Reg120", "Irreg120"];
+        S1Duration = [3000.5, 3000.3,  3000.5, 3019, 3000.5, 3010.3,  3000.3, 2977.1];
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -3500;
+        Window = [winStart 2500];
+        FFTWin = [-2000 0];
+        ICAWin = [-1000 1000];
+    case "TITS_X_24_Reg_Irreg" 
+        titleStr = "TITS_X_24_Reg_Irreg";
+        stimStr = ["36_24Reg", "36_24Irreg", "60_24Reg", "60_24Irreg"];
+        S1Duration = [2988.3, 3047.3,  3000.3, 2963.4];
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -3500;
+        Window = [winStart 2500];
+        FFTWin = [-2000 0];
+        ICAWin = [-1000 1000];
     case "TITS_ToneFixed"  % prediction based 400-700,/ 400-700 Irreg 6s-4s
         titleStr = "TITS_ToneFixed";
         stimStr = ["24_60_0o1", "24_60_0o2", "24_60_0o4", "24_60_0o7", "24_60_1", "60_24_0o1", "60_24_0o2", "60_24_0o4", "60_24_0o7", "60_24_1"];
@@ -8,7 +35,7 @@ switch Protocol
         cursor = [62.5, 62.5, 62.5 ,62.5];
         winStart = -3500;
         Window = [winStart 4000];
-        FFTWin = [300 1900];
+        FFTWin = [-2000 0];
         ICAWin = [-1000 1000];
     case "TITS_400_700"  % prediction based 400-700,/ 400-700 Irreg 6s-4s
         titleStr = "TITS_400_700";

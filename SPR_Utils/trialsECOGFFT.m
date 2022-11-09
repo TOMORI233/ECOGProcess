@@ -23,6 +23,7 @@ temp = changeCellRowNum(trialsECoG);
 
 
 mParpool = gcp;
+
 chTemp = cellfun(@(x) array2VectorCell(x), temp, "uni", false);
 P = cell(length(chTemp), 1);
 for ch = 1 : length(chTemp)
