@@ -3,7 +3,7 @@ close all; clc; clear;
 monkeyId = 1;  % 1：chouchou; 2：xiaoxiao
 
 if monkeyId == 1
-    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_ICI4\cc20221027\cc20221027_AC.mat';
+    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_Reg_Irreg_15_120\cc20221109\cc20221109_AC.mat';
     
 elseif monkeyId == 2
 
@@ -13,10 +13,10 @@ end
 
 fhp = 0.1;
 flp = 10;
-stimStrs = ["4-4.06ms Reg", "4.06-4ms Reg", "4-4.06ms Irreg", "4.06-4ms Irreg"];
+stimStrs = ["Reg15", "Irreg15", "Reg30", "Irreg30", "Reg60", "Irreg60", "Reg120", "Irreg120"];
 
-protStr = "Add_on_Basic_ICI4";
-ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
+protStr = "Offset_Reg_Irreg";
+ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Rhythm\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
@@ -26,7 +26,7 @@ CRIScale = [0.8, 2; -0.1 0.5];
 CRITest = [1, 0];
 pBase = 0.01;
 
-colors = ["#FF0000", "#FFA500", "#0000FF", "#000000"];
+colors = ["#FF0000", "#FFA500","#00FF00" , "#0000FF", "#556B2F", "#000000", "#AAAAAA"];
 
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
@@ -37,8 +37,8 @@ yScale = [30, 40];
 quantWin = [0 300];
 sponWin = [-300 0];
 latencyWin = [80 200];
-baseICI = [4, 4.06, 4, 4.06];
-ICI2 = [4.06, 4, 4.06, 4];
+baseICI = [15, 15, 30 ,30, 60, 60, 120, 120];
+ICI2 = baseICI;
 correspFreq = 1000./ICI2;
 
 for mIndex = 1 : length(MATPATH)
@@ -47,8 +47,7 @@ for mIndex = 1 : length(MATPATH)
     dateStr = temp(end - 1);
     Protocol = temp(end - 2);
     Protocols(mIndex) = Protocol;
-    FIGPATH = strcat(ROOTPATH, "\Figure2\", dateStr, "\", AREANAME, "\");
-    
+    FIGPATH = strcat(ROOTPATH, "Figure5_Offset_Reg_Irreg\", dateStr, "\", AREANAME, "\");
     mkdir(FIGPATH);
     %% process
     tic
@@ -100,21 +99,33 @@ for mIndex = 1 : length(MATPATH)
     chMean = cell(length(MATPATH), length(devType));
     chMeanFilterd = cell(length(MATPATH), length(devType));
     trialsECOGFilterd = cell(length(MATPATH), length(devType));
-    for dIndex = 1 : length(devType)
-        tIndex = [trialAll.devOrdr] == devType(dIndex);
+    for dIndex = devType
+        tIndex = [trialAll.devOrdr] == dIndex;
         trials = trialAll(tIndex);
         trialsECOG = trialsECOG_Merge(tIndex);
+        trialsECOGFilterd = trialsECOG_Merge_Filtered(tIndex);
+        % FFT during S1
+        tIdx = find(t > FFTWin(1) & t < FFTWin(2));
+        [ff, PMean{mIndex, dIndex}, trialsFFT]  = trialsECOGFFT(trialsECOG, fs, tIdx, [], 2);
+        
 
         % raw wave
         chMean{mIndex, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG), 'UniformOutput', false));
         chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG), 'UniformOutput', false));
 
+        % filter
+        chMeanFilterd{mIndex, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOGFilterd), 'UniformOutput', false));
+        chStdFilter = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOGFilterd), 'UniformOutput', false));
 
        
 
         for ch = 1 : size(chMean{mIndex, dIndex}, 1)
             cdrPlot(ch).(strcat(protStr(mIndex), "Wave"))(:, 2 * dIndex - 1) = t';
             cdrPlot(ch).(strcat(protStr(mIndex), "Wave"))(:, 2 * dIndex) = chMean{mIndex, dIndex}(ch, :)';
+            cdrPlot(ch).(strcat(protStr(mIndex), "WaveFilted"))(:, 2 * dIndex - 1) = t';
+            cdrPlot(ch).(strcat(protStr(mIndex), "WaveFilted"))(:, 2 * dIndex) = chMeanFilterd{mIndex, dIndex}(ch, :)';
+            cdrPlot(ch).(strcat(protStr(mIndex), "FFT"))(:, 2 * dIndex - 1) =ff;
+            cdrPlot(ch).(strcat(protStr(mIndex), "FFT"))(:, 2 * dIndex) = PMean{mIndex, dIndex}(ch, :)';
         end
 
         % quantization amplitude
@@ -152,11 +163,34 @@ end
 
 
 
+    %% plot FFT
+for mIndex = 1 : length(MATPATH)
+    for dIndex = devType
 
+    FigFFT = plotRawWave(PMean{mIndex, dIndex}, [], [ff(1), ff(end)], strcat("FFT ", stimStrs(dIndex)));
+    deleteLine(FigFFT, "LineStyle", "--");
+    lines(1).X = correspFreq(mIndex, dIndex); lines(1).color = "k";
+    addLines2Axes(FigFFT, lines);
+    orderLine(FigFFT, "LineStyle", "--", "bottom");
+
+    % rescale FFT Plot
+    scaleAxes(FigFFT, "y", [0 400]);
+    scaleAxes(FigFFT, "x", [0 250]);
+    setAxes(FigFFT, 'yticklabel', '');
+    setAxes(FigFFT, 'xticklabel', '');
+    setAxes(FigFFT, 'visible', 'off');
+    setLine(FigFFT, "YData", [0 400], "LineStyle", "--");
+    pause(1);
+    set(FigFFT, "outerposition", [300, 100, 800, 670]);
+    plotLayout(FigFFT, params.posIndex + 2 * (monkeyId - 1), 0.3);
+    print(FigFFT, strrep(strcat(FIGPATH, Protocols(mIndex), "_", stimStrs(dIndex),  "_FFT_", num2str(baseICI(dIndex)), "_", num2str(ICI2(dIndex))), ".", "o"), "-djpeg", "-r200");
+    close(FigFFT);
+    end
+end
 
 
 %% plot raw wave
-for dIndex = 1 : length(devType)
+for dIndex = devType
     diff = [];
     diffFilter = [];
     for mIndex = 1 : length(MATPATH)
@@ -189,22 +223,73 @@ for dIndex = 1 : length(devType)
 end
 
 
+%% select certain channels to reduce noise via corr matrix
+[trialsECOG_Merge_Mean, rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOG_Merge, Window, [0 400], "method", "pearson", "refCh", 2, "selNum", 10);
+
+%  plot trialMean result
+trialMean = cell(length(MATPATH), length(devType));
+trialStd = cell(length(MATPATH), length(devType));
+trialsECOGMean = cell(length(MATPATH), length(devType));
+for mIndex = 1 : length(MATPATH)
+    for dIndex = devType
+        tIndex = [trialAll.devOrdr] == dIndex;
+        trialsECOGMean{dIndex, mIndex} = trialsECOG_Merge_Mean(tIndex);
+        
+        % Mean wave
+        trialMean{dIndex, mIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOGMean{dIndex, mIndex}), 'UniformOutput', false));
+        trialStd{dIndex, mIndex} = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOGMean{dIndex, mIndex}), 'UniformOutput', false));
+    end
+
+    meanTemp = cell2mat(trialMean(:, mIndex));
+    stdTemp = cell2mat(trialStd(:, mIndex));
+
+    Fig = plotRawWave(meanTemp, [], Window, "TITS_Rev", autoPlotSize(length(devType)));
+    titles = strrep(stimStrs, "_", " ");
+    setTitle(Fig, titles(devType));
+    Axes = findobj(Fig, "Type", "axes");
+
+    % add cursors of  S2 clicks
+    for dIndex = devType
+        idx = find(devType == dIndex);
+        for lIndex = 1 : 5
+            lines(lIndex).X = lIndex * ICI2(idx);
+            lines(lIndex).Y = [-10, 10];
+            lines(lIndex).color = "b";
+        end
+        addLines2Axes(Axes(end - idx + 1), lines);
+
+        waves(1).X = t;
+        waves(1).Y = cell2mat(trialsECOGMean{dIndex, mIndex});
+        waves(1).color = "#AAAAAA";
+        waves(1).width = 0.5;
+        waves(1).style = "-";
+        addLines2Axes(Axes(end - idx + 1), waves);
+        
+    end
+    orderLine(Fig, "Color", [2/3, 2/3, 2/3], "bottom");
+    scaleAxes(Fig, "x", [-100 600]);
+    scaleAxes(Fig, "y", [-70 70]);
+end
 %% compare offset and change 
-regIdx = [1, 2];
-irregIdx = [3, 4];
-devIdx = 2;
+regIdx = 1:2:8;
+irregIdx = 2:2:8;
+devIdx = 3;
 selWin = [-100 400];
-[~, tIndex] = findWithinInterval(t, selWin + soundDur(regIdx(devIdx)) - S1Duration(regIdx(devIdx)));
+[~, tIndex] = findWithinInterval(t, selWin);
 changeOffset(1).chMean = chMean{1, regIdx(devIdx)}(:, tIndex);
 changeOffset(1).color = "r";
 
-[~, tIndex] = findWithinInterval(t, selWin + soundDur(irregIdx(devIdx)) - S1Duration(irregIdx(devIdx)));
 changeOffset(2).chMean = chMean{1, irregIdx(devIdx)}(:, tIndex);
 changeOffset(2).color = "k";
 
 FigCompare = plotRawWaveMulti_SPR(changeOffset, selWin);
 
-
+for lIndex = 1 : 5
+    lines(lIndex).X = lIndex * ICI2(devIdx * 2);
+    lines(lIndex).Y = [-10, 10];
+    lines(lIndex).color = "b";
+end
+addLines2Axes(FigCompare, lines);
 
 %%
 

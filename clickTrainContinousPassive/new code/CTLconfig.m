@@ -1,4 +1,14 @@
 switch Protocol
+    case "TITS_Offset_60_24_26o4" 
+        titleStr = "TITS_Offset_60_24_26o4";
+        stimStr = ["24_26o4Reg", "24_26o4Irreg", "60_24Reg", "60_24Irreg"];
+        S1Duration = [3000.3, 2979.7,  3000.3, 2997.1];
+        soundDur = [4954.6, 5971.3,  3000.3, 4944.4];
+        cursor = [62.5, 62.5, 62.5 ,62.5];
+        winStart = -3500;
+        Window = [winStart 2500];
+        FFTWin = [-2000 0];
+        ICAWin = [-1000 1000];
     case "TITS_Offset_SPL" 
         titleStr = "TITS_Offset_SPL";
         stimStr = ["Reg30_0o1", "Reg30_0o2", "Reg30_0o4", "Reg30_0o7", "Reg30_1", "Reg60_0o1", "Reg60_0o2", "Reg60_0o4", "Reg60_0o7", "Reg60_1", ];
@@ -11,7 +21,8 @@ switch Protocol
     case "TITS_Offset_Reg_Irreg_15_120" 
         titleStr = "TITS_Offset_Reg_Irreg_15_120";
         stimStr = ["Reg15", "Irreg15", "Reg30", "Irreg30", "Reg60", "Irreg60", "Reg120", "Irreg120"];
-        S1Duration = [3000.5, 3000.3,  3000.5, 3019, 3000.5, 3010.3,  3000.3, 2977.1];
+        S1Duration = [3000.3, 3000.1,  3000.3, 3018.8, 3000.3, 3010.1,  3000.1, 2976.8];
+        
         cursor = [62.5, 62.5, 62.5 ,62.5];
         winStart = -3500;
         Window = [winStart 2500];
@@ -220,9 +231,10 @@ switch Protocol
     case "Add_on_Basic_ICI4"
         titleStr = "Add_on_Basic_ICI4";
         stimStr = {'4-4.06ms Reg','4.06-4ms Reg','4-4.06ms Irreg','4.06-4ms Irreg'};
-        S1Duration = [5004.8, 5008.4, 5000, 5000] + 4;
+        S1Duration = [5004.8, 5008.4, 5000, 5075] + 4;
+        soundDur = [10009.2, 10009.2, 10068.8, 10068.8];
         winStart = -5500;
-        Window = [winStart 5500];
+        Window = [winStart 6500];
         ICAWin = [-1000 1000];
     case "Add_on_Basic_Tone"
         titleStr = "Add_on_Basic_Tone";
