@@ -1,4 +1,73 @@
 switch Protocol
+    %% TITS 框架：
+    % 1. 发现offset(reg & Irreg， 10+ VS 1-8， 跟随， 纯音/噪声对照)
+    % 2. 改变duration(时间整合需要时间， 纯音/噪声对照）
+    % 3. 节律的建立和节律的打破
+    % 4. 一个节律变成另外一个节律
+    case "TITS_15_30_3s_13s_Reg_Irreg_Rev"   % 1. wavelet 2. 1Hz oscillation 3. PFC    
+        %% 1. 3s-4s Base ICI: 4ms, 15ms, 20ms, 25ms   2. noise-regular(15ms)   3. 4ms Reg-15Reg,   4ms Irreg - 15Reg,  30 Irreg - 15Reg  
+        titleStr = "TITS_15_30_3s_13s_Reg_Irreg_Rev";
+        stimStr = ["15ms_Reg_Irreg", "15ms_Irreg_Reg", "30ms_Reg_Irreg", "30ms_Irreg_Reg"];
+        S1Duration = [3000.3, 2977.5, 3000.3, 2936.3];
+        winStart = -3500;
+        Window = [winStart 14000];
+        FFTWin = [500, 3500];
+        ICAWin = [-2000 2000];
+    case "TITS_Offset_15_Reg_Irreg_Noise_DiffDur_500_1000ms"
+        titleStr = "TITS_Offset_15_Reg_Irreg_Noise_DiffDur_500_1000ms";
+        stimStr = ["Reg15_500ms", "Reg15_750ms", "Reg15_1000ms", ...
+            "Irreg15_500ms", "Irreg15_750ms", "Irreg15_1000ms",...
+            "Noise_500ms", "Noise_750ms", "Noise_1000ms"];
+        S1Duration = [495.1, 750.1, 1005.1, 499.6, 748.5, 1011.2, 500, 750, 1000];
+        winStart = -1500;
+        Window = [winStart 1000];
+        FFTWin = [-1500 -500];
+        ICAWin = [-1000 1000];
+    case "TITS_15_30_60_Reg_Irreg_Rev"  % 15ms ICI Reg & Irreg + noise : 250, 500, 1s, 2s, 4s;  15ms, 30ms, 60ms : Reg to Irreg / Irreg to Reg 2s-2s, reverse
+        titleStr = "TITS_15_30_60_Reg_Irreg_Rev";
+        stimStr = ["15ms_Reg_Irreg", "15ms_Irreg_Reg", "30ms_Reg_Irreg", "30ms_Irreg_Reg", "60ms_Reg_Irreg", "60ms_Irreg_Reg"];
+        S1Duration = [2010.2, 1985.5, 2010.2, 2016.6, 2040.2, 2066.6];
+        winStart = -2500;
+        Window = [winStart 2500];
+        FFTWin = [200, 1800];
+        ICAWin = [-1000 1000];
+    case "TITS_Offset_15_Reg_Irreg_Noise_DiffDur"
+        titleStr = "TITS_Offset_15_Reg_Irreg_Noise_DiffDur";
+        stimStr = ["Reg15_250ms", "Reg15_500ms", "Reg15_1000ms", "Reg15_2000ms", "Reg15_4000ms", ...
+            "Irreg15_250ms", "Irreg15_500ms", "Irreg15_1000ms", "Irreg15_2000ms", "Irreg15_400ms",...
+            "Noise_250ms", "Noise_500ms", "Noise_1000ms", "Noise_2000ms", "Noise_4000ms"];
+        S1Duration = [255, 495.1, 1005.1, 1995.2, 4005.4, 240.7, 510.9, 996.6, 2008.6, 3999.3, 250, 500, 1000, 2000, 4000];
+        winStart = -3500;
+        Window = [winStart 1000];
+        FFTWin = [-2500 -500];
+        ICAWin = [-1000 1000];
+    case "TITS_Offset_15_DiffRep_5_40"  % 15ms ICI Reg & Irreg + noise : 250, 500, 1s, 2s, 4s;  15ms, 30ms, 60ms : Reg to Irreg / Irreg to Reg 2s-2s, reverse
+        titleStr = "TITS_Offset_15_DiffRep_5_40";
+        stimStr = ["Reg15_Rep0", "Reg15_Rep5", "Reg15_Rep10", "Reg15_Rep20", "Reg15_Rep40", "Irreg15_Rep1", "Irreg15_Rep5", "Irreg15_Rep10", "Irreg15_Rep20", "Irreg15_Rep40"];
+        S1Duration = [3000.3, 2998.7,  2996, 3007.6, 2987.4, 2991.4,  2993.1, 2989.9, 3004.9, 3008.3];
+        changeTime = [3000.3, 2925.3, 2850.3, 2700.3, 2400.3, 2976.4, 2918.1, 2839.8, 2704.9, 2408.2];
+        winStart = -3500;
+        Window = [winStart 1500];
+        FFTWin = [-2500 -500];
+        ICAWin = [-1000 1000];
+    case "TITS_Offset_30_DiffRep" 
+        titleStr = "TITS_Offset_30_DiffRep";
+        stimStr = ["Reg30_Rep0", "Reg30_Rep3", "Reg30_Rep6", "Reg30_Rep9", "Reg30_Rep12", "Irreg30_Rep1", "Irreg30_Rep2", "Irreg30_Rep3", "Irreg30_Rep4", "Irreg30_Rep5"];        
+        S1Duration = [3000.3, 2998,  3004.5, 2998.7, 3001, 3017.7,  3003.5, 29873, 3006.5, 3004.9];
+        changeTime = [3000.3, 2910.3, 2820.3, 2730.3, 2640.3, 2987.7, 2943.5, 2897.2, 2886.5, 2854.9];
+        winStart = -3500;
+        Window = [winStart 1500];
+        FFTWin = [-2500 -500];
+        ICAWin = [-1000 1000];
+    case "TITS_Offset_15_DiffRep"  % more RegRep for Irreg
+        titleStr = "TITS_Offset_15_DiffRep";
+        stimStr = ["Reg15_Rep0", "Reg15_Rep3", "Reg15_Rep6", "Reg15_Rep9", "Reg15_Rep12", "Irreg15_Rep1", "Irreg15_Rep2", "Irreg15_Rep3", "Irreg15_Rep4", "Irreg15_Rep5"];
+        S1Duration = [3000.3, 2993.4,  2998.8, 3004.9, 2996.6, 2991.4,  2997.8, 2997.4, 2999.8, 2993.1];
+        changeTime = [3000.3, 2955.3, 2910.3, 2865.3, 2820.3, 2976.4, 2967.8, 2952.4, 2939.8, 2918.1];
+        winStart = -3500;
+        Window = [winStart 1500];
+        FFTWin = [-2500 -500];
+        ICAWin = [-1000 1000];
     case "TITS_Offset_60_24_26o4" 
         titleStr = "TITS_Offset_60_24_26o4";
         stimStr = ["24_26o4Reg", "24_26o4Irreg", "60_24Reg", "60_24Irreg"];

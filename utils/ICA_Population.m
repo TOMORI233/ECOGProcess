@@ -33,7 +33,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
         ICs(badICs) = [];
         [~, temp] = reconstructData(trialsECOG, comp, ICs);
         FigWave(2) = plotRawWave(temp, [], windowICA, "reconstruct");
-        k = validateInput("string", "Press Y to continue or N to reselect ICs: ");
+        k = validateInput('Press Y to continue or N to reselect ICs: ', 's');
     end
 
     comp.trial = [];
