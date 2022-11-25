@@ -1,6 +1,6 @@
 close all; clc; clear;
 
-monkeyId = 2;  % 1：chouchou; 2：xiaoxiao
+monkeyId = 1;  % 1：chouchou; 2：xiaoxiao
 
 if monkeyId == 1
     MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TITS_15_30_3s_13s_Reg_Irreg_Rev\cc20221114\cc20221114_AC.mat';
@@ -157,8 +157,6 @@ for mIndex = 1 : length(MATPATH)
     % compare S1Res and spon
     [S1H{mIndex}, S1P{mIndex}] = cellfun(@(x, y) ttest2(x, y), changeCellRowNum(ampS1{mIndex}), changeCellRowNum(rmsSponS1{mIndex}), "UniformOutput", false);
 
-
-
 end
 
 
@@ -289,13 +287,11 @@ changeOffset = [];
 dev1 = 1;
 dev2 = 2;
 
-selWin = [-3000 8000];
+selWin = [-500 500];
 [~, tIndex] = findWithinInterval(t, selWin);
-% [~, tIndex] = findWithinInterval(t, selWin -S1Duration(dev1) + changeTime(dev1));
+
 changeOffset(1).chMean = chMean{1, dev1}(:, tIndex);
 changeOffset(1).color = "r";
-
-% [~, tIndex] = findWithinInterval(t, selWin -S1Duration(dev2) + changeTime(dev2));
 changeOffset(2).chMean = chMean{1, dev2}(:, tIndex);
 changeOffset(2).color = "k";
 
@@ -304,12 +300,38 @@ FigCompare = plotRawWaveMulti_SPR(changeOffset, selWin);
 orderLine(FigCompare, "Color", [1, 0, 0], "bottom");
 scaleAxes(FigCompare, "y", [-30, 30]);
 
+%% TFA Compare
+dev1 = 1;
+dev2 = 2;
 
-FigTopo(1) = plotTFA(chMean{1, dev1}(:, tIndex), fs, fs, selWin);
-FigTopo(2) = plotTFA(chMean{1, dev2}(:, tIndex), fs, fs, selWin);
+selWin = [-3000 4000];
+[~, tIndex] = findWithinInterval(t, selWin);
+% [~, tIndex] = findWithinInterval(t, selWin -S1Duration(dev1) + changeTime(dev1));
 
-scaleAxes(FigTopo, "y", [0, 10]);
-scaleAxes(FigTopo, "c", [0, 6]);
+trialsECOG_Merge_Sel = cellfun(@(x) x(:, tIndex), trialsECOG_Merge, "UniformOutput", false);
+trialsECOG = trialsECOG_Merge_Sel([trialAll.devOrdr] == dev1);
+tic
+FigTFAMean(1) = plotTFA_Mean(trialsECOG, fs, selWin, [0 10]);
+toc
+
+% [~, tIndex] = findWithinInterval(t, selWin -S1Duration(dev2) + changeTime(dev2));
+trialsECOG = trialsECOG_Merge_Sel([trialAll.devOrdr] == dev2);
+tic
+FigTFAMean(2) = plotTFA_Mean(trialsECOG, fs, selWin, [0 10]);
+toc
+scaleAxes(FigTFAMean, "y", [0, 10]);
+scaleAxes(FigTFAMean, "c", [1, 16]);
+setAxes(FigTFAMean, "ColorScale", "linear");
+
+% mean TFA
+
+FigTFA(1) = plotTFA(chMean{1, dev1}(:, tIndex), fs, fs, selWin);
+FigTFA(2) = plotTFA(chMean{1, dev2}(:, tIndex), fs, fs, selWin);
+scaleAxes(FigTFA, "y", [0, 20]);
+scaleAxes(FigTFA, "c", [0, 6]);
+setAxes(FigTFA, "ColorScale", "linear");
+
+
 %% check click train
 soundPath = "E:\ratNeuroPixel\monkeySounds\2022-11-14_Offset_Rep_By_Duration\offset";
 soundParse = clickTrainCheckFcn(soundPath);

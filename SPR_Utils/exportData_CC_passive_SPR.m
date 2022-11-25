@@ -1,5 +1,46 @@
 clear; clc; close all;
 
+%% Species_2_4ms_Ratio
+disp("Exporting ClickTrainLongTerm Species_2_4ms_Ratio  ...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\SpeciesNew\Species_2_4ms_Ratio\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221118\Block-1'; % 20221118 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+
+%% Species_6_8ms_Ratio
+disp("Exporting ClickTrainLongTerm Species_6_8ms_Ratio  ...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\SpeciesNew\Species_6_8ms_Ratio\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221118\Block-2'; % 20221118 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Species_2_4_6_8_Duaration_1o5
+disp("Exporting ClickTrainLongTerm Species_2_4_6_8_Duaration_1o5  ...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\SpeciesNew\Species_2_4_6_8_Duaration_1o5\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221119\Block-1'; % 20221119 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Species_2_4_6_8_Duaration_1o015
+disp("Exporting ClickTrainLongTerm Species_2_4_6_8_Duaration_1o015  ...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\SpeciesNew\Species_2_4_6_8_Duaration_1o015\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221119\Block-2'; % 20221119 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm,TITS_4_15_20_25_noise_3s_4s_Reg_Irreg_Rev
+disp("Exporting ClickTrainLongTerm TITS_4_25_noise_3s_4s_Reg_Irreg_Rev  ...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_4_25_noise_3s_4s_Reg_Irreg_Rev\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221115\Block-3'; % 20221115 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
 %% Rhythm,TITS_Offset_15_Reg_Irreg_Noise_DiffDur_500_1000ms
 disp("Exporting ClickTrainLongTerm TITS_Offset_15_Reg_Irreg_Noise_DiffDur_500_1000ms  ...");
 SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_15_Reg_Irreg_Noise_DiffDur_500_1000ms\";
