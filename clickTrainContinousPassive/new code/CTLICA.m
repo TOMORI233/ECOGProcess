@@ -19,7 +19,7 @@ trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 
 %% ICA
 trialAll(1) = [];
-comp = mICA(ECOGDataset, trialAll([trialAll.oddballType]' ~= "INTERRUPT"), ICAWin, "dev onset", fs);
+comp = mICA(ECOGDataset, ICAWin, trialAll([trialAll.oddballType]' ~= "INTERRUPT"), fs, "dev onset");
 
 t1 = -200;
 t2 = t1 + 1000;

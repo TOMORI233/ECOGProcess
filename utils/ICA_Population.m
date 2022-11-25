@@ -19,7 +19,6 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
 
     FigWave(1) = plotRawWave(cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG), "UniformOutput", false)), [], windowICA, "origin");
     k = 'N';
-
     while ~strcmp(k, 'y') && ~strcmp(k, 'Y')
 
         try
@@ -31,7 +30,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
         ICs(badICs) = [];
         [~, temp] = reconstructData(trialsECOG, comp, ICs);
         FigWave(2) = plotRawWave(temp, [], windowICA, "reconstruct");
-        k = validateInput("Press Y to continue or N to reselect ICs: ", @(x) validatestring(x, {'y', 'n', 'Y', 'N'}), "s");
+        k = validateInput('Press Y to continue or N to reselect ICs: ', 's');
     end
 
     comp.trial = [];

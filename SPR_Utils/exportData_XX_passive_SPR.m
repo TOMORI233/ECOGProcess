@@ -1,5 +1,97 @@
 clear; clc; close all;
 
+%% Rhythm,TITS_Offset_15_Reg_Irreg_Noise_DiffDur_500_1000ms
+disp("Exporting ClickTrainLongTerm TITS_Offset_15_Reg_Irreg_Noise_DiffDur_500_1000ms  ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TITS_Offset_15_Reg_Irreg_Noise_DiffDur_500_1000ms\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221114\Block-3'; % 20221114 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm,TITS_15_30_3s_13s_Reg_Irreg_Rev
+disp("Exporting ClickTrainLongTerm TITS_15_30_3s_13s_Reg_Irreg_Rev  ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TITS_15_30_3s_13s_Reg_Irreg_Rev\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221114\Block-4'; % 20221114 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm,TITS_Offset_30_DiffRep_5_40
+disp("Exporting ClickTrainLongTerm TITS_Offset_15_DiffRep_5_40  ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TITS_Offset_15_DiffRep_5_40\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221111\Block-2'; % 20221111 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm,TITS_Offset_15_DiffRep 
+disp("Exporting ClickTrainLongTerm TITS_Offset_15_DiffRep  ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TITS_Offset_15_DiffRep\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221110\Block-4'; % 20221110 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm,TITS_Offset_30_DiffRep 
+disp("Exporting ClickTrainLongTerm TITS_Offset_30_DiffRep  ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TITS_Offset_30_DiffRep\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221110\Block-3'; % 20221110 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+
+%% Rhythm,TITS_Offset_60_24_26o4 
+disp("Exporting ClickTrainLongTerm TITS_Offset_60_24_26o4  ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TITS_Offset_60_24_26o4\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221109\Block-4'; % 20221109 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm,TITS_Offset_SPL 
+disp("Exporting ClickTrainLongTerm TITS_Offset_SPL  ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TITS_Offset_SPL\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221108\Block-5'; % 20221108 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm,TITS_Offset_Irreg_15_120 
+disp("Exporting ClickTrainLongTerm TITS_Offset_Reg_Irreg_15_120 ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TITS_Offset_Reg_Irreg_15_120\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221108\Block-4'; % 20221108 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm,TITS_X_24_Reg_Irreg    
+disp("Exporting ClickTrainLongTerm TITS_X_24_Reg_Irreg ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TITS_X_24_Reg_Irreg\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221108\Block-3'; % 20221108 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm,TITS_ToneFixed    
+disp("Exporting ClickTrainLongTerm TITS_ToneFixed ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TITS_ToneFixed\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221107\Block-4'; % 20221107 export, 
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+%% Rhythm, TITS 400_700     
+disp("Exporting ClickTrainLongTerm TITS 400_700 ...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TITS_400_700\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221107\Block-3'; % 20221107 export,
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+
+
+
 %% species, Base ICI & Ratio 16ms
 disp("Exporting ClickTrainLongTerm species_ICI 16ms, ratio ...");
 SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\Species_Ratio_ICI16\";

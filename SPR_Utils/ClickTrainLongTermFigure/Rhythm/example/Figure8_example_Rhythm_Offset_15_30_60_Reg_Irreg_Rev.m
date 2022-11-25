@@ -3,31 +3,31 @@ close all; clc; clear;
 monkeyId = 1;  % 1：chouchou; 2：xiaoxiao
 
 if monkeyId == 1
-    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Rhythm_Ratio_Rev\cc20221104\cc20221104_AC.mat';
+    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TITS_15_30_60_Reg_Irreg_Rev\cc20221112\cc20221112_AC.mat';
     
 elseif monkeyId == 2
 
 end
 
+
+
 fhp = 0.1;
 flp = 10;
-stimStrs = ["26o4_24", "36_24", "48_24", "39o6_36", "54_36", "72_36", "72_48"];
+stimStrs = ["15ms_Reg_Irreg", "15ms_Irreg_Reg", "30ms_Reg_Irreg", "30ms_Irreg_Reg", "60ms_Reg_Irreg", "60ms_Irreg_Reg"];
 
-protStr = "Rev";
+protStr = "TITS_15_30_60_Reg_Irreg_Rev";
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Rhythm\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
 CRIMethod = 2;
-CRIMethodStr = ["Resp_devided_by_Spon", "R_minus_S_devide_R_plus_S"];
+
 CRIScale = [0.8, 2; -0.1 0.5];
 CRITest = [1, 0];
 pBase = 0.01;
 
-% colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#AAAAAA"];
-% colors = ["#AAAAAA", "#000000", "#0000FF", "#FFA500", "#FF0000"];
 colors = ["#FF0000", "#FFA500","#00FF00" , "#0000FF", "#556B2F", "#000000", "#AAAAAA"];
-% colors = ["#FF0000", "#FFA500","#00FF00" , "#0000FF", "#556B2F", "#0000FF", "#000000"];
+
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
 fs = 500;
@@ -37,8 +37,8 @@ yScale = [30, 40];
 quantWin = [0 300];
 sponWin = [-300 0];
 latencyWin = [80 200];
-baseICI = [26.4, 36, 48, 39.6, 54, 72, 72];
-ICI2 = [24, 24, 24, 36, 36, 36, 48];
+baseICI = [15, 15, 30, 30, 60, 60];
+ICI2 = baseICI;
 correspFreq = 1000./ICI2;
 
 for mIndex = 1 : length(MATPATH)
@@ -47,7 +47,7 @@ for mIndex = 1 : length(MATPATH)
     dateStr = temp(end - 1);
     Protocol = temp(end - 2);
     Protocols(mIndex) = Protocol;
-    FIGPATH = strcat(ROOTPATH, "Figure3_Rev\", dateStr, "\", temp(4), "\");
+    FIGPATH = strcat(ROOTPATH, "Figure8_TITS_15_30_60_Reg_Irreg_Rev\", dateStr, "\", AREANAME, "\");
     mkdir(FIGPATH);
     %% process
     tic
@@ -84,8 +84,6 @@ for mIndex = 1 : length(MATPATH)
     %% filter
      trialsECOG_Merge_Filtered = mECOGFilter(trialsECOG_Merge, fhp, flp, fs);
     
-    
-
     %% process
     devType = unique([trialAll.devOrdr]);
 
@@ -149,8 +147,6 @@ for mIndex = 1 : length(MATPATH)
 
     end
 
-%% pearson correlation matrix
-[rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOGFilterd, Window, [0 1000], "method", "pearson", "refCh", 4);
 
     %% significance of s1 onset response
     [temp, ampS1{mIndex}, rmsSponS1{mIndex}] = cellfun(@(x) waveAmp_Norm(x, Window, quantWin, CRIMethod, sponWin), trialsECOG_S1_Merge, 'UniformOutput', false);
@@ -187,7 +183,7 @@ for mIndex = 1 : length(MATPATH)
     pause(1);
     set(FigFFT, "outerposition", [300, 100, 800, 670]);
     plotLayout(FigFFT, params.posIndex + 2 * (monkeyId - 1), 0.3);
-    print(FigFFT, strcat(FIGPATH, Protocols(mIndex), "_FFT_", strrep(num2str(baseICI(dIndex)), ".", "o"), "_", strrep(num2str(ICI2(dIndex)), ".", "o")), "-djpeg", "-r200");
+    print(FigFFT, strrep(strcat(FIGPATH, Protocols(mIndex), "_", stimStrs(dIndex),  "_FFT_", num2str(baseICI(dIndex)), "_", num2str(ICI2(dIndex))), ".", "o"), "-djpeg", "-r200");
     close(FigFFT);
     end
 end
@@ -195,25 +191,20 @@ end
 
 %% plot raw wave
 for dIndex = devType
-    diffRaw = [];
+    diff = [];
     diffFilter = [];
     for mIndex = 1 : length(MATPATH)
         % for raw wave
-        diffRaw(1).chMean = chMean{mIndex, dIndex};
+        diff(1).chMean = chMean{mIndex, dIndex};
         diffFilter(1).chMean = chMeanFilterd{mIndex, dIndex};
-        diffRaw(1).color = colors(dIndex);
-        diffFilter(1).color = colors(dIndex);
-        FigWave = plotRawWaveMulti_SPR(diffRaw, Window, titleStr, [8, 8]);
+        diff(1).color = "r";
+        diffFilter(1).color = "r";
+        FigWave = plotRawWaveMulti_SPR(diff, Window, titleStr, [8, 8]);
         FigWaveFilted = plotRawWaveMulti_SPR(diffFilter, Window, titleStr, [8, 8]);
         scaleAxes([FigWave, FigWaveFilted], "y", [-yScale(monkeyId) yScale(monkeyId)]);
-        scaleAxes([FigWave, FigWaveFilted], "x", [-150 600]);
+        scaleAxes([FigWave, FigWaveFilted], "x", [-500 1000]);
         setLine([FigWave, FigWaveFilted], "YData", [-yScale(monkeyId) yScale(monkeyId)], "LineStyle", "--");
-        for lIndex = 1 : 5
-            lines(lIndex).X = lIndex * ICI2(dIndex);
-            lines(lIndex).Y = [-10, 10];
-            lines(lIndex).color = "r";
-        end
-        addLines2Axes([FigWave, FigWaveFilted], lines);
+
         setAxes([FigWave, FigWaveFilted], 'yticklabel', '');
         setAxes([FigWave, FigWaveFilted], 'xticklabel', '');
         setAxes([FigWave, FigWaveFilted], 'visible', 'off');
@@ -222,16 +213,16 @@ for dIndex = devType
         set([FigWave, FigWaveFilted], "outerposition", [300, 100, 800, 670]);
         plotLayout(FigWave, params.posIndex + 2 * (monkeyId - 1), 0.3);
         plotLayout(FigWaveFilted, params.posIndex + 2 * (monkeyId - 1), 0.3);
-        print(FigWave, strcat(FIGPATH, Protocols(mIndex), "_Wave_", strrep(num2str(baseICI(dIndex)), ".", "o"), "_", strrep(num2str(ICI2(dIndex)), ".", "o")), "-djpeg", "-r200");
-        print(FigWaveFilted, strrep(strcat(FIGPATH, Protocols(mIndex), "_Wave_Filted", num2str(fhp), "_", num2str(flp), "Hz_", num2str(baseICI(dIndex)), "_", num2str(ICI2(dIndex))), ".", "o"), "-djpeg", "-r200");
+        print(FigWave, strrep(strcat(FIGPATH, Protocols(mIndex), "_", stimStrs(dIndex),  "_Wave_", num2str(baseICI(dIndex)), "_", num2str(ICI2(dIndex))), ".", "o"), "-djpeg", "-r200");
+        print(FigWaveFilted, strrep(strcat(FIGPATH, Protocols(mIndex), "_", stimStrs(dIndex),  "_Wave_Filtered_", num2str(fhp), "_", num2str(flp), "Hz_", num2str(baseICI(dIndex)), "_", num2str(ICI2(dIndex))), ".", "o"), "-djpeg", "-r200");
         close(FigWave);
+        close(FigWaveFilted);
     end
 end
 
 
-
 %% select certain channels to reduce noise via corr matrix
-[trialsECOG_Merge_Mean, rhoMean, chSort, rhoSort] = mECOGCorr(trialsECOG_Merge, Window, [0 400], "method", "pearson", "refCh", 2, "selNum", 10);
+FigRho = mECOGCorr(trialsECOG_Merge, Window, [0 400], "method", "pearson", "refCh", 2, "selNum", 10);
 
 %  plot trialMean result
 trialMean = cell(length(MATPATH), length(devType));
@@ -278,12 +269,68 @@ for mIndex = 1 : length(MATPATH)
     scaleAxes(Fig, "y", [-70 70]);
 end
 
+%% compare diff rep
+changeOffset = [];
+dev = 0; % 0: reg, 1: irreg
+selWin = [-100 1000];
+% [~, tIndex] = findWithinInterval(t, selWin);
+colors = ["#FF0000", "#FFA500","#00FF00" , "#0000FF", "#000000"];
+for dIndex = 1 : 5
+    [~, tIndex] = findWithinInterval(t, selWin -S1Duration(dev * 5 + dIndex) + changeTime(dev * 5 + dIndex));
+    changeOffset(dIndex).chMean = chMean{1, dev * 5 + dIndex}(:, tIndex);
+    changeOffset(dIndex).color = colors(dIndex);
+end
+
+FigCompare = plotRawWaveMulti_SPR(changeOffset, selWin);
+
+%% compare change 
+changeOffset = [];
+
+dev1 = 3;
+dev2 = 4;
+
+selWin = [-0 300];
+[~, tIndex] = findWithinInterval(t, selWin);
+% [~, tIndex] = findWithinInterval(t, selWin -S1Duration(dev1) + changeTime(dev1));
+changeOffset(1).chMean = chMean{1, dev1}(:, tIndex);
+changeOffset(1).color = "r";
+
+% [~, tIndex] = findWithinInterval(t, selWin -S1Duration(dev2) + changeTime(dev2));
+changeOffset(2).chMean = chMean{1, dev2}(:, tIndex);
+changeOffset(2).color = "k";
+
+FigCompare = plotRawWaveMulti_SPR(changeOffset, selWin);
+
+orderLine(FigCompare, "Color", [1, 0, 0], "top");
+%% check click train
+soundPath = "E:\ratNeuroPixel\monkeySounds\2022-11-12_Offset_Rep_By_Duration\offset";
+soundParse = clickTrainCheckFcn(soundPath);
+temp = soundParse(1);
+soundT = (1 : length(temp.y1)) / temp.fs * 1000;
+soundY = temp.y1;
+
+resmpY = resample(soundY, length(t), length(soundT));
+resmpT = resample(gpuArray(soundT), length(t), length(soundT)) - S1Duration(1);
+resmpYSmth = smoothdata(resmpY, "gaussian", 100);
+% plot(resmpT, resmpYSmth);
+
+%% add click distribution to Fig
+deleteLine(FigCompare, "Color", [0, 0.7, 0.7]);
+CT(1).X = resmpT;
+CT(1).Y = resmpYSmth * 2000 - 30;
+CT(1).color = [0, 0.7, 0.7];
+CT(1).style = "-";
+CT(1).width = 1.5;
+addLines2Axes(FigCompare, CT);
+
+
 
 %%
+
 ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
 save(ResName, "cdrPlot", "PMean", "chMean", "baseICI", "ICI2", "-mat");
 
 if ~isempty(gcp('nocreate'))
     delete(gcp('nocreate'));
 end
-close all
+% close all
