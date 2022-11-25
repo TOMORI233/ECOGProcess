@@ -10,7 +10,7 @@ function [TFR, t, f, coi] = computeTFR(chMean, fs, fsD, freqLimits, fRange)
     end
 
     TFR = cell(size(chMean, 1), 1);
-    
+
     for chNum = 1:size(chMean, 1)
         [t, f, TFR{chNum}, coi] = mCWT(double(chMean(chNum, :)), fs, 'morlet', fsD, freqLimits);
     end
@@ -20,7 +20,7 @@ function [TFR, t, f, coi] = computeTFR(chMean, fs, fsD, freqLimits, fRange)
         if numel(fRange) == 1
             [~, idx] = min(abs(f - fRange));
         elseif numel(fRange) == 2
-            idx = find(f > fRange(2), 1, "last") + 1:find(f < fRange(1), 1) - 1;
+            idx = find(f >= fRange(2), 1, "last") + 1:find(f <= fRange(1), 1) - 1;
         else
             error("Invalid frequency range input");
         end

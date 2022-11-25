@@ -3,14 +3,16 @@
 
     "mICA": {
         "inputs": [
-            {"name": "trialsECOG", "kind": "required", "type": ["cell"], "purpose": "data by trials"},
-            {"name": "windowICA", "kind": "required", "type": ["numeric", "numel=2"]},
             {"mutuallyExclusiveGroup": [
                 [
+                    {"name": "trialsECOG", "kind": "required", "type": ["cell"], "purpose": "data by trials"},
+                    {"name": "windowICA", "kind": "required", "type": ["numeric", "numel=2"]},
                     {"name": "fs", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "sample rate"},
                     {"name": "fsD", "kind": "ordered", "type": ["numeric", "positive", "numel=1"]}
                 ],
                 [
+                    {"name": "dataset", "kind": "required", "type": ["struct"], "purpose": "TDT dataset"},
+                    {"name": "windowICA", "kind": "required", "type": ["numeric", "numel=2"]},
                     {"name": "trials", "kind": "required", "type": ["struct"]},
                     {"name": "fsD", "kind": "ordered", "type": ["numeric", "positive", "numel=1"]},
                     {"name": "segOption", "kind": "ordered", "type": ["char", "choices={'trial onset', 'dev onset', 'push onset', 'last std'}"]}
@@ -28,7 +30,7 @@
         ]
     },
 
-       "mECOGCorr": {
+   "mECOGCorr": {
         "inputs": [
             {"name": "trialsECOG", "kind": "required", "type": ["cell"], "purpose": "data by trials"},
             {"name": "range", "kind": "ordered",  "type": ["numeric", "numel=2"], "purpose": "whole range "},
@@ -38,8 +40,6 @@
             {"name": "refCh", "kind": "namevalue", "type":["numeric", "positive", "numel=1"]}
         ]
     },
-
-
 
     "joinSTD": {
         "inputs": [
