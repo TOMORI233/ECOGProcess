@@ -7,17 +7,17 @@ function [resultSTD, chMean, chStd, window] = joinSTD(trials, varargin)
     %         2. ECOGDataset: TDT dataset
     %     fs: raw sample rate, in Hz
     % Output:
-    %     resultSTD: nStd*1 cell, mean wave of trials with std number >= nStd(i)
+    %     resultSTD: unique(nStd)*1 cell, re-weighted wave of trials with std number >= nStd(i)
     %     chMean: joint mean wave of trials of all std number
     %     chStd: std
-    %     window: [-2500, ISI * max(stdNumAll) + 2000], in ms
+    %     window: [-2500, ISI * max(nStd) + 2000], in ms
     % Example:
     %     [resultSTD, chMean, chStd, window] = joinSTD(trials, trialsECOG, fs);
     %     [resultSTD, chMean, chStd, window] = joinSTD(trials, ECOGDataset);
 
     mInputParser = inputParser;
     mInputParser.addRequired('trials', @isstruct);
-    mInputParser.addRequired('dataset');
+    mInputParser.addRequired('dataset', @(x) isstruct(x) || iscell(x));
     mInputParser.addOptional("fs", [], @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
     mInputParser.parse(trials, varargin{:});
 
@@ -31,7 +31,7 @@ function [resultSTD, chMean, chStd, window] = joinSTD(trials, varargin)
 
     switch class(dataset)
         case 'cell'
-            trialsECOG = data;
+            trialsECOG = dataset;
 
             if isempty(fs)
                 error('Required input fs is empty!');
@@ -48,8 +48,6 @@ function [resultSTD, chMean, chStd, window] = joinSTD(trials, varargin)
     
         if sIndex == 1
             windowSTD = [window(1), ISI * stdNumAll(sIndex)];
-        elseif sIndex == length(stdNumAll)
-            windowSTD = [ISI * (stdNumAll(sIndex) - 1), window(2)];
         else
             windowSTD = [ISI * (stdNumAll(sIndex) - 1), ISI * stdNumAll(sIndex)];
         end
@@ -65,7 +63,7 @@ function [resultSTD, chMean, chStd, window] = joinSTD(trials, varargin)
         end
 
     end
-    
+
     chMean = resultSTD{1};
     
     for index = 2:length(resultSTD)

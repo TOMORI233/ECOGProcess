@@ -4,11 +4,11 @@ ROOTPATH = "D:\Education\Lab\Projects\ECOG\Figures\7-10Freq\";
 rootPathMat{1} = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Active\';
 rootPathMat{2} = 'D:\Education\Lab\Projects\ECOG\MAT Data\XX\7-10Freq Active\';
 
-for rIndex = 1:2
+for rIndex = 2:2
     temp = dir(rootPathMat{rIndex});
     MATPATHs = [];
     
-    for fIndex = 1:length(temp)
+    for fIndex = 17:length(temp)
     
         if isequal(temp(fIndex).name, '.') || isequal(temp(fIndex).name, '..')
             continue;

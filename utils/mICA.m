@@ -20,7 +20,7 @@ function comp = mICA(dataset, windowICA, arg3, varargin)
     mInputParser = inputParser;
     mInputParser.addRequired("dataset");
     mInputParser.addRequired("windowICA", @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
-    mInputParser.addRequired("arg3");
+    mInputParser.addRequired("arg3", @(x) isnumeric(x) || isstruct(x));
     mInputParser.addOptional("fsD", 500, @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
     mInputParser.addOptional("segOption", "trial onset", @(x) any(validatestring(x, {'trial onset', 'dev onset', 'push onset', 'last std'})));
     mInputParser.parse(dataset, windowICA, arg3, varargin{:});
