@@ -1,7 +1,9 @@
 function [CData, f, coi] = cwtMulti(data, fs, fRange)
     [nSample, nTrial] = size(data);
     [~, f, coi] =cwt(data(:, 1), 'amor', fs);
-    fIdx = find(f >= fRange(2), 1, "last") + 1:find(f <= fRange(1), 1) - 1;
+    fIdx = find(f > fRange(1) & f < fRange(2));
+    fIdx(1) = max([fIdx(1) - 1, 1]);
+    fIdx(2) = min([fIdx(2) + 1, length(f)]);
     CData = zeros(nSample, nTrial);
 
     parfor index = 1:nTrial
