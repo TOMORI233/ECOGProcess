@@ -17,12 +17,13 @@ if ~isempty(sponWin)
     tIndex = t > sponWin(1) & t < sponWin(2);
     temp = wave(:, tIndex);
     rmsSpon = rms(temp, 2);
+    areaSpon = sum(abs(temp), 2);
 end
 
 tIndex = t > testWin(1) & t < testWin(2);
 temp = wave(:, tIndex);
 amp = rms(temp, 2);
-
+area = sum(abs(temp), 2);
 % switch method
 %     case 1 % rms
 %         amp = rms(temp, 2);
@@ -42,5 +43,7 @@ switch method
         normAmp = amp./rmsSpon;
     case 2 % R_minus_S_devide_R_plus_S
         normAmp = (amp - rmsSpon) ./ rmsSpon;
+    case 3
+        normAmp = (area - areaSpon) ./ areaSpon;
 end
 

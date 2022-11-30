@@ -1,4 +1,14 @@
-function [trialAll, trialsECOG, trialsECOG_S1] = mergeCTLTrialsECOG(MATPATH, posIndex)
+function [trialAll, trialsECOG, trialsECOG_S1] = mergeCTLTrialsECOG(MATPATH, posIndex, CTLParams)
+narginchk(2, 3);
+if nargin < 3
+    run("CTLconfig.m");
+else
+    CTL_Fields = fields(CTLParams);
+    for pIndex = 1 : length(CTL_Fields)
+        eval(strcat(CTL_Fields(pIndex), "= CTLParams.", CTL_Fields(pIndex), ";"));
+    end
+
+end
 %% Parameter settings
 params.posIndex = posIndex; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
@@ -9,7 +19,7 @@ Protocol = temp(end - 2);
 segOption = ["trial onset", "dev onset"];
 flp = 500;
 fhp = 0.1;
-run("CTLconfig.m");
+
 
 %% Processing
 [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);

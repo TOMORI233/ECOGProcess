@@ -27,11 +27,11 @@ mParpool = gcp;
 chTemp = cellfun(@(x) array2VectorCell(x), temp, "uni", false);
 P = cell(length(chTemp), 1);
 for ch = 1 : length(chTemp)
-if method == 1 || strcmpi(method, "power")
+if isequal(method, 1) || strcmpi(method, "power")
         %             [f, P{ch, 1}, ~] = cellfun(@(x) mFFT_Pow(x(tIdx), fs), chTemp, 'UniformOutput', false);
         F(ch) = parfeval(mParpool, @cellfun, 2, @(x) mFFT_Pow(x(tIdx), fs), chTemp{ch, 1}, 'UniformOutput', false);
         P{ch, 1} = F.OutputArguments{2};
-elseif method == 2 || strcmpi(method, "magnitude")% magnitude
+elseif isequal(method, 2) || strcmpi(method, "magnitude")% magnitude
         %             [f, ~,  P{ch, 1}] = cellfun(@(x) mFFT_Base(x(tIdx), fs), chTemp, 'UniformOutput', false);
         F(ch) = parfeval(mParpool, @cellfun, 3, @(x) mFFT_Base(x(tIdx), fs), chTemp{ch, 1}, 'UniformOutput', false);
 %         while isempty(F.OutputArguments)

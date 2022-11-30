@@ -4,6 +4,15 @@ switch Protocol
     % 2. 改变duration(时间整合需要时间， 纯音/噪声对照）
     % 3. 节律的建立和节律的打破
     % 4. 一个节律变成另外一个节律
+        case "TITS_4_25_noise_3s_4s_Reg_Irreg_Rev"   % 1. wavelet 2. 1Hz oscillation 3. PFC    
+        %% 1. 3s-4s Base ICI: 4ms, 15ms, 20ms, 25ms   2. noise-regular(15ms)   3. 4ms Reg-15Reg,   4ms Irreg - 15Reg,  30 Irreg - 15Reg  
+        titleStr = "TITS_4_25_noise_3s_4s_Reg_Irreg_Rev";
+        stimStr = ["4ms_Reg_Irreg", "4ms_Irreg_Reg", "15ms_Reg_Irreg", "15ms_Irreg_Reg", "20ms_Reg_Irreg", "20ms_Irreg_Reg", "25ms_Reg_Irreg", "25ms_Irreg_Reg", "noise_15ms_Reg"];
+        S1Duration = [4003.9, 4000, 4005.4, 3982.2, 4001.8, 4000, 4001, 4009.3, 2994.4];
+        winStart = -4500;
+        Window = [winStart 4000];
+        FFTWin = [500, 3500];
+        ICAWin = [-2000 2000];
     case "TITS_15_30_3s_13s_Reg_Irreg_Rev"   % 1. wavelet 2. 1Hz oscillation 3. PFC    
         %% 1. 3s-4s Base ICI: 4ms, 15ms, 20ms, 25ms   2. noise-regular(15ms)   3. 4ms Reg-15Reg,   4ms Irreg - 15Reg,  30 Irreg - 15Reg  
         titleStr = "TITS_15_30_3s_13s_Reg_Irreg_Rev";
