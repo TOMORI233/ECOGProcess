@@ -1,5 +1,5 @@
 function ECOGDataset = mResample(ECOGDataset, trials, window, segOption, fs, fhp, flp)
-% Description: Split data by trials, window and segOption. Filter and
+    % Description: Split data by trials, window and segOption. Filter and
     %              resample data. Perform ICA on data.
     % Input:
     %     ECOGDataset: TDT dataset of [LAuC] or [LPFC]

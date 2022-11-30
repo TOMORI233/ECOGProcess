@@ -7,7 +7,7 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, behaviorOnly
     %         - posIndex: position number, 1-AC, 2-PFC
     %         - choiceWin: choice window, in ms
     %         - processFcn: behavior processing function handle
-    %         - behaviorOnly: if true, return [trialAll] only
+    %     behaviorOnly: if set true, return [trialAll] only
     % Output:
     %     trialAll: n*1 struct of trial information
     %     ECOGDataset: TDT dataset of [streams.(posStr(posIndex))]

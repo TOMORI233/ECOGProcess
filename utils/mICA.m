@@ -17,16 +17,16 @@ function comp = mICA(dataset, windowICA, arg3, varargin)
 %     comp = mICA(ECOGDataset, windowICA, trials, [fsD], [segOption]);
 %     comp = mICA(trialsECOG, windowICA, fs, [fsD]);
 
-mInputParser = inputParser;
-mInputParser.addRequired("dataset");
-mInputParser.addRequired("windowICA", @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
-mInputParser.addRequired("arg3", @(x) isnumeric(x) || isstruct(x));
-mInputParser.addOptional("fsD", 500, @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-mInputParser.addOptional("segOption", "trial onset", @(x) any(validatestring(x, {'trial onset', 'dev onset', 'push onset', 'last std'})));
-mInputParser.parse(dataset, windowICA, arg3, varargin{:});
+mIp = inputParser;
+mIp.addRequired("dataset");
+mIp.addRequired("windowICA", @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
+mIp.addRequired("arg3", @(x) isnumeric(x) || isstruct(x));
+mIp.addOptional("fsD", 500, @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
+mIp.addOptional("segOption", "trial onset", @(x) any(validatestring(x, {'trial onset', 'dev onset', 'push onset', 'last std'})));
+mIp.parse(dataset, windowICA, arg3, varargin{:});
 
-fsD = mInputParser.Results.fsD;
-segOption = mInputParser.Results.segOption;
+fsD = mIp.Results.fsD;
+segOption = mIp.Results.segOption;
 
 switch class(arg3)
     case 'double'
@@ -73,6 +73,7 @@ cfg.lpfreq = 50;
 cfg.hpfilter = 'yes';
 cfg.hpfreq = 0.5;
 cfg.hpfiltord = 3;
+cfg.dftfilter = 'yes';
 cfg.dftfreq = [50 100 150]; % line noise frequencies in Hz for DFT filter (default = [50 100 150])
 data = ft_preprocessing(cfg, data);
 

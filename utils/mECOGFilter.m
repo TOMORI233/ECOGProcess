@@ -17,14 +17,14 @@ function varargout = mECOGFilter(dataset, fhp, flp, varargin)
     %     ECOGDataset = mECOGFilter(ECOGDataset, 0.1, 10);
     %     trialsECOG = mECOGFilter(trialsECOG, 0.1, 10, [fs]);
 
-    mInputParser = inputParser;
-    mInputParser.addRequired("dataset");
-    mInputParser.addRequired("fhp", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mInputParser.addRequired("flp", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mInputParser.addOptional("fs", 500, @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mInputParser.parse(dataset, fhp, flp, varargin{:});
+    mIp = inputParser;
+    mIp.addRequired("dataset");
+    mIp.addRequired("fhp", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
+    mIp.addRequired("flp", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
+    mIp.addOptional("fs", 500, @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
+    mIp.parse(dataset, fhp, flp, varargin{:});
 
-    fs = mInputParser.Results.fs;
+    fs = mIp.Results.fs;
 
     switch class(dataset)
         case 'cell'
@@ -62,6 +62,7 @@ function varargout = mECOGFilter(dataset, fhp, flp, varargin)
     cfg.hpfilter = 'yes';
     cfg.hpfreq = fhp;
     cfg.hpfiltord = 3;
+    cfg.dftfilter = 'yes';
     cfg.dftfreq = [50 100 150]; % line noise frequencies in Hz for DFT filter (default = [50 100 150])
     data = ft_preprocessing(cfg, data);
 

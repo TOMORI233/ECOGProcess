@@ -1,8 +1,8 @@
 function stat = CBPT(data, cfg)
-% Description: cluster-based permutation test
+% Description: cluster-based permutation test for 2 or more than 2 groups of data
 % NOTICE: If you run into error messages like "too many args input for nearest",
 %         then solution to function name duplication is to add fieldtrip path to
-%         the beginning of pathdef.m (or via path settings)
+%         the beginning of pathdef.m (or via path settings).
 % Input:
 %     data: n*1 struct with fields:
 %           - time: [1, nSample]
@@ -11,7 +11,7 @@ function stat = CBPT(data, cfg)
 %           - trialinfo: trial type label, [nTrial, 1]
 %     cfg: configurations (you can alter settings marked * for better performance)
 %          - method: method to calculate significance probability (default: 'montecarlo')
-%        * - statistic: 'indepsamplesT', 'indepsamplesF'
+%        * - statistic: 'indepsamplesT'(for 2 groups), 'indepsamplesF'(for more than 2 groups)
 %          - correctm: 'no', 'max', 'cluster'(default), 'bonferoni', 'holms', or 'fdr'.
 %        * - clusterstatistic: 'maxsum'(default), 'maxsize', or 'wcm'
 %        * - clusteralpha: alpha level of the sample-specific test statistic that will be used
@@ -32,10 +32,10 @@ function stat = CBPT(data, cfg)
 %     stat: result of fieldtrip
 %           - prob: prob of cluster-based Monte Carlo permutation test, [nCh, nSample]
 %           - posclusters/negclusters: 1*k struct of information of each cluster
-%           - posclusterslabelmat/negclusterslabelmat: cluster position, [nCh, nSample]
+%           - posclusterslabelmat/negclusterslabelmat: cluster position specified by 
+%                                                      non-zero values, [nCh, nSample]
 %           - mask: significant sample position, [nCh, nSample] logical
-%           - stat: the effect at the sample level (t-value or f-value
-%                   by cfg.statistic), [nCh, nSample]
+%           - stat: the effect at the sample level (t-value or f-value by cfg.statistic), [nCh, nSample]
 % Example:
 %     % Perform CBPT on data with different deviant freq ratio
 %     t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
@@ -71,8 +71,8 @@ cfg_default.alpha            = 0.025;                % alpha level of the permut
 
 cfg_default.neighbours       = mPrepareNeighbours(); % the neighbours specify for each sensor with which other sensors it can form clusters
 cfg_default.minnbchan        = 1;                    % minimum number of neighborhood channels that is
-% required for a selected sample to be included
-% in the clustering algorithm (default=0).
+                                                     % required for a selected sample to be included
+                                                     % in the clustering algorithm (default=0).
 
 % cfg_default.latency          = [0 1];                % time interval over which the experimental conditions must be compared (in seconds)
 
