@@ -1,4 +1,4 @@
-function varargout = ECOGResample(dataset, fResample, fs)
+function varargout = ECOGResample(dataset, fResample, varargin)
     % Description: resample data
     % Input:
     %     dataset:
@@ -20,7 +20,7 @@ function varargout = ECOGResample(dataset, fResample, fs)
     mIp.addRequired("dataset");
     mIp.addRequired("fResample", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
     mIp.addOptional("fs", [], @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mIp.parse(dataset, fResample, fs);
+    mIp.parse(dataset, fResample, varargin{:});
 
     switch class(dataset)
         case 'cell'
@@ -63,6 +63,7 @@ function varargout = ECOGResample(dataset, fResample, fs)
     %% output
     if isstruct(dataset)
         dataset.data = data.trial{1};
+        dataset.fs = fResample;
         varargout{1} = dataset;
     else
         varargout{1} = data.trial';

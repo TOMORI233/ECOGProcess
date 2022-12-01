@@ -67,7 +67,7 @@ else
 end
 
 %% filter
-trialsECOG_Merge_Filtered = mECOGFilter(trialsECOG_Merge, fhp, flp, fs);
+trialsECOG_Merge_Filtered = ECOGFilter(trialsECOG_Merge, fhp, flp, fs);
 
 %% process across diff devTypes
 devType = unique([trialAll.devOrdr]);
@@ -153,7 +153,7 @@ for gIndex = 1 : length(group_Index)
     FigGroup = plotRawWaveMulti_SPR(group, Window);
     scaleAxes(FigGroup, "x", [-10 600]);
 scaleAxes(FigGroup, "y", [-yScale(monkeyId) yScale(monkeyId)]);
-reOrganizeFig(FigGroup, "paddings", [0.01, 0.01, 0.01, 0.01])
+addLegend2Fig(FigGroup, stimStrs(group_Index{gIndex}));
 print(FigGroup, strcat(FIGPATH, group_Str(gIndex)), "-djpeg", "-r200");
 close(FigGroup);
 end
