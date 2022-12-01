@@ -41,8 +41,6 @@ AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
 
 
-
-
 badCh = {[], []};
 yScale = [60, 90];
 quantWin = [0 300];

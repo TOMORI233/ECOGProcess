@@ -668,7 +668,6 @@ function exportDataFcn(BLOCKPATH, SAVEPATH, params, startIdx, endIdx)
         tic
         [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
         ECOGDataset = ECOGDownsample(ECOGDataset, fd);
-        ECOGDataset = ECOGFilter(ECOGDataset);
         disp("Saving...");
         save(strcat(SAVEPATH, DateStr, "\", DateStr, "_", AREANAME(params.posIndex), ".mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");
         toc
@@ -679,7 +678,6 @@ function exportDataFcn(BLOCKPATH, SAVEPATH, params, startIdx, endIdx)
         tic
         [~, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
         ECOGDataset = ECOGDownsample(ECOGDataset, fd);
-        ECOGDataset = ECOGFilter(ECOGDataset);
         disp("Saving...");
         save(strcat(SAVEPATH, DateStr, "\", DateStr, "_", AREANAME(params.posIndex), ".mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");
         toc

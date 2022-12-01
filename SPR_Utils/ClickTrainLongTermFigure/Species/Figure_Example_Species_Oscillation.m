@@ -29,7 +29,7 @@ correspFreq = 1000./ICI2;
 temp = string(split(MATPATH, '\'));
 DateStr = temp(end - 1);
 Protocol = temp(end - 2);
-FIGPATH = strcat(rootPathFig, "Figure1_", protStr,"\", DateStr, "_", AREANAME, "\");
+FIGPATH = strcat(rootPathFig, "Figure4_", protStr,"\", DateStr, "_", AREANAME, "\");
 mkdir(FIGPATH);
 
 

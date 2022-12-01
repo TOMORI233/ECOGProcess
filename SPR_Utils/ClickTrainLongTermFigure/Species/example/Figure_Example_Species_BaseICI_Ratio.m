@@ -92,7 +92,7 @@ for mIndex = 1 : length(MATPATH)
         trials = trialAll(tIndex);
         trialsECOG = trialsECOG_Merge(tIndex);
         trialsECOGFilterd = trialsECOG_Merge_Filtered(tIndex);
-        % FFT during S1
+        % FFT 
         tIdx = find(t > FFTWin(1) & t < FFTWin(2));
         [ff, PMean{mIndex, dIndex}, trialsFFT]  = trialsECOGFFT(trialsECOG, fs, tIdx, [], 2);
         

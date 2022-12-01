@@ -14,8 +14,9 @@ for i = iIndex'
     params.processFcn = @PassiveProcess_clickTrainContinuous;
     exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
     recordInfo(i).Exported = 1;
+    writetable(struct2table(recordInfo), recordPath);
 end
-writetable(struct2table(recordInfo), recordPath);
+
 
 %% XX
 clear ; clc
@@ -33,5 +34,5 @@ for i = iIndex'
     params.processFcn = @PassiveProcess_clickTrainContinuous;
     exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
     recordInfo(i).Exported = 1;
+    writetable(struct2table(recordInfo), recordPath);
 end
-writetable(struct2table(recordInfo), recordPath);
