@@ -5,12 +5,14 @@
 #ignore slprj folder
 */slprj/
 /slprj/
+#ignore codegen folder
+*/codegen/
+/codegen/
 
 #ignore following files;
 *asv
 *slxc
 *mexmaci64
 *mexmaci32
-*mexw32
-*mexw64
 *jpg
+*png

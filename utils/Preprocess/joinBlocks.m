@@ -12,7 +12,7 @@ if nargin < 3
     error("Blocks to be joint should be at least 2");
 end
 
-run("joinBlocksConfig.m");
+run("../Config/joinBlocksConfig.m");
 opts = getOrFull(opts, jbDefaultOpts);
 abortHeadTail = getOr(opts, 'abortHeadTail', 1);
 behavOnly = getOr(opts, 'behavOnly', 0);
@@ -96,7 +96,7 @@ for dIndex = 1:length(varargin)
     end
 end
 
-    data = struct('epocs', epocs, 'streams', streams);
+data = struct('epocs', epocs, 'streams', streams);
 
-    return;
+return;
 end

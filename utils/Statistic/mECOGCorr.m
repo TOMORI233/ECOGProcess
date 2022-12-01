@@ -30,26 +30,26 @@ function Fig = mECOGCorr(trialsECOG, Window, varargin)
 
 
 %% Validate input
-mInputParser = inputParser;
-mInputParser.addRequired("trialsECOG");
-mInputParser.addRequired("Window", @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
-mInputParser.addOptional("selWin", Window, @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
-mInputParser.addOptional("Fig", []);
-mInputParser.addParameter("method", "pearson", @(x) any(validatestring(x, {'pearson','kendall','spearman'})));
-mInputParser.addParameter("refCh", 0, @(x) validateattributes(x, {'numeric'}, {'numel', 1}));
-mInputParser.addParameter("ch", 1 : size(trialsECOG{1}, 2), @(x) validateattributes(x, {'numeric'}));
-mInputParser.addParameter("selNum", 0.7, @(x) validateattributes(x, {'numeric'}, {'numel', 1}));
-mInputParser.addParameter("params", []);
+mIp = inputParser;
+mIp.addRequired("trialsECOG");
+mIp.addRequired("Window", @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
+mIp.addOptional("selWin", Window, @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
+mIp.addOptional("Fig", []);
+mIp.addParameter("method", "pearson", @(x) any(validatestring(x, {'pearson','kendall','spearman'})));
+mIp.addParameter("refCh", 0, @(x) validateattributes(x, {'numeric'}, {'numel', 1}));
+mIp.addParameter("ch", 1 : size(trialsECOG{1}, 2), @(x) validateattributes(x, {'numeric'}));
+mIp.addParameter("selNum", 0.7, @(x) validateattributes(x, {'numeric'}, {'numel', 1}));
+mIp.addParameter("params", []);
 
-mInputParser.parse(trialsECOG, Window, varargin{:});
+mIp.parse(trialsECOG, Window, varargin{:});
 
-Fig = mInputParser.Results.Fig; 
-selWin = mInputParser.Results.selWin;
-METHOD = mInputParser.Results.method;
-REFCH = mInputParser.Results.refCh;
-CH = mInputParser.Results.ch;
-selNum = mInputParser.Results.selNum;
-params = mInputParser.Results.params;
+Fig = mIp.Results.Fig; 
+selWin = mIp.Results.selWin;
+METHOD = mIp.Results.method;
+REFCH = mIp.Results.refCh;
+CH = mIp.Results.ch;
+selNum = mIp.Results.selNum;
+params = mIp.Results.params;
 
 tRange = linspace(Window(1), Window(2), size(trialsECOG{1}, 2));
 if ~isempty(Window) && ~isempty(selWin)

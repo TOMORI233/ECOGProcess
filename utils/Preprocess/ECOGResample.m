@@ -1,30 +1,26 @@
-function varargout = mECOGFilter(dataset, fhp, flp, varargin)
-    % Description: Split data by trials, perform band pass filter on data
+function varargout = ECOGResample(dataset, fResample, fs)
+    % Description: resample data
     % Input:
     %     dataset:
     %         1. ECOGDataset: TDT dataset of [LAuC] or [LPFC]
     %         2. trialsECOG: n*1 cell array of trial data (64*m matrix)
-    %     windowICA: 2*1 vector of time window of trial data, in ms
-    %     fhp:
-    %         1. high pass cutoff frequency
-    %     flp
-    %         2. low pass cutoff frequency
+    %     fResample: resample rate
     %     fs: sample rate of dataset
-    %     
     % Output:
-    %     comp: result of filter
+    %     dataset:
+    %         1. ECOGDataset: result of resampled dataset
+    %         2. trialsECOG: result of resampled data
+    %     fResample
     % Example:
-    %     ECOGDataset = mECOGFilter(ECOGDataset, 0.1, 10);
-    %     trialsECOG = mECOGFilter(trialsECOG, 0.1, 10, [fs]);
+    %     fd = 300;
+    %     ECOGDataset = mECOGResample(ECOGDataset, fd);
+    %     trialsECOG = mECOGResample(trialsECOG, fd, fs);
 
     mIp = inputParser;
     mIp.addRequired("dataset");
-    mIp.addRequired("fhp", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mIp.addRequired("flp", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mIp.addOptional("fs", 500, @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mIp.parse(dataset, fhp, flp, varargin{:});
-
-    fs = mIp.Results.fs;
+    mIp.addRequired("fResample", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
+    mIp.addOptional("fs", [], @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
+    mIp.parse(dataset, fResample, fs);
 
     switch class(dataset)
         case 'cell'
@@ -40,6 +36,10 @@ function varargout = mECOGFilter(dataset, fhp, flp, varargin)
             error("Invalid syntax");
     end
 
+    if isempty(fs)
+        error("fs input missing for resampling trial data");
+    end
+
     %% Preprocessing
     disp("Preprocessing...");
     t = (1 : size(trialsECOG{1}, 2)) / fs;
@@ -53,18 +53,12 @@ function varargout = mECOGFilter(dataset, fhp, flp, varargin)
     data.sampleinfo = sampleinfo;
     data = ft_selectdata(cfg, data);
 
-       % Filter
-    disp("Filtering...");
+    %% Resample
+    disp("Resampling...");
     cfg = [];
-    cfg.demean = 'no';
-    cfg.lpfilter = 'yes';
-    cfg.lpfreq = flp;
-    cfg.hpfilter = 'yes';
-    cfg.hpfreq = fhp;
-    cfg.hpfiltord = 3;
-    cfg.dftfilter = 'yes';
-    cfg.dftfreq = [50 100 150]; % line noise frequencies in Hz for DFT filter (default = [50 100 150])
-    data = ft_preprocessing(cfg, data);
+    cfg.resamplefs = fResample;
+    cfg.trials = 'all';
+    data = ft_resampledata(cfg, data);
 
     %% output
     if isstruct(dataset)
@@ -73,6 +67,8 @@ function varargout = mECOGFilter(dataset, fhp, flp, varargin)
     else
         varargout{1} = data.trial';
     end
+
+    varargout{2} = fResample;
 
     return;
 end

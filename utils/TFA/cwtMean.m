@@ -2,7 +2,9 @@ function [CData, f, coi] = cwtMean(data, fs, fRange)
 [~, f, coi] =cwt(data(:, 1), 'amor', fs);
 [nSample, nTrial] = size(data);
 if diff(fRange) > 0
-    fIdx = max([find(f > fRange(2), 1, "last")+1, 1]) : min([find(f < fRange(1), 1)-1, length(f)]);
+    fIdx = find(f > fRange(1) & f < fRange(2));
+    fIdx(1) = max([fIdx(1) - 1, 1]);
+    fIdx(2) = min([fIdx(2) + 1, length(f)]);
 else
     fIdx = 1 : length(f);
 end
