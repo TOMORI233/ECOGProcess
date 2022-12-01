@@ -1,30 +1,25 @@
-function varargout = mECOGFilter(dataset, fhp, flp, varargin)
-    % Description: Split data by trials, perform band pass filter on data
+function varargout = ECOGFilter(dataset, fhp, flp, fs)
+    % Description: perform band pass filter on data
     % Input:
     %     dataset:
     %         1. ECOGDataset: TDT dataset of [LAuC] or [LPFC]
     %         2. trialsECOG: n*1 cell array of trial data (64*m matrix)
-    %     windowICA: 2*1 vector of time window of trial data, in ms
-    %     fhp:
-    %         1. high pass cutoff frequency
-    %     flp
-    %         2. low pass cutoff frequency
+    %     fhp: high pass cutoff frequency
+    %     flp: low pass cutoff frequency
     %     fs: sample rate of dataset
-    %     
     % Output:
-    %     comp: result of filter
+    %     1. dataset: result of filtered dataset
+    %     2. trialsECOG: result of filtered data
     % Example:
     %     ECOGDataset = mECOGFilter(ECOGDataset, 0.1, 10);
-    %     trialsECOG = mECOGFilter(trialsECOG, 0.1, 10, [fs]);
+    %     trialsECOG = mECOGFilter(trialsECOG, 0.1, 10, fs);
 
-    mInputParser = inputParser;
-    mInputParser.addRequired("dataset");
-    mInputParser.addRequired("fhp", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mInputParser.addRequired("flp", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mInputParser.addOptional("fs", 500, @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mInputParser.parse(dataset, fhp, flp, varargin{:});
-
-    fs = mInputParser.Results.fs;
+    mIp = inputParser;
+    mIp.addRequired("dataset");
+    mIp.addRequired("fhp", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
+    mIp.addRequired("flp", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
+    mIp.addOptional("fs", [], @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
+    mIp.parse(dataset, fhp, flp, fs);
 
     switch class(dataset)
         case 'cell'
@@ -40,6 +35,10 @@ function varargout = mECOGFilter(dataset, fhp, flp, varargin)
             error("Invalid syntax");
     end
 
+    if isempty(fs)
+        error("fs input missing for filtering trial data");
+    end
+
     %% Preprocessing
     disp("Preprocessing...");
     t = (1 : size(trialsECOG{1}, 2)) / fs;
@@ -53,7 +52,7 @@ function varargout = mECOGFilter(dataset, fhp, flp, varargin)
     data.sampleinfo = sampleinfo;
     data = ft_selectdata(cfg, data);
 
-       % Filter
+    %% Filter
     disp("Filtering...");
     cfg = [];
     cfg.demean = 'no';

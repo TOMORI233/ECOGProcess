@@ -7,10 +7,8 @@ if nargin < 5
     gpuSize = 5001;
 end
 
-if size(trialsECOG{1}, 2) > gpuSize
-    [trialsECOG_DS, fd] = trialsDownsample(trialsECOG, fs0, fs0* gpuSize / size(trialsECOG{1}, 2));
-elseif size(trialsECOG{1}, 2) < gpuSize
-    [trialsECOG_DS, fd] = trialsUpsample(trialsECOG, fs0, fs0* gpuSize / size(trialsECOG{1}, 2));
+if size(trialsECOG{1}, 2) ~= gpuSize
+    [trialsECOG_DS, fd] = ECOGResample(trialsECOG, fs0* gpuSize / size(trialsECOG{1}, 2), fs0);
 end
 
 t = linspace(window(1), window(2), size(trialsECOG_DS{1}, 2));

@@ -20,7 +20,9 @@ function [TFR, t, f, coi] = computeTFR(chMean, fs, fsD, freqLimits, fRange)
         if numel(fRange) == 1
             [~, idx] = min(abs(f - fRange));
         elseif numel(fRange) == 2
-            idx = find(f >= fRange(2), 1, "last") + 1:find(f <= fRange(1), 1) - 1;
+            idx = find(f > fRange(1) & f < fRange(2));
+            idx(1) = max([idx(1) - 1, 1]);
+            idx(2) = min([idx(2) + 1, length(f)]);
         else
             error("Invalid frequency range input");
         end

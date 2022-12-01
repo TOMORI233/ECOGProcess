@@ -7,7 +7,7 @@ function Figs = plotLayout(Figs, posIndex, alphaValue)
     
     for fIndex = 1:length(Figs)
         setAxes(Figs(fIndex), 'color', 'none');
-        layAx = mSubplot(Figs(fIndex), 1, 1, 1, [1 1], zeros(4, 1));
+        layAx = mSubplot(Figs(fIndex), 1, 1, 1, [1 1], zeros(4, 1), 0.01 * ones(4, 1));
         load('layout.mat');
     
         switch posIndex

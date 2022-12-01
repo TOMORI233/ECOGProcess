@@ -1,0 +1,40 @@
+{
+    "_schemaVersion": "1.0.0",
+
+    "ECOGFilter": {
+        "inputs": [
+            {"mutuallyExclusiveGroup": [
+                [
+                    {"name": "trialsECOG", "kind": "required", "type": ["cell"], "purpose": "data by trials"},
+                    {"name": "fhp", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "high pass cutoff frequency"},
+                    {"name": "flp", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "low pass cutoff frequency"},
+                    {"name": "fs", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "sample rate"}
+                ],
+                [
+                    {"name": "ECOGDataset", "kind": "required", "type": ["struct"], "purpose": "TDT dataset"},
+                    {"name": "fhp", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "high pass cutoff frequency"},
+                    {"name": "flp", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "low pass cutoff frequency"}
+                ]
+            ]}
+            
+        ]
+    },
+
+    "ECOGResample": {
+        "inputs": [
+            {"mutuallyExclusiveGroup": [
+                [
+                    {"name": "trialsECOG", "kind": "required", "type": ["cell"], "purpose": "data by trials"},
+                    {"name": "fResample", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "resample rate"},
+                    {"name": "fs", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "sample rate"}
+                ],
+                [
+                    {"name": "ECOGDataset", "kind": "required", "type": ["struct"], "purpose": "TDT dataset"},
+                    {"name": "fResample", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "resample rate"}
+                ]
+            ]}
+            
+        ]
+    }
+    
+}
