@@ -12,7 +12,7 @@ if nargin < 3
     error("Blocks to be joint should be at least 2");
 end
 
-run("../Config/joinBlocksConfig.m");
+run("joinBlocksConfig.m");
 opts = getOrFull(opts, jbDefaultOpts);
 abortHeadTail = getOr(opts, 'abortHeadTail', 1);
 behavOnly = getOr(opts, 'behavOnly', 0);
