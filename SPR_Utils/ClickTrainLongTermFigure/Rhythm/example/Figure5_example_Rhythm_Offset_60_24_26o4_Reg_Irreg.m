@@ -80,7 +80,7 @@ for mIndex = 1 : length(MATPATH)
     end
 
     %% filter
-     trialsECOG_Merge_Filtered = mECOGFilter(trialsECOG_Merge, fhp, flp, fs);
+     trialsECOG_Merge_Filtered = ECOGFilter(trialsECOG_Merge, fhp, flp, fs);
     
     %% process
     devType = unique([trialAll.devOrdr]);

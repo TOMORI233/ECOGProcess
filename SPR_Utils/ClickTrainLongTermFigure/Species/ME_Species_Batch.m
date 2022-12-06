@@ -37,20 +37,21 @@ for rIndex = 1 : length(protocols)
         clearvars -except areaSel rootPathMat rootPathFig protocols protocolStr rIndex dateSel protSel MATPATHS mIndex
 
         if matches(protocolStr, ["Species_2_4ms_Ratio", "Species_6_8ms_Ratio"])
-            run("Figure1_Example_Species_BaseICI_Ratio.m");
+            run("Figure_Example_Species_Basic.m");
         elseif matches(protocolStr, ["Species_2_4_6_8_Duaration_1o5", "Species_2_4_6_8_Duaration_1o015"])
             continue
         elseif matches(protocolStr, ["Species2_4_Oscillation_1o5", "Species6_8_Oscillation_1o5", "Species2_4_Oscillation_1o015", "Species6_8_Oscillation_1o015"])
             continue
         elseif matches(protocolStr, ["Species2_4_Variance_1o5", "Species6_8_Variance_1o5", "Species2_4_Variance_1o015", "Species6_8_Variance_1o015"])
-            continue
+            run("Figure_Example_Species_Basic.m");
         elseif matches(protocolStr, ["Species_2ms_Control_1o5", "Species_4ms_Control_1o5", "Species_2ms_Control_1o015", "Species_4ms_Control_1o015"])
-            continue
+%             continue
+            run("Figure_Example_Species_Basic.m");
         end
 
     end
 end
 
-if ~isempty(gcp('nocreate'))
-    delete(gcp('nocreate'));
-end
+% if ~isempty(gcp('nocreate'))
+%     delete(gcp('nocreate'));
+% end

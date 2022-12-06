@@ -19,7 +19,7 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, behaviorOnly
     end
 
     %% Parameter settings
-    run("preprocessConfig.m");
+    run(fullfile(fileparts(fileparts(mfilename("fullpath"))), "Config\preprocessConfig.m"));
     params = getOrFull(params, paramsDefault);
 
     paramsNames = fieldnames(params);

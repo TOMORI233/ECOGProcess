@@ -70,7 +70,7 @@ for mIndex = 1 : length(MATPATH)
     end
 
     %% filter
-     trialsECOG_Merge_Filtered = mECOGFilter(trialsECOG_Merge, fhp, flp, fs);
+     trialsECOG_Merge_Filtered = ECOGFilter(trialsECOG_Merge, fhp, flp, fs);
     
     %% process
     devType = unique([trialAll.devOrdr]);
@@ -92,7 +92,7 @@ for mIndex = 1 : length(MATPATH)
         trials = trialAll(tIndex);
         trialsECOG = trialsECOG_Merge(tIndex);
         trialsECOGFilterd = trialsECOG_Merge_Filtered(tIndex);
-        % FFT during S1
+        % FFT 
         tIdx = find(t > FFTWin(1) & t < FFTWin(2));
         [ff, PMean{mIndex, dIndex}, trialsFFT]  = trialsECOGFFT(trialsECOG, fs, tIdx, [], 2);
         

@@ -11,8 +11,8 @@ function varargout = ECOGFilter(dataset, fhp, flp, fs)
     %     1. dataset: result of filtered dataset
     %     2. trialsECOG: result of filtered data
     % Example:
-    %     ECOGDataset = mECOGFilter(ECOGDataset, 0.1, 10);
-    %     trialsECOG = mECOGFilter(trialsECOG, 0.1, 10, fs);
+    %     ECOGDataset = ECOGFilter(ECOGDataset, 0.1, 10);
+    %     trialsECOG = ECOGFilter(trialsECOG, 0.1, 10, fs);
 
     mIp = inputParser;
     mIp.addRequired("dataset");

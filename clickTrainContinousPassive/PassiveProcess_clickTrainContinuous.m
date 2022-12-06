@@ -1,17 +1,7 @@
-function trialAll = PassiveProcess_clickTrainContinuous(epocs, choiceWin, soundDuration)
-narginchk(1, 3);
-
-if nargin < 2
-    choiceWin = [0, 600];
-    soundDuration = 0;
-end
-if nargin < 3
-    soundDuration = 0;
-end
-choiceWinDev = choiceWin + soundDuration;
+function trialAll = PassiveProcess_clickTrainContinuous(epocs, choiceWin)
+narginchk(1, 2);
 %% Information extraction
 trialOnsetIndex = 1:length(epocs.ordr.data);
-trialOnsetTimeAll = epocs.ordr.onset(trialOnsetIndex) * 1000; % ms
 soundOnsetTimeAll = epocs.ordr.onset * 1000; % ms
 ordrAll = epocs.ordr.data; % Hz
 

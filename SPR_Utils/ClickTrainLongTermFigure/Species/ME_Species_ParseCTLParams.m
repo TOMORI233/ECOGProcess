@@ -25,5 +25,14 @@ CTLParams.CRIMethod = mProtocol.CRIMethod;
 CTLParams.pBase = mProtocol.pBase;
 CTLParams.CRIScale = reshape(str2double(string(strsplit(mProtocol.CRIScale, ","))), 2, 2);
 CTLParams.yScale = str2double(string(strsplit(mProtocol.yScale, ",")));
+
+group_Index =  string(strsplit(mProtocol.group_Index, ";"));
+for cIndex = 1 : length(group_Index) 
+    CTLParams.group_Index{cIndex, 1} = str2double(strsplit(group_Index(cIndex), ","));
+end
+CTLParams.group_Str = strrep(string(strsplit(mProtocol.group_Str, ",")), "_", "-");
+CTLParams.colors = string(strsplit(mProtocol.colors, ","));
+
+
 end
 
