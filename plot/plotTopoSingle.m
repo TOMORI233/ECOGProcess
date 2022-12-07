@@ -21,4 +21,3 @@ xlim([1, topoSize(1)]);
 ylim([1, topoSize(2)]);
 xticklabels('');
 yticklabels('');
-colorbar;
