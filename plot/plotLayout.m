@@ -41,7 +41,7 @@ function plotLayout(varargin)
                 currentFig = FigsOrAxes(fIndex).Parent;
                 layAx = axes(currentFig, "Position", currentPosition);
             otherwise
-                warning("Input targets should be figures or axes object array");
+                error("Input targets should be figures or axes object array");
         end
 
         switch posIndex
@@ -55,7 +55,6 @@ function plotLayout(varargin)
                 h = image(layAx, xx_PFC_sulcus_square);
         end
 
-        alpha(layAx, alphaValue);
         set(layAx, 'Visible', 'off');
         set(h, "alphadata", ~imbinarize(rgb2gray(h.CData)) * alphaValue);
     end
