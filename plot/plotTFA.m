@@ -67,7 +67,7 @@ function [Fig, res] = plotTFA(chMean, fs0, fs, window, titleStr, plotSize, chs, 
         end
     end
     
-    colorbar('position', [1 - paddings(2),   0.1 , 0.5 * paddings(2), 0.8]);
+    colorbar('position', [1 - paddings(2), 0.1, 0.5 * paddings(2), 0.8]);
     
     yRange = scaleAxes(Fig);
     scaleAxes(Fig, "c");

@@ -72,7 +72,7 @@ for pos = 1 : 2
 
         devPath = fullfile(ROOTPATH,'ICAReulst');
 
-        Fig1 = plotTopo(comp, topoSize, topoSize);
+        Fig1 = plotTopoICA(comp, topoSize, topoSize);
 
 
         if ~exist(fullfile(DATAPATH,strcat(posStr(posIndex), '_ICARes.mat')),"file") || reprocess

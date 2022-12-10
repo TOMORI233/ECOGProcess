@@ -40,7 +40,7 @@ plot(200 * ones(1, 2), [0, mAxe.YLim(2)]);
 
 plotRawWave(chMean, [], window, "ICA");
 plotTFA(chMean, fs0, fs, window, "ICA");
-Fig1 = plotTopo(comp);
+Fig1 = plotTopoICA(comp);
 scaleAxes(Fig1, "c");
 
 %%

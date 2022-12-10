@@ -14,6 +14,8 @@ function [granger, coh, cohm] = mGranger(trialsECOG_AC, trialsECOG_PFC, window, 
 %     coh: coherence of non-parametric computation of the cross-spectral density matrix
 %     cohm: coherence of parametric computation of the spectral transfer function
 
+ft_setPath2Top;
+
 %% Prepare data
 data.trial = cellfun(@(x, y) [x; y], trialsECOG_AC, trialsECOG_PFC, "UniformOutput", false)';
 data.time = repmat({linspace(window(1), window(2), size(trialsECOG_AC{1}, 2)) / 1000}, [1, length(data.trial)]);

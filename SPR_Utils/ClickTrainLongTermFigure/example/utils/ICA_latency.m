@@ -16,13 +16,13 @@ ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", 
 ICStd = cell2mat(cellfun(@std, changeCellRowNum(comp.trial), "UniformOutput", false));
 chPlot = reshape(1:12, 3, 4);
 FigICAWave = plotRawWave(ICMean, ICStd, Window, "ICA", [3, 4], 1 : 12);
-Fig = plotTopo(comp, [8, 8], [3, 4]);
+Fig = plotTopoICA(comp, [8, 8], [3, 4]);
 scaleAxes(FigICAWave, "y", [], [-8 8], "max");
 IC = input("Selected IC: ");
 close(Fig);
 close(FigICAWave);
 
-FigTopo = plotTopo(comp, [8, 8], [1, 1], IC);
+FigTopo = plotTopoICA(comp, [8, 8], [1, 1], IC);
 set(FigWave(mIndex), "outerposition", [300, 100, 800, 670]);
 
 

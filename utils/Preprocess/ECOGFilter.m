@@ -1,4 +1,4 @@
-function varargout = ECOGFilter(dataset, fhp, flp, fs)
+function varargout = ECOGFilter(dataset, fhp, flp, varargin)
     % Description: perform band pass filter on data
     % Input:
     %     dataset:
@@ -16,10 +16,12 @@ function varargout = ECOGFilter(dataset, fhp, flp, fs)
 
     mIp = inputParser;
     mIp.addRequired("dataset");
-    mIp.addRequired("fhp", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mIp.addRequired("flp", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mIp.addOptional("fs", [], @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mIp.parse(dataset, fhp, flp, fs);
+    mIp.addRequired("fhp", @(x) validateattributes(x, {'numeric'}, {'scalar', 'positive'}));
+    mIp.addRequired("flp", @(x) validateattributes(x, {'numeric'}, {'scalar', 'positive'}));
+    mIp.addOptional("fs", [], @(x) validateattributes(x, {'numeric'}, {'scalar', 'positive'}));
+    mIp.parse(dataset, fhp, flp, varargin{:});
+
+    fs = mIp.Results.fs;
 
     switch class(dataset)
         case 'cell'

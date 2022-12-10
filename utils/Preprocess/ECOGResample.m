@@ -18,8 +18,8 @@ function varargout = ECOGResample(dataset, fResample, varargin)
 
     mIp = inputParser;
     mIp.addRequired("dataset");
-    mIp.addRequired("fResample", @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
-    mIp.addOptional("fs", [], @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
+    mIp.addRequired("fResample", @(x) validateattributes(x, {'numeric'}, {'scalar', 'positive'}));
+    mIp.addOptional("fs", [], @(x) validateattributes(x, {'numeric'}, {'scalar', 'positive'}));
     mIp.parse(dataset, fResample, varargin{:});
 
     switch class(dataset)

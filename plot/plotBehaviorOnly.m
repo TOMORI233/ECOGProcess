@@ -38,7 +38,7 @@ function [Fig, mAxe, nPush, nTotal] = plotBehaviorOnly(trials, color, legendStr,
         RT = cell2mat(cellfun(@(x, y) x - y, {temp.firstPush}, {temp.devOnset}, 'UniformOutput', false));
 
         if nargin < 5
-            mAxe(dIndex + 1) = mSubplot(Fig, length(diffLevelUnique), 4, 4 * dIndex, [1, 1], [0.1, 0.1, 0.15, 0.15]);
+            mAxe(dIndex + 1) = mSubplot(Fig, length(diffLevelUnique), 4, 4 * dIndex, [1, 1], [0.1, 0.1, 0.2, 0.2]);
         end
 
         scatter(mAxe(dIndex + 1), RT, 1:length(RT), 40, color, "filled");

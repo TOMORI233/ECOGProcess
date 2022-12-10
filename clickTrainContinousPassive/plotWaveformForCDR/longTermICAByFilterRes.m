@@ -40,7 +40,7 @@ else
     topoTemp(LAuC_Ch, :) = LAuC_comp.topo;
     LAuC_compTemp = LAuC_comp;
     LAuC_compTemp.topo = topoTemp;
-    Fig_AC_Topo = plotTopo(LAuC_compTemp, [8, 8], [8, 8]);
+    Fig_AC_Topo = plotTopoICA(LAuC_compTemp, [8, 8], [8, 8]);
     LAuC_comp = rmfield(LAuC_compTemp, "trial");
     clear topoTemp
 
@@ -55,7 +55,7 @@ else
     topoTemp(LPFC_Ch, :) = LPFC_comp.topo;
     LPFC_compTemp = LPFC_comp;
     LPFC_compTemp.topo = topoTemp;
-    Fig_PFC_Topo = plotTopo(LPFC_compTemp, [8, 8], [8, 8]);
+    Fig_PFC_Topo = plotTopoICA(LPFC_compTemp, [8, 8], [8, 8]);
     LPFC_comp = rmfield(LPFC_compTemp, "trial");
     clear topoTemp
 

@@ -54,7 +54,7 @@ end
 
 [comp] = mICA(ECOGDataset, trialAll, window, "dev onset", fs);
 
-Fig1 = plotTopo(comp, topoSize, [6 2]);
+Fig1 = plotTopoICA(comp, topoSize, [6 2]);
 
 
 

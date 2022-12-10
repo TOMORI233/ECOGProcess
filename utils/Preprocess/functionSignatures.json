@@ -35,6 +35,13 @@
             ]}
             
         ]
+    },
+
+    "joinBlocks": {
+        "inputs": [
+            {"name": "opts", "kind": "required"},
+            {"name": "TDTDataset", "kind": "required", "type": ["struct"], "repeating": true}
+        ]
     }
     
 }

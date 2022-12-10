@@ -5,7 +5,7 @@ function [comp, ICs, FigTopoICA, FigWave] = ICA_Exclude(trialsECOG, comp, window
     ICStd = cell2mat(cellfun(@(x) std(x, [], 1), changeCellRowNum(trialsICs), "UniformOutput", false));
     plotRawWave(ICMean, ICStd, windowICA, "ICA");
    
-    FigTopoICA = plotTopo(comp, [8, 8], [8, 8]);
+    FigTopoICA = plotTopoICA(comp, [8, 8], [8, 8]);
 
     FigWave(1) = plotRawWave(cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG), "UniformOutput", false)), [], windowICA, "origin");
     k = 'N';

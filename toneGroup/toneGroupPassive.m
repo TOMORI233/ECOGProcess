@@ -45,7 +45,7 @@ if contains(BLOCKPATH,'HQY')
 end
 [comp, trialsECOG] = mICA(ECOGDataset, trialAll, window, "dev onset", fs);
 
-Fig1 = plotTopo(comp, topoSize);
+Fig1 = plotTopoICA(comp, topoSize);
 
 
 
