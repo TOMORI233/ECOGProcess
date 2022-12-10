@@ -2,10 +2,10 @@
 clear; close all; clc;
 
 %% Parameter settings
-monkeyID = 2; % 1-CC, 2-XX
+monkeyID = 1; % 1-CC, 2-XX
 
-% AREANAME = 'AC';
-AREANAME = 'PFC';
+AREANAME = 'AC';
+% AREANAME = 'PFC';
 
 AREANAMEs = ["AC", "PFC"];
 params.posIndex = find(AREANAMEs == AREANAME); % 1-AC, 2-PFC
@@ -13,7 +13,7 @@ params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
 alpha = 0.01; % For ANOVA
 margins = [0.05, 0.05, 0.1, 0.1];
-paddings = [0.05, 0.05, 0.01, 0.01];
+paddings = [0.1, 0.1, 0.01, 0.01];
 colors = cellfun(@(x) x / 255, {[200 200 200], [0 0 0], [0 0 255], [255 128 0], [255 0 0]}, "UniformOutput", false);
 
 if monkeyID == 1
@@ -80,7 +80,7 @@ catch
     catch
         [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA);
         print(FigTopoICA, strcat(PrePATH, AREANAME, "_Topo_ICA"), "-djpeg", "-r400");
-        save([PrePATH, AREANAME, '_ICA'], "comp", "ICs");
+        save([PrePATH, AREANAME, '_ICA.mat'], "comp", "ICs");
     end
 
     trialsECOG = trialsECOG([trialAll.correct]);
@@ -103,21 +103,27 @@ end
 
 %% Multiple comparison
 t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
-data = [];
-pool = 2:5;
-for dIndex = 1:length(pool)
-    temp = trialsECOG(dRatioAll == dRatio(pool(dIndex)));
-    % time 1*nSample
-    data(dIndex).time = t' / 1000;
-    % label nCh*1 cell
-    data(dIndex).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
-    % trial nTrial*nCh*nSample
-    data(dIndex).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), temp, "UniformOutput", false));
-    % trialinfo nTrial*1
-    data(dIndex).trialinfo = repmat(dIndex, [length(temp), 1]);
-end
 
-stat = CBPT(data);
+try 
+    load([MONKEYPATH, AREANAME, '_PE_CBPT'], "stat", "-mat");
+catch
+    data = [];
+    pool = 2:5;
+    for dIndex = 1:length(pool)
+        temp = trialsECOG(dRatioAll == dRatio(pool(dIndex)));
+        % time 1*nSample
+        data(dIndex).time = t' / 1000;
+        % label nCh*1 cell
+        data(dIndex).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
+        % trial nTrial*nCh*nSample
+        data(dIndex).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), temp, "UniformOutput", false));
+        % trialinfo nTrial*1
+        data(dIndex).trialinfo = repmat(dIndex, [length(temp), 1]);
+    end
+    
+    stat = CBPT(data);
+    save([MONKEYPATH, AREANAME, '_PE_CBPT.mat'], "stat", "-mat");
+end
 
 p = stat.stat;
 mask = stat.mask;
@@ -128,8 +134,8 @@ tIdx = fix((windowSortCh(1) - windowPE(1)) / 1000 * fs) + 1:fix((windowSortCh(2)
 V = V0(chIdx, :);
 
 figure;
-maximizeFig(gcf);
-mSubplot(gcf, 1, 1, 1, 1, [0, 0, 0, 0], [0.03, 0.01, 0.06, 0.03]);
+maximizeFig;
+mSubplot(1, 1, 1, 1, [0, 0, 0, 0], [0.03, 0.01, 0.06, 0.03]);
 imagesc("XData", t, "YData", channels, "CData", V);
 xlim([0, windowPE(2)]);
 ylim([0.5, 64.5]);
@@ -156,8 +162,8 @@ scaleAxes(FigPE, "x", [0, windowPE(2)]);
 yRange = scaleAxes(FigPE);
 setAxes(FigPE, "visible", "off");
 mAxes = findobj(FigPE, "Type", "axes");
-plotLayout(FigPE, (monkeyID - 1) * 2 + find(AREANAMEs == AREANAME), 0.4);
-print(FigPE, [MONKEYPATH, AREANAME, '_PE_Wave.jpg'], "-djpeg", "-r600");
+plotLayout(FigPE, (monkeyID - 1) * 2 + params.posIndex, 0.4);
+% print(FigPE, [MONKEYPATH, AREANAME, '_PE_Wave.jpg'], "-djpeg", "-r600");
 
 nCh = length(channels);
 for cIndex = 1:nCh
@@ -200,54 +206,36 @@ for wIndex = 1:length(edge)
     end
 
     % tuning value
-    mAxesDiff(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumDiff(wIndex), 1, margins, paddings);
+    mAxesDiff(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumDiff(wIndex), 1, "paddings", paddings, "shape", "square-min");
     tuningSlope(:, wIndex) = (tuningMean{wIndex}(end, :) - tuningMean{wIndex}(2, :))';
     tuningSlope(badCHs, wIndex) = 0;
-    C = flipud(reshape(tuningSlope(:, wIndex), topoSize)');
-    C = interp2(C, N);
-    C = imgaussfilt(C, 8);
-    X = linspace(1, topoSize(1), size(C, 1));
-    Y = linspace(1, topoSize(2), size(C, 2));
-    imagesc(mAxesDiff(wIndex), "XData", X, "YData", Y, "CData", C);
-    colormap("jet");
-    %     hold(mAxesDiff(wIndex), "on");
-    %     contour(mAxesDiff(wIndex), X, Y, C, "LineColor", "k");
-    xticklabels(mAxesDiff(wIndex), []);
-    yticklabels(mAxesDiff(wIndex), []);
+    plotTopo(tuningSlope(:, wIndex), "contourOpt", "off");
+%     plotLayout(mAxesDiff(wIndex), 2 * (monkeyID - 1) + params.posIndex);
     title(mAxesDiff(wIndex), ['Predictive error topo [', num2str(windowT(1)), ' ', num2str(windowT(2)), ']']);
 
     % p
-    mAxesP(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumP(wIndex), 1, margins, paddings);
+    mAxesP(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumP(wIndex), 1, "paddings", paddings, "shape", "square-min");
     P(:, wIndex) = cellfun(@(x1, x2, x3, x4) anova1([x1; x2; x3; x4], [ones(length(x1), 1); 2 * ones(length(x2), 1); 3 * ones(length(x3), 1); 4 * ones(length(x4), 1)], "off"), tuning{2, wIndex}, tuning{3, wIndex}, tuning{4, wIndex}, tuning{5, wIndex});
     temp = log(P(:, wIndex) / alpha) / log(alpha);
     temp(badCHs) = 0;
-    C = flipud(reshape(temp, topoSize)');
-    C = interp2(C, N);
-    C = imgaussfilt(C, 8);
-    X = linspace(1, topoSize(1), size(C, 1));
-    Y = linspace(1, topoSize(2), size(C, 2));
-    imagesc(mAxesP(wIndex), "XData", X, "YData", Y, "CData", C);
-    colormap("jet");
-    %     hold(mAxesP(wIndex), "on");
-    %     contour(mAxesP(wIndex), X, Y, C, "LineColor", "k");
-    xticklabels(mAxesP(wIndex), []);
-    yticklabels(mAxesP(wIndex), []);
+    plotTopo(temp, "contourOpt", "off");
+%     plotLayout(mAxesP(wIndex), 2 * (monkeyID - 1) + params.posIndex);
     title(mAxesP(wIndex), ['p topo [', num2str(edge(wIndex)), ' ', num2str(edge(wIndex) + binSize), '] | p=log_{', num2str(alpha), '}(p/', num2str(alpha), ')']);
 end
 scaleAxes(mAxesDiff, "c", [], [], "max");
-scaleAxes(mAxesP, "c", [-2, 2]);
-scaleAxes(FigTopo, "x", [1, 8]);
-scaleAxes(FigTopo, "y", [1, 8]);
-cb1 = colorbar(mAxesDiff(end), 'position', [1 - paddings(2), 0.1, 0.01, 0.8]);
-% cb1.Label.String = "Tuning difference between ratio 1.08 & 1.02";
-cb1.Label.FontSize = 10;
-cb2 = colorbar(mAxesP(end), 'position', [paddings(1) - 0.01, 0.1, 0.01, 0.8]);
-% cb2.Label.String = ['ANOVA p=log_{', num2str(alpha), '}(p/', num2str(alpha), ')'];
-cb2.Label.FontSize = 10;
+scaleAxes(mAxesP, "c", [], [-2, 2], "max");
+cb1 = colorbar(mAxesDiff(end), 'position', [0.95, 0.1, 0.01, 0.8]);
+cb1.Label.String = "Tuning difference between ratio 1.08 & 1.02";
+cb1.Label.FontSize = 15;
+cb1.Label.VerticalAlignment = 'bottom';
+cb1.Label.Rotation = -90;
+cb2 = colorbar(mAxesP(end), 'position', [0.05, 0.1, 0.01, 0.8]);
+cb2.Label.String = ['ANOVA p=log_{', num2str(alpha), '}(p/', num2str(alpha), ')'];
+cb2.Label.FontSize = 15;
 setAxes(FigTopo, "visible", "off");
 print(FigTopo, [MONKEYPATH, AREANAME, '_PE_Topo.jpg'], "-djpeg", "-r600");
 PEI = chData(end).chMean - chData(2).chMean;
-save([MONKEYPATH, AREANAME, '_PE_tuning.mat'], "windowPE", "PEI", "tuningSlope", "stat", "V0", "chIdx", "mask", "P", "-mat");
+save([MONKEYPATH, AREANAME, '_PE_tuning.mat'], "windowPE", "PEI", "tuningSlope", "V0", "chIdx", "mask", "P", "-mat");
 
 %% Example
 ch = input('Input example channel: ');
@@ -259,12 +247,12 @@ a = ones(length(t), 1) * (-100);
 a(V0(ch, :) > 0) = yRange(2);
 % a(V(ch, :) > 0) = 30;
 resultWave = [t, ...
-    chData(1).chMean(ch, :)', ...
-    chData(2).chMean(ch, :)', ...
-    chData(3).chMean(ch, :)', ...
-    chData(4).chMean(ch, :)', ...
-    chData(5).chMean(ch, :)', ...
-    a];
+              chData(1).chMean(ch, :)', ...
+              chData(2).chMean(ch, :)', ...
+              chData(3).chMean(ch, :)', ...
+              chData(4).chMean(ch, :)', ...
+              chData(5).chMean(ch, :)', ...
+              a];
 a(V0(ch, :) == 0) = [];
 t(V0(ch, :) == 0) = [];
 hold on;
@@ -272,13 +260,13 @@ plot(t, a, "Color", [128 128 128]/255, "Marker", "square", "MarkerSize", 10, "Ma
 
 resultTuning = cellfun(@(x, y) [x(:, ch), y(:, ch)], tuningMean, tuningSE, "UniformOutput", false);
 figure;
-maximizeFig(gcf);
+maximizeFig;
 for wIndex = 1:length(resultTuning)
-    mSubplot(gcf, 3, 4, wIndex, 1, margins, paddings);
+    mSubplot(3, 4, wIndex, 1, margins, paddings);
     errorbar(resultTuning{wIndex}(:, 1), resultTuning{wIndex}(:, 2), "k-", "LineWidth", 1);
     title(['[', num2str(edge(wIndex)), ', ', num2str(edge(wIndex) + binSize), '] | p=', num2str(P(ch, wIndex))]);
     xlim([0.5, 5.5]);
     xticks(1:5);
     xticklabels(num2str(dRatio'));
 end
-scaleAxes(gcf);
+scaleAxes;

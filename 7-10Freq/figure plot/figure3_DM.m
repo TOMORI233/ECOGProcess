@@ -4,8 +4,8 @@ clear; close all; clc;
 %% Parameter settings
 monkeyID = 1; % 1-CC, 2-XX
 
-% AREANAME = 'AC';
-AREANAME = 'PFC';
+AREANAME = 'AC';
+% AREANAME = 'PFC';
 
 AREANAMEs = ["AC", "PFC"];
 params.posIndex = find(AREANAMEs == AREANAME); % 1-AC, 2-PFC
@@ -108,19 +108,25 @@ end
 
 %% Multiple comparison
 t = linspace(windowDM(1), windowDM(2), size(trialsECOG_correct{1}, 2))';
-data = [];
 
-data(1).time = t' / 1000;
-data(1).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
-data(1).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), resultC, "UniformOutput", false));
-data(1).trialinfo = ones(length(resultC), 1);
-
-data(2).time = t' / 1000;
-data(2).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
-data(2).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), resultW, "UniformOutput", false));
-data(2).trialinfo = 2 * ones(length(resultW), 1);
-
-stat = CBPT(data);
+try
+    load([MONKEYPATH, AREANAME, '_DM_CBPT'], "stat", "-mat");
+catch
+    data = [];
+    
+    data(1).time = t' / 1000;
+    data(1).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
+    data(1).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), resultC, "UniformOutput", false));
+    data(1).trialinfo = ones(length(resultC), 1);
+    
+    data(2).time = t' / 1000;
+    data(2).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
+    data(2).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), resultW, "UniformOutput", false));
+    data(2).trialinfo = 2 * ones(length(resultW), 1);
+    
+    stat = CBPT(data);
+    save([MONKEYPATH, AREANAME, '_DM_CBPT.mat'], "stat", "-mat");
+end
 
 p = stat.stat;
 mask = stat.mask;
@@ -150,7 +156,7 @@ cb.Label.Interpreter = 'latex';
 cb.Label.FontSize = 12;
 cb.Label.Position = [2.5, 0];
 cb.Label.Rotation = -90;
-cRange = scaleAxes(gcf, "c", [], [], "max");
+cRange = scaleAxes("c", [], [], "max");
 
 %% Plot raw data
 chMeanC0 = cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG_correct), "UniformOutput", false));
@@ -177,11 +183,11 @@ scaleAxes(FigDM, "y", [], [-1, 1]);
 scaleAxes(FigDM, "x", [0, windowDM(2)]);
 setAxes(FigDM, "visible", "off");
 plotLayout(FigDM, (monkeyID - 1) * 2 + find(AREANAMEs == AREANAME), 0.4);
-print(FigDM, [MONKEYPATH, AREANAME, '_DM_ZscoreWave.jpg'], "-djpeg", "-r600");
+% print(FigDM, [MONKEYPATH, AREANAME, '_DM_ZscoreWave.jpg'], "-djpeg", "-r600");
 
 %% DRP
 try
-    load([MONKEYPATH, AREANAME, '_DRP']);
+    load([MONKEYPATH, AREANAME, '_DRP'], 'resDP');
 catch
     edge = 0:step:windowDM(2) - binSize;
     for wIndex = 1:length(edge)
@@ -199,7 +205,7 @@ catch
         toc;
         disp(['[', num2str(edge(wIndex)), ' ', num2str(edge(wIndex) + binSize), '] done']);
     end
-    save([MONKEYPATH, AREANAME, '_DRP'], "resDP");
+    save([MONKEYPATH, AREANAME, '_DRP.mat'], "resDP");
 end
 
 FigDRP = figure;
@@ -248,54 +254,38 @@ FigTopo = figure;
 maximizeFig(FigTopo);
 topoSize = [8, 8];
 N = 5;
-paddings = [0.05, 0.05, 0.01, 0.01];
+paddings = [0.1, 0.1, 0.01, 0.01];
 
 subplotNumDRP = [1:6, 13:18];
 subplotNumP = [7:12, 19:24];
 
 for wIndex = 1:12
     % DRP
-    mAxesDRP(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumDRP(wIndex), 1, margins, paddings);
+    mAxesDRP(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumDRP(wIndex), 1, "paddings", paddings, "shape", "square-min");
     tuning = resDP(wIndex).v - 0.5;
     tuning(badCHs) = 0;
-    C = flipud(reshape(tuning, topoSize)');
-    C = interp2(C, N);
-    C = imgaussfilt(C, 8);
-    X = linspace(1, topoSize(1), size(C, 1));
-    Y = linspace(1, topoSize(2), size(C, 2));
-    imagesc("XData", X, "YData", Y, "CData", C);
-    colormap("jet");
-    %     hold on;
-    %     contour(X, Y, C, "LineColor", "k");
-    xticklabels([]);
-    yticklabels([]);
+    plotTopo(tuning, "contourOpt", "off");
     title(['DRP topo [', num2str(resDP(wIndex).window(1)), ' ', num2str(resDP(wIndex).window(2)), ']']);
 
     % p
-    mAxesP(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumP(wIndex), 1, margins, paddings);
+    mAxesP(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumP(wIndex), 1, "paddings", paddings, "shape", "square-min");
     P = resDP(wIndex).p;
     P(P == 0) = 1 / nIter;
     P = log(P / alpha) / log(alpha);
     P(badCHs) = 0;
-    C = flipud(reshape(P, topoSize)');
-    C = interp2(C, N);
-    C = imgaussfilt(C, 8);
-    X = linspace(1, topoSize(1), size(C, 1));
-    Y = linspace(1, topoSize(2), size(C, 2));
-    imagesc("XData", X, "YData", Y, "CData", C);
-    colormap("jet");
-    %     hold on;
-    %     contour(X, Y, C, "LineColor", "k");
-    xticklabels([]);
-    yticklabels([]);
+    plotTopo(P, "contourOpt", "off");
     title(['p topo [', num2str(resDP(wIndex).window(1)), ' ', num2str(resDP(wIndex).window(2)), '] | p=log_{', num2str(alpha), '}(p/', num2str(alpha), ')']);
 end
 scaleAxes(mAxesDRP, "c", [], [], "max");
 scaleAxes(mAxesP, "c", [], [-2, 2], "max");
-scaleAxes(FigTopo, "x", [1, 8]);
-scaleAxes(FigTopo, "y", [1, 8]);
-colorbar(mAxesDRP(end), 'position', [1 - paddings(2), 0.1, 0.01, 0.8]);
-colorbar(mAxesP(end), 'position', [paddings(1) - 0.01, 0.1, 0.01, 0.8]);
+cb1 = colorbar(mAxesDRP(end), 'position', [0.95, 0.1, 0.01, 0.8]);
+cb1.Label.String = "DRP value";
+cb1.Label.FontSize = 15;
+cb1.Label.VerticalAlignment = 'bottom';
+cb1.Label.Rotation = -90;
+cb2 = colorbar(mAxesP(end), 'position', [0.05, 0.1, 0.01, 0.8]);
+cb2.Label.String = ['ANOVA p=log_{', num2str(alpha), '}(p/', num2str(alpha), ')'];
+cb2.Label.FontSize = 15;
 setAxes(FigTopo, "visible", "off");
 print(FigTopo, [MONKEYPATH, AREANAME, '_DM_Topo.jpg'], "-djpeg", "-r600");
 

@@ -1,11 +1,12 @@
-%% granger
+% granger spectrum
 clear; clc;
 
 monkeyID = 2; % 1-CC, 2-XX
-type = 1; % 1-PE, 2-DM
+protocolType = 3; % 1-PE, 2-DM, 3-Prediction
+trialType = 1; % 1-dev/correct, 2-std/wrong
 
 %% Load
-if type == 1 % PE
+if protocolType == 1 % PE
 
     if monkeyID == 1
         dataAC  = load("CC\PE\AC_PE_Data.mat");
@@ -19,13 +20,19 @@ if type == 1 % PE
 
     dRatioAll = dataAC.dRatioAll;
     dRatio = dataAC.dRatio;
-    % dRatio1 = dRatio(1);
-    dRatio0 = dRatio(2:end);
+
+    if trialType == 1
+        dRatio0 = dRatio(2:end);
+    else
+        dRatio0 = dRatio(1);
+    end
 
     idx = ismember(dRatioAll, dRatio0);
     trialsECOG_AC  = dataAC.trialsECOG(idx);
     trialsECOG_PFC = dataPFC.trialsECOG(idx);
-else % DM
+
+    titleStr = 'Dev onset';
+elseif protocolType == 2 % DM
     
     if monkeyID == 1
         dataAC  = load("CC\DM\AC_DM_Data.mat");
@@ -37,13 +44,33 @@ else % DM
     
     window = dataAC.windowDM;
 
-    trialsECOG_AC  = dataAC.trialsECOG_correct;
-    trialsECOG_PFC = dataPFC.trialsECOG_correct;
-    dRatio0 = [1.02, 1.04, 1.06, 1.08];
+    if trialType == 1
+        trialsECOG_AC  = dataAC.trialsECOG_correct;
+        trialsECOG_PFC = dataPFC.trialsECOG_correct;
+        dRatio0 = [1.02, 1.04, 1.06, 1.08];
+    else
+        trialsECOG_AC  = dataAC.trialsECOG_wrong;
+        trialsECOG_PFC = dataPFC.trialsECOG_wrong;
+        dRatio0 = 1;
+    end
 
-    % trialsECOG_AC  = dataAC.trialsECOG_wrong;
-    % trialsECOG_PFC = dataPFC.trialsECOG_wrong;
-    % dRatio0 = 1;
+    titleStr = 'Dev onset';
+else % Prediction
+
+    if monkeyID == 1
+        dataAC  = load("CC\Prediction\AC_Prediction_Data.mat");
+        dataPFC = load("CC\Prediction\PFC_Prediction_Data.mat");
+    else
+        dataAC  = load("XX\Prediction\AC_Prediction_Data.mat");
+        dataPFC = load("XX\Prediction\PFC_Prediction_Data.mat");
+    end
+
+    window = dataAC.windowP;
+    dRatio0 = 1;
+    trialsECOG_AC  = dataAC.trialsECOG;
+    trialsECOG_PFC = dataPFC.trialsECOG;
+
+    titleStr = 'Trial onset';
 end
 
 fs = dataAC.fs;
@@ -51,7 +78,8 @@ channels = dataAC.channels;
 topoSize = [8, 8]; % nx * ny
 
 %% Parameter settings
-windowGranger = [0, 300];
+% windowGranger = [0, 500];
+windowGranger = [500 * 6, 500 * 7];
 
 nSmooth = 2;
 channels = mat2cell(reshape(channels, topoSize), nSmooth * ones(topoSize(1) / nSmooth, 1), nSmooth * ones(topoSize(1) / nSmooth, 1));
@@ -62,6 +90,9 @@ areaAC = 1:length(channels);
 areaPFC = 1:length(channels);
 
 borderPercentage = 0.95; % for scaling granger spectrum
+
+fRange = 0:fs / 2; % sum granger spectrum within this freq range
+% fRange = 0:50;
 
 %% Perform Granger
 tIdx = fix((windowGranger(1) - window(1)) / 1000 * fs) + 1:fix((windowGranger(2) - window(1)) / 1000 * fs);
@@ -78,7 +109,7 @@ maximizeFig;
 ft_connectivityplot(cfg, granger);
 
 %% plot
-granger_sum = sum(granger.grangerspctrm, 3);
+granger_sum = sum(granger.grangerspctrm(:, :, fRange + 1), 3);
 
 figure;
 maximizeFig;
@@ -95,7 +126,7 @@ lines.X = upper;
 lines.legend = [num2str(borderPercentage * 100), '% upper border at ', num2str(upper)];
 addLines2Axes(lines);
 ylabel('Count');
-title(['Dev onset [', num2str(windowGranger(1)), ', ', num2str(windowGranger(2)), '] ms (dRatio = ', char(join(string(num2str(dRatio0')), ', ')), ' | Each averaged by a ', num2str(nSmooth), '*', num2str(nSmooth), ' area)']);
+title(['[', num2str(windowGranger(1)), ', ', num2str(windowGranger(2)), '] ms (dRatio = ', char(join(string(num2str(dRatio0')), ', ')), ' | Each averaged by a ', num2str(nSmooth), '*', num2str(nSmooth), ' area)']);
 
 AC2AC   = granger_sum(1:length(channels), 1:length(channels));
 AC2PFC  = granger_sum(1:length(channels), length(channels) + 1:end);
@@ -180,7 +211,7 @@ scaleAxes("c", [0, inf], [0, upper]);
 %% diff plot
 figure;
 maximizeFig;
-mSubplot(1, 1, 1, "shape", "square-max");
+mSubplot(1, 1, 1, "shape", "square-min");
 imagesc("XData", areaAC, "YData", areaPFC, "CData", AC2PFC' - PFC2AC);
 xlim([areaAC(1) - 0.5, areaAC(end) + 0.5]);
 ylim([areaPFC(1) - 0.5, areaPFC(end) + 0.5]);
@@ -188,7 +219,7 @@ xlabel('AC', 'FontSize', 16, 'FontWeight', 'bold');
 ylabel('PFC', 'FontSize', 16, 'FontWeight', 'bold');
 xticks(areaAC);
 yticks(areaPFC);
-title(['Dev onset [', num2str(windowGranger(1)), ', ', num2str(windowGranger(2)), '] ms (dRatio = ', char(join(string(num2str(dRatio0')), ', ')), ' | Each averaged by a ', num2str(nSmooth), '*', num2str(nSmooth), ' area)'], 'FontSize', 15, 'FontWeight', 'bold');
+title([titleStr, ' [', num2str(windowGranger(1)), ', ', num2str(windowGranger(2)), '] ms (dRatio = ', char(join(string(num2str(dRatio0')), ', ')), ' | Each averaged by a ', num2str(nSmooth), '*', num2str(nSmooth), ' area)'], 'FontSize', 15, 'FontWeight', 'bold');
 set(gca, "Box", "on");
 set(gca, "BoxStyle", "full");
 set(gca, "LineWidth", 3);
@@ -210,7 +241,8 @@ maximizeFig;
 
 % AC topo
 mAxe = mSubplot(topoSize(1) / nSmooth, topoSize(2) / nSmooth, 1, [topoSize(1) / nSmooth, topoSize(2) / nSmooth], "margins", zeros(1, 4), "paddings", [(1 - adjIdx + 0.13 - shiftFromCenter) / 2, (1 - adjIdx + 0.13 + shiftFromCenter) / 2, 0.09, 0.04], "alignment", "top-left");
-text(mAxe, 0.5, 1.02, 'AC', "FontSize", 15, "FontWeight", "bold", "HorizontalAlignment", "center");
+text(mAxe, 0.5, 1.02, ['AC | ', titleStr, ' [', num2str(windowGranger(1)), ', ', num2str(windowGranger(2)), '] ms (dRatio = ', char(join(string(num2str(dRatio0')), ', ')), ')'], ...
+     "FontSize", 15, "FontWeight", "bold", "HorizontalAlignment", "center");
 set(mAxe, "Visible", "off");
 temp = rowFcn(@(x) flip(reshape(x, [topoSize(1) / nSmooth, topoSize(2) / nSmooth])', 1), (AC2PFC' - PFC2AC)', "UniformOutput", false);
 for index = 1:length(temp)
@@ -224,8 +256,8 @@ end
 
 % PFC topo
 mAxe = mSubplot(topoSize(1) / nSmooth, topoSize(2) / nSmooth, 1, [topoSize(1) / nSmooth, topoSize(2) / nSmooth], "margins", zeros(1, 4), "paddings", [(1 - adjIdx + 0.13 + shiftFromCenter) / 2, (1 - adjIdx + 0.13 - shiftFromCenter) / 2, 0.09, 0.04], "alignment", "top-left");
-text(mAxe, 0.5, 1.02, 'PFC', "FontSize", 15, "FontWeight", "bold", "HorizontalAlignment", "center");
-set(mAxe, "Visible", "off");
+text(mAxe, 0.5, 1.02, ['PFC | ', titleStr, ' [', num2str(windowGranger(1)), ', ', num2str(windowGranger(2)), '] ms (dRatio = ', char(join(string(num2str(dRatio0')), ', ')), ')'], ...
+     "FontSize", 15, "FontWeight", "bold", "HorizontalAlignment", "center");set(mAxe, "Visible", "off");
 temp = rowFcn(@(x) flip(reshape(x, [topoSize(1) / nSmooth, topoSize(2) / nSmooth])', 1), AC2PFC' - PFC2AC, "UniformOutput", false);
 for index = 1:length(temp)
     mSubplot(topoSize(1) / nSmooth, topoSize(2) / nSmooth, index, "margins", ones(1, 4) * 0.01, "paddings", [(1 - adjIdx + 0.13 + shiftFromCenter) / 2, (1 - adjIdx + 0.13 - shiftFromCenter) / 2, 0.09, 0.04]);

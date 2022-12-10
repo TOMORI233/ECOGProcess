@@ -1,8 +1,8 @@
 clear; clc;
 close all force;
 
-monkeyID = 1; % CC
-% monkeyID = 2; % XX
+% monkeyID = 1; % CC
+monkeyID = 2; % XX
 
 if monkeyID == 1
     tuningPE_AC  = load('CC\PE\AC_PE_tuning.mat');
@@ -288,31 +288,31 @@ lines = [];
 lines.X = 0;
 addLines2Axes(gca, lines);
 
-mSubplot(2, 1, 2, [0.3, 1], "alignment", "center-left");
+mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-left", "margin_top", 0.2, "shape", "square-min");
 sTimeAC_DM = cellfun(@(x) replaceVal(x, inf), sTimeAC_DM);
 for tIndex = 1:length(sTimeAC_DM)
     if isinf(sTimeAC_DM(tIndex))
         sTimeAC_DM(tIndex) = mean(sTimeAC_DM(sTimeAC_DM(cellfun(@str2double, neighbours(tIndex).neighblabel)) ~= inf));
     end
 end
-plotTopoSingle(sTimeAC_DM);
+plotTopo(sTimeAC_DM);
 title('DM in AC' , 'FontSize', 12, 'FontWeight', 'bold');
 
-mSubplot(2, 1, 2, [0.3, 1], "alignment", "center");
+mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-center", "margin_top", 0.2, "shape", "square-min");
 sTimeAC_PE = cellfun(@(x) replaceVal(x, inf), sTimeAC_PE);
 for tIndex = 1:length(sTimeAC_PE)
     if isinf(sTimeAC_PE(tIndex))
         sTimeAC_PE(tIndex) = mean(sTimeAC_PE(sTimeAC_PE(cellfun(@str2double, neighbours(tIndex).neighblabel)) ~= inf));
     end
 end
-plotTopoSingle(sTimeAC_PE);
+plotTopo(sTimeAC_PE);
 title('PE in AC' , 'FontSize', 12, 'FontWeight', 'bold');
 scaleAxes("c", [0, inf]);
 colormap(flip(colormap('jet')));
 
-mSubplot(2, 1, 2, [0.3, 1], "alignment", "center-right");
+mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-right", "margin_top", 0.2, "shape", "square-min");
 diffTimeAC = sTimeAC_DM - sTimeAC_PE;
-plotTopoSingle(diffTimeAC);
+plotTopo(diffTimeAC);
 title('DM - PE' , 'FontSize', 12, 'FontWeight', 'bold');
 scaleAxes(gca, "c", [], [], "max");
 colormap(gca, 'jet');
@@ -355,31 +355,31 @@ lines = [];
 lines.X = 0;
 addLines2Axes(gca, lines);
 
-mSubplot(2, 1, 2, [0.3, 1], "alignment", "center-left");
+mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-left", "margin_top", 0.2, "shape", "square-min");
 sTimePFC_DM = cellfun(@(x) replaceVal(x, inf), sTimePFC_DM);
 for tIndex = 1:length(sTimePFC_DM)
     if isinf(sTimePFC_DM(tIndex))
         sTimePFC_DM(tIndex) = mean(sTimePFC_DM(sTimePFC_DM(cellfun(@str2double, neighbours(tIndex).neighblabel)) ~= inf));
     end
 end
-plotTopoSingle(sTimePFC_DM);
+plotTopo(sTimePFC_DM);
 title('DM in PFC' , 'FontSize', 12, 'FontWeight', 'bold');
 
-mSubplot(2, 1, 2, [0.3, 1], "alignment", "center");
+mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-center", "margin_top", 0.2, "shape", "square-min");
 sTimePFC_PE = cellfun(@(x) replaceVal(x, inf), sTimePFC_PE);
 for tIndex = 1:length(sTimePFC_PE)
     if isinf(sTimePFC_PE(tIndex))
         sTimePFC_PE(tIndex) = mean(sTimePFC_PE(sTimePFC_PE(cellfun(@str2double, neighbours(tIndex).neighblabel)) ~= inf));
     end
 end
-plotTopoSingle(sTimePFC_PE);
+plotTopo(sTimePFC_PE);
 title('PE in PFC' , 'FontSize', 12, 'FontWeight', 'bold');
 scaleAxes("c", [0, inf]);
 colormap(flip(colormap('jet')));
 
-mSubplot(2, 1, 2, [0.3, 1], "alignment", "center-right");
+mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-right", "margin_top", 0.2, "shape", "square-min");
 diffTimePFC = sTimePFC_DM - sTimePFC_PE;
-plotTopoSingle(diffTimePFC);
+plotTopo(diffTimePFC);
 title('DM - PE' , 'FontSize', 12, 'FontWeight', 'bold');
 scaleAxes(gca, "c", [], [], "max");
 colormap(gca, 'jet');

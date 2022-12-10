@@ -44,3 +44,6 @@ c = fitresult.c;
 y = erf(c*x-b/(sqrt(2)*a));
 
 result = [x, y];
+
+figure;
+plot(x, y);
