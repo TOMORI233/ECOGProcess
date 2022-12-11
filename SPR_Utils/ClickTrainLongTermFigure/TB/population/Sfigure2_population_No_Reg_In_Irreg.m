@@ -1,7 +1,7 @@
 close all; clc; clear;
 
-MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI4\';
-% MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI4\';
+MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_ICI4\';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_ICI4\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
@@ -11,25 +11,24 @@ CRIMethod = 2;
 CRIMethodStr = ["Resp_devided_by_Spon", "R_minus_S_devide_R_plus_S"];
 CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.3]};
 CRITest = [1, 0];
-pBase = 0.01;
 
 colors = ["#FF0000", "#FFA500", "#0000FF", "#000000"];
 
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
 fs = 500;
-
+pBase = 0.01;
 
 selectCh = [13 9];
 badCh = {[], []};
-yScale = [40, 60];
+yScale = [40, 50];
 quantWin = [0 300];
 sponWin = [-300 0];
-for mIndex =  1 : length(MATPATH)
+for mIndex =  2 : length(MATPATH)
  
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
-    FIGPATH = strcat(ROOTPATH, "\Pop_Figure2\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+    FIGPATH = strcat(ROOTPATH, "\Pop_Sfigure2_No_Reg_In_Irreg\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
     mkdir(FIGPATH);
     
     %% merge population data
@@ -40,29 +39,34 @@ for mIndex =  1 : length(MATPATH)
         load(strcat(FIGPATH, "PopulationData.mat"));
     end
 
-
+    
     %% ICA
     % align to certain duration
     run("CTLconfig.m");
     ICAName = strcat(FIGPATH, "comp_", AREANAME, ".mat");
+    
     trialsECOG_MergeTemp = trialsECOG_Merge;
     trialsECOG_S1_MergeTemp = trialsECOG_S1_Merge;
-
     if ~exist(ICAName, "file")
-        [comp, ICs, FigTopoICA, FigWave] = ICA_Population(trialsECOG_MergeTemp, fs, Window);
+        [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG_MergeTemp, fs, Window);
         compT = comp;
         compT.topo(:, ~ismember(1:size(compT.topo, 2), ICs)) = 0;
         trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
         close(FigTopoICA);
-        close(FigWave);
         save(ICAName, "compT", "comp", "ICs", "-mat");
     else
         load(ICAName);
+%         [~, ICs, FigTopoICA] = ICA_Exclude(trialsECOG_MergeTemp, comp, Window);
         trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
     end
-    %% process
+
+    
+
+
+
+%% process
     devType = unique([trialAll.devOrdr]);
 
 
@@ -105,7 +109,7 @@ for mIndex =  1 : length(MATPATH)
                 
 
 
-       %% plot rawWave
+    %% plot rawWave
     FigWave_Reg(mIndex) = plotRawWave(chMean{1}, [], Window, titleStr, [8, 8]);
     FigWave_Irreg(mIndex) = plotRawWave(chMean{3}, [], Window, titleStr, [8, 8]);
     FigWave_Whole_Reg(mIndex) = plotRawWave(chMean{1}, [], Window, titleStr, [8, 8]);
@@ -186,7 +190,8 @@ for mIndex =  1 : length(MATPATH)
     scaleAxes(FigTopo, "c", [-5, 5]);
     pause(1);
     set(FigTopo, "outerposition", [300, 100, 800, 670]);
-    %     title("p-value (log(log(0.05, p)) distribution of Reg vs Irreg");
+    %     title("p-value (log(log(pBase, p)) distribution of Reg vs Irreg");
+
     print(FigTopo, strcat(FIGPATH, Protocol, "Reg_Irreg_pValue_Topo_Reg"), "-djpeg", "-r200");
     close(FigTopo);
 
@@ -211,14 +216,15 @@ for mIndex =  1 : length(MATPATH)
         scaleAxes(FigTopo, "c", [-5 5]);
         pause(1);
         set(FigTopo, "outerposition", [300, 100, 800, 670]);
-        %         title("p-value (log(log(0.05, p)) distribution of [0 300] response and baseline");
-        
+        %         title("p-value (log(log(pBase, p)) distribution of [0 300] response and baseline");
+        pause(2);
         print(FigTopo, strcat(FIGPATH, Protocol, "_", stiStr(dIndex), "_pValue_Topo_Reg"), "-djpeg", "-r200");
         close(FigTopo);
     end
 drawnow
-ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
-save(ResName, "cdrPlot", "chMean", "Protocol", "compare", "-mat");
+
+ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
+save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
 end
 
 close all

@@ -286,7 +286,7 @@ FigCompare = plotRawWaveMulti_SPR(changeOffset, selWin);
 scaleAxes(FigCompare, "y", [-40 40]);
 %%
 
-ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
+ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
 save(ResName, "cdrPlot", "PMean", "chMean", "baseICI", "ICI2", "-mat");
 
 if ~isempty(gcp('nocreate'))

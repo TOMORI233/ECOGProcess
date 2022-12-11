@@ -6,12 +6,16 @@
             {"mutuallyExclusiveGroup": [
                 [
                     {"name": "posIndex", "kind": "required", "type": ["numeric", "choices = {1, 2, 3, 4}"]},
-                    {"name": "alphaValue", "kind": "ordered", "type": ["numeric", "scalar"]}
+                    {"name": "alphaValue", "kind": "ordered", "type": ["numeric", "scalar"]},
+                    {"name": "tag", "kind": "ordered", "Type": [["string"], ["char"]]},
+                    {"name": "target", "kind": "ordered", "type": ["choices = {'figure','axes','FigOrAxes'}"]}
                 ],
                 [
                     {"name": "FigOrAxes", "kind": "required", "type": ["@(args) all(isgraphics(args))"]},
                     {"name": "posIndex", "kind": "required", "type": ["numeric", "choices = {1, 2, 3, 4}"]},
-                    {"name": "alphaValue", "kind": "ordered", "type": ["numeric", "scalar", "nonnegative"]}
+                    {"name": "alphaValue", "kind": "ordered", "type": ["numeric", "scalar", "nonnegative"]},
+                    {"name": "tag", "kind": "ordered", "Type": [["string"], ["char"]]},
+                    {"name": "target", "kind": "ordered", "type": ["choices = {'figure','axes','FigOrAxes'}"]}
                 ]
             ]}
         ]

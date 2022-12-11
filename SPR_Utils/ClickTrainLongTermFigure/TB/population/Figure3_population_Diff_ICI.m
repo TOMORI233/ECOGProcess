@@ -262,7 +262,7 @@ for mIndex = 1 : length(MATPATH)
     close(FigTopo);
 end
 
-ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
+ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
 save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
 % clearvars -except toPlot_Wave compare sigch cdrPlot ampNorm latency temp
 close all

@@ -1,7 +1,7 @@
 close all; clc; clear;
 
-MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_Oscillation_Tone_250_5000\';
-MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_Oscillation_Tone_250_5000\';
+MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_Oscillation_control_500_250_125_60_30\';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_Oscillation_control_500_250_125_60_30\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
@@ -12,19 +12,19 @@ SRIMethod = 2;
 SRIMethodStr = ["Resp_devided_by_Spon", "R_minus_S_devide_R_plus_S"];
 SRIScale = [0.8, 2; 0 0.2];
 SRITest = [1, 0];
-pBase = 0.01;
+pBase = 0.05;
 
 % FFT method
 FFTMethod = 2; %1: power(dB); 2: magnitude
 fftScale = [60, 60; 400, 400];
-correspFreq = 1000./[60, 60, 30, 30];
+correspFreq = 1000./[500, 250, 125, 60, 30, 1000];
 
 flp = 400;
 fhp = 0.1;
 segOption = ["trial onset", "dev onset"];
 s1OnsetOrS2Onset = 1; % 1, s1onset; 2, s2Onset
 colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#AAAAAA"];
-stimStrs = ["Osc_250Hz_60ms", "Osc_5000Hz_60ms", "Osc_250Hz_30ms", "Osc_5000Hz_30ms", "control"];
+stimStrs = ["Osc_500ms", "Osc_250ms", "Osc_125ms", "Osc_60ms", "Osc_30ms", "control"];
 
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
@@ -32,15 +32,15 @@ AREANAME = AREANAME(params.posIndex);
 fs = 500;
 
 badCh = {[], []};
-yScale = [60, 90];
+
 quantWin = [0 300];
 latencyWin = [80 200];
 sponWin = [-300 0];
-for mIndex = 1 : length(MATPATH)
+for mIndex = 2 : length(MATPATH)
 
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
-    FIGPATH = strcat(ROOTPATH, "\Pop_Sfigure6_Osci_Tone\",  SRIMethodStr(SRIMethod), "\", monkeyStr(mIndex), "\");
+    FIGPATH = strcat(ROOTPATH, "\Pop_Figure6_Osci_Control\",  SRIMethodStr(SRIMethod), "\", monkeyStr(mIndex), "\");
     mkdir(FIGPATH);
     %% process
     disp("loading data...");
@@ -52,8 +52,7 @@ for mIndex = 1 : length(MATPATH)
         load(strcat(FIGPATH, "PopulationData.mat"));
     end
     toc
-
-        %% ICA
+    %% ICA
     % align to certain duration
     run("CTLconfig.m");
     ICAName = strcat(FIGPATH, "comp_", AREANAME, ".mat");
@@ -76,14 +75,8 @@ for mIndex = 1 : length(MATPATH)
 
 
     %% process
-    trialAll(1) = [];
     devType = unique([trialAll.devOrdr]);
-    devTemp = {trialAll.devOnset}';
-    [~, ordTemp] = ismember([trialAll.ordrSeq]', devType);
-    temp = cellfun(@(x, y) x + S1Duration(y), devTemp, num2cell(ordTemp), "UniformOutput", false);
-    trialAll = addFieldToStruct(trialAll, temp, "devOnset");
-
-   
+    % initialize
     t = linspace(Window(1), Window(2), diff(Window) /1000 * fs + 1)';
 
 %% diff stim type
@@ -112,16 +105,15 @@ for mIndex = 1 : length(MATPATH)
     end
 
     %% compare and plot rawWave
-    for  dIndex = 1 : length(devType)
+    for  dIndex = 1 : length(devType)-1
         fftPValue(dIndex).info = stimStrs(dIndex);
-        Successive = PMean{dIndex}; 
-
-        
-        [H, P] = waveFFTPower_pValue(trialsFFT{dIndex}, trialsFFT{3}, [{ff}, {ff}], targetIdx(dIndex), 2);
+        Successive(1).chMean = PMean{dIndex}; Successive(1).color = "r";
+        Successive(2).chMean = PMean{length(devType)}; Successive(2).color = "k";
+        [H, P] = waveFFTPower_pValue(trialsFFT{dIndex}, trialsFFT{length(devType)}, [{ff}, {ff}], targetIdx(dIndex), 2);
         fftPValue(dIndex).(strcat(stimStrs(dIndex), "_pValue")) = P;
         fftPValue(dIndex).(strcat(stimStrs(dIndex), "_H")) = H;
         % plot raw wave
-        FigWave = plotRawWave(Successive, [], [0 fs/2], strcat(stimStrs(dIndex), " Oscillation"), [8, 8]);
+        FigWave = plotRawWaveMulti_SPR(Successive, [0 fs/2], strcat(stimStrs(dIndex), " Oscillation"), [8, 8]);
         FigWave = deleteLine(FigWave, "LineStyle", "--");
         scaleAxes(FigWave, "y", [0 fftScale(FFTMethod, mIndex)]);
         scaleAxes(FigWave, "x", [0 50]);
@@ -142,7 +134,7 @@ for mIndex = 1 : length(MATPATH)
 
 %% p-value distribution
 
-for dIndex = 1 : length(devType)
+for dIndex = 1 : length(devType) - 1
     % plot p-value topo
     temp = fftPValue(dIndex).(strcat(stimStrs(dIndex), "_pValue"));
     topo = logg(pBase, temp / pBase);
@@ -156,13 +148,12 @@ for dIndex = 1 : length(devType)
     print(FigTopo(dIndex), strcat(FIGPATH, stimStrs(dIndex), "_pValue_Topo"), "-djpeg", "-r200");
 end
 
-ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
-save(ResName, "cdrPlot", "PMean", "Protocol", "trialsFFT", "targetIdx", "ff", "-mat");
-
+ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
+FFT_60ms = trialsFFT{4};
+FFT_30ms = trialsFFT{5};
+save(ResName, "cdrPlot", "PMean", "Protocol", "FFT_60ms", "FFT_30ms", "-mat");
 end
 if ~isempty(gcp('nocreate'))
     delete(gcp('nocreate'));
 end
 close all
-
-

@@ -140,7 +140,9 @@ ampNormS1.(strcat(monkeyStr, "_S1_raw")) = changeCellRowNum(temp);
 [S1H, S1P] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(ampS1), changeCellRowNum(rmsSponS1), "UniformOutput", false);
 
 
-
+if ~exist(FIGPATH, "dir")
+    mkdir(FIGPATH);
+end
 %% comparison between devTypes
 for gIndex = 1 : length(group_Index)
     temp = group_Index{gIndex};
@@ -152,10 +154,33 @@ for gIndex = 1 : length(group_Index)
     end
     FigGroup = plotRawWaveMulti_SPR(group, Window);
     scaleAxes(FigGroup, "x", [-10 600]);
-scaleAxes(FigGroup, "y", [-yScale(monkeyId) yScale(monkeyId)]);
-addLegend2Fig(FigGroup, stimStrs(group_Index{gIndex}));
-print(FigGroup, strcat(FIGPATH, group_Str(gIndex)), "-djpeg", "-r200");
-close(FigGroup);
+    scaleAxes(FigGroup, "y", [-yScale(monkeyId) yScale(monkeyId)]);
+    addLegend2Fig(FigGroup, stimStrs(group_Index{gIndex}));
+    print(FigGroup, strcat(FIGPATH, group_Str(gIndex)), "-djpeg", "-r200");
+    close(FigGroup);
+end
+
+
+%% plot FFT
+for dIndex = devType
+    FigFFT = plotRawWave(PMean{mIndex, dIndex}, [], [ff(1), ff(end)], strcat("FFT ", stimStrs(dIndex)));
+    deleteLine(FigFFT, "LineStyle", "--");
+    lines(1).X = correspFreq(mIndex, dIndex); lines(1).color = "k";
+    addLines2Axes(FigFFT, lines);
+    orderLine(FigFFT, "LineStyle", "--", "bottom");
+
+    % rescale FFT Plot
+    scaleAxes(FigFFT, "y", [0 400]);
+    scaleAxes(FigFFT, "x", [0 250]);
+    setAxes(FigFFT, 'yticklabel', '');
+    setAxes(FigFFT, 'xticklabel', '');
+    setAxes(FigFFT, 'visible', 'off');
+    setLine(FigFFT, "YData", [0 400], "LineStyle", "--");
+    pause(1);
+    set(FigFFT, "outerposition", [300, 100, 800, 670]);
+    plotLayout(FigFFT, params.posIndex + 2 * (monkeyId - 1), 0.3);
+    print(FigFFT, strcat(FIGPATH, "_", stimStrs(dIndex),  "_FFT_"), "-djpeg", "-r200");
+    close(FigFFT);
 end
 
 
@@ -163,8 +188,8 @@ end
 for dIndex = devType
 
     % wave
-%     FigWave = plotRawWave(chMean{mIndex, dIndex}, [], Window, stimStrs(dIndex), [8, 8]);
-%     FigWave_Whole = plotRawWave(chMean{mIndex, dIndex}, [], Window, stimStrs(dIndex), [8, 8]);
+    %     FigWave = plotRawWave(chMean{mIndex, dIndex}, [], Window, stimStrs(dIndex), [8, 8]);
+    %     FigWave_Whole = plotRawWave(chMean{mIndex, dIndex}, [], Window, stimStrs(dIndex), [8, 8]);
 
     % CRI Topo
     topo = ampNorm(dIndex).(strcat(monkeyStr, "_mean"));
@@ -173,24 +198,22 @@ for dIndex = devType
 
     %% change figure scale
     scaleAxes(FigTopo, "c", CRIScale(CRIMethod, :));
-%     scaleAxes([FigWave, FigWave_Whole], "y", [-yScale(monkeyId) yScale(monkeyId)]);
-% 
-%     setAxes([FigWave, FigWave_Whole], 'yticklabel', '');
-%     setAxes([FigWave, FigWave_Whole], 'xticklabel', '');
-%     setAxes([FigWave, FigWave_Whole], 'visible', 'off');
-%     setLine([FigWave, FigWave_Whole], "YData", [-yScale(monkeyId) yScale(monkeyId)], "LineStyle", "--");
+    %     scaleAxes([FigWave, FigWave_Whole], "y", [-yScale(monkeyId) yScale(monkeyId)]);
+    %
+    %     setAxes([FigWave, FigWave_Whole], 'yticklabel', '');
+    %     setAxes([FigWave, FigWave_Whole], 'xticklabel', '');
+    %     setAxes([FigWave, FigWave_Whole], 'visible', 'off');
+    %     setLine([FigWave, FigWave_Whole], "YData", [-yScale(monkeyId) yScale(monkeyId)], "LineStyle", "--");
     pause(1);
     set(FigTopo, "outerposition", [300, 100, 800, 670]);
 
-%     scaleAxes(FigWave, "x", [-10 600]);
-%     plotLayout([FigWave, FigWave_Whole], params.posIndex + 2 * (monkeyId - 1), 0.3);
+    %     scaleAxes(FigWave, "x", [-10 600]);
+    %     plotLayout([FigWave, FigWave_Whole], params.posIndex + 2 * (monkeyId - 1), 0.3);
 
-    if ~exist(FIGPATH, "dir")
-        mkdir(FIGPATH);
-    end
 
-%     print(FigWave_Whole, strcat(FIGPATH, stimStrs(dIndex),  "_whole_Wave"), "-djpeg", "-r200");
-%     print(FigWave, strcat(FIGPATH, stimStrs(dIndex),  "_Wave"), "-djpeg", "-r200");
+
+    %     print(FigWave_Whole, strcat(FIGPATH, stimStrs(dIndex),  "_whole_Wave"), "-djpeg", "-r200");
+    %     print(FigWave, strcat(FIGPATH, stimStrs(dIndex),  "_Wave"), "-djpeg", "-r200");
     print(FigTopo, strcat(FIGPATH,  stimStrs(dIndex),  "_Topo"), "-djpeg", "-r200");
 
     %% p-value of CRI and sponRes
@@ -233,6 +256,6 @@ compare.latency_mean_se_S1Sig = [(1:length(devType))', CTL_Compute_Compare(laten
 compare.latency_mean_se_S1nSig = [(1:length(devType))', CTL_Compute_Compare(latency, nSigCh, devType, monkeyStr)];
 
 
-ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
+ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
 save(ResName, "cdrPlot", "chMean", "Protocol", "compare", "-mat");
 
