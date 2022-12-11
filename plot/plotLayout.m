@@ -9,8 +9,8 @@ function plotLayout(varargin)
     %     alphaValue: alpha from 0 to 1.
     %                 0 for completely transparent.
     %                 1 for completely opaque.
-    %     target: when FigOrAxes is figure, apply layout to figure or axes
     %     tag: axes tags used to confirm the target axes
+    %     target: if tag is set, only plot layout on appointed type(s): figure|axes|FigsOrAxes
     % Example:
     %     Fig = figure;
     %     Ax1 = mSubplot(2,1,1);
@@ -20,9 +20,9 @@ function plotLayout(varargin)
     %     Ax3 = mSubplot(Fig2, 2,1,1);
     %     Fig2.Tag = "haha";
     %     Ax3.Tag = "haha";
-    %     plotLayout([Fig, Fig2], 1, 0.5, "haha")
-    %     plotLayout([Fig, Fig2], 1, 0.5, "haha", "axes")
-    %     plotLayout([Fig, Fig2], 1, 0.5, "haha", "figure")
+    %     plotLayout([Fig, Fig2, Ax1], 1, 0.5)
+    %     plotLayout([Fig, Fig2, Ax1], 1, 0.5, "haha", "axes")
+    %     plotLayout([Fig, Fig2, Ax1], 1, 0.5, "haha", "figure")
     
     if all(isgraphics(varargin{1}, "figure") | isgraphics(varargin{1}, "axes"))
         FigsOrAxes = varargin{1};
