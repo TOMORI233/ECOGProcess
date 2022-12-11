@@ -1,0 +1,13 @@
+{
+    "_schemaVersion": "1.0.0",
+    
+    "plotLayout": {
+        "inputs": [
+            {"name": "FigsOrAxes", "kind": "required", "type": ["@(args) all(isgraphics(args))"]},
+            {"name": "posIndex", "kind": "required", "type": ["choices = {1, 2, 3,4}"]},
+            {"name": "alphaValue", "kind": "ordered", "type": ["numeric", "numel=1", ">=0", "<=1", "scalar"]},
+            {"name": "tag", "kind": "ordered", "Type": [["string"], ["char"]]},
+            {"name": "target", "kind": "ordered", "type": ["choices = {'figure','axes','FigOrAxes'}"]}
+        ]
+    }
+}

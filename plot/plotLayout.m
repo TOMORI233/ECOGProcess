@@ -11,7 +11,7 @@ function plotLayout(varargin)
     %                 1 for completely opaque.
     %     target: when FigOrAxes is figure, apply layout to figure or axes
     %     tag: axes tags used to confirm the target axes
-    % Example
+    % Example:
     %     Fig = figure;
     %     Ax1 = mSubplot(2,1,1);
     %     Ax2 = mSubplot(2,1,2);
@@ -20,7 +20,9 @@ function plotLayout(varargin)
     %     Ax3 = mSubplot(Fig2, 2,1,1);
     %     Fig2.Tag = "haha";
     %     Ax3.Tag = "haha";
-    %     plotLayout([Fig, Fig2], 1, 0.1, "haha")
+    %     plotLayout([Fig, Fig2], 1, 0.5, "haha")
+    %     plotLayout([Fig, Fig2], 1, 0.5, "haha", "axes")
+    %     plotLayout([Fig, Fig2], 1, 0.5, "haha", "figure")
     
     if all(isgraphics(varargin{1}, "figure") | isgraphics(varargin{1}, "axes"))
         FigsOrAxes = varargin{1};
@@ -37,20 +39,16 @@ function plotLayout(varargin)
     mIp.addRequired("posIndex", @(x) ismember(x, 1:4));
     mIp.addOptional("alphaValue", 0.5, @(x) isa(x, "double") && isscalar(x) && x >= 0 && x <= 1);
     mIp.addOptional("tag", [], @(x) isstring(x) && ~matches(x, ["figure", "axes"], "IgnoreCase", true));
-    mIp.addOptional("target", "figure", @(x)  any(validatestring(x, {'figure', 'axes'})));
+    mIp.addOptional("target", "FigOrAxes", @(x)  any(validatestring(x, {'figure', 'axes', 'FigOrAxes'})));
 
     mIp.parse(FigsOrAxes, posIndex, varargin{:});
 
     alphaValue = mIp.Results.alphaValue;
-    target = mIp.Results.target;
     tag = mIp.Results.tag;
-
-    if strcmpi(target, "axes")
-        FigsOrAxes = findobj(FigsOrAxes, "Type", "axes");
-    end
-    
+    target = mIp.Results.target;
+   
     if ~isempty(tag)
-        [~, FigsOrAxes] = getObjVal(FigsOrAxes, "FigOrAxes", [], "Tag", tag);
+        FigsOrAxes = getObjVal(FigsOrAxes, target, [], "Tag", tag);
     end
 
     load('layout.mat');
