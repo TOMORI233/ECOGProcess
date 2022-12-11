@@ -42,7 +42,7 @@ ICAPATH = strcat(ROOTPATH, DateStr, "\ICA\");
         ECOGDataset.data = comp.unmixing * ECOGDataset.data;
     end
 
-    FigTopo = plotTopo(comp, [8, 8], [1, 1], icSelect(mIndex));
+    FigTopo = plotTopoICA(comp, [8, 8], [1, 1], icSelect(mIndex));
 print(FigTopo, strcat(FIGPATH, AREANAME, "_IC_example_", DateStr), "-djpeg", "-r200");
 
 %% trial select

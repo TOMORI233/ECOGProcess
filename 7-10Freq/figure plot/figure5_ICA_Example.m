@@ -36,14 +36,14 @@ catch
     ICStd = cell2mat(cellfun(@(x) std(x, [], 1), changeCellRowNum(comp.trial), "UniformOutput", false));
     Fig1(1) = plotRawWave(ICMean, ICStd, window, "ICA");
     Fig1(2) = plotTFA(ICMean, fs, [], window, "ICA");
-    Fig1(3) = plotTopo(comp, [8, 8], [8, 8]);
+    Fig1(3) = plotTopoICA(comp, [8, 8], [8, 8]);
     scaleAxes(Fig1(1), "y", [-2, 2]);
     scaleAxes(Fig1(2), "c", [0, 0.2]);
     
     comp = reverseIC(comp, input("Input ICs to reverse: "));
     ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
     plotRawWave(ICMean, [], window, "ICA");
-    plotTopo(comp, [8, 8], [8, 8]);
+    plotTopoICA(comp, [8, 8], [8, 8]);
     save(strcat(fileparts(MATPATH), "\", AREANAME, "_ICA"), "comp");
 end
 
@@ -82,5 +82,5 @@ result = [t, ...
           chData(3).chMean(ICNum, :)', ...
           t, ...
           chData(4).chMean(ICNum, :)'];
-FigTopo = plotTopo(comp, [8, 8], [1, 1], ICNum);
+FigTopo = plotTopoICA(comp, [8, 8], [1, 1], ICNum);
 print(FigTopo, strcat(fileparts(MATPATH), "\", AREANAME, "_ICA_Push"), "-djpeg", "-r400");

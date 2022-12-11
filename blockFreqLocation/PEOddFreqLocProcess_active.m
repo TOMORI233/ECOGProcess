@@ -24,7 +24,7 @@ comp = realignIC(comp, window, t1, t2);
 ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
 plotRawWave(ICMean, [], window, "ICA", [8, 8]);
 plotTFA(ICMean, fs, [], window, "ICA", [8, 8]);
-plotTopo(comp, [8, 8]);
+plotTopoICA(comp, [8, 8]);
 ECOGDataset.data = comp.unmixing * ECOGDatasetTemp.data;
 
 
@@ -35,7 +35,7 @@ ECOGDataset.data = ECOGDatasetTemp.data;
 % ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
 % plotRawWave(ICMean, [], window, "ICA", [4, 5]);
 % plotTFA(ICMean, fs, [], window, "ICA", [4, 5]);
-% plotTopo(comp, [8, 8], [4, 5]);
+% plotTopoICA(comp, [8, 8], [4, 5]);
 %% trial select
 block1Idx = mod([trialAll.trialNum]', 80) >= 1 & mod([trialAll.trialNum]', 80) <= 20;
 block2Idx = mod([trialAll.trialNum]', 80) >= 21 & mod([trialAll.trialNum]', 80) <= 40;

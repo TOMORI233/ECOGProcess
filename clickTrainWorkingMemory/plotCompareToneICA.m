@@ -57,7 +57,7 @@ for resN = 1 : length(resData) %% result type
                     %% plot ICA topo
                     clear comp
                     load(strrep(matPath{recordCode}, resData(resN), 'icaComp.mat'));
-                    FigTopo = plotTopo(comp, [8, 8], [8, 8], "on");
+                    FigTopo = plotTopoICA(comp, [8, 8], [8, 8], "on");
                     topoPath = fullfile(savePath, "icaTopo");
                     mkdir(topoPath)
                     print(FigTopo, fullfile(topoPath, strcat(posStr(pos), "icaTopo")), "-djpeg", "-r300");

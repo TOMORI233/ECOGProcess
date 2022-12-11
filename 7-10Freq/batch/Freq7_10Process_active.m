@@ -35,13 +35,13 @@ drawnow;
 % ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
 % plotRawWave(ICMean, [], window, "ICA", [4, 5]);
 % plotTFA(ICMean, fs, [], window, "ICA", [4, 5]);
-% plotTopo(comp, [8, 8], [4, 5]);
+% plotTopoICA(comp, [8, 8], [4, 5]);
 % 
 % comp = reverseIC(comp, input("IC to reverse: "));
 % ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
 % plotRawWave(ICMean, [], window, "ICA", [4, 5]);
 % plotTFA(ICMean, fs, [], window, "ICA", [4, 5]);
-% plotTopo(comp, [8, 8], [4, 5]);
+% plotTopoICA(comp, [8, 8], [4, 5]);
 
 %% MMN - PE
 window = [-2000, 2000];

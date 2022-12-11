@@ -15,7 +15,7 @@ ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", 
 ICStd = cell2mat(cellfun(@std, changeCellRowNum(comp.trial), "UniformOutput", false));
 
 FigICAWave = plotRawWave(ICMean, ICStd, Window, "ICA", [8, 8]);
-FigTopo = plotTopo(comp, [8, 8]);
+FigTopo = plotTopoICA(comp, [8, 8]);
 scaleAxes(FigICAWave, "y", [], [-8 8], "max");
 IC = input("ICs to exclude: ");
 close(FigTopo);

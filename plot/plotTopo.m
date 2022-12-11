@@ -1,59 +1,54 @@
-function Fig = plotTopo(comp, topoSize, plotSize, ICs)
-    narginchk(1, 4);
+function plotTopo(varargin)
+    % Description: remap Data according to [topoSize] and plot color map to axes
+    % Input:
+    %     mAxe: target axes
+    %     Data: data to plot, make sure numel(data) == topoSize(1) * topoSize(2)
+    %     topoSize: [x,y], Data will be remapped as a [x,y] matrix
+    %     contourOpt: contour option "on" or "off"
+    %     resolution: apply 2-D interpolation to the remapped [Data], which is an
+    %                 N-point insertion. Thus, resolution = N.
 
-    if nargin < 2
-        topoSize = [8, 8];
+    if isgraphics(varargin{1}(1), "axes")
+        mAxe = varargin{1}(1);
+        varargin = varargin(2:end);
+    else
+        mAxe = gca;
     end
 
-    if nargin < 3
-        plotSize = [8, 8];
-    end
+    mIp = inputParser;
+    mIp.addRequired("mAxe", @(x) isgraphics(x, "axes"));
+    mIp.addRequired("Data");
+    mIp.addOptional("topoSize", [8, 8], @(x) validateattributes(x, 'numeric', {'numel', 2, 'positive', 'integer'}));
+    mIp.addParameter("contourOpt", "on", @(x) any(validatestring(x, {'on', 'off'})));
+    mIp.addParameter("resolution", 5, @(x) validateattributes(x, 'numeric', {'scalar', 'positive', 'integer'}));
+    mIp.parse(mAxe, varargin{:})
 
-    if nargin < 4
-        ICs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
-    end
+    Data = mIp.Results.Data;
+    topoSize = mIp.Results.topoSize;
+    contourOpt = mIp.Results.contourOpt;
+    N = mIp.Results.resolution;
 
-    if size(ICs, 1) ~= plotSize(1) || size(ICs, 2) ~= plotSize(2)
-        disp("chs option not matched with plotSize. Resize chs...");
-        ICs = reshape(ICs(1):(ICs(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
+    if numel(Data) ~= topoSize(1) * topoSize(2)
+        error("Numel of input data should be topoSize(1)*topoSize(2)");
     end
-
-    Fig = figure;
-    maximizeFig(Fig);
-    margins = [0.05, 0.05, 0.1, 0.1];
-    paddings = [0.01, 0.03, 0.01, 0.01];
-    topo = comp.topo;
     
-    for rIndex = 1:plotSize(1)
-    
-        for cIndex = 1:plotSize(2)
-            ICNum = ICs(rIndex, cIndex);
+    C = flipud(reshape(Data, topoSize)');
+    C = padarray(C, [1, 1], "replicate");
+    C = interp2(C, N);
+    C = imgaussfilt(C, 8);
+    X = linspace(0, topoSize(1) + 1, size(C, 1));
+    Y = linspace(0, topoSize(2) + 1, size(C, 2));
+    imagesc(mAxe, "XData", X, "YData", Y, "CData", C);
 
-
-            if ICs(rIndex, cIndex) > size(topo, 1)
-                continue;
-            end
-
-            mAxe = mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
-            N = 5;
-            C = flipud(reshape(topo(:, ICNum), topoSize)');
-            C = interp2(C, N);
-            C = imgaussfilt(C, 8);
-            X = linspace(1, topoSize(1), size(C, 1));
-            Y = linspace(1, topoSize(2), size(C, 2));
-            imagesc("XData", X, "YData", Y, "CData", C); hold on;
-            contour(X, Y, C, "LineColor", "k");
-            [~, idx] = max(topo(:, ICNum));
-            title(['IC ', num2str(ICNum), ' | max - ', num2str(idx)]);
-            xlim([1 topoSize(1)]);
-            ylim([1 topoSize(2)]);
-            xticklabels('');
-            yticklabels('');
-            scaleAxes(mAxe, "c", [], [-10, 10], "max");
-            colorbar;
-        end
-    
+    if strcmpi(contourOpt, "on")
+        hold on;
+        contour(X, Y, C, "LineColor", "k");
     end
 
-    return;
+    xlim([0.5, topoSize(1) + 0.5]);
+    ylim([0.5, topoSize(2) + 0.5]);
+    xticklabels('');
+    yticklabels('');
+    
+    colormap('jet');
 end

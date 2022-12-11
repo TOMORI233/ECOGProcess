@@ -15,7 +15,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
     ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
     ICStd = cell2mat(cellfun(@(x) std(x, [], 1), changeCellRowNum(comp.trial), "UniformOutput", false));
     FigIC = plotRawWave(ICMean, ICStd, windowICA, "ICA");
-    FigTopoICA = plotTopo(comp, [8, 8], [8, 8]);
+    FigTopoICA = plotTopoICA(comp, [8, 8], [8, 8]);
     FigWave(1) = plotRawWave(cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG), "UniformOutput", false)), [], windowICA, "origin");
     k = 'N';
     while ~strcmp(k, 'y') && ~strcmp(k, 'Y')

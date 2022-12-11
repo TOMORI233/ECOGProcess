@@ -45,7 +45,7 @@ for i = 10 : length(basicRegIrreg)
 %%
         % topoFig
         [trialsECOG, ~, ~] = selectEcog(ECOGDataset, trialAll, "trial onset", window);
-        FigTopo = plotTopo(comp, topoSize);
+        FigTopo = plotTopoICA(comp, topoSize);
         AREANAME = {'AC', 'PFC', 'ratAC'};
 
         for blk = 1 : length(blkMerge)
