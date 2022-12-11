@@ -55,7 +55,7 @@ function stat = CBPT(data, cfg)
 %     xlim([0, windowPE(2)]);
 %     ylim([0.5, 63.5]);
 %     scaleAxes(gcf, "c", [], [], "max");
-
+ft_setPath2Top
 narginchk(1, 2);
 
 if nargin < 2

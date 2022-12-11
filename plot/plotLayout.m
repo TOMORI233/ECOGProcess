@@ -1,46 +1,88 @@
-function Figs = plotLayout(Figs, posIndex, alphaValue)
-    narginchk(2, 3);
+function plotLayout(varargin)
+    % Description: plot layout image to figures or axes
+    % Input:
+    %     FigsOrAxes: target figures or axes array
+    %     posIndex: 1 - AC of CC
+    %               2 - PFC of CC
+    %               3 - AC of XX
+    %               4 - PFC of XX
+    %     alphaValue: alpha from 0 to 1.
+    %                 0 for completely transparent.
+    %                 1 for completely opaque.
+    %     target: when FigOrAxes is figure, apply layout to figure or axes
+    %     tag: axes tags used to confirm the target axes
+    % Example
+    %     Fig = figure;
+    %     Ax1 = mSubplot(2,1,1);
+    %     Ax2 = mSubplot(2,1,2);
+    %     Ax2.Tag = "haha";
+    %     Fig2 = figure;
+    %     Ax3 = mSubplot(Fig2, 2,1,1);
+    %     Fig2.Tag = "haha";
+    %     Ax3.Tag = "haha";
+    %     plotLayout([Fig, Fig2], 1, 0.1, "haha")
+    
+    if all(isgraphics(varargin{1}, "figure") | isgraphics(varargin{1}, "axes"))
+        FigsOrAxes = varargin{1};
+        posIndex = varargin{2};
+        varargin = varargin(3:end);
+    else
+        FigsOrAxes = gcf;
+        posIndex = varargin{1};
+        varargin = varargin(2:end);
+    end
 
-    if nargin < 3
-        alphaValue = 0.5;
+    mIp = inputParser;
+    mIp.addRequired("FigsOrAxes", @(x) all(isgraphics(x)));
+    mIp.addRequired("posIndex", @(x) ismember(x, 1:4));
+    mIp.addOptional("alphaValue", 0.5, @(x) isa(x, "double") && isscalar(x) && x >= 0 && x <= 1);
+    mIp.addOptional("tag", [], @(x) isstring(x) && ~matches(x, ["figure", "axes"], "IgnoreCase", true));
+    mIp.addOptional("target", "figure", @(x)  any(validatestring(x, {'figure', 'axes'})));
+
+    mIp.parse(FigsOrAxes, posIndex, varargin{:});
+
+    alphaValue = mIp.Results.alphaValue;
+    target = mIp.Results.target;
+    tag = mIp.Results.tag;
+
+    if strcmpi(target, "axes")
+        FigsOrAxes = findobj(FigsOrAxes, "Type", "axes");
     end
     
-    for fIndex = 1:length(Figs)
-        setAxes(Figs(fIndex), 'color', 'none');
-        layAx = mSubplot(Figs(fIndex), 1, 1, 1, [1 1], zeros(4, 1), 0.01 * ones(4, 1));
-        load('layout.mat');
-    
-        switch posIndex
-%             case 1 % chouchou AC large
-%                 image(layAx, cc_AC_sulcus_large); hold on
-%             case 2 % chouchou PFC large
-%                 image(layAx, cc_PFC_sulcus_large); hold on
-            case 1 % chouchou AC square
-                image(layAx, cc_AC_sulcus_square); hold on
-            case 2 % chouchou PFC square
-                image(layAx, cc_PFC_sulcus_square); hold on
-%             case 11 % xiaoxiao AC large
-%             
-%             case 12 % xiaoxiao PFC large
+    if ~isempty(tag)
+        [~, FigsOrAxes] = getObjVal(FigsOrAxes, "FigOrAxes", [], "Tag", tag);
+    end
 
-            case 3 % xiaoxiao AC square 
-                image(layAx, xx_AC_sulcus_square); hold on
-            case 4 % xiaoxiao PFC square
-                image(layAx, xx_PFC_sulcus_square); hold on
+    load('layout.mat');
+
+    for fIndex = 1:length(FigsOrAxes)
+        
+        switch class(FigsOrAxes(fIndex))
+            case "matlab.ui.Figure"
+                    setAxes(FigsOrAxes(fIndex), 'color', 'none');
+                    layAx = mSubplot(FigsOrAxes(fIndex), 1, 1, 1, "shape", "fill");
+            case "matlab.graphics.axis.Axes"
+                currentPosition = FigsOrAxes(fIndex).Position;
+                currentFig = FigsOrAxes(fIndex).Parent;
+                layAx = axes(currentFig, "Position", currentPosition);
+            otherwise
+                warning("Input targets should be figures or axes object array");
         end
 
-        alpha(layAx, alphaValue);
-        set(layAx, 'XTickLabel', []);
-        set(layAx, 'YTickLabel', []);
-        set(layAx, 'Box', 'off');
-        set(layAx, 'visible', 'off');
+        switch posIndex
+            case 1 % chouchou AC square
+                h = image(layAx, cc_AC_sulcus_square);
+            case 2 % chouchou PFC square
+                h = image(layAx, cc_PFC_sulcus_square);
+            case 3 % xiaoxiao AC square 
+                h = image(layAx, xx_AC_sulcus_square);
+            case 4 % xiaoxiao PFC square
+                h = image(layAx, xx_PFC_sulcus_square);
+        end
 
-        % Set as background
-%         allAxes = findobj(Figs(fIndex), "Type", "axes");
-        allAxes = get(Figs(fIndex), "child");
-        set(Figs(fIndex), 'child', [allAxes; layAx]);
-        drawnow;
+        set(layAx, 'Visible', 'off');
+        set(h, "alphadata", ~imbinarize(rgb2gray(h.CData)) * alphaValue);
     end
-
+    
     return;
 end

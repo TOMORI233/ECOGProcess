@@ -333,7 +333,7 @@ addLines2Axes(FigCompare, CT);
 
 %%
 
-ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
+ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
 save(ResName, "cdrPlot", "PMean", "chMean", "baseICI", "ICI2", "-mat");
 
 if ~isempty(gcp('nocreate'))

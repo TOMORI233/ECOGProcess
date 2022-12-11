@@ -1,6 +1,6 @@
 %% CC
 clear ; clc
-recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\SPR_Utils\ClickTrainLongTermFigure\MSTI\ME_MSTIRecording_CC.xlsx");
+recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\SPR_Utils\ClickTrainLongTermFigure\Offset\ME_OffsetRecording_CC.xlsx");
 recordInfo = table2struct(readtable(recordPath));
 exported = [recordInfo.Exported]';
 iIndex = find(exported == 0);  % export sorted and unprocessed spike data
@@ -9,7 +9,7 @@ iIndex = find(exported == 0);  % export sorted and unprocessed spike data
 for i = iIndex'
     disp(strcat("processing ", recordInfo(i).paradigm, "... (", num2str(i), "/", num2str(max(iIndex)), ")"));
     recordInfo = table2struct(readtable(recordPath));
-    SAVEPATH = strcat("E:\ECOG\MAT Data\CC\ClickTrainLongTerm\MSTI\", string(recordInfo(i).paradigm), "\");
+    SAVEPATH = strcat("E:\ECOG\MAT Data\CC\ClickTrainLongTerm\Offset\", string(recordInfo(i).paradigm), "\");
     BLOCKPATH{1} = recordInfo(i).tankPath;
     params.processFcn = @PassiveProcess_clickTrainContinuous;
     exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
@@ -20,7 +20,7 @@ end
 
 %% XX
 clear ; clc
-recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\SPR_Utils\ClickTrainLongTermFigure\MSTI\ME_MSTIRecording_XX.xlsx");
+recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\SPR_Utils\ClickTrainLongTermFigure\Offset\ME_OffsetRecording_XX.xlsx");
 recordInfo = table2struct(readtable(recordPath));
 exported = [recordInfo.Exported]';
 iIndex = find(exported == 0);  % export sorted and unprocessed spike data
@@ -29,7 +29,7 @@ iIndex = find(exported == 0);  % export sorted and unprocessed spike data
 for i = iIndex'
     disp(strcat("processing ", recordInfo(i).paradigm, "... (", num2str(i), "/", num2str(max(iIndex)), ")"));
     recordInfo = table2struct(readtable(recordPath));
-    SAVEPATH = strcat("E:\ECOG\MAT Data\XX\ClickTrainLongTerm\MSTI\", string(recordInfo(i).paradigm), "\");
+    SAVEPATH = strcat("E:\ECOG\MAT Data\XX\ClickTrainLongTerm\Offset\", string(recordInfo(i).paradigm), "\");
     BLOCKPATH{1} = recordInfo(i).tankPath;
     params.processFcn = @PassiveProcess_clickTrainContinuous;
     exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);

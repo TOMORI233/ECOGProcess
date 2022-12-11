@@ -156,7 +156,7 @@ for dIndex = 1 : length(devType)
     print(FigTopo(dIndex), strcat(FIGPATH, stimStrs(dIndex), "_pValue_Topo"), "-djpeg", "-r200");
 end
 
-ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
+ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
 save(ResName, "cdrPlot", "PMean", "Protocol", "trialsFFT", "targetIdx", "ff", "-mat");
 
 end

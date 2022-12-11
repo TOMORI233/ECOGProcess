@@ -206,6 +206,6 @@ compare.latency_mean_se_S1Sig = [(1:length(devType))', CTL_Compute_Compare(laten
 compare.latency_mean_se_S1nSig = [(1:length(devType))', CTL_Compute_Compare(latency, nSigCh, devType, monkeyStr)];
 
 
-ResName = strcat(FIGPATH, "res_", AREANAME, ".mat");
+ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
 save(ResName, "cdrPlot", "chMean", "Protocol", "compare", "-mat");
 
