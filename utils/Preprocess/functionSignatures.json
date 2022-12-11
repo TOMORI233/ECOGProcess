@@ -1,6 +1,16 @@
 {
     "_schemaVersion": "1.0.0",
 
+    "selectEcog": {
+        "inputs": [
+            {"name": "ECOGDataset", "kind": "required", "type": ["struct"]},
+            {"name": "trials", "kind": "required", "type": ["struct"]},
+            {"name": "segOption", "kind": "required", "type": ["choices={'trial onset', 'dev onset', 'push onset', 'last std'}"]},
+            {"name": "window", "kind": "required", "type": ["numeric", "numel=2"]},
+            {"name": "scaleFactor", "kind": "ordered", "type": ["numeric", "scalar"]}
+        ]
+    },
+
     "ECOGFilter": {
         "inputs": [
             {"mutuallyExclusiveGroup": [

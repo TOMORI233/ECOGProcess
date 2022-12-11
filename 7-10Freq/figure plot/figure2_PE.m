@@ -104,7 +104,7 @@ end
 %% Multiple comparison
 t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
 
-try 
+try
     load([MONKEYPATH, AREANAME, '_PE_CBPT'], "stat", "-mat");
 catch
     data = [];
@@ -120,7 +120,7 @@ catch
         % trialinfo nTrial*1
         data(dIndex).trialinfo = repmat(dIndex, [length(temp), 1]);
     end
-    
+
     stat = CBPT(data);
     save([MONKEYPATH, AREANAME, '_PE_CBPT.mat'], "stat", "-mat");
 end
@@ -210,7 +210,7 @@ for wIndex = 1:length(edge)
     tuningSlope(:, wIndex) = (tuningMean{wIndex}(end, :) - tuningMean{wIndex}(2, :))';
     tuningSlope(badCHs, wIndex) = 0;
     plotTopo(tuningSlope(:, wIndex), "contourOpt", "off");
-%     plotLayout(mAxesDiff(wIndex), 2 * (monkeyID - 1) + params.posIndex);
+    %     plotLayout(mAxesDiff(wIndex), 2 * (monkeyID - 1) + params.posIndex);
     title(mAxesDiff(wIndex), ['Predictive error topo [', num2str(windowT(1)), ' ', num2str(windowT(2)), ']']);
 
     % p
@@ -219,7 +219,7 @@ for wIndex = 1:length(edge)
     temp = log(P(:, wIndex) / alpha) / log(alpha);
     temp(badCHs) = 0;
     plotTopo(temp, "contourOpt", "off");
-%     plotLayout(mAxesP(wIndex), 2 * (monkeyID - 1) + params.posIndex);
+    %     plotLayout(mAxesP(wIndex), 2 * (monkeyID - 1) + params.posIndex);
     title(mAxesP(wIndex), ['p topo [', num2str(edge(wIndex)), ' ', num2str(edge(wIndex) + binSize), '] | p=log_{', num2str(alpha), '}(p/', num2str(alpha), ')']);
 end
 scaleAxes(mAxesDiff, "c", [], [], "max");
@@ -247,12 +247,12 @@ a = ones(length(t), 1) * (-100);
 a(V0(ch, :) > 0) = yRange(2);
 % a(V(ch, :) > 0) = 30;
 resultWave = [t, ...
-              chData(1).chMean(ch, :)', ...
-              chData(2).chMean(ch, :)', ...
-              chData(3).chMean(ch, :)', ...
-              chData(4).chMean(ch, :)', ...
-              chData(5).chMean(ch, :)', ...
-              a];
+    chData(1).chMean(ch, :)', ...
+    chData(2).chMean(ch, :)', ...
+    chData(3).chMean(ch, :)', ...
+    chData(4).chMean(ch, :)', ...
+    chData(5).chMean(ch, :)', ...
+    a];
 a(V0(ch, :) == 0) = [];
 t(V0(ch, :) == 0) = [];
 hold on;
