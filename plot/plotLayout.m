@@ -60,9 +60,7 @@ function plotLayout(varargin)
                 setAxes(FigsOrAxes(fIndex), 'color', 'none');
                 layAx = mSubplot(FigsOrAxes(fIndex), 1, 1, 1, "shape", "fill");
             case "matlab.graphics.axis.Axes"
-                currentPosition = FigsOrAxes(fIndex).Position;
-                currentFig = FigsOrAxes(fIndex).Parent;
-                layAx = axes(currentFig, "Position", currentPosition);
+                layAx = axes(FigsOrAxes(fIndex).Parent, "Position", FigsOrAxes(fIndex).Position);
             otherwise
                 error("Input targets should be figures or axes object array");
         end
