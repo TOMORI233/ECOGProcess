@@ -1,5 +1,5 @@
 clear; clc;
-rootPathMat = "E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Offset\";
+rootPathMat = "E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Offset\";
 rootPathFig = "E:\ECoG\corelDraw\ClickTrainLongTerm\Offset\";
 
 %% set protocols
@@ -10,7 +10,7 @@ protocols = string({temp.name}');
 %% select data
 areaSel = "AC";
 dateSel = "";
-protSel = "";
+protSel = "Offset_Duration_Effect_8ms_Reg_New";
 
 % validate areaSel
 if ~matches(areaSel, ["AC", "PFC"]) || length(areaSel) > 1
@@ -39,7 +39,12 @@ for rIndex = 1 : length(protocols)
         if matches(protocolStr, ["Offset_2_128_4s", ...
                                 "Offset_256_512_10s",...
                                 "Offset_Duration_Effect_4ms_16ms_Reg", ...
-                                "Offset_Variance_Effect_4ms_16ms_sigma250_2_Reg"]);
+                                "Offset_Variance_Effect_4ms_16ms_sigma250_2_Reg", ...
+                                "Offset_2_128_4s_New", ...
+                                "Offset_Duration_Effect_4ms_Reg_New", ...
+                                "Offset_Duration_Effect_8ms_Reg_New", ...
+                                "Offset_Variance_Effect_4ms_8ms_sigma250_2_Reg_500ms", ...
+                                ])
             run("Figure_Example_Offset_Basic.m");
         end
 

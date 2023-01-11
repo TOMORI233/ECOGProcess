@@ -9,7 +9,7 @@ function exportDataFcn(BLOCKPATH, SAVEPATH, params, startIdx, endIdx)
         endIdx = length(BLOCKPATH);
     end
 
-    fd = 500; % Hz
+    fd = 600; % Hz
 
     for index = startIdx:endIdx
         AREANAME = ["AC", "PFC"];

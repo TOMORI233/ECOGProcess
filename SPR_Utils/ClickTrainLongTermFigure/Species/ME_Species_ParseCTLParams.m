@@ -13,6 +13,7 @@ CTLParams.Window = str2double(string(strsplit(mProtocol.Window, ",")));
 CTLParams.Offset = str2double(string(strsplit(mProtocol.Offset, ",")));
 CTLParams.stimStrs = strrep(string(strsplit(mProtocol.trialTypes, ",")), "_", "-");
 CTLParams.FFTWin = str2double(string(strsplit(mProtocol.FFTWin, ",")));
+CTLParams.FFTPlotWin = str2double(string(strsplit(mProtocol.FFTPlotWin, ",")));
 CTLParams.ICAWin = str2double(string(strsplit(mProtocol.ICAWin, ",")));
 CTLParams.BaseICI = str2double(string(strsplit(mProtocol.BaseICI, ",")));
 CTLParams.ICI2 = str2double(string(strsplit(mProtocol.ICI2, ",")));

@@ -14,13 +14,11 @@ params.processFcn = @PassiveProcess_clickTrainContinuous;
 AREANAME = AREANAME(params.posIndex);
 
 %% load parameters
-CTLParams = ME_Species_ParseCTLParams(protocolStr);
-CTL_Fields = fields(CTLParams);
-for pIndex = 1 : length(CTL_Fields)
-    eval(strcat(CTL_Fields(pIndex), "= CTLParams.", CTL_Fields(pIndex), ";"));
-end
+OffsetParams = ME_ParseOffsetParams(protocolStr);
+parseStruct(OffsetParams)
 
-fs = 500;
+fs = 600;
+OffsetParams.fs = fs;
 correspFreq = 1000./ICI2;
 
 
@@ -35,7 +33,7 @@ if exist(FIGPATH, "dir")
 end
 
 tic
-[trialAll, trialsECOG_Merge, trialsECOG_S1_Merge] =  mergeCTLTrialsECOG(MATPATH, params.posIndex, CTLParams);
+[trialAll, trialsECOG_Merge, trialsECOG_S1_Merge] =  mergeCTLTrialsECOG(MATPATH, params.posIndex, OffsetParams);
 toc
 
 %% ICA
@@ -75,10 +73,10 @@ devType = unique([trialAll.devOrdr]);
 t = linspace(Window(1), Window(2), diff(Window) /1000 * fs + 1)';
 for ch = 1 : 64
     cdrPlot(ch).(strcat(monkeyStr, "info")) = strcat("Ch", num2str(ch));
-    cdrPlot(ch).(strcat(monkeyStr, "Wave")) = zeros(length(t), 2 * length(devType));
 end
 PMean = cell(length(MATPATH), length(devType));
 chMean = cell(length(MATPATH), length(devType));
+chMeanS1 = cell(length(MATPATH), length(devType));
 chMeanFilterd = cell(length(MATPATH), length(devType));
 trialsECOGFilterd = cell(length(MATPATH), length(devType));
 
@@ -87,15 +85,20 @@ for dIndex = devType
     tIndex = [trialAll.devOrdr] == dIndex;
     trials = trialAll(tIndex);
     trialsECOG = trialsECOG_Merge(tIndex);
+    trialsECOG_S1 = trialsECOG_S1_Merge(tIndex);
     trialsECOGFilterd = trialsECOG_Merge_Filtered(tIndex);
 
     % FFT during S1
-    tIdx = find(t > FFTWin(1) & t < FFTWin(2));
+    tIdx = find(t > FFTWin(dIndex, 1) & t < FFTWin(dIndex, 2));
     [ff, PMean{mIndex, dIndex}, trialsFFT]  = trialsECOGFFT(trialsECOG, fs, tIdx, [], 2);
 
     % raw wave
     chMean{mIndex, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG), 'UniformOutput', false));
     chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG), 'UniformOutput', false));
+
+    % raw wave S1
+    chMeanS1{mIndex, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG_S1), 'UniformOutput', false));
+    chStdS1 = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG_S1), 'UniformOutput', false));
 
     % filter
     chMeanFilterd{mIndex, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOGFilterd), 'UniformOutput', false));
@@ -103,12 +106,14 @@ for dIndex = devType
 
     % data for corelDraw plot
     for ch = 1 : size(chMean{mIndex, dIndex}, 1)
-        cdrPlot(ch).(strcat(monkeyStr, "Wave"))(:, 2 * dIndex - 1) = t';
-        cdrPlot(ch).(strcat(monkeyStr, "Wave"))(:, 2 * dIndex) = chMean{mIndex, dIndex}(ch, :)';
+        cdrPlot(ch).(strcat(monkeyStr, "Wave"))(dIndex).Data(:, 1) = t';
+        cdrPlot(ch).(strcat(monkeyStr, "Wave"))(dIndex).Data(:, 2) = chMean{mIndex, dIndex}(ch, :)';
+        cdrPlot(ch).(strcat(monkeyStr, "WaveS1"))(dIndex).Data(:, 1) = t';
+        cdrPlot(ch).(strcat(monkeyStr, "WaveS1"))(dIndex).Data(:, 2) = chMeanS1{mIndex, dIndex}(ch, :)';
         cdrPlot(ch).(strcat(monkeyStr, "WaveFilted"))(:, 2 * dIndex - 1) = t';
         cdrPlot(ch).(strcat(monkeyStr, "WaveFilted"))(:, 2 * dIndex) = chMeanFilterd{mIndex, dIndex}(ch, :)';
-        cdrPlot(ch).(strcat(monkeyStr, "FFT"))(:, 2 * dIndex - 1) =ff;
-        cdrPlot(ch).(strcat(monkeyStr, "FFT"))(:, 2 * dIndex) = PMean{mIndex, dIndex}(ch, :)';
+        cdrPlot(ch).(strcat(monkeyStr, "FFT"))(dIndex).Data(:, 1) = ff;
+        cdrPlot(ch).(strcat(monkeyStr, "FFT"))(dIndex).Data(:, 2) = PMean{mIndex, dIndex}(ch, :)';
     end
 
 
@@ -143,7 +148,7 @@ ampNormS1.(strcat(monkeyStr, "_S1_raw")) = changeCellRowNum(temp);
 if ~exist(FIGPATH, "dir")
     mkdir(FIGPATH);
 end
-%% comparison between devTypes
+%% comparison between devTypes_ dev Onset 
 for gIndex = 1 : length(group_Index)
     temp = group_Index{gIndex};
     group = [];
@@ -152,80 +157,93 @@ for gIndex = 1 : length(group_Index)
         group(dIndex).chMean = chMean{mIndex, dIdx};
         group(dIndex).color = colors(dIndex);
     end
-    FigGroup = plotRawWaveMulti_SPR(group, Window);
-    scaleAxes(FigGroup, "x", [-10 600]);
-    scaleAxes(FigGroup, "y", [-yScale(monkeyId) yScale(monkeyId)]);
-    addLegend2Fig(FigGroup, stimStrs(group_Index{gIndex}));
-    print(FigGroup, strcat(FIGPATH, group_Str(gIndex)), "-djpeg", "-r200");
-    close(FigGroup);
+    FigGroup(gIndex) = plotRawWaveMulti_SPR(group, Window);
+    addLegend2Fig(FigGroup(gIndex), stimStrs(group_Index{gIndex}));
 end
 
-
-%% plot FFT
-for dIndex = devType
-    FigFFT = plotRawWave(PMean{mIndex, dIndex}, [], [ff(1), ff(end)], strcat("FFT ", stimStrs(dIndex)));
-    deleteLine(FigFFT, "LineStyle", "--");
-    lines(1).X = correspFreq(mIndex, dIndex); lines(1).color = "k";
-    addLines2Axes(FigFFT, lines);
-    orderLine(FigFFT, "LineStyle", "--", "bottom");
-
-    % rescale FFT Plot
-    scaleAxes(FigFFT, "y", [0 400]);
-    scaleAxes(FigFFT, "x", [0 250]);
-    setAxes(FigFFT, 'yticklabel', '');
-    setAxes(FigFFT, 'xticklabel', '');
-    setAxes(FigFFT, 'visible', 'off');
-    setLine(FigFFT, "YData", [0 400], "LineStyle", "--");
-    pause(1);
-    set(FigFFT, "outerposition", [300, 100, 800, 670]);
-    plotLayout(FigFFT, params.posIndex + 2 * (monkeyId - 1), 0.3);
-    print(FigFFT, strcat(FIGPATH, "_", stimStrs(dIndex),  "_FFT_"), "-djpeg", "-r200");
-    close(FigFFT);
+%% comparison between devTypes_ sound Onset
+for gIndex = 1 : length(group_Index)
+    temp = group_Index{gIndex};
+    groupS1 = [];
+    for dIndex  = 1 : length(temp)
+        dIdx = temp(dIndex);
+        groupS1(dIndex).chMean = chMeanS1{mIndex, dIdx};
+        groupS1(dIndex).color = colors(dIndex);
+    end
+    FigGroupS1(gIndex) = plotRawWaveMulti_SPR(groupS1, Window);
+    addLegend2Fig(FigGroupS1(gIndex), stimStrs(group_Index{gIndex}));
 end
 
-
-%% plot rawWave
-for dIndex = devType
-
-    % wave
-    %     FigWave = plotRawWave(chMean{mIndex, dIndex}, [], Window, stimStrs(dIndex), [8, 8]);
-    %     FigWave_Whole = plotRawWave(chMean{mIndex, dIndex}, [], Window, stimStrs(dIndex), [8, 8]);
-
-    % CRI Topo
-    topo = ampNorm(dIndex).(strcat(monkeyStr, "_mean"));
-    FigTopo = plotTopo_Raw(topo, [8, 8]);
-    colormap(FigTopo, "jet");
-
-    %% change figure scale
-    scaleAxes(FigTopo, "c", CRIScale(CRIMethod, :));
-       pause(1);
-    set(FigTopo, "outerposition", [300, 100, 800, 670]);
-       print(FigTopo, strcat(FIGPATH,  stimStrs(dIndex),  "_Topo"), "-djpeg", "-r200");
-
-    %% p-value of CRI and sponRes
-    % compare change resp and spon resp
-    amp = ampNorm(dIndex).(strcat(monkeyStr, "_amp"));
-    rmsSpon = ampNorm(dIndex).(strcat(monkeyStr, "_rmsSpon"));
-    [sponH, sponP] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(amp), changeCellRowNum(rmsSpon), "UniformOutput", false);
-
-    % plot p-value topo
-    topo = logg(pBase, cell2mat(sponP) / pBase);
-    topo(isinf(topo)) = 5;
-    topo(topo > 5) = 5;
-    FigPVal= plotTopo_Raw(topo, [8, 8]);
-    colormap(FigPVal, "jet");
-    scaleAxes(FigPVal, "c", [-5 5]);
-    pause(1);
-    set(FigPVal, "outerposition", [300, 100, 800, 670]);
-    %         title("p-value (log(log(0.05, p)) distribution of [0 300] response and baseline");
-
-    print(FigPVal, strcat(FIGPATH, stimStrs(dIndex), "_pValue_Topo_Reg"), "-djpeg", "-r200");
-    close(FigPVal);
-
-    drawnow
-    close all
-
+%% scale
+scaleAxes([FigGroup, FigGroupS1] , "x", PlotWin);
+scaleAxes([FigGroup, FigGroupS1], "y", "on");
+for gIndex = 1 : length(FigGroup)
+    print(FigGroup(gIndex), strcat(FIGPATH, group_Str(gIndex)), "-djpeg", "-r200");
+    close(FigGroup(gIndex));
 end
+for gIndex = 1 : length(FigGroupS1)
+    print(FigGroupS1(gIndex), strcat(FIGPATH, "S1", group_Str(gIndex)), "-djpeg", "-r200");
+    close(FigGroupS1(gIndex));
+end
+
+% %% plot FFT
+% for dIndex = devType
+%     FigFFT = plotRawWave(PMean{mIndex, dIndex}, [], [ff(1), ff(end)], strcat("FFT ", stimStrs(dIndex)));
+%     deleteLine(FigFFT, "LineStyle", "--");
+%     lines(1).X = correspFreq(mIndex, dIndex); lines(1).color = "k";
+%     addLines2Axes(FigFFT, lines);
+%     orderLine(FigFFT, "LineStyle", "--", "bottom");
+% 
+%     % rescale FFT Plot
+%     scaleAxes(FigFFT, "x", FFTPlotWin);
+%     YLIM = scaleAxes(FigFFT, "y", "on");
+%     setLine(FigFFT, "YData", YLIM, "LineStyle", "--");
+%     pause(1);
+%     set(FigFFT, "outerposition", [300, 100, 800, 670]);
+%     plotLayout(FigFFT, params.posIndex + 2 * (monkeyId - 1), 0.3);
+%     print(FigFFT, strcat(FIGPATH, "_", stimStrs(dIndex),  "_FFT_"), "-djpeg", "-r200");
+%     close(FigFFT);
+% end
+
+
+% %% plot Topo
+% for dIndex = devType
+%     
+%     % CRI Topo
+%     topo = ampNorm(dIndex).(strcat(monkeyStr, "_mean"));
+%     FigTopo = plotTopo_Raw(topo, [8, 8]);
+%     colormap(FigTopo, "jet");
+% 
+%     %% change figure scale
+%     scaleAxes(FigTopo, "c", CRIScale(CRIMethod, :));
+%        pause(1);
+%     set(FigTopo, "outerposition", [300, 100, 800, 670]);
+%        print(FigTopo, strcat(FIGPATH,  stimStrs(dIndex),  "_Topo"), "-djpeg", "-r200");
+% 
+% %     %% p-value of CRI and sponRes
+% %     % compare change resp and spon resp
+% %     amp = ampNorm(dIndex).(strcat(monkeyStr, "_amp"));
+% %     rmsSpon = ampNorm(dIndex).(strcat(monkeyStr, "_rmsSpon"));
+% %     [sponH, sponP] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(amp), changeCellRowNum(rmsSpon), "UniformOutput", false);
+% % 
+% %     % plot p-value topo
+% %     topo = logg(pBase, cell2mat(sponP) / pBase);
+% %     topo(isinf(topo)) = 5;
+% %     topo(topo > 5) = 5;
+% %     FigPVal= plotTopo_Raw(topo, [8, 8]);
+% %     colormap(FigPVal, "jet");
+% %     scaleAxes(FigPVal, "c", [-5 5]);
+% %     pause(1);
+% %     set(FigPVal, "outerposition", [300, 100, 800, 670]);
+% %     %         title("p-value (log(log(0.05, p)) distribution of [0 300] response and baseline");
+% % 
+% %     print(FigPVal, strcat(FIGPATH, stimStrs(dIndex), "_pValue_Topo_Reg"), "-djpeg", "-r200");
+% %     close(FigPVal);
+% 
+%     drawnow
+%     close all
+% 
+% end
 
 
 
