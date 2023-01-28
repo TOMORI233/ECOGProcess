@@ -31,11 +31,13 @@ yScale = [50, 60];
 quantWin = [0 300];
 sponWin = [-300 0];
 for mIndex = 1 : length(MATPATH)
-
+    NegOrPos{1} = -1 * ones(64, 1);
+    NegOrPos{2} = [ones(24, 1); -1*ones(40, 1)];
+    chNP = NegOrPos{mIndex};
     temp = string(split(MATPATH{mIndex}, '\'));
 
     Protocol = temp(end - 1);
-    FIGPATH = strcat(ROOTPATH, "\Pop_Figure5\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+    FIGPATH = strcat(ROOTPATH, "\Pop_Figure5_IrregVar\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
     mkdir(FIGPATH);
 
     %%
@@ -101,7 +103,8 @@ for mIndex = 1 : length(MATPATH)
         ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_rmsSpon")) = rmsSpon;
 
         % quantization latency
-        [latency_mean, latency_se, latency_raw] = waveLatency_trough(trialsECOG, Window, latencyWin, 50, fs); %        latency(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = latency_mean;
+% %         [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","FAL", "fraction", 0.5, "thrFrac", 0.3);
+        [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","AVL");
         latency(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = latency_mean;
         latency(dIndex).(strcat(monkeyStr(mIndex), "_se")) = latency_se;
         latency(dIndex).(strcat(monkeyStr(mIndex), "_raw")) = latency_raw;

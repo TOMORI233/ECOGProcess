@@ -44,10 +44,13 @@ sponWin = [-300 0];
 latencyWin = [80 200];
 
 for mIndex = 1 : length(MATPATH)
+    NegOrPos{1} = -1 * ones(64, 1);
+    NegOrPos{2} = [ones(24, 1); -1*ones(40, 1)];
+    chNP = NegOrPos{mIndex};
     disp(strcat("processing ", protStr(mIndex), "..."));
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
-    FIGPATH = strcat(ROOTPATH, "Pop_Figure3\", CRIMethodStr(CRIMethod), "\", temp(4), "\");
+    FIGPATH = strcat(ROOTPATH, "Pop_Figure3_DiffICI\", CRIMethodStr(CRIMethod), "\", temp(4), "\");
     mkdir(FIGPATH);
     %% process
     tic
@@ -118,7 +121,8 @@ for mIndex = 1 : length(MATPATH)
         ampNorm(dIndex).(strcat(protStr(mIndex), "_rmsSpon")) = rmsSpon;
 
         % quantization latency
-        [latency_mean, latency_se, latency_raw] = waveLatency_trough(trialsECOG, Window, latencyWin, 50, fs); %
+% %         [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","FAL", "fraction", 0.5, "thrFrac", 0.3);
+        [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","AVL");
         % thr = 0.5;
         %         [latency_mean, latency_se, latency_raw] = waveLatency_cumThreshold(trialsECOG, Window, quantWin, thr, fs, sponWin); %
         latency(dIndex).(strcat(protStr(mIndex), "_mean")) = latency_mean;
