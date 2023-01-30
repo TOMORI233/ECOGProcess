@@ -1,4 +1,4 @@
-function Fig = plotRawWave2(Fig, chMean, chStd, window, lineSetting, plotSize)
+function Fig = plotRawWaveAdd(Fig, chMean, chStd, window, lineSetting, plotSize)
     narginchk(5, 6);
 
 

@@ -67,7 +67,7 @@ for mIndex =  1 : length(MATPATH)
     end
     %% process
     devType = unique([trialAll.devOrdr]);
-
+    
 
     % initialize
     t = linspace(Window(1), Window(2), diff(Window) /1000 * fs + 1)';

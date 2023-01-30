@@ -24,7 +24,7 @@ narginchk(2, 6);
     if length(chData) > 1
         for i = 2 : length(chData)
             lineSetting.color = chData(i).color;
-            Fig_MultiWave = plotRawWave2(Fig, chData(i).chMean, [], window, lineSetting);
+            Fig_MultiWave = plotRawWaveAdd(Fig, chData(i).chMean, [], window, lineSetting);
         end
     end
 end
