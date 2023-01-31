@@ -61,7 +61,7 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
             streams = temp.streams;
 
             if patch
-                streams.(posStr(posIndex)).data = streams.(posStr(posIndex)).data(ECOGSitePatch(posStr(posIndex)));
+                streams.(posStr(posIndex)).data = streams.(posStr(posIndex)).data(ECOGSitePatch(posStr(posIndex)), :);
             end
 
             ECOGDataset = streams.(posStr(posIndex));
