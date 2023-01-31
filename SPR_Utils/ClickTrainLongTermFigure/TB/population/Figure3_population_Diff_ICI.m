@@ -46,7 +46,7 @@ latencyWin = [80 200];
 for mIndex = 1 : length(MATPATH)
     NegOrPos{1} = -1 * ones(64, 1);
     NegOrPos{2} = [ones(24, 1); -1*ones(40, 1)];
-    chNP = NegOrPos{mIndex};
+    chNP = NegOrPos{monkeyId};
     disp(strcat("processing ", protStr(mIndex), "..."));
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
@@ -61,6 +61,9 @@ for mIndex = 1 : length(MATPATH)
         load(strcat(FIGPATH, protStr(mIndex), "_PopulationData.mat"));
     end
     toc
+
+
+
 
     %% ICA
     % align to certain duration
@@ -84,6 +87,14 @@ for mIndex = 1 : length(MATPATH)
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
     end
 
+        %% Patch
+    temp = changeCellRowNum(trialsECOG_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_Merge = changeCellRowNum(temp);
+
+    temp = changeCellRowNum(trialsECOG_S1_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_S1_Merge = changeCellRowNum(temp);
     %% process
     devType = unique([trialAll.devOrdr]);
 

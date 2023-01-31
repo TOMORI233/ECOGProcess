@@ -1,6 +1,6 @@
 close all; clc; clear;
 
-% MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICIThr\';
+MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICIThr\';
 MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICIThr\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
@@ -46,7 +46,9 @@ for mIndex = 2 : length(MATPATH)
     end
     toc
 
-        %% ICA
+
+
+    %% ICA
     % align to certain duration
     run("CTLconfig.m");
     ICAName = strcat(FIGPATH, "comp_", AREANAME, ".mat");
@@ -64,12 +66,21 @@ for mIndex = 2 : length(MATPATH)
         save(ICAName, "compT", "comp", "ICs", "-mat");
     else
         load(ICAName);
-%         [~, ICs, FigTopoICA] = ICA_Exclude(trialsECOG_MergeTemp, comp, Window);
+        %         [~, ICs, FigTopoICA] = ICA_Exclude(trialsECOG_MergeTemp, comp, Window);
         trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
     end
 
+    %% Patch
+    temp = changeCellRowNum(trialsECOG_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_Merge = changeCellRowNum(temp);
 
+    temp = changeCellRowNum(trialsECOG_S1_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_S1_Merge = changeCellRowNum(temp);
+
+    %% process
     devType = unique([trialAll.devOrdr]);
 
     % initialize
@@ -85,7 +96,7 @@ for mIndex = 2 : length(MATPATH)
         tIndex = [trialAll.devOrdr] == devType(dIndex);
         trials = trialAll(tIndex);
         trialsECOG = trialsECOG_Merge(tIndex);
-%         trialsECOG_S1 = trialsECOG_S1_Merge(tIndex);
+        %         trialsECOG_S1 = trialsECOG_S1_Merge(tIndex);
 
         chMean{dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG), 'UniformOutput', false));
         chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG), 'UniformOutput', false));
@@ -103,10 +114,10 @@ for mIndex = 2 : length(MATPATH)
         ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_rmsSpon")) = rmsSpon;
 
         % quantization latency
-% %         [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","FAL", "fraction", 0.5, "thrFrac", 0.3);
+        % %         [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","FAL", "fraction", 0.5, "thrFrac", 0.3);
         [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","AVL");
 
-%         [latency_mean, latency_se, latency_raw] = waveLatency_trough(trialsECOG, Window, latencyWin, 50, fs); %        latency(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = latency_mean;
+        %         [latency_mean, latency_se, latency_raw] = waveLatency_trough(trialsECOG, Window, latencyWin, 50, fs); %        latency(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = latency_mean;
         latency(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = latency_mean;
         latency(dIndex).(strcat(monkeyStr(mIndex), "_se")) = latency_se;
         latency(dIndex).(strcat(monkeyStr(mIndex), "_raw")) = latency_raw;
@@ -198,7 +209,7 @@ for mIndex = 2 : length(MATPATH)
     compare.amp_mean_se_S1nSig = [[1; 2; 3; 4], temp];
 
     %% Diff ICI latency comparison
-    
+
     sigCh= find(cell2mat(sponH{cdrPlotIdx(1)/2}));
     nSigCh = find(~cell2mat(sponH{cdrPlotIdx(1)/2}));
     temp = reshape([latency(1).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)'; latency(3).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)';...
@@ -232,8 +243,8 @@ for mIndex = 2 : length(MATPATH)
     end
 
     drawnow
-ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
-save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
+    ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
+    save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
 
 end
 

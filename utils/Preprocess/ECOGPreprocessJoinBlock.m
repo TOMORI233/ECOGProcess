@@ -60,6 +60,7 @@ function [trialAll, ECOGDataset, segTimePoint] = ECOGPreprocessJoinBlock(BLOCKPA
         eval(strBuffer);
         epocs = temp.epocs;
         streams = temp.streams;
+        streams.(posStr(posIndex)).data = streams.(posStr(posIndex)).data(ECOGSitePatch(posStr(posIndex)));
         ECOGDataset = streams;
         trialAll = processFcn(epocs, choiceWin);
 

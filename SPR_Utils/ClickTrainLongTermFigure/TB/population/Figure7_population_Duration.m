@@ -3,7 +3,7 @@ close all; clc; clear;
 % MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Duration1-5s_1s_4_4o06\cc20221014\cc20221014_AC.mat';
 % MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Duration1-5s_1s_4_4o06\xx20221012\xx20221012_AC.mat';
 MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_Duration_0o5_5\';
-% MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_Duration_0o5_5\';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_Duration_0o5_5\';
 
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
@@ -49,6 +49,8 @@ for mIndex = 1 : length(MATPATH)
     else
         load(strcat(FIGPATH, "PopulationData.mat"));
     end
+
+
         %% ICA
     % align to certain duration
     run("CTLconfig.m");
@@ -71,6 +73,14 @@ for mIndex = 1 : length(MATPATH)
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
     end
 
+    %% Patch
+    temp = changeCellRowNum(trialsECOG_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_Merge = changeCellRowNum(temp);
+
+    temp = changeCellRowNum(trialsECOG_S1_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_S1_Merge = changeCellRowNum(temp);
 
     %% process
 

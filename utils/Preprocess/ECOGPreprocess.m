@@ -1,4 +1,4 @@
-function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, behaviorOnly)
+function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     % Description: load data from *.mat or TDT block
     % Input:
     %     DATAPATH: full path of *.mat or TDT block path
@@ -12,11 +12,16 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, behaviorOnly
     %     trialAll: n*1 struct of trial information
     %     ECOGDataset: TDT dataset of [streams.(posStr(posIndex))]
 
-    narginchk(2, 3);
+    mIp = inputParser;
+    mIp.addRequired("DATAPATH");
+    mIp.addRequired("params", @(x) isstruct(x));
+    mIp.addParameter("behaviorOnly", false, @(x) validateattributes(x, 'logical', {'scalar'}));
+    mIp.addParameter("patch", false, @(x) validateattributes(x, 'logical', {'scalar'}));
+    mIp.parse(DATAPATH, params, varargin{:});
 
-    if nargin < 3
-        behaviorOnly = false;
-    end
+    behaviorOnly = mIp.Results.behaviorOnly;
+    patch = mIp.Results.patch;
+
 
     %% Parameter settings
     run(fullfile(fileparts(fileparts(mfilename("fullpath"))), "Config\preprocessConfig.m"));
@@ -54,6 +59,9 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, behaviorOnly
         if ~behaviorOnly
             temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'streams'}, 'STORE', {char(posStr(posIndex))});
             streams = temp.streams;
+            if patch
+                streams.(posStr(posIndex)).data = streams.(posStr(posIndex)).data(ECOGSitePatch(posStr(posIndex)));
+            end
             ECOGDataset = streams.(posStr(posIndex));
         else
             ECOGDataset = [];
