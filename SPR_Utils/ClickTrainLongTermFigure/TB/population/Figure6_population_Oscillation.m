@@ -52,6 +52,8 @@ for mIndex = 2 : length(MATPATH)
         load(strcat(FIGPATH, "PopulationData.mat"));
     end
     toc
+
+
     %% ICA
     % align to certain duration
     run("CTLconfig.m");
@@ -72,6 +74,15 @@ for mIndex = 2 : length(MATPATH)
         trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
     end
+    
+    %% Patch
+    temp = changeCellRowNum(trialsECOG_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_Merge = changeCellRowNum(temp);
+
+    temp = changeCellRowNum(trialsECOG_S1_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_S1_Merge = changeCellRowNum(temp);
 
 
     %% process

@@ -10,6 +10,15 @@
             {"name": "scaleFactor", "kind": "ordered", "type": ["numeric", "scalar"]}
         ]
     },
+    
+    "ECOGPreprocess": {
+        "inputs": [
+            {"name": "DATAPATH", "kind": "required", "type": ["string"]},
+            {"name": "params", "kind": "required", "type": ["struct"]},
+            {"name": "behaviorOnly", "kind": "namevalue", "type": ["logical"]},
+            {"name": "patch", "kind": "namevalue", "type": ["logical"]}
+        ]
+    },
 
     "ECOGFilter": {
         "inputs": [

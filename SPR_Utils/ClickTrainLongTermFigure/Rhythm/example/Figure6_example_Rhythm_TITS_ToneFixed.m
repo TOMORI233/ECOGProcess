@@ -174,7 +174,7 @@ for mIndex = 1 : length(MATPATH)
 
     % rescale FFT Plot
     scaleAxes(FigFFT, "y", [0 400]);
-    scaleAxes(FigFFT, "x", [0 250]);
+    scaleAxes(FigFFT, "x", [0 150]);
     setAxes(FigFFT, 'yticklabel', '');
     setAxes(FigFFT, 'xticklabel', '');
     setAxes(FigFFT, 'visible', 'off');

@@ -171,7 +171,7 @@ for dIndex = devType
 
     % rescale FFT Plot
     scaleAxes(FigFFT, "y", [0 400]);
-    scaleAxes(FigFFT, "x", [0 250]);
+    scaleAxes(FigFFT, "x", FFTPlotWin);
     setAxes(FigFFT, 'yticklabel', '');
     setAxes(FigFFT, 'xticklabel', '');
     setAxes(FigFFT, 'visible', 'off');

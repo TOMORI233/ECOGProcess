@@ -1,7 +1,7 @@
 close all; clc; clear;
 
 MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICIThr\';
-% MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICIThr\';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICIThr\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
@@ -21,16 +21,19 @@ AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
 fs = 500;
 
+
 badCh = {[], []};
 yScale = [50, 50];
 quantWin = [0 300];
 sponWin = [-300 0];
 latencyWin = [80, 200];
-for mIndex = 1 : length(MATPATH)
-
+for mIndex = 2 : length(MATPATH)
+    NegOrPos{1} = -1 * ones(64, 1);
+    NegOrPos{2} = [ones(24, 1); -1*ones(40, 1)];
+    chNP = NegOrPos{mIndex};
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
-    FIGPATH = strcat(ROOTPATH, "Pop_Figure4\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+    FIGPATH = strcat(ROOTPATH, "Pop_Figure4_ICIThr\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
     mkdir(FIGPATH);
     %% process
     disp("loading data...");
@@ -43,7 +46,9 @@ for mIndex = 1 : length(MATPATH)
     end
     toc
 
-        %% ICA
+
+
+    %% ICA
     % align to certain duration
     run("CTLconfig.m");
     ICAName = strcat(FIGPATH, "comp_", AREANAME, ".mat");
@@ -61,12 +66,21 @@ for mIndex = 1 : length(MATPATH)
         save(ICAName, "compT", "comp", "ICs", "-mat");
     else
         load(ICAName);
-%         [~, ICs, FigTopoICA] = ICA_Exclude(trialsECOG_MergeTemp, comp, Window);
+        %         [~, ICs, FigTopoICA] = ICA_Exclude(trialsECOG_MergeTemp, comp, Window);
         trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
     end
 
+    %% Patch
+    temp = changeCellRowNum(trialsECOG_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_Merge = changeCellRowNum(temp);
 
+    temp = changeCellRowNum(trialsECOG_S1_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_S1_Merge = changeCellRowNum(temp);
+
+    %% process
     devType = unique([trialAll.devOrdr]);
 
     % initialize
@@ -82,6 +96,7 @@ for mIndex = 1 : length(MATPATH)
         tIndex = [trialAll.devOrdr] == devType(dIndex);
         trials = trialAll(tIndex);
         trialsECOG = trialsECOG_Merge(tIndex);
+        %         trialsECOG_S1 = trialsECOG_S1_Merge(tIndex);
 
         chMean{dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG), 'UniformOutput', false));
         chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG), 'UniformOutput', false));
@@ -99,7 +114,10 @@ for mIndex = 1 : length(MATPATH)
         ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_rmsSpon")) = rmsSpon;
 
         % quantization latency
-        [latency_mean, latency_se, latency_raw] = waveLatency_trough(trialsECOG, Window, latencyWin, 50, fs); %        latency(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = latency_mean;
+        % %         [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","FAL", "fraction", 0.5, "thrFrac", 0.3);
+        [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","AVL");
+
+        %         [latency_mean, latency_se, latency_raw] = waveLatency_trough(trialsECOG, Window, latencyWin, 50, fs); %        latency(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = latency_mean;
         latency(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = latency_mean;
         latency(dIndex).(strcat(monkeyStr(mIndex), "_se")) = latency_se;
         latency(dIndex).(strcat(monkeyStr(mIndex), "_raw")) = latency_raw;
@@ -192,6 +210,8 @@ for mIndex = 1 : length(MATPATH)
 
     %% Diff ICI latency comparison
 
+    sigCh= find(cell2mat(sponH{cdrPlotIdx(1)/2}));
+    nSigCh = find(~cell2mat(sponH{cdrPlotIdx(1)/2}));
     temp = reshape([latency(1).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)'; latency(3).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)';...
         latency(2).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)'; latency(4).(strcat(monkeyStr(mIndex), "_mean"))(sigCh)';...
         latency(1).(strcat(monkeyStr(mIndex), "_se"))(sigCh)'; latency(3).(strcat(monkeyStr(mIndex), "_se"))(sigCh)';...
@@ -223,8 +243,8 @@ for mIndex = 1 : length(MATPATH)
     end
 
     drawnow
-ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
-save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
+    ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
+    save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
 
 end
 

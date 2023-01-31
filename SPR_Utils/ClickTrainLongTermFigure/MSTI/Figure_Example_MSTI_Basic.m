@@ -141,15 +141,19 @@ for gIndex = 1 : length(comparePool)
     group(3).color = colors(3);
 
     % plot
-    FigGroup = plotRawWaveMulti_SPR(group, Window, DevStr);
-    scaleAxes(FigGroup, "x", DevPlotWin);
-    scaleAxes(FigGroup, "y");
-    addLegend2Fig(FigGroup, legendStr);
-
-    % print figure
-    print(FigGroup, strcat(FIGPATH, DevStr, "_", AREANAME), "-djpeg", "-r200");
-    close(FigGroup);
+    FigGroup(gIndex) = plotRawWaveMulti_SPR(group, Window, DevStr);
+    addLegend2Fig(FigGroup(gIndex), legendStr);
 end
+scaleAxes(FigGroup, "x", DevPlotWin);
+scaleAxes(FigGroup, "y", "on");
+
+for gIndex = 1 : length(FigGroup)
+    parseStruct(comparePool, gIndex);
+    % print figure
+    print(FigGroup(gIndex), strcat(FIGPATH, DevStr, "_", AREANAME), "-djpeg", "-r200");
+    close(FigGroup(gIndex));
+end
+
 
 
 
@@ -158,77 +162,77 @@ save(ResName, "cdrPlot", "chMean", "Protocol", "-mat");
 
 
 
-%% Multiple comparison
-channels = 1 : size(trialsECOG_Merge{1}, 1);
-t = linspace(Window(1), Window(2), size(trialsECOG_Merge{1}, 2))';
-compareStr = repmat(["Odd-Dev vs Odd-Std"; "Odd-Dev vs Manystd-Dev"], length(comparePool), 1);
-pools = cell2mat(cellfun(@(x,y,z) [x, y; x z], {comparePool.Odd_Dev_Index}', {comparePool.Odd_Std_Index}', {comparePool.ManyStd_Dev_Index}', "UniformOutput", false));
-ResName = strcat(FIGPATH, "CBPT_", AREANAME, ".mat");
-if exist(ResName, "file")
-    load(ResName);
-end
-
-for gIndex = 1 : size(pools, 1)
-    data = [];
-    pool = pools(gIndex, :);
-    if ~exist(ResName, "file")
-        for dIndex = 1:length(pool)
-            if contains(compareStr(dIndex), "Odd-Std", "IgnoreCase", true)
-                temp = trialsECOG_Merge_Lag([trialAll.devOrdr] == devType(pool(dIndex)));
-            else
-                temp = trialsECOG_Merge([trialAll.devOrdr] == devType(pool(dIndex)));
-            end
-            % time 1*nSample
-            data(dIndex).time = t' / 1000;
-            % label nCh*1 cell
-            data(dIndex).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
-            % trial nTrial*nCh*nSample
-            data(dIndex).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), temp, "UniformOutput", false));
-            % trialinfo nTrial*1
-            data(dIndex).trialinfo = repmat(dIndex, [length(temp), 1]);
-        end
-        config.alpha = 0.04;
-        stat = CBPT(data);
-        CBPTRez(gIndex).Info = strcat(comparePool(ceil(gIndex/2)).DevStr, " | | ", compareStr(gIndex));
-        CBPTRez(gIndex).stat = stat;
-    else
-        stat = CBPTRez(gIndex).stat;
-    end
-
-
-    p = stat.stat;
-    mask = stat.mask;
-    V0 = p .* mask;
-    %     V0 = p;
-    windowSortCh = [0, 200];
-    tIdx = fix((windowSortCh(1) - Window(1)) / 1000 * fs) + 1:fix((windowSortCh(2) - Window(1)) / 1000 * fs);
-    [~, chIdx] = sort(sum(V0(:, tIdx), 2), 'descend');
-    V = V0(chIdx, :);
-
-    figure;
-    maximizeFig(gcf);
-    mSubplot(gcf, 1, 1, 1, 1, [0, 0, 0, 0], [0.03, 0.01, 0.06, 0.03]);
-    imagesc("XData", t, "YData", channels, "CData", V);
-    xlim(DevPlotWin);
-    ylim([0.5, 64.5]);
-    yticks(channels);
-    yticklabels(num2str(channels(chIdx)'));
-    cm = colormap('jet');
-    cm(127:129, :) = repmat([1 1 1], [3, 1]);
-    colormap(cm);
-    title(strcat("t-value of ", CBPTRez(gIndex).Info));
-    ylabel('Ranked channels');
-    xlabel('Time (ms)');
-    cb = colorbar;
-    cb.Label.String = '\bf{{\it{T}}-value}';
-    cb.Label.Interpreter = 'latex';
-    cb.Label.FontSize = 12;
-    cb.Label.Position = [2.5, 0];
-    cb.Label.Rotation = -90;
-    cRange = scaleAxes("c", [], [], "max");
-    if any(unique(mask(:, t > DevPlotWin(1) & t < DevPlotWin(2))))
-        print(gcf, strcat(FIGPATH, comparePool(ceil(gIndex/2)).DevStr, "_", compareStr(gIndex), "_CBPT_", AREANAME), "-djpeg", "-r200");
-    end
-    drawnow;
-end
-save(ResName, "CBPTRez", "-mat");
+% %% Multiple comparison
+% channels = 1 : size(trialsECOG_Merge{1}, 1);
+% t = linspace(Window(1), Window(2), size(trialsECOG_Merge{1}, 2))';
+% compareStr = repmat(["Odd-Dev vs Odd-Std"; "Odd-Dev vs Manystd-Dev"], length(comparePool), 1);
+% pools = cell2mat(cellfun(@(x,y,z) [x, y; x z], {comparePool.Odd_Dev_Index}', {comparePool.Odd_Std_Index}', {comparePool.ManyStd_Dev_Index}', "UniformOutput", false));
+% ResName = strcat(FIGPATH, "CBPT_", AREANAME, ".mat");
+% if exist(ResName, "file")
+%     load(ResName);
+% end
+%
+% for gIndex = 1 : size(pools, 1)
+%     data = [];
+%     pool = pools(gIndex, :);
+%     if ~exist(ResName, "file")
+%         for dIndex = 1:length(pool)
+%             if contains(compareStr(dIndex), "Odd-Std", "IgnoreCase", true)
+%                 temp = trialsECOG_Merge_Lag([trialAll.devOrdr] == devType(pool(dIndex)));
+%             else
+%                 temp = trialsECOG_Merge([trialAll.devOrdr] == devType(pool(dIndex)));
+%             end
+%             % time 1*nSample
+%             data(dIndex).time = t' / 1000;
+%             % label nCh*1 cell
+%             data(dIndex).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
+%             % trial nTrial*nCh*nSample
+%             data(dIndex).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), temp, "UniformOutput", false));
+%             % trialinfo nTrial*1
+%             data(dIndex).trialinfo = repmat(dIndex, [length(temp), 1]);
+%         end
+%         config.alpha = 0.04;
+%         stat = CBPT(data);
+%         CBPTRez(gIndex).Info = strcat(comparePool(ceil(gIndex/2)).DevStr, " | | ", compareStr(gIndex));
+%         CBPTRez(gIndex).stat = stat;
+%     else
+%         stat = CBPTRez(gIndex).stat;
+%     end
+%
+%
+%     p = stat.stat;
+%     mask = stat.mask;
+%     V0 = p .* mask;
+%     %     V0 = p;
+%     windowSortCh = [0, 200];
+%     tIdx = fix((windowSortCh(1) - Window(1)) / 1000 * fs) + 1:fix((windowSortCh(2) - Window(1)) / 1000 * fs);
+%     [~, chIdx] = sort(sum(V0(:, tIdx), 2), 'descend');
+%     V = V0(chIdx, :);
+%
+%     figure;
+%     maximizeFig(gcf);
+%     mSubplot(gcf, 1, 1, 1, 1, [0, 0, 0, 0], [0.03, 0.01, 0.06, 0.03]);
+%     imagesc("XData", t, "YData", channels, "CData", V);
+%     xlim(DevPlotWin);
+%     ylim([0.5, 64.5]);
+%     yticks(channels);
+%     yticklabels(num2str(channels(chIdx)'));
+%     cm = colormap('jet');
+%     cm(127:129, :) = repmat([1 1 1], [3, 1]);
+%     colormap(cm);
+%     title(strcat("t-value of ", CBPTRez(gIndex).Info));
+%     ylabel('Ranked channels');
+%     xlabel('Time (ms)');
+%     cb = colorbar;
+%     cb.Label.String = '\bf{{\it{T}}-value}';
+%     cb.Label.Interpreter = 'latex';
+%     cb.Label.FontSize = 12;
+%     cb.Label.Position = [2.5, 0];
+%     cb.Label.Rotation = -90;
+%     cRange = scaleAxes("c", [], [], "max");
+%     if any(unique(mask(:, t > DevPlotWin(1) & t < DevPlotWin(2))))
+%         print(gcf, strcat(FIGPATH, comparePool(ceil(gIndex/2)).DevStr, "_", compareStr(gIndex), "_CBPT_", AREANAME), "-djpeg", "-r200");
+%     end
+%     drawnow;
+% end
+% save(ResName, "CBPTRez", "-mat");

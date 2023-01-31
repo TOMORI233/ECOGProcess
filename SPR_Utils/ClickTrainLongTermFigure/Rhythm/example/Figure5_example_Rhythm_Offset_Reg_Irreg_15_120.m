@@ -1,6 +1,6 @@
 close all; clc; clear;
 
-monkeyId = 1;  % 1ï¼šchouchou; 2ï¼šxiaoxiao
+monkeyId = 1;  % 1£ºchouchou; 2£ºxiaoxiao
 
 if monkeyId == 1
     MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_Reg_Irreg_15_120\cc20221109\cc20221109_AC.mat';
@@ -175,7 +175,7 @@ for mIndex = 1 : length(MATPATH)
 
     % rescale FFT Plot
     scaleAxes(FigFFT, "y", [0 400]);
-    scaleAxes(FigFFT, "x", [0 250]);
+    scaleAxes(FigFFT, "x", [0 150]);
     setAxes(FigFFT, 'yticklabel', '');
     setAxes(FigFFT, 'xticklabel', '');
     setAxes(FigFFT, 'visible', 'off');

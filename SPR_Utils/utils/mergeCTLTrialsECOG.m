@@ -3,11 +3,7 @@ narginchk(2, 3);
 if nargin < 3
     run("CTLconfig.m");
 else
-    CTL_Fields = fields(CTLParams);
-    for pIndex = 1 : length(CTL_Fields)
-        eval(strcat(CTL_Fields(pIndex), "= CTLParams.", CTL_Fields(pIndex), ";"));
-    end
-
+    parseStruct(CTLParams);
 end
 %% Parameter settings
 params.posIndex = posIndex; % 1-AC, 2-PFC
@@ -53,6 +49,7 @@ trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 
 % filter
 ECOGFDZ = mFTHP(ECOGDataset, fhp, flp);% filtered, dowmsampled, zoomed
+ECOGFDZ = ECOGResample(ECOGFDZ, fs);
 trialsECOG = selectEcog(ECOGFDZ, trialAll, segOption(2), Window);
 trialsECOG_S1 = selectEcog(ECOGFDZ, trialAll, segOption(1), Window);
 

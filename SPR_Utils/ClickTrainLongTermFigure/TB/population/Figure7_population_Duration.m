@@ -3,7 +3,7 @@ close all; clc; clear;
 % MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Duration1-5s_1s_4_4o06\cc20221014\cc20221014_AC.mat';
 % MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Duration1-5s_1s_4_4o06\xx20221012\xx20221012_AC.mat';
 MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_Duration_0o5_5\';
-% MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_Duration_0o5_5\';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_Duration_0o5_5\';
 
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
@@ -34,7 +34,9 @@ quantWin = [0 300];
 latencyWin = [80 200];
 sponWin = [-300 0];
 for mIndex = 1 : length(MATPATH)
-
+    NegOrPos{1} = -1 * ones(64, 1);
+    NegOrPos{2} = [ones(24, 1); -1*ones(40, 1)];
+    chNP = NegOrPos{mIndex};
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
     FIGPATH = strcat(ROOTPATH, "\Pop_Figure7_Duration_0.5_5\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
@@ -47,6 +49,8 @@ for mIndex = 1 : length(MATPATH)
     else
         load(strcat(FIGPATH, "PopulationData.mat"));
     end
+
+
         %% ICA
     % align to certain duration
     run("CTLconfig.m");
@@ -69,6 +73,14 @@ for mIndex = 1 : length(MATPATH)
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
     end
 
+    %% Patch
+    temp = changeCellRowNum(trialsECOG_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_Merge = changeCellRowNum(temp);
+
+    temp = changeCellRowNum(trialsECOG_S1_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_S1_Merge = changeCellRowNum(temp);
 
     %% process
 
@@ -106,7 +118,8 @@ for mIndex = 1 : length(MATPATH)
 
 
         % quantization latency
-        [latency_mean, latency_se, latency_raw] = waveLatency_trough(trialsECOG, Window, latencyWin, 50, fs); %        latency(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = latency_mean;
+% %         [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","FAL", "fraction", 0.5, "thrFrac", 0.3);
+        [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","AVL");
         latency(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = latency_mean;
         latency(dIndex).(strcat(monkeyStr(mIndex), "_se")) = latency_se;
         latency(dIndex).(strcat(monkeyStr(mIndex), "_raw")) = latency_raw;

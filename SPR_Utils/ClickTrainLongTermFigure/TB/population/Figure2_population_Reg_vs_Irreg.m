@@ -1,7 +1,7 @@
 close all; clc; clear;
 
 MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI4\';
-% MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI4\';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI4\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
@@ -9,7 +9,7 @@ params.processFcn = @PassiveProcess_clickTrainContinuous;
 
 CRIMethod = 2;
 CRIMethodStr = ["Resp_devided_by_Spon", "R_minus_S_devide_R_plus_S"];
-CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.3]};
+CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.6]};
 CRITest = [1, 0];
 pBase = 0.01;
 
@@ -23,13 +23,16 @@ fs = 500;
 selectCh = [13 9];
 badCh = {[], []};
 yScale = [40, 60];
+S1Frac = [1.5 1.7];
 quantWin = [0 300];
 sponWin = [-300 0];
 for mIndex =  1 : length(MATPATH)
- 
+    if isempty(MATPATH{mIndex})
+        continue
+    end
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
-    FIGPATH = strcat(ROOTPATH, "\Pop_Figure2\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+    FIGPATH = strcat(ROOTPATH, "\Pop_Figure2_RegIrreg\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
     mkdir(FIGPATH);
     
     %% merge population data
@@ -39,7 +42,6 @@ for mIndex =  1 : length(MATPATH)
     else
         load(strcat(FIGPATH, "PopulationData.mat"));
     end
-
 
     %% ICA
     % align to certain duration
@@ -62,9 +64,19 @@ for mIndex =  1 : length(MATPATH)
         trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
         trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
     end
+
+        %% Patch
+    temp = changeCellRowNum(trialsECOG_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_Merge = changeCellRowNum(temp);
+
+    temp = changeCellRowNum(trialsECOG_S1_Merge);
+    temp = temp(ECOGSitePatch(AREANAME));
+    trialsECOG_S1_Merge = changeCellRowNum(temp);
+    
     %% process
     devType = unique([trialAll.devOrdr]);
-
+    
 
     % initialize
     t = linspace(Window(1), Window(2), diff(Window) /1000 * fs + 1)';
@@ -78,8 +90,10 @@ for mIndex =  1 : length(MATPATH)
         tIndex = [trialAll.devOrdr] == devType(dIndex);
         trials = trialAll(tIndex);
         trialsECOG = trialsECOG_Merge(tIndex);
-
+        trialsECOG_S1 = trialsECOG_S1_Merge(tIndex);
+        
         chMean{dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG), 'UniformOutput', false));
+        chMean_S1{dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG_S1), 'UniformOutput', false));
         chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG), 'UniformOutput', false));
         for ch = 1 : size(chMean{dIndex}, 1)
             cdrPlot(ch).(strcat(monkeyStr(mIndex), "Wave"))(:, 2 * dIndex - 1) = t';
@@ -108,9 +122,13 @@ for mIndex =  1 : length(MATPATH)
        %% plot rawWave
     FigWave_Reg(mIndex) = plotRawWave(chMean{1}, [], Window, titleStr, [8, 8]);
     FigWave_Irreg(mIndex) = plotRawWave(chMean{3}, [], Window, titleStr, [8, 8]);
+    FigWave_Reg_S1(mIndex) = plotRawWave(chMean_S1{1}, [], Window, titleStr, [8, 8]);
+    FigWave_Irreg_S1(mIndex) = plotRawWave(chMean_S1{3}, [], Window, titleStr, [8, 8]);
+
     FigWave_Whole_Reg(mIndex) = plotRawWave(chMean{1}, [], Window, titleStr, [8, 8]);
     FigWave_Whole_Irreg(mIndex) = plotRawWave(chMean{3}, [], Window, titleStr, [8, 8]);
-    setLine([FigWave_Whole_Irreg, FigWave_Irreg], "Color", [0 0 0], "Color", [1 0 0]);
+    
+    setLine([FigWave_Whole_Irreg, FigWave_Irreg, FigWave_Irreg_S1], "Color", [0 0 0], "Color", [1 0 0]);
 
 
     topo_Reg = ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"));
@@ -129,20 +147,29 @@ for mIndex =  1 : length(MATPATH)
     %% change figure scale
     scaleAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigTopo_Reg(mIndex), FigTopo_Irreg(mIndex)], "c", CRIScale{mIndex}(CRIMethod, :));
     scaleAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "y", [-yScale(mIndex) yScale(mIndex)]);
-    
-    setAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], 'yticklabel', '');
-    setAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], 'xticklabel', '');
-    setAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], 'visible', 'off');
+    scaleAxes([FigWave_Reg_S1(mIndex), FigWave_Irreg_S1(mIndex)], "y", [-yScale(mIndex)*S1Frac(mIndex) yScale(mIndex)*S1Frac(mIndex)]);
+
+
+    setAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex), FigWave_Reg_S1(mIndex), FigWave_Irreg_S1(mIndex)], 'yticklabel', '');
+    setAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex), FigWave_Reg_S1(mIndex), FigWave_Irreg_S1(mIndex)], 'xticklabel', '');
+    setAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex), FigWave_Reg_S1(mIndex), FigWave_Irreg_S1(mIndex)], 'visible', 'off');
     setLine([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "YData", [-yScale(mIndex) yScale(mIndex)], "LineStyle", "--");
+    setLine([FigWave_Reg_S1(mIndex), FigWave_Irreg_S1(mIndex)], "YData", [-yScale(mIndex)*S1Frac(mIndex) yScale(mIndex)*S1Frac(mIndex)], "LineStyle", "--");
+
     pause(1);
-    set([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigTopo_Reg(mIndex), FigTopo_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "outerposition", [300, 100, 800, 670]);
+    set([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigTopo_Reg(mIndex), FigTopo_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex), FigWave_Reg_S1(mIndex), FigWave_Irreg_S1(mIndex)], "outerposition", [300, 100, 800, 670]);
    
-    scaleAxes([FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "x", [-10 600]);    
-    plotLayout([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], params.posIndex + 2 * (mIndex - 1), 0.3);
+    scaleAxes([FigWave_Reg(mIndex), FigWave_Irreg(mIndex), FigWave_Reg_S1(mIndex), FigWave_Irreg_S1(mIndex)], "x", [-10 600]);    
+      
+
+    plotLayout([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex), FigWave_Reg_S1(mIndex), FigWave_Irreg_S1(mIndex)], params.posIndex + 2 * (mIndex - 1), 0.3);
 
     print(FigWave_Whole_Reg(mIndex), strcat(FIGPATH, Protocol, "_whole_Reg_Wave"), "-djpeg", "-r200");
     print(FigWave_Whole_Irreg(mIndex), strcat(FIGPATH, Protocol, "_whole_Irreg_Wave"), "-djpeg", "-r200");
     
+    print(FigWave_Reg_S1(mIndex), strcat(FIGPATH, Protocol, "_Reg_Wave_S1"), "-djpeg", "-r200");
+    print(FigWave_Irreg_S1(mIndex), strcat(FIGPATH, Protocol, "_Irreg_Wave_S1"), "-djpeg", "-r200");
+
     
     print(FigWave_Reg(mIndex), strcat(FIGPATH, Protocol, "_Reg_Wave"), "-djpeg", "-r200");
     print(FigWave_Irreg(mIndex), strcat(FIGPATH, Protocol, "_Irreg_Wave"), "-djpeg", "-r200");
@@ -219,6 +246,66 @@ for mIndex =  1 : length(MATPATH)
 drawnow
 ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
 save(ResName, "cdrPlot", "chMean", "Protocol", "compare", "-mat");
+
+%% ANOVA between Reg and Irreg
+% mAnova1()
+
+% %% Multiple comparison
+% channels = 1 : size(trialsECOG_Merge{1}, 1);
+% t = linspace(Window(1), Window(2), size(trialsECOG_Merge{1}, 2))';
+% ResName = strcat(FIGPATH, "CBPT_", AREANAME, ".mat");
+% try
+%     load(ResName, "stat", "-mat");
+% catch
+%     data = [];
+%     pool = [1, 3];
+%     for dIndex = 1:length(pool)
+%         temp = trialsECOG_Merge([trialAll.devOrdr] == devType(pool(dIndex)));
+%         % time 1*nSample
+%         data(dIndex).time = t' / 1000;
+%         % label nCh*1 cell
+%         data(dIndex).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
+%         % trial nTrial*nCh*nSample
+%         data(dIndex).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), temp, "UniformOutput", false));
+%         % trialinfo nTrial*1
+%         data(dIndex).trialinfo = repmat(dIndex, [length(temp), 1]);
+%     end
+% 
+%     stat = CBPT(data);
+%     save(ResName, "stat", "-mat");
+% end
+% 
+% p = stat.stat;
+% mask = stat.mask;
+% V0 = p .* mask;
+% windowSortCh = [0, 400];
+% tIdx = fix((windowSortCh(1) - Window(1)) / 1000 * fs) + 1:fix((windowSortCh(2) - Window(1)) / 1000 * fs);
+% [~, chIdx] = sort(sum(V0(:, tIdx), 2), 'descend');
+% V = V0(chIdx, :);
+% 
+% figure;
+% maximizeFig;
+% mSubplot(1, 1, 1, 1, [0, 0, 0, 0], [0.03, 0.01, 0.06, 0.03]);
+% imagesc("XData", t, "YData", channels, "CData", V);
+% xlim(windowSortCh);
+% % xlim([0, Window(2)]);
+% ylim([0.5, 64.5]);
+% yticks(channels);
+% yticklabels(num2str(channels(chIdx)'));
+% cm = colormap('jet');
+% cm(127:129, :) = repmat([1 1 1], [3, 1]);
+% colormap(cm);
+% title('F-value of comparison among 4 deviant frequency ratio in all channels (significant)');
+% ylabel('Ranked channels');
+% xlabel('Time (ms)');
+% cb = colorbar;
+% cb.Label.String = '\bf{{\it{F}}-value}';
+% cb.Label.Interpreter = 'latex';
+% cb.Label.FontSize = 12;
+% cb.Label.Position = [2.5, 0];
+% cb.Label.Rotation = -90;
+% cRange = scaleAxes(gcf, "c", [], [], "max");
+
 end
 
 close all

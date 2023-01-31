@@ -8,7 +8,6 @@ if monkeyId == 1
 elseif monkeyId == 2
 
 end
-
 fhp = 0.1;
 flp = 20;
 stimStrs = ["Reg_160_400", "Reg_400_160"];
@@ -177,7 +176,7 @@ for mIndex = 1 : length(MATPATH)
 
         % rescale FFT Plot
         scaleAxes(FigFFT, "y", [0 400]);
-        scaleAxes(FigFFT, "x", [0 250]);
+        scaleAxes(FigFFT, "x", [0 150]);
         setAxes(FigFFT, 'yticklabel', '');
         setAxes(FigFFT, 'xticklabel', '');
         setAxes(FigFFT, 'visible', 'off');

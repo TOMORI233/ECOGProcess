@@ -153,7 +153,7 @@ for mIndex = 1 : length(MATPATH)
     orderLine(FigFFT, "LineStyle", "--", "bottom");
     % rescale FFT Plot
     scaleAxes(FigFFT, "y", [0 400]);
-    scaleAxes(FigFFT, "x", [0 250]);
+    scaleAxes(FigFFT, "x", FFTPlotWin);
     setAxes(FigFFT, 'yticklabel', '');
     setAxes(FigFFT, 'xticklabel', '');
     setAxes(FigFFT, 'visible', 'off');
