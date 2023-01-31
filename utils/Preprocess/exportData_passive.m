@@ -13,8 +13,8 @@ Blocks = tb.PassiveBlock;
 skipIdx = isnan(Blocks);
 
 Monkeys = string(tb.Monkey);
-Dates = string(num2str(tb.Date));
-Blocks = string(num2str(Blocks));
+Dates = rowFcn(@(x) strrep(x, ' ', ''), string(num2str(tb.Date)));
+Blocks = rowFcn(@(x) strrep(x, ' ', ''), string(num2str(Blocks)));
 Exported = tb.Exported_passive;
 
 BLOCKPATHs = arrayfun(@(x, y, z) char(fullfile(BLOCKROOTPATH, x, strcat(x, y), strcat("Block-", z))), Monkeys, Dates, Blocks, "UniformOutput", false);

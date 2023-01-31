@@ -12,8 +12,8 @@ tb = readtable(TBPATH);
 skipIdx = [];
 
 Monkeys = string(tb.Monkey);
-Dates = string(num2str(tb.Date));
-Blocks = string(num2str(tb.ActiveBlock));
+Dates = rowFcn(@(x) strrep(x, ' ', ''), string(num2str(tb.Date)));
+Blocks = rowFcn(@(x) strrep(x, ' ', ''), string(num2str(tb.ActiveBlock)));
 Exported = tb.Exported_active;
 
 BLOCKPATHs = arrayfun(@(x, y, z) char(fullfile(BLOCKROOTPATH, x, strcat(x, y), strcat("Block-", z))), Monkeys, Dates, Blocks, "UniformOutput", false);

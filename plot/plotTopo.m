@@ -1,4 +1,4 @@
-function plotTopo(varargin)
+function mAxe = plotTopo(varargin)
     % Description: remap Data according to [topoSize] and plot color map to axes
     % Input:
     %     mAxe: target axes
@@ -7,6 +7,8 @@ function plotTopo(varargin)
     %     contourOpt: contour option "on" or "off"
     %     resolution: apply 2-D interpolation to the remapped [Data], which is an
     %                 N-point insertion. Thus, resolution = N.
+    % Output:
+    %     mAxe: output axes
 
     if isgraphics(varargin{1}(1), "axes")
         mAxe = varargin{1}(1);

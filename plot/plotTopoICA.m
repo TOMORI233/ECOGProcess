@@ -34,10 +34,11 @@ function Fig = plotTopoICA(comp, topoSize, plotSize, ICs)
                 continue;
             end
 
-            mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
-            plotTopo(topo(:, ICNum), topoSize);
+            mAxe = mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
+            plotTopo(mAxe, topo(:, ICNum), topoSize);
             [~, idx] = max(topo(:, ICNum));
             title(['IC ', num2str(ICNum), ' | max - ', num2str(idx)]);
+            scaleAxes(mAxe, "c", "on", "symOpts", "max");
             colorbar;
         end
     
