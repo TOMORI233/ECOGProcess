@@ -13,13 +13,16 @@ Blocks = tb.PassiveBlock;
 skipIdx = isnan(Blocks);
 
 Monkeys = string(tb.Monkey);
-Dates = string(num2str(tb.Date));
-Blocks = string(num2str(Blocks));
+Dates = rowFcn(@(x) strrep(x, ' ', ''), string(num2str(tb.Date)));
+Blocks = rowFcn(@(x) strrep(x, ' ', ''), string(num2str(Blocks)));
 Exported = tb.Exported_passive;
 
 BLOCKPATHs = arrayfun(@(x, y, z) char(fullfile(BLOCKROOTPATH, x, strcat(x, y), strcat("Block-", z))), Monkeys, Dates, Blocks, "UniformOutput", false);
 SAVEPATHs = arrayfun(@(x) char(fullfile(SAVEROOTPATH, upper(x), PROTOCOL, "\")), Monkeys, "UniformOutput", false);
 
+params.fd = 500; % downsample, Hz
+params.fhp = 0.1;
+params.flp = 200;
 params.processFcn = @PassiveProcess_7_10Freq;
 tb.Exported_passive = exportDataFcn(BLOCKPATHs, SAVEPATHs, params, Exported, skipIdx);
 tb.Exported_passive(skipIdx) = Exported(skipIdx);
@@ -27,9 +30,9 @@ writetable(tb, TBPATH);
 
 %% Fcn
 function Exported = exportDataFcn(BLOCKPATHs, SAVEPATHs, params, Exported, skipIdx)
-    fd = 500; % Hz
-    fhp = 0.1; % Hz
-    flp = 200; % Hz
+    fd = params.fd;
+    fhp = params.fhp;
+    flp = params.flp;
 
     Exported(skipIdx) = true;
     idxAll = find(~Exported);
@@ -44,7 +47,7 @@ function Exported = exportDataFcn(BLOCKPATHs, SAVEPATHs, params, Exported, skipI
         disp("Loading AC Data...");
         params.posIndex = 1;
         tic
-        [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params);
+        [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params, "patch", true);
         ECOGDataset = ECOGResample(ECOGDataset, fd);
         ECOGDataset = ECOGFilter(ECOGDataset, fhp, flp);
         disp("Saving...");
@@ -55,7 +58,7 @@ function Exported = exportDataFcn(BLOCKPATHs, SAVEPATHs, params, Exported, skipI
         disp("Loading PFC Data...");
         params.posIndex = 2;
         tic
-        [~, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params);
+        [~, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params, "patch", true);
         ECOGDataset = ECOGResample(ECOGDataset, fd);
         ECOGDataset = ECOGFilter(ECOGDataset, fhp, flp);
         disp("Saving...");

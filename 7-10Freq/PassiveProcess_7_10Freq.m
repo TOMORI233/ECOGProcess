@@ -1,6 +1,6 @@
 function trialAll = PassiveProcess_7_10Freq(epocs, varargin)
     %% Information extraction
-    % fixation 20220520 Block-2
+%     % fixation 20220520 Block-2
 %     for index = 1:length(unique(epocs.swee.data))
 %         idx = find(epocs.swee.data == index);
 %         epocs.num0.data(idx) = (1:length(idx))';
@@ -17,6 +17,7 @@ function trialAll = PassiveProcess_7_10Freq(epocs, varargin)
                       'devOnset', temp, ...
                       'freqSeq', temp, ...
                       'devFreq', temp, ...
+                      'ISI', temp, ...
                       'interrupt', temp, ...
                       'oddballType', temp, ...
                       'stdNum', temp, ...
@@ -42,10 +43,14 @@ function trialAll = PassiveProcess_7_10Freq(epocs, varargin)
 
         trialAll(tIndex, 1).devFreq = trialAll(tIndex, 1).freqSeq(end);
         trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).freqSeq) - 1;
+        trialAll(tIndex, 1).ISI = (trialAll(tIndex, 1).soundOnsetSeq(end) - trialAll(tIndex, 1).soundOnsetSeq(1)) / trialAll(tIndex, 1).stdNum;
 
         trialAll(tIndex, 1).firstPush = [];
         trialAll(tIndex, 1).waterOnsetTime = [];
     end
+
+    % Abort the first trial
+    trialAll(1) = [];
 
     return;
 end

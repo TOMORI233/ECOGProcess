@@ -8,6 +8,7 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     %         - choiceWin: choice window, in ms
     %         - processFcn: behavior processing function handle
     %     behaviorOnly: if set true, return [trialAll] only
+    %     patch: channel adjustment option
     % Output:
     %     trialAll: n*1 struct of trial information
     %     ECOGDataset: TDT dataset of [streams.(posStr(posIndex))]
@@ -21,7 +22,6 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
 
     behaviorOnly = mIp.Results.behaviorOnly;
     patch = mIp.Results.patch;
-
 
     %% Parameter settings
     run(fullfile(fileparts(fileparts(mfilename("fullpath"))), "Config\preprocessConfig.m"));
@@ -59,9 +59,11 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
         if ~behaviorOnly
             temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'streams'}, 'STORE', {char(posStr(posIndex))});
             streams = temp.streams;
+
             if patch
-                streams.(posStr(posIndex)).data = streams.(posStr(posIndex)).data(ECOGSitePatch(posStr(posIndex)));
+                streams.(posStr(posIndex)).data = streams.(posStr(posIndex)).data(ECOGSitePatch(posStr(posIndex)), :);
             end
+
             ECOGDataset = streams.(posStr(posIndex));
         else
             ECOGDataset = [];
