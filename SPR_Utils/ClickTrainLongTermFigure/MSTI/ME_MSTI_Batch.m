@@ -1,5 +1,7 @@
-clear; clc;
-rootPathMat = "E:\ECoG\MAT Data\XX\ClickTrainLongTerm\MSTI\";
+
+
+clc;
+rootPathMat = strcat("E:\ECoG\MAT Data\", monkeyName, "\ClickTrainLongTerm\MSTI\");
 rootPathFig = "E:\ECoG\corelDraw\ClickTrainLongTerm\MSTI\";
 
 %% set protocols
@@ -8,7 +10,7 @@ temp(ismember(string({temp.name}'), [".", ".."])) = [];
 protocols = string({temp.name}');
 
 %% select data
-areaSel = "PFC";
+areaSel = "AC";
 dateSel = "";
 protSel = "";
 

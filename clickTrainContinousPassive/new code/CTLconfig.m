@@ -312,7 +312,7 @@ switch Protocol
         S1Duration = [5004.8, 5008.4, 5000, 5075] + 4;
         soundDur = [10009.2, 10009.2, 10068.8, 10068.8];
         winStart = -5500;
-        Window = [winStart 6500];
+        Window = [winStart 5500];
         ICAWin = [-1000 1000];
     case "Add_on_Basic_Tone"
         titleStr = "Add_on_Basic_Tone";

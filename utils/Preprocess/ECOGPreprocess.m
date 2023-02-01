@@ -15,7 +15,7 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     mIp = inputParser;
     mIp.addRequired("DATAPATH");
     mIp.addRequired("params", @(x) isstruct(x));
-    mIp.addParameter("behaviorOnly", false, @(x) validateattributes(x, 'logical', {'scalar'}));
+    mIp.addParameter("behaviorOnly", false, @(x) validateattrbutes(x, 'logical', {'scalar'}));
     mIp.addParameter("patch", false, @(x) validateattributes(x, 'logical', {'scalar'}));
     mIp.parse(DATAPATH, params, varargin{:});
 
