@@ -129,5 +129,9 @@ function trialAll = ActiveProcess_7_10Freq(epocs, choiceWin)
     % Abort the first trial
     trialAll(1) = [];
 
+    % Abort trials with abnormal ISI
+    idx = find(~[trialAll.interrupt] & roundn([trialAll.ISI], 1) ~= roundn(mode([trialAll.ISI]), 1), 1);
+    trialAll(idx:end) = [];
+
     return;
 end

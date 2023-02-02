@@ -15,8 +15,11 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
     ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
     ICStd = cell2mat(cellfun(@(x) std(x, [], 1), changeCellRowNum(comp.trial), "UniformOutput", false));
     FigIC = plotRawWave(ICMean, ICStd, windowICA, "ICA");
+    scaleAxes(FigIC, "y", "on", "symOpts", "max");
     FigTopoICA = plotTopoICA(comp, [8, 8], [8, 8]);
+    colormap('jet');
     FigWave(1) = plotRawWave(cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG), "UniformOutput", false)), [], windowICA, "origin");
+    scaleAxes(FigWave(1), "y", "on", "symOpts", "max");
     k = 'N';
     while ~strcmp(k, 'y') && ~strcmp(k, 'Y')
 
@@ -29,6 +32,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
         ICs(ismember(ICs, badICs)) = [];
         [~, temp] = reconstructData(trialsECOG, comp, ICs);
         FigWave(2) = plotRawWave(temp, [], windowICA, "reconstruct");
+        scaleAxes(FigWave(2), "y", "on", "symOpts", "max");
         k = validateInput('Press Y to continue or N to reselect ICs: ', @(x) any(validatestring(x, {'y', 'n', 'N', 'Y'})), 's');
     end
 

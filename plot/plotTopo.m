@@ -51,6 +51,5 @@ function mAxe = plotTopo(varargin)
     ylim([0.5, topoSize(2) + 0.5]);
     xticklabels('');
     yticklabels('');
-    
-    colormap('jet');
+    colormap(mAxe, 'jet');
 end

@@ -9,7 +9,7 @@ PROTOCOL = "7-10Freq Active";
 tb = readtable(TBPATH);
 
 % join blocks
-joinIdx = {[2, 3]};
+joinIdx = {};
 
 % skip recordings
 skipIdx = [joinIdx{:}];

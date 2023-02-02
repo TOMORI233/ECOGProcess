@@ -70,7 +70,7 @@ cfg_default.clusteralpha     = 0.05;                 % alpha level of the sample
 cfg_default.alpha            = 0.025;                % alpha level of the permutation test
 
 cfg_default.neighbours       = mPrepareNeighbours(); % the neighbours specify for each sensor with which other sensors it can form clusters
-cfg_default.minnbchan        = 1;                    % minimum number of neighborhood channels that is
+cfg_default.minnbchan        = 0;                    % minimum number of neighborhood channels that is
                                                      % required for a selected sample to be included
                                                      % in the clustering algorithm (default=0).
 

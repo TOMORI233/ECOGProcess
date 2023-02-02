@@ -16,8 +16,8 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     mIp = inputParser;
     mIp.addRequired("DATAPATH");
     mIp.addRequired("params", @(x) isstruct(x));
-    mIp.addParameter("behaviorOnly", false, @(x) validateattributes(x, 'logical', {'scalar'}));
-    mIp.addParameter("patch", false, @(x) validateattributes(x, 'logical', {'scalar'}));
+    mIp.addParameter("behaviorOnly", false, @(x) validateattributes(x, {'logical'}, {'scalar'}));
+    mIp.addParameter("patch", false, @(x) validateattributes(x, {'logical'}, {'scalar'}));
     mIp.parse(DATAPATH, params, varargin{:});
 
     behaviorOnly = mIp.Results.behaviorOnly;
@@ -26,12 +26,7 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     %% Parameter settings
     run(fullfile(fileparts(fileparts(mfilename("fullpath"))), "Config\preprocessConfig.m"));
     params = getOrFull(params, paramsDefault);
-
-    paramsNames = fieldnames(params);
-
-    for index = 1:size(paramsNames, 1)
-        eval([paramsNames{index}, '=params.', paramsNames{index}, ';']);
-    end
+    parseStruct(params);
 
     %% Validation
     if isempty(processFcn)
