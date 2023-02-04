@@ -12,6 +12,7 @@ elseif strcmpi(patchType, "bankIssue") %20230204, to remove artifacts in top ban
         idx = [1:36, 52, 37:51, 53:64];  % same as matchIssue
     elseif strcmpi(Area, "PFC") || strcmpi(Area, "LPFC")
         idx = [1:26, 28:36, 27, 37:64];  % to rewrite
+        idx = idx([1:31, 49:64, 32:48]);
     end
 end
 
