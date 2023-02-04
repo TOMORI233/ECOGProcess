@@ -17,7 +17,7 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     mIp.addRequired("DATAPATH");
     mIp.addRequired("params", @(x) isstruct(x));
     mIp.addParameter("behaviorOnly", false, @(x) validateattrbutes(x, 'logical', {'scalar'}));
-    mIp.addParameter("patch", false, @(x) validateattributes(x, 'logical', {'scalar'}));
+    mIp.addParameter("patch", "reject", @(x) any(validatestring(x, {'reject','matchIssue','bankIssue'})));
     mIp.parse(DATAPATH, params, varargin{:});
 
     behaviorOnly = mIp.Results.behaviorOnly;
@@ -60,7 +60,7 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
             temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'streams'}, 'STORE', {char(posStr(posIndex))});
             streams = temp.streams;
 
-            if patch
+            if ~strcmpi(patch, "reject")
                 streams.(posStr(posIndex)).data = streams.(posStr(posIndex)).data(ECOGSitePatch(posStr(posIndex)), :);
             end
 
