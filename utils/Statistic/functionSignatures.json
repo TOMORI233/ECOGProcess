@@ -25,7 +25,8 @@
                 [
                     {"name": "ECOGDataset", "kind": "required", "type": ["struct"], "purpose": "TDT dataset"}
                 ]
-            ]}
+            ]},
+            {"name": "reserveTail", "kind": "namevalue", "type": ["logical", "scalar"]}
         ]
     }
 }
