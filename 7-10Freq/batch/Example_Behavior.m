@@ -1,9 +1,7 @@
 %% Behavior-Population
 clear; close all; clc;
 MATPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\XX\7-10Freq Active\xx20220822\xx20220822_PFC';
-% MATPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\XX\7-10Freq Active\xx20220822\xx20220822_AC';
 % MATPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Active\cc20220520\cc20220520_PFC';
-% MATPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Active\cc20220520\cc20220520_AC';
 
 %% Parameter settings
 [ROOTPATH, fileName] = fileparts(MATPATH);

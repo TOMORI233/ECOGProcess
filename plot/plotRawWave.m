@@ -59,7 +59,7 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize, chs, visib
                 yticklabels('');
             end
 
-            if chNum < (plotSize(1) - 1) * plotSize(2) + 1
+            if (rIndex - 1) * plotSize(2) + cIndex < (plotSize(1) - 1) * plotSize(2) + 1
                 xticklabels('');
             end
 

@@ -1,22 +1,11 @@
-clear; clc;
-close all force;
+function Compare_ProcessFcn(params)
+close all;
+parseStruct(params);
 
-% monkeyID = 1; % CC
-monkeyID = 2; % XX
-
-if monkeyID == 1
-    tuningPE_AC  = load('CC\PE\AC_PE_tuning.mat');
-    tuningPE_PFC = load('CC\PE\PFC_PE_tuning.mat');
-    tuningDM_AC  = load('CC\DM\AC_DM_tuning.mat');
-    tuningDM_PFC = load('CC\DM\PFC_DM_tuning.mat');
-    MONKEYPATH = 'CC\Compare\';
-else
-    tuningPE_AC  = load('XX\PE\AC_PE_tuning.mat');
-    tuningPE_PFC = load('XX\PE\PFC_PE_tuning.mat');
-    tuningDM_AC  = load('XX\DM\AC_DM_tuning.mat');
-    tuningDM_PFC = load('XX\DM\PFC_DM_tuning.mat');
-    MONKEYPATH = 'XX\Compare\';
-end
+tuningPE_AC  = load(DATAPATH{1});
+tuningPE_PFC = load(DATAPATH{2});
+tuningDM_AC  = load(DATAPATH{3});
+tuningDM_PFC = load(DATAPATH{4});
 
 mkdir(MONKEYPATH);
 
@@ -96,7 +85,7 @@ text(-50, 29, 'DM', 'FontSize', 15, 'FontWeight', 'bold', 'Rotation', 90);
 text(-50, -29, 'PE', 'FontSize', 15, 'FontWeight', 'bold', 'Rotation', 90);
 colormap(gca, 'jet');
 
-print(gcf, [MONKEYPATH, 'AC_PE&DM.jpg'], "-djpeg", "-r600");
+mPrint(gcf, [MONKEYPATH, 'AC_PE&DM.jpg'], "-djpeg", "-r600");
 
 %% PE vs DM in PFC
 figure;
@@ -147,7 +136,7 @@ text(-50, 29, 'DM', 'FontSize', 15, 'FontWeight', 'bold', 'Rotation', 90);
 text(-50, -29, 'PE', 'FontSize', 15, 'FontWeight', 'bold', 'Rotation', 90);
 colormap(gca, 'jet');
 
-print(gcf, [MONKEYPATH, 'PFC_PE&DM.jpg'], "-djpeg", "-r600");
+mPrint(gcf, [MONKEYPATH, 'PFC_PE&DM.jpg'], "-djpeg", "-r600");
 
 %% PE in AC vs in PFC
 figure;
@@ -198,7 +187,7 @@ text(-50, 29, 'PFC', 'FontSize', 15, 'FontWeight', 'bold', 'Rotation', 90);
 text(-50, -29, 'AC', 'FontSize', 15, 'FontWeight', 'bold', 'Rotation', 90);
 colormap(gca, 'jet');
 
-print(gcf, [MONKEYPATH, 'PE_AC&PFC.jpg'], "-djpeg", "-r600");
+mPrint(gcf, [MONKEYPATH, 'PE_AC&PFC.jpg'], "-djpeg", "-r600");
 
 %% DM in AC vs in PFC
 figure;
@@ -249,7 +238,7 @@ text(-50, 29, 'PFC', 'FontSize', 15, 'FontWeight', 'bold', 'Rotation', 90);
 text(-50, -29, 'AC', 'FontSize', 15, 'FontWeight', 'bold', 'Rotation', 90);
 colormap(gca, 'jet');
 
-print(gcf, [MONKEYPATH, 'DM_AC&PFC.jpg'], "-djpeg", "-r600");
+mPrint(gcf, [MONKEYPATH, 'DM_AC&PFC.jpg'], "-djpeg", "-r600");
 
 %% PE vs DM in each channel in AC and PFC
 % AC
@@ -290,34 +279,42 @@ addLines2Axes(gca, lines);
 
 mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-left", "margin_top", 0.2, "shape", "square-min");
 sTimeAC_DM = cellfun(@(x) replaceVal(x, inf), sTimeAC_DM);
-for tIndex = 1:length(sTimeAC_DM)
-    if isinf(sTimeAC_DM(tIndex))
-        sTimeAC_DM(tIndex) = mean(sTimeAC_DM(sTimeAC_DM(cellfun(@str2double, neighbours(tIndex).neighblabel)) ~= inf));
+while any(isinf(sTimeAC_DM))
+    for tIndex = 1:length(sTimeAC_DM)
+        if isinf(sTimeAC_DM(tIndex))
+            idx = cellfun(@str2double, neighbours(tIndex).neighblabel);
+            sTimeAC_DM(tIndex) = mean(sTimeAC_DM(idx(sTimeAC_DM(idx) ~= inf)));
+        end
     end
 end
 plotTopo(sTimeAC_DM);
 title('DM in AC' , 'FontSize', 12, 'FontWeight', 'bold');
+colorbar("Position", [0.265, 0.12, 0.01, 0.3]);
 
 mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-center", "margin_top", 0.2, "shape", "square-min");
 sTimeAC_PE = cellfun(@(x) replaceVal(x, inf), sTimeAC_PE);
-for tIndex = 1:length(sTimeAC_PE)
-    if isinf(sTimeAC_PE(tIndex))
-        sTimeAC_PE(tIndex) = mean(sTimeAC_PE(sTimeAC_PE(cellfun(@str2double, neighbours(tIndex).neighblabel)) ~= inf));
+while any(isinf(sTimeAC_PE))
+    for tIndex = 1:length(sTimeAC_PE)
+        if isinf(sTimeAC_PE(tIndex))
+            idx = cellfun(@str2double, neighbours(tIndex).neighblabel);
+            sTimeAC_PE(tIndex) = mean(sTimeAC_PE(idx(sTimeAC_PE(idx) ~= inf)));
+        end
     end
 end
 plotTopo(sTimeAC_PE);
 title('PE in AC' , 'FontSize', 12, 'FontWeight', 'bold');
 scaleAxes("c", [0, inf]);
-colormap(flip(colormap('jet')));
+colorbar("Position", [0.6, 0.12, 0.01, 0.3]);
 
 mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-right", "margin_top", 0.2, "shape", "square-min");
 diffTimeAC = sTimeAC_DM - sTimeAC_PE;
 plotTopo(diffTimeAC);
 title('DM - PE' , 'FontSize', 12, 'FontWeight', 'bold');
-scaleAxes(gca, "c", [], [], "max");
-colormap(gca, 'jet');
+scaleAxes(gca, "c", "symOpts", "max");
+colorbar("Position", [0.935, 0.12, 0.01, 0.3]);
+colormap(flip(colormap('jet')));
 
-print(gcf, [MONKEYPATH, 'AC_PE&DM_Topo.jpg'], "-djpeg", "-r600");
+mPrint(gcf, [MONKEYPATH, 'AC_PE&DM_Topo.jpg'], "-djpeg", "-r600");
 
 % PFC
 figure;
@@ -357,31 +354,39 @@ addLines2Axes(gca, lines);
 
 mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-left", "margin_top", 0.2, "shape", "square-min");
 sTimePFC_DM = cellfun(@(x) replaceVal(x, inf), sTimePFC_DM);
-for tIndex = 1:length(sTimePFC_DM)
-    if isinf(sTimePFC_DM(tIndex))
-        sTimePFC_DM(tIndex) = mean(sTimePFC_DM(sTimePFC_DM(cellfun(@str2double, neighbours(tIndex).neighblabel)) ~= inf));
+while any(isinf(sTimePFC_DM))
+    for tIndex = 1:length(sTimePFC_DM)
+        if isinf(sTimePFC_DM(tIndex))
+            idx = cellfun(@str2double, neighbours(tIndex).neighblabel);
+            sTimePFC_DM(tIndex) = mean(sTimePFC_DM(idx(sTimePFC_DM(idx) ~= inf)));
+        end
     end
 end
 plotTopo(sTimePFC_DM);
 title('DM in PFC' , 'FontSize', 12, 'FontWeight', 'bold');
+colorbar("Position", [0.265, 0.12, 0.01, 0.3]);
 
 mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-center", "margin_top", 0.2, "shape", "square-min");
 sTimePFC_PE = cellfun(@(x) replaceVal(x, inf), sTimePFC_PE);
-for tIndex = 1:length(sTimePFC_PE)
-    if isinf(sTimePFC_PE(tIndex))
-        sTimePFC_PE(tIndex) = mean(sTimePFC_PE(sTimePFC_PE(cellfun(@str2double, neighbours(tIndex).neighblabel)) ~= inf));
+while any(isinf(sTimePFC_PE))
+    for tIndex = 1:length(sTimePFC_PE)
+        if isinf(sTimePFC_PE(tIndex))
+            idx = cellfun(@str2double, neighbours(tIndex).neighblabel);
+            sTimePFC_PE(tIndex) = mean(sTimePFC_PE(idx(sTimePFC_PE(idx) ~= inf)));
+        end
     end
 end
 plotTopo(sTimePFC_PE);
 title('PE in PFC' , 'FontSize', 12, 'FontWeight', 'bold');
 scaleAxes("c", [0, inf]);
-colormap(flip(colormap('jet')));
+colorbar("Position", [0.6, 0.12, 0.01, 0.3]);
 
 mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-right", "margin_top", 0.2, "shape", "square-min");
 diffTimePFC = sTimePFC_DM - sTimePFC_PE;
 plotTopo(diffTimePFC);
 title('DM - PE' , 'FontSize', 12, 'FontWeight', 'bold');
-scaleAxes(gca, "c", [], [], "max");
-colormap(gca, 'jet');
+scaleAxes(gca, "c", "symOpts", "max");
+colorbar("Position", [0.935, 0.12, 0.01, 0.3]);
+colormap(flip(colormap('jet')));
 
-print(gcf, [MONKEYPATH, 'PFC_PE&DM_Topo.jpg'], "-djpeg", "-r600");
+mPrint(gcf, [MONKEYPATH, 'PFC_PE&DM_Topo.jpg'], "-djpeg", "-r600");

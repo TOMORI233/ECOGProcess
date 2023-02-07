@@ -43,8 +43,12 @@ function mAxe = plotTopo(varargin)
     imagesc(mAxe, "XData", X, "YData", Y, "CData", C);
 
     if strcmpi(contourOpt, "on")
-        hold on;
-        contour(X, Y, C, "LineColor", "k");
+        % contour option may not work for linear array
+        try
+            hold on;
+            contour(X, Y, C, "LineColor", "k");
+        end
+
     end
 
     xlim([0.5, topoSize(1) + 0.5]);

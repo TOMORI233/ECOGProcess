@@ -1,86 +1,67 @@
-% granger spectrum
-clear; clc;
+function Granger_ProcessFcn(params)
+close all;
+ft_setPath2Top;
+parseStruct(params);
 
-monkeyID = 2; % 1-CC, 2-XX
-protocolType = 3; % 1-PE, 2-DM, 3-Prediction
-trialType = 1; % 1-dev/correct, 2-std/wrong
+dataAC  = load(DATAPATH{1});
+dataPFC = load(DATAPATH{2});
 
 %% Load
 if protocolType == 1 % PE
-
-    if monkeyID == 1
-        dataAC  = load("CC\PE\AC_PE_Data.mat");
-        dataPFC = load("CC\PE\PFC_PE_Data.mat");
-    else
-        dataAC  = load("XX\PE\AC_PE_Data.mat");
-        dataPFC = load("XX\PE\PFC_PE_Data.mat");
-    end
-    
+    protocolStr = 'PE';
     window = dataAC.windowPE;
-
     dRatioAll = dataAC.dRatioAll;
     dRatio = dataAC.dRatio;
-
     if trialType == 1
+        trialTypeStr = 'dev';
         dRatio0 = dRatio(2:end);
     else
+        trialTypeStr = 'std';
         dRatio0 = dRatio(1);
     end
-
     idx = ismember(dRatioAll, dRatio0);
     trialsECOG_AC  = dataAC.trialsECOG(idx);
     trialsECOG_PFC = dataPFC.trialsECOG(idx);
-
     titleStr = 'Dev onset';
+    windowGranger = [0, 500];
 elseif protocolType == 2 % DM
-    
-    if monkeyID == 1
-        dataAC  = load("CC\DM\AC_DM_Data.mat");
-        dataPFC = load("CC\DM\PFC_DM_Data.mat");
-    else
-        dataAC  = load("XX\DM\AC_DM_Data.mat");
-        dataPFC = load("XX\DM\PFC_DM_Data.mat");
-    end
-    
+    protocolStr = 'DM';
     window = dataAC.windowDM;
-
     if trialType == 1
+        trialTypeStr = 'correct';
         trialsECOG_AC  = dataAC.trialsECOG_correct;
         trialsECOG_PFC = dataPFC.trialsECOG_correct;
         dRatio0 = [1.02, 1.04, 1.06, 1.08];
     else
+        trialTypeStr = 'wrong';
         trialsECOG_AC  = dataAC.trialsECOG_wrong;
         trialsECOG_PFC = dataPFC.trialsECOG_wrong;
         dRatio0 = 1;
     end
-
     titleStr = 'Dev onset';
+    windowGranger = [0, 500];
 else % Prediction
-
-    if monkeyID == 1
-        dataAC  = load("CC\Prediction\AC_Prediction_Data.mat");
-        dataPFC = load("CC\Prediction\PFC_Prediction_Data.mat");
-    else
-        dataAC  = load("XX\Prediction\AC_Prediction_Data.mat");
-        dataPFC = load("XX\Prediction\PFC_Prediction_Data.mat");
-    end
-
+    protocolStr = 'Prediction';
     window = dataAC.windowP;
     dRatio0 = 1;
     trialsECOG_AC  = dataAC.trialsECOG;
     trialsECOG_PFC = dataPFC.trialsECOG;
-
     titleStr = 'Trial onset';
+    if trialType == 1
+        nStd = 1; % No.[nStd] std sound
+    else
+        nStd = 7;
+    end
+    windowGranger = [500 * (nStd - 1), 500 * nStd];
 end
+
+mkdir(MONKEYPATH);
 
 fs = dataAC.fs;
 channels = dataAC.channels;
 topoSize = [8, 8]; % nx * ny
 
 %% Parameter settings
-% windowGranger = [0, 500];
-windowGranger = [500 * 6, 500 * 7];
-
 nSmooth = 2;
 channels = mat2cell(reshape(channels, topoSize), nSmooth * ones(topoSize(1) / nSmooth, 1), nSmooth * ones(topoSize(1) / nSmooth, 1));
 channels = reshape(channels, [numel(channels), 1]);
@@ -91,27 +72,55 @@ areaPFC = 1:length(channels);
 
 borderPercentage = 0.95; % for scaling granger spectrum
 
-fRange = 0:fs / 2; % sum granger spectrum within this freq range
-% fRange = 0:50;
+fRange = [0, fs / 2]; % sum granger spectrum within this freq range
 
 %% Perform Granger
-tIdx = fix((windowGranger(1) - window(1)) / 1000 * fs) + 1:fix((windowGranger(2) - window(1)) / 1000 * fs);
-trialsECOG_AC  = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, tIdx), 1), channels, "UniformOutput", false)), trialsECOG_AC, "UniformOutput", false);
-trialsECOG_PFC = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, tIdx), 1), channels, "UniformOutput", false)), trialsECOG_PFC, "UniformOutput", false);
-[granger, coh, cohm] = mGranger(trialsECOG_AC, trialsECOG_PFC, window, fs);
+try
+
+    if protocolType == 3
+        load([MONKEYPATH, 'GrangerData_', protocolStr, '_nStd', num2str(nStd), '.mat']);
+    else
+        load([MONKEYPATH, 'GrangerData_', protocolStr, '_', trialTypeStr, '.mat']);
+    end
+    
+catch
+    tIdx = fix((windowGranger(1) - window(1)) / 1000 * fs) + 1:fix((windowGranger(2) - window(1)) / 1000 * fs);
+    
+    idxAC = load([PrePATH, 'AC_excludeIdx']);
+    idxPFC = load([PrePATH, 'PFC_excludeIdx']);
+    chsAC = cellfun(@(x) x(~ismember(x, vertcat(idxAC.badChIdx{:}))), channels, "UniformOutput", false);
+    chsPFC = cellfun(@(x) x(~ismember(x, vertcat(idxPFC.badChIdx{:}))), channels, "UniformOutput", false);
+    trialsECOG_AC  = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, tIdx), 1), chsAC, "UniformOutput", false)), trialsECOG_AC, "UniformOutput", false);
+    trialsECOG_PFC = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, tIdx), 1), chsPFC, "UniformOutput", false)), trialsECOG_PFC, "UniformOutput", false);
+    
+    [granger, coh, cohm] = mGranger(trialsECOG_AC, trialsECOG_PFC, window, fs);
+
+    if protocolType == 3
+        mSave([MONKEYPATH, 'GrangerData_', protocolStr, '_nStd', num2str(nStd), '.mat'], "granger", "coh", "cohm");
+    else
+        mSave([MONKEYPATH, 'GrangerData_', protocolStr, '_', trialTypeStr, '.mat'], "granger", "coh", "cohm");
+    end
+    
+end
 
 %% ft plot
 cfg           = [];
 cfg.parameter = 'grangerspctrm';
 cfg.zlim      = [0 0.1];
-figure;
+ftcpFig = figure;
 maximizeFig;
 ft_connectivityplot(cfg, granger);
 
-%% plot
-granger_sum = sum(granger.grangerspctrm(:, :, fRange + 1), 3);
+if protocolType == 3
+    mPrint(ftcpFig, [MONKEYPATH, protocolStr, '_ftconnectivityplot_nStd', num2str(nStd), '.jpg'], "-djpeg", "-r600");
+else
+    mPrint(ftcpFig, [MONKEYPATH, protocolStr, '_', trialTypeStr, '_ftconnectivityplot.jpg'], "-djpeg", "-r600");
+end
 
-figure;
+%% plot
+granger_sum = sum(granger.grangerspctrm(:, :, granger.freq >= fRange(1) & granger.freq <= fRange(2)), 3);
+
+Fig1 = figure;
 maximizeFig;
 screenSize = get(0, "ScreenSize");
 adjIdx = screenSize(4) / screenSize(3);
@@ -120,10 +129,10 @@ paddings = [(1 - adjIdx + 0.13 + rightShift) / 2, (1 - adjIdx + 0.13 - rightShif
 
 mSubplot(2, 1, 1, [0.35, 1], "alignment", "center-left");
 h = histogram(granger_sum, 'BinWidth', 0.01, "DisplayName", "All");
-upper = h.BinEdges(find(cumsum(h.Values) >= borderPercentage * sum(h.Values), 1));
+ub = h.BinEdges(find(cumsum(h.Values) >= borderPercentage * sum(h.Values), 1));
 lines = [];
-lines.X = upper;
-lines.legend = [num2str(borderPercentage * 100), '% upper border at ', num2str(upper)];
+lines.X = ub;
+lines.legend = [num2str(borderPercentage * 100), '% upper border at ', num2str(ub)];
 addLines2Axes(lines);
 ylabel('Count');
 title(['[', num2str(windowGranger(1)), ', ', num2str(windowGranger(2)), '] ms (dRatio = ', char(join(string(num2str(dRatio0')), ', ')), ' | Each averaged by a ', num2str(nSmooth), '*', num2str(nSmooth), ' area)']);
@@ -143,7 +152,7 @@ histogram(PFC2AC, "DisplayName", "From PFC to AC", 'BinWidth', 0.05, "FaceColor"
 legend;
 xlabel('Granger spectrum');
 ylabel('Count');
-scaleAxes([a1, a2], "x", [0, inf]);
+scaleAxes([a1, a2], "x", [0, ub]);
 scaleAxes([a1, a2], "y", [0, inf]);
 lines = [];
 lines.X = mean(AC2PFC, "all");
@@ -206,10 +215,16 @@ cb.Label.FontWeight = 'bold';
 cb.Label.Rotation = -90;
 cb.Label.VerticalAlignment = 'bottom';
 colormap('jet');
-scaleAxes("c", [0, inf], [0, upper]);
+scaleAxes("c", [0, inf], [0, ub]);
+
+if protocolType == 3
+    mPrint(Fig1, [MONKEYPATH, protocolStr, '_connectivityplot_nStd', num2str(nStd), '.jpg'], "-djpeg", "-r600");
+else
+    mPrint(Fig1, [MONKEYPATH, protocolStr, '_', trialTypeStr, '_connectivityplot.jpg'], "-djpeg", "-r600");
+end
 
 %% diff plot
-figure;
+Fig2 = figure;
 maximizeFig;
 mSubplot(1, 1, 1, "shape", "square-min");
 imagesc("XData", areaAC, "YData", areaPFC, "CData", AC2PFC' - PFC2AC);
@@ -231,12 +246,18 @@ cb.Label.FontWeight = 'bold';
 cb.Label.Rotation = -90;
 cb.Label.VerticalAlignment = 'bottom';
 colormap('jet');
-scaleAxes("c", [], [], "max");
+scaleAxes("c", "on", "symOpts", "max");
+
+if protocolType == 3
+    mPrint(Fig2, [MONKEYPATH, protocolStr, '_diffplot_nStd', num2str(nStd), '.jpg'], "-djpeg", "-r600");
+else
+    mPrint(Fig2, [MONKEYPATH, protocolStr, '_', trialTypeStr, '_diffplot.jpg'], "-djpeg", "-r600");
+end
 
 %% diff plot topo
 shiftFromCenter = 0.5;
 
-figure;
+Fig3 = figure;
 maximizeFig;
 
 % AC topo
@@ -274,4 +295,10 @@ cb.Label.FontSize = 14;
 cb.Label.FontWeight = 'bold';
 cb.Label.VerticalAlignment = 'top';
 colormap('jet');
-scaleAxes("c", [], [], "max");
+scaleAxes("c", "on", "symOpts", "max", "cutoffRange", [-ub, ub]);
+
+if protocolType == 3
+    mPrint(Fig3, [MONKEYPATH, protocolStr, '_diffplot_topo_nStd', num2str(nStd), '.jpg'], "-djpeg", "-r600");
+else
+    mPrint(Fig3, [MONKEYPATH, protocolStr, '_', trialTypeStr, '_diffplot_topo.jpg'], "-djpeg", "-r600");
+end

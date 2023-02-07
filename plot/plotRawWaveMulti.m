@@ -85,7 +85,7 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
                 yticklabels('');
             end
 
-            if chNum < (plotSize(1) - 1) * plotSize(2) + 1
+            if (rIndex - 1) * plotSize(2) + cIndex < (plotSize(1) - 1) * plotSize(2) + 1
                 xticklabels('');
             end
 
@@ -94,6 +94,7 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
     end
 
     yRange = scaleAxes(Fig, "y");
+    
     allAxes = findobj(Fig, "Type", "axes");
 
     for aIndex = 1:length(allAxes)
