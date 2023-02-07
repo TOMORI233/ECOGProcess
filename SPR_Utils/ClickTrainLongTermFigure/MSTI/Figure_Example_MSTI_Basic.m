@@ -23,10 +23,14 @@ temp = string(split(MATPATH, '\'));
 DateStr = temp(end - 1);
 Protocol = temp(end - 2);
 FIGPATH = strcat(rootPathFig, "Figure_", protStr,"\", DateStr, "_", AREANAME, "\Figures\");
-% if exist(FIGPATH, "dir")
-%     return
-% end
-
+if exist(FIGPATH, "dir")
+    return
+end
+if str2double(regexpi(DateStr, "\d*", "match")) < 20230204
+    MSTIParams.patch = "matchIssue";
+else
+    MSTIParams.patch = "bankIssue";
+end
 tic
 [trialAll, trialsECOG_Merge] =  mergeMSTITrialsECOG(MATPATH, params.posIndex, MSTIParams);
 toc
