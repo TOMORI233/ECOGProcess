@@ -10,6 +10,11 @@ if numel(fScale) > 1
 else
     fIndex = fScale;
 end
+if isnumeric(soundTrialsFFT{1})
+    soundTrialsFFT = cellfun(@(x) num2cell(x, 2), soundTrialsFFT, "UniformOutput", false);
+    sponTrialFFT = cellfun(@(x) num2cell(x, 2), sponTrialFFT, "UniformOutput", false);
+end
+
 switch method
     case 1
         for cIndex = 1 : length(soundTrialsFFT)

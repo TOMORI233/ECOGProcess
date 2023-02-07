@@ -16,7 +16,7 @@
             {"name": "DATAPATH", "kind": "required", "type": ["string", "char"]},
             {"name": "params", "kind": "required", "type": ["struct"]},
             {"name": "behaviorOnly", "kind": "namevalue", "type": ["logical", "scalar"]},
-            {"name": "patch", "kind": "namevalue", "type": ["logical", "scalar"]}
+            {"name": "patch", "kind": "namevalue", "type": ["choices={'reject', 'matchIssue', 'bankIssue'}"]}
         ]
     },
 

@@ -17,7 +17,10 @@ MSTIParams.Std_Dev_Onset = cell2mat(cellfun(@(x) str2double(strsplit(x, ",")), s
 MSTIParams.DevOnset = MSTIParams.Std_Dev_Onset(:, end);
 MSTIParams.S1_S2 = table2array(cell2table(cellfun(@(x) string(strsplit(x, ",")), string(strsplit(mProtocol.S1_S2, ";")), "uni", false)'));
 MSTIParams.colors = string(strsplit(mProtocol.colors, ","));
-MSTIParams.fhp = mProtocol.fhp;
-MSTIParams.flp = mProtocol.flp;
+MSTIParams.fhp = str2double(string(mProtocol.fhp));
+MSTIParams.flp = str2double(string(mProtocol.flp));
+MSTIParams.fhp2 = str2double(string(mProtocol.fhp2));
+MSTIParams.flp2 = str2double(string(mProtocol.flp2));
+MSTIParams.fs = str2double(string(mProtocol.fs));
 end
 

@@ -16,16 +16,16 @@ AREANAME = AREANAME(params.posIndex);
 %% load parameters
 MSTIParams = ME_ParseMSTIParams(protocolStr);
 parseStruct(MSTIParams);
-fs = 500;
+% fs = 600;
 
 %% process
 temp = string(split(MATPATH, '\'));
 DateStr = temp(end - 1);
 Protocol = temp(end - 2);
 FIGPATH = strcat(rootPathFig, "Figure_", protStr,"\", DateStr, "_", AREANAME, "\Figures\");
-if exist(FIGPATH, "dir")
-    return
-end
+% if exist(FIGPATH, "dir")
+%     return
+% end
 
 tic
 [trialAll, trialsECOG_Merge] =  mergeMSTITrialsECOG(MATPATH, params.posIndex, MSTIParams);
@@ -68,7 +68,7 @@ else
 end
 
 %% filter
-trialsECOG_Merge_Filtered = ECOGFilter(trialsECOG_Merge, fhp, flp, fs);
+trialsECOG_Merge_Filtered = ECOGFilter(trialsECOG_Merge, fhp2, flp2, fs);
 
 %% lag
 tSD = round(diff(Std_Dev_Onset(:, end-1:end), 1, 2) / 1000 * fs);
@@ -77,7 +77,7 @@ trialsECOG_Merge_Lag = cellfun(@(x, y) [zeros(size(x, 1), tSD(y)), x(:, 1:end-tS
 %% process across diff devTypes
 devType = unique([trialAll.devOrdr]);
 % initialize
-t = linspace(Window(1), Window(2), diff(Window) /1000 * fs + 1)';
+t = linspace(Window(1), Window(2), size(trialsECOG_Merge{1}, 2))';
 for ch = 1 : 64
     cdrPlot(ch).(strcat(monkeyStr, "info")) = strcat("Ch", num2str(ch));
     cdrPlot(ch).(strcat(monkeyStr, "Wave")) = zeros(length(t), 2 * length(devType));
@@ -98,25 +98,25 @@ for dIndex = devType
     trialsECOGLag = trialsECOG_Merge_Lag(tIndex);
 
     % raw wave
-    chMean{mIndex, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG), 'UniformOutput', false));
+    chMean{1, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG), 'UniformOutput', false));
     chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG), 'UniformOutput', false));
 
     % filter
-    chMeanFilterd{mIndex, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOGFilterd), 'UniformOutput', false));
+    chMeanFilterd{1, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOGFilterd), 'UniformOutput', false));
     chStdFilter = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOGFilterd), 'UniformOutput', false));
 
     % lag
-    chMeanLag{mIndex, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOGLag), 'UniformOutput', false));
+    chMeanLag{1, dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOGLag), 'UniformOutput', false));
     chStdLag = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOGLag), 'UniformOutput', false));
 
     % data for corelDraw plot
-    for ch = 1 : size(chMean{mIndex, dIndex}, 1)
+    for ch = 1 : size(chMean{1, dIndex}, 1)
         cdrPlot(ch).(strcat(monkeyStr, "Wave"))(:, 2 * dIndex - 1) = t';
-        cdrPlot(ch).(strcat(monkeyStr, "Wave"))(:, 2 * dIndex) = chMean{mIndex, dIndex}(ch, :)';
+        cdrPlot(ch).(strcat(monkeyStr, "Wave"))(:, 2 * dIndex) = chMean{1, dIndex}(ch, :)';
         cdrPlot(ch).(strcat(monkeyStr, "WaveFilted"))(:, 2 * dIndex - 1) = t';
-        cdrPlot(ch).(strcat(monkeyStr, "WaveFilted"))(:, 2 * dIndex) = chMeanFilterd{mIndex, dIndex}(ch, :)';
+        cdrPlot(ch).(strcat(monkeyStr, "WaveFilted"))(:, 2 * dIndex) = chMeanFilterd{1, dIndex}(ch, :)';
         cdrPlot(ch).(strcat(monkeyStr, "WaveLag"))(:, 2 * dIndex - 1) = t';
-        cdrPlot(ch).(strcat(monkeyStr, "WaveLag"))(:, 2 * dIndex) = chMeanLag{mIndex, dIndex}(ch, :)';
+        cdrPlot(ch).(strcat(monkeyStr, "WaveLag"))(:, 2 * dIndex) = chMeanLag{1, dIndex}(ch, :)';
     end
 
 
@@ -131,13 +131,13 @@ for gIndex = 1 : length(comparePool)
 
     parseStruct(comparePool, gIndex);
     % Odd_Dev
-    group(1).chMean = chMean{mIndex, Odd_Dev_Index};
+    group(1).chMean = chMean{1, Odd_Dev_Index};
     group(1).color = colors(1);
     % Odd_Std
-    group(2).chMean = chMeanLag{mIndex, Odd_Std_Index};
+    group(2).chMean = chMeanLag{1, Odd_Std_Index};
     group(2).color = colors(2);
     % ManyStd_Dev
-    group(3).chMean = chMean{mIndex, ManyStd_Dev_Index};
+    group(3).chMean = chMean{1, ManyStd_Dev_Index};
     group(3).color = colors(3);
 
     % plot
