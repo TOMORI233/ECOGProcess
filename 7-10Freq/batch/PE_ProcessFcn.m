@@ -53,8 +53,18 @@ catch
         badCHs = [badCHs, badCHsAll{mIndex}];
     end
 
+    badCHs = unique(badCHs);
     fs = ECOGDataset.fs;
     channels = ECOGDataset.channels;
+
+    % Replace bad chs by averaging neighbour chs before performing ICA
+    [~, neighbours] = mPrepareNeighbours(channels);
+    for bIndex = 1:numel(badCHs)
+        for tIndex = 1:length(trialsECOG)
+            chsTemp = neighbours{badCHs(bIndex)};
+            trialsECOG{tIndex}(badCHs(bIndex), :) = mean(trialsECOG{tIndex}(chsTemp(~ismember(chsTemp, badCHs)), :), 1);
+        end
+    end
 
     % ICA
     if strcmp(icaOpt, "on")
@@ -65,25 +75,17 @@ catch
             mPrint(FigTopoICA, strcat(PrePATH, AREANAME, "_Topo_ICA"), "-djpeg", "-r400");
             mSave([PrePATH, AREANAME, '_ICA.mat'], "comp", "ICs");
         end
-    end
-
-    trialsECOG = trialsECOG([trialAll.correct]);
-    trialAll = trialAll([trialAll.correct]);
-    startIdx = fix((windowPE(1) - windowICA(1)) / 1000 * fs);
-    endIdx = fix((windowPE(2) - windowICA(1)) / 1000 * fs);
-    trialsECOG = cellfun(@(x) x(:, startIdx:endIdx), trialsECOG, "UniformOutput", false);
-
-    if strcmp(icaOpt, "on")
         trialsECOG = reconstructData(trialsECOG, comp, ICs);
     end
 
-    [dRatioAll, dRatio] = computeDevRatio(trialAll);
+    [dRatioAll, dRatio] = computeDevRatio(trialAll([trialAll.correct]));
+
+    startIdx = fix((windowPE(1) - windowICA(1)) / 1000 * fs);
+    endIdx = fix((windowPE(2) - windowICA(1)) / 1000 * fs);
+    trialsECOG = cellfun(@(x) x(:, startIdx:endIdx), trialsECOG([trialAll.correct]), "UniformOutput", false);
+
     mSave([MONKEYPATH, AREANAME, '_PE_Data.mat'], "windowPE", "trialsECOG", "dRatioAll", "dRatio", "fs", "channels", "badCHs");
 end
-
-plotCHs = channels;
-plotCHs(badCHs) = inf;
-plotCHs = reshape(plotCHs, [8, 8])';
 
 %% Categorization
 tIdx1 = (-500 - windowPE(1)) / 1000 * fs + 1:(0 - windowPE(1)) / 1000 * fs;
@@ -158,7 +160,7 @@ mPrint(FigCBPT, [MONKEYPATH, AREANAME, '_PE_CBPT.jpg'], "-djpeg", "-r600");
 
 %% Raw
 t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
-FigPE = plotRawWaveMulti(chData(2:end), windowPE, [], [8, 8], plotCHs);
+FigPE = plotRawWaveMulti(chData(2:end), windowPE);
 scaleAxes(FigPE, "x", [0, windowPE(2)]);
 yRange = scaleAxes(FigPE);
 setAxes(FigPE, "visible", "off");
@@ -198,7 +200,6 @@ for wIndex = 1:length(edge)
     % tuning value
     mAxesDiff(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumDiff(wIndex), 1, "paddings", paddings, "shape", "square-min");
     tuningSlope(:, wIndex) = (tuningMean{wIndex}(end, :) - tuningMean{wIndex}(2, :))';
-    tuningSlope(badCHs, wIndex) = 0;
     plotTopo(tuningSlope(:, wIndex), "contourOpt", "off");
     title(mAxesDiff(wIndex), ['PEI topo [', num2str(windowT(1)), ' ', num2str(windowT(2)), ']']);
 
@@ -206,13 +207,12 @@ for wIndex = 1:length(edge)
     mAxesP(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumP(wIndex), 1, "paddings", paddings, "shape", "square-min");
     P(:, wIndex) = cellfun(@(x1, x2, x3, x4) anova1([x1; x2; x3; x4], [ones(length(x1), 1); 2 * ones(length(x2), 1); 3 * ones(length(x3), 1); 4 * ones(length(x4), 1)], "off"), tuning{2, wIndex}, tuning{3, wIndex}, tuning{4, wIndex}, tuning{5, wIndex});
     temp = log(P(:, wIndex) / alpha) / log(alpha);
-    temp(badCHs) = 0;
     plotTopo(temp, "contourOpt", "off");
     title(mAxesP(wIndex), ['p topo [', num2str(edge(wIndex)), ' ', num2str(edge(wIndex) + binSize), '] | p=log_{', num2str(alpha), '}(p/', num2str(alpha), ')']);
 end
 colormap('jet');
-scaleAxes(mAxesDiff, "c", "on", "symOpts", "max");
-scaleAxes(mAxesP, "c", "on", "symOpts", "max");
+scaleAxes(mAxesDiff, "c", "symOpts", "max");
+scaleAxes(mAxesP, "c", "symOpts", "max", "cutoffRange", [-2, 2]);
 cb1 = colorbar(mAxesDiff(end), 'position', [0.95, 0.1, 0.01, 0.8]);
 cb1.Label.String = "Tuning difference between ratio 1.08 & 1.02";
 cb1.Label.FontSize = 15;
@@ -229,7 +229,7 @@ mSave([MONKEYPATH, AREANAME, '_PE_tuning.mat'], "windowPE", "PEI", "tuningSlope"
 
 %% MMN
 % chDataMMN(end).color = [0 0 0];
-% FigMMN = plotRawWaveMulti(chDataMMN(end), [0, 500], 'MMN', [8, 8], plotCHs);
+% FigMMN = plotRawWaveMulti(chDataMMN(end), [0, 500], 'MMN');
 % scaleAxes("y", "on", "symOpts", "max");
 % addLines2Axes(struct("X", 0));
 % plotLayout((monkeyID - 1) * 2 + posIndex);

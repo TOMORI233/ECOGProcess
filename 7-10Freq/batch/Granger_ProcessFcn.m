@@ -85,14 +85,8 @@ try
     
 catch
     tIdx = fix((windowGranger(1) - window(1)) / 1000 * fs) + 1:fix((windowGranger(2) - window(1)) / 1000 * fs);
-    
-    idxAC = load([PrePATH, 'AC_excludeIdx']);
-    idxPFC = load([PrePATH, 'PFC_excludeIdx']);
-    chsAC = cellfun(@(x) x(~ismember(x, vertcat(idxAC.badChIdx{:}))), channels, "UniformOutput", false);
-    chsPFC = cellfun(@(x) x(~ismember(x, vertcat(idxPFC.badChIdx{:}))), channels, "UniformOutput", false);
-    trialsECOG_AC  = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, tIdx), 1), chsAC, "UniformOutput", false)), trialsECOG_AC, "UniformOutput", false);
-    trialsECOG_PFC = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, tIdx), 1), chsPFC, "UniformOutput", false)), trialsECOG_PFC, "UniformOutput", false);
-    
+    trialsECOG_AC  = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, tIdx), 1), channels, "UniformOutput", false)), trialsECOG_AC, "UniformOutput", false);
+    trialsECOG_PFC = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, tIdx), 1), channels, "UniformOutput", false)), trialsECOG_PFC, "UniformOutput", false);
     [granger, coh, cohm] = mGranger(trialsECOG_AC, trialsECOG_PFC, window, fs);
 
     if protocolType == 3

@@ -17,7 +17,9 @@ if ~exist([PrePATH, 'AC_excludeIdx.mat'], "file")
 
     for mIndex = 1:length(MATPATHs)
         [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHs{mIndex}, params);
-        [excludeIdx{mIndex}, badChIdx{mIndex}] = excludeTrials(selectEcog(ECOGDataset, trialAll_temp(~[trialAll_temp.interrupt]), "dev onset", window));
+        [excludeIdx{mIndex}, badChIdx{mIndex}] = excludeTrials(selectEcog(ECOGDataset, trialAll_temp(~[trialAll_temp.interrupt]), "dev onset", window), ...
+                                                               "userDefineOpt", "off", ...
+                                                               "previewOpt", "off");
     end
 
     mSave([PrePATH, 'AC_excludeIdx'], "excludeIdx", "badChIdx");
@@ -37,7 +39,9 @@ if ~exist([PrePATH, 'PFC_excludeIdx.mat'], "file")
 
     for mIndex = 1:length(MATPATHs)
         [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHs{mIndex}, params);
-        [excludeIdx{mIndex}, badChIdx{mIndex}] = excludeTrials(selectEcog(ECOGDataset, trialAll_temp(~[trialAll_temp.interrupt]), "dev onset", window));
+        [excludeIdx{mIndex}, badChIdx{mIndex}] = excludeTrials(selectEcog(ECOGDataset, trialAll_temp(~[trialAll_temp.interrupt]), "dev onset", window), ...
+                                                               "userDefineOpt", "off", ...
+                                                               "previewOpt", "off");
     end
 
     mSave([PrePATH, 'PFC_excludeIdx'], "excludeIdx", "badChIdx");

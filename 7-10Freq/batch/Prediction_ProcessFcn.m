@@ -53,21 +53,28 @@ catch
         badCHs = [badCHs, badCHsAll{mIndex}];
     end
 
+    badCHs = unique(badCHs);
     fs = ECOGDataset.fs;
     channels = ECOGDataset.channels;
 
-    %% ICA
+    % Replace bad chs by averaging neighbour chs
+    [~, neighbours] = mPrepareNeighbours(channels);
+    for bIndex = 1:numel(badCHs)
+        for tIndex = 1:length(trialsECOG)
+            chsTemp = neighbours{badCHs(bIndex)};
+            trialsECOG{tIndex}(badCHs(bIndex), :) = mean(trialsECOG{tIndex}(chsTemp(~ismember(chsTemp, badCHs)), :), 1);
+        end
+    end
+
+    % ICA
     if strcmp(icaOpt, "on")
         load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs");
         trialsECOG = reconstructData(trialsECOG, comp, ICs);
+        badCHs = [];
     end
 
     mSave([MONKEYPATH, AREANAME, '_Prediction_Data.mat'], "windowP", "windowT0", "trialsECOG", "trialAll", "channels", "fs", "badCHs");
 end
-
-plotCHs = channels;
-plotCHs(badCHs) = inf;
-plotCHs = reshape(plotCHs, [8, 8])';
 
 t = (0:size(trialsECOG{1}, 2) - 1)' / fs * 1000 + windowP(1);
 nCh = size(trialsECOG{1}, 1);
@@ -78,8 +85,8 @@ nStd = nStdAll(end);
 
 %% Raw
 [~, chMean] = joinSTD(trialAll, trialsECOG, fs);
-FigWave = plotRawWave(chMean, [], windowP, [], [8, 8], plotCHs);
-FigTFA = plotTFA(chMean, fs, [], windowP, [], [8, 8], plotCHs);
+FigWave = plotRawWave(chMean, [], windowP);
+FigTFA = plotTFA(chMean, fs, [], windowP);
 scaleAxes([FigWave, FigTFA], "x", [0, ISI * nStd]);
 scaleAxes(FigWave, "y", "on", "symOpts", "max");
 scaleAxes(FigTFA, "c", "on", "cutoffRange", [0, 10]);
@@ -136,11 +143,13 @@ for cIndex = 1:nCh
     errorbar(AoiMean(cIndex, :), AoiSE(cIndex, :), "k.-", "LineWidth", 1);
     xlim([0.5, nStd + 0.5])
     xticks(1:nStd);
+
     if ismember(cIndex, badCHs)
         title(['CH ', num2str(cIndex), ' (bad)']);
     else
         title(['CH ', num2str(cIndex)]);
     end
+    
     if cIndex < 57
         xticklabels('');
     end
@@ -153,13 +162,11 @@ maximizeFig;
 mSubplot(1, 1, 1, "shape", "square-min");
 if params.posIndex == 1
     temp = rowFcn(@(x) mean(x(7:9)) - mean(x(1:3)), AoiMean);
-    temp(badCHs) = [];
     mAxe = plotTopo(temp);
     title('AOIF Topography of AC | mean AOIF_{7,8,9} - mean AOIF_{1,2,3}');
     plotLayout(gca, 2 * (monkeyID - 1) + params.posIndex);
 else
     temp = rowFcn(@(x) mean(x(7:9)) - mean(x(3:5)), AoiMean);
-    temp(badCHs) = [];
     mAxe = plotTopo(temp);
     title('AOIF Topography of PFC | mean AOIF_{7,8,9} - mean AOIF_{3,4,5}');
     plotLayout(gca, 2 * (monkeyID - 1) + params.posIndex);

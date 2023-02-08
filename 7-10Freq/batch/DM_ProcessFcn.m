@@ -56,6 +56,7 @@ catch
         badCHs = [badCHs, badCHsAll{mIndex}];
     end
 
+    badCHs = unique(badCHs);
     FigB = plotBehaviorOnly(trialAll, "r", "7-10 Freq");
     mPrint(FigB, strcat(MONKEYPATH, "Behavior"), "-djpeg", "-r400");
 
@@ -66,13 +67,23 @@ catch
     endIdx = fix((windowDM(2) - windowICA(1)) / 1000 * fs);
     trialsECOG = cellfun(@(x) x(:, startIdx:endIdx), trialsECOG, "UniformOutput", false);
 
-    %% ICA
+    % Replace bad chs by averaging neighbour chs
+    [~, neighbours] = mPrepareNeighbours(channels);
+    for bIndex = 1:numel(badCHs)
+        for tIndex = 1:length(trialsECOG)
+            chsTemp = neighbours{badCHs(bIndex)};
+            trialsECOG{tIndex}(badCHs(bIndex), :) = mean(trialsECOG{tIndex}(chsTemp(~ismember(chsTemp, badCHs)), :), 1);
+        end
+    end
+
+    % ICA
     if strcmp(icaOpt, "on")
         load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs");
         trialsECOG = reconstructData(trialsECOG, comp, ICs);
+        badCHs = [];
     end
     
-    %% Z-score
+    % Z-score
     resultC = [];
     resultW = [];
     trialsECOG_correct = [];
@@ -90,10 +101,6 @@ catch
 
     mSave([MONKEYPATH, AREANAME, '_DM_Data.mat'], "windowDM", "trialsECOG_correct", "trialsECOG_wrong", "resultC", "resultW", "fs", "channels", "badCHs");
 end
-
-plotCHs = channels;
-plotCHs(badCHs) = inf;
-plotCHs = reshape(plotCHs, [8, 8])';
 
 %% Multiple comparison
 t = linspace(windowDM(1), windowDM(2), size(trialsECOG_correct{1}, 2))';
@@ -155,7 +162,7 @@ chData0(1).chMean = chMeanC0;
 chData0(1).color = "r";
 chData0(2).chMean = chMeanW0;
 chData0(2).color = "k";
-FigDM0 = plotRawWaveMulti(chData0, windowDM, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))], [8, 8], plotCHs);
+FigDM0 = plotRawWaveMulti(chData0, windowDM, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
 scaleAxes(FigDM0, "x", [0, windowDM(2)]);
 % setAxes(FigDM0, "visible", "off");
 plotLayout(FigDM0, (monkeyID - 1) * 2 + posIndex, 0.4);
@@ -168,7 +175,7 @@ chData(1).chMean = chMeanC;
 chData(1).color = "r";
 chData(2).chMean = chMeanW;
 chData(2).color = "k";
-FigDM = plotRawWaveMulti(chData, windowDM, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))], [8, 8], plotCHs);
+FigDM = plotRawWaveMulti(chData, windowDM, ['C', num2str(length(resultC)), 'W', num2str(length(resultW))]);
 scaleAxes(FigDM, "y", "symOpts", "max");
 scaleAxes(FigDM, "x", [0, windowDM(2)]);
 setAxes(FigDM, "visible", "off");
@@ -202,9 +209,6 @@ FigDRP = figure;
 maximizeFig(FigDRP);
 sz = 80;
 for cIndex = 1:length(channels)
-    if any(badCHs == cIndex)
-        continue;
-    end
     mAxe = mSubplot(FigDRP, 8, 8, cIndex, 1, margins, paddings);
     hold(mAxe, "on");
     V_s = [];
@@ -258,7 +262,6 @@ for wIndex = 1:12
     % DRP
     mAxesDRP(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumDRP(wIndex), 1, "paddings", paddings, "shape", "square-min");
     tuning = resDP(wIndex).v - 0.5;
-    tuning(badCHs) = 0;
     plotTopo(tuning, "contourOpt", "off");
     title(['DRP topo [', num2str(resDP(wIndex).window(1)), ' ', num2str(resDP(wIndex).window(2)), ']']);
 
@@ -267,13 +270,12 @@ for wIndex = 1:12
     P = resDP(wIndex).p;
     P(P == 0) = 1 / nIter;
     P = log(P / alpha) / log(alpha);
-    P(badCHs) = 0;
     plotTopo(P, "contourOpt", "off");
     title(['p topo [', num2str(resDP(wIndex).window(1)), ' ', num2str(resDP(wIndex).window(2)), '] | p=log_{', num2str(alpha), '}(p/', num2str(alpha), ')']);
 end
 colormap('jet');
-scaleAxes(mAxesDRP, "c", "on", "symOpts", "max");
-scaleAxes(mAxesP, "c", "on", "symOpts", "max");
+scaleAxes(mAxesDRP, "c", "symOpts", "max");
+scaleAxes(mAxesP, "c", "symOpts", "max");
 cb1 = colorbar(mAxesDRP(end), 'position', [0.95, 0.1, 0.01, 0.8]);
 cb1.Label.String = "DRP value";
 cb1.Label.FontSize = 15;
