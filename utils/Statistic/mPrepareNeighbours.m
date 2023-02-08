@@ -1,4 +1,4 @@
-function neighbours = mPrepareNeighbours(channels, topoSize)
+function [neighbours, neighboursInDouble] = mPrepareNeighbours(channels, topoSize)
     narginchk(0, 2);
 
     if nargin < 1
@@ -20,6 +20,8 @@ function neighbours = mPrepareNeighbours(channels, topoSize)
         temp = num2str(temp');
         neighbours(index).neighblabel = mat2cell(temp, ones(size(temp, 1), 1));
     end
+
+    neighboursInDouble = arrayfun(@(x) cellfun(@(y) str2double(y), x.neighblabel), neighbours, "UniformOutput", false)';
 
     return;
 end

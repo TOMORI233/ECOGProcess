@@ -60,7 +60,7 @@ function [Fig, res] = plotTFA(chMean, fs0, fs, window, titleStr, plotSize, chs, 
                 yticklabels('');
             end
 
-            if chNum < (plotSize(1) - 1) * plotSize(2) + 1
+            if (rIndex - 1) * plotSize(2) + cIndex < (plotSize(1) - 1) * plotSize(2) + 1
                 xticklabels('');
             end
     
