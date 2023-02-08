@@ -11,7 +11,7 @@ protocols = string({temp.name}');
 %% select data
 % areaSel = "AC";
 dateSel = "";
-protSel = ["MSTI_BG-5_S1-4o5_S2-4_ISI-800_Dur-300_StdN-15", "MSTI_BG-5_S1-4o5_S2-4_ISI-500_Dur-300_StdN-15"];
+protSel = ["MSTI_BG-5_S1-4o5_S2-4_ISI-800_Dur-300_StdN-15", "MSTI_BG-5_S1-4o5_S2-4_ISI-500_Dur-300_StdN-15", "MSTI_BG-5_S1-4o5_S2-4_ISI-400_Dur-200_StdN-15"];
 
 % validate areaSel
 if ~matches(areaSel, ["AC", "PFC"]) || length(areaSel) > 1
@@ -37,7 +37,7 @@ for rIndex = 1 : length(protocols)
     for mIndex = 1 : length(MATPATHS)
         clearvars -except areaSel rootPathMat rootPathFig protocols protocolStr rIndex dateSel protSel MATPATHS mIndex AREAS NAMES aIndex monIndex;
         if matches(protocolStr, ["MSTI_BG-5_S1-4o5_S2-4_ISI-800_Dur-300", "MSTI_BG-5_S1-4o5_S2-4_ISI-800-800-650_Dur-300-150-150", ...
-                "MSTI_BG-5_S1-4o5_S2-4_ISI-800_Dur-300_StdN-15", "MSTI_BG-5_S1-4o5_S2-4_ISI-500_Dur-300_StdN-15"])
+                "MSTI_BG-5_S1-4o5_S2-4_ISI-800_Dur-300_StdN-15", "MSTI_BG-5_S1-4o5_S2-4_ISI-500_Dur-300_StdN-15", "MSTI_BG-5_S1-4o5_S2-4_ISI-400_Dur-200_StdN-15"])
             run("Figure_Example_MSTI_Basic.m");
         end
 

@@ -1,15 +1,15 @@
-function exportDataFcn(BLOCKPATH, SAVEPATH, params, startIdx, endIdx)
-    narginchk(3, 5);
+function exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, startIdx, endIdx)
+    narginchk(5, 6);
 
-    if nargin < 4
+    if nargin < 5
         startIdx = 1;
     end
 
-    if nargin < 5
+    if nargin < 6
         endIdx = length(BLOCKPATH);
     end
 
-    fd = 600; % Hz
+
 
     for index = startIdx:endIdx
         AREANAME = ["AC", "PFC"];
