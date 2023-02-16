@@ -9,6 +9,10 @@
 */codegen/
 /codegen/
 
+#ignore figures
+*/CC/
+*/XX/
+
 #ignore following files;
 *asv
 *slxc
