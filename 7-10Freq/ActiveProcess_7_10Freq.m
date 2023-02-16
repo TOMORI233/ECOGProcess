@@ -130,10 +130,8 @@ function trialAll = ActiveProcess_7_10Freq(epocs, choiceWin)
     trialAll(1) = [];
 
     % Abort trials after the first trial with abnormal ISI
-    ISIs = cellfun(@(x) roundn(x, 1), {trialAll.ISI}', "UniformOutput", false);
     ISI = roundn(mode([trialAll.ISI]), 1);
-    ISIs = cellfun(@(x) replaceVal(x, ISI), ISIs);
-    idx = find(~[trialAll.interrupt] & ISIs ~= ISI, 1);
+    idx = find(~[trialAll.interrupt] & cellfun(@(x) ~isequal(roundn(x, 1), ISI), {trialAll.ISI}), 1);
     trialAll(idx:end) = [];
 
     return;

@@ -89,13 +89,18 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
             chData.color = 'r';
         end
 
-        plotRawWaveMulti(chData, [0, 1]);
+        Fig = plotRawWaveMulti(chData, [0, 1]);
+        scaleAxes(Fig, "y", "cutoffRange", [-200, 200], "symOpts", "max");
     end
 
     if strcmp(userDefineOpt, "on")
+        channel = (1:length(goodChIdx))';
+        nTrial_bad = arrayfun(@(x) [num2str(x), '/', num2str(length(trialsData))], V, "UniformOutput", false);
+        mark = goodChIdx;
+        disp(table(channel, nTrial_bad, mark));
         disp(['Possible bad channel numbers are: ', num2str(find(~goodChIdx)')]);
         badCHs = validateInput('Please input bad channel number (empty for auto): ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer'}));
-    
+
         if ~isempty(badCHs)
             goodChIdx = true(1, length(goodChIdx));
             goodChIdx(badCHs) = false;

@@ -41,12 +41,13 @@ function trialAll = PassiveProcess_7_10Freq(epocs, varargin)
             trialAll(tIndex, 1).oddballType = "DEV";
         end
 
+        trialAll(tIndex, 1).interrupt = false;
         trialAll(tIndex, 1).devFreq = trialAll(tIndex, 1).freqSeq(end);
         trialAll(tIndex, 1).stdNum = length(trialAll(tIndex, 1).freqSeq) - 1;
         trialAll(tIndex, 1).ISI = (trialAll(tIndex, 1).soundOnsetSeq(end) - trialAll(tIndex, 1).soundOnsetSeq(1)) / trialAll(tIndex, 1).stdNum;
 
         trialAll(tIndex, 1).firstPush = [];
-        trialAll(tIndex, 1).waterOnsetTime = [];
+        trialAll(tIndex, 1).correct = true;
     end
 
     % Abort the first trial

@@ -94,7 +94,7 @@ tIdx2 = (0 - windowPE(1)) / 1000 * fs + 1:(500 - windowPE(1)) / 1000 * fs;
 for dIndex = 1:length(dRatio)
     temp = trialsECOG(dRatioAll == dRatio(dIndex));
     chData(dIndex).chMean = cell2mat(cellfun(@(x) mean(x, 1), changeCellRowNum(temp), "UniformOutput", false));
-    chData(dIndex).dataNorm = cellfun(@(x) x - chData(1).chMean, temp, "UniformOutput", false);
+    chData(dIndex).dataNorm = cellfun(@(x) x - chData(1).chMean, temp, "UniformOutput", false);    
     chData(dIndex).color = colors{dIndex};
 
     trialsECOG_MMN = cellfun(@(x) x(:, tIdx2), temp, "UniformOutput", false) - cellfun(@(x) x(:, tIdx1), temp, "UniformOutput", false);
@@ -162,9 +162,8 @@ mPrint(FigCBPT, [MONKEYPATH, AREANAME, '_PE_CBPT.jpg'], "-djpeg", "-r600");
 t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
 FigPE = plotRawWaveMulti(chData(2:end), windowPE);
 scaleAxes(FigPE, "x", [0, windowPE(2)]);
-yRange = scaleAxes(FigPE);
+scaleAxes(FigPE, "y", "on");
 setAxes(FigPE, "visible", "off");
-mAxes = findobj(FigPE, "Type", "axes");
 plotLayout(FigPE, (monkeyID - 1) * 2 + posIndex, 0.4);
 drawnow;
 mPrint(FigPE, [MONKEYPATH, AREANAME, '_PE_RawWave.jpg'], "-djpeg", "-r600");
@@ -228,14 +227,11 @@ PEI = chData(end).chMean - chData(2).chMean;
 mSave([MONKEYPATH, AREANAME, '_PE_tuning.mat'], "windowPE", "PEI", "tuningSlope", "V0", "chIdx", "mask", "P");
 
 %% MMN
-% chDataMMN(end).color = [0 0 0];
-% FigMMN = plotRawWaveMulti(chDataMMN(end), [0, 500], 'MMN');
-% scaleAxes("y", "on", "symOpts", "max");
-% addLines2Axes(struct("X", 0));
-% plotLayout((monkeyID - 1) * 2 + posIndex);
-% mPrint(FigMMN, [MONKEYPATH, AREANAME, '_PE_MMN0.jpg'], "-djpeg", "-r600");
-% setAxes(FigMMN, "Visible", "off");
-% mPrint(FigMMN, [MONKEYPATH, AREANAME, '_PE_MMN.jpg'], "-djpeg", "-r600");
+FigMMN = plotRawWaveMulti(chDataMMN, [0, 500], 'MMN');
+plotLayout((monkeyID - 1) * 2 + posIndex);
+mPrint(FigMMN, [MONKEYPATH, AREANAME, '_PE_MMN0.jpg'], "-djpeg", "-r600");
+setAxes(FigMMN, "Visible", "off");
+mPrint(FigMMN, [MONKEYPATH, AREANAME, '_PE_MMN.jpg'], "-djpeg", "-r600");
 
 %% Example
 % ch = input('Input example channel: ');
@@ -255,6 +251,10 @@ mSave([MONKEYPATH, AREANAME, '_PE_tuning.mat'], "windowPE", "PEI", "tuningSlope"
 %               a];
 % a(V0(ch, :) == 0) = [];
 % t(V0(ch, :) == 0) = [];
+% hold on;
+% plot(t, a, "Color", [128 128 128]/255, "Marker", "square", "MarkerSize", 10, "MarkerFaceColor", [128 128 128]/255);
+% 
+% plotRawWaveMulti(chDataMMN, [0, 500], 'MMN', [1, 1], ch);
 % hold on;
 % plot(t, a, "Color", [128 128 128]/255, "Marker", "square", "MarkerSize", 10, "MarkerFaceColor", [128 128 128]/255);
 % 

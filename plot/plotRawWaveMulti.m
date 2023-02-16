@@ -93,7 +93,7 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
 
     end
 
-    yRange = scaleAxes(Fig, "y");
+    yRange = scaleAxes(Fig, "y", "on");
     
     allAxes = findobj(Fig, "Type", "axes");
 
