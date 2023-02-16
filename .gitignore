@@ -10,8 +10,8 @@
 /codegen/
 
 #ignore figures
-*/CC/
-*/XX/
+**/CC/
+**/XX/
 
 #ignore following files;
 *asv
