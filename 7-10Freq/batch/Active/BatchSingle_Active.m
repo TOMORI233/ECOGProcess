@@ -16,7 +16,7 @@ else
     MONKEYPATH = 'XX\Single\';
 end
 
-params.icaOpt = "off"; % on or off
+params.icaOpt = "on"; % on or off
 
 %% Single day
 for index = 1:length(DATESTRs)

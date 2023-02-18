@@ -67,21 +67,18 @@ catch
     endIdx = fix((windowDM(2) - windowICA(1)) / 1000 * fs);
     trialsECOG = cellfun(@(x) x(:, startIdx:endIdx), trialsECOG, "UniformOutput", false);
 
-    % Replace bad chs by averaging neighbour chs
-    [~, neighbours] = mPrepareNeighbours(channels);
-    for bIndex = 1:numel(badCHs)
-        for tIndex = 1:length(trialsECOG)
-            chsTemp = neighbours{badCHs(bIndex)};
-            trialsECOG{tIndex}(badCHs(bIndex), :) = mean(trialsECOG{tIndex}(chsTemp(~ismember(chsTemp, badCHs)), :), 1);
-        end
-    end
-
     % ICA
     if strcmp(icaOpt, "on")
-        load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs");
+        load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs", "badCHs");
+        trialsECOG = changeCellRowNum(trialsECOG);
+        trialsECOG(badCHs) = [];
+        trialsECOG = changeCellRowNum(trialsECOG);
         trialsECOG = reconstructData(trialsECOG, comp, ICs);
-        badCHs = [];
     end
+
+    % Replace bad chs by averaging neighbour chs
+    trialsECOG = cellfun(@(x) insertRows(x, badCHs), trialsECOG, "UniformOutput", false);
+    trialsECOG = interpolateBadChs(trialsECOG, badCHs);
     
     % Z-score
     resultC = [];

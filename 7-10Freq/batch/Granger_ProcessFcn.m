@@ -20,7 +20,6 @@ if protocolType == 1 % PE
     idx = ismember(dRatioAll, dRatio0);
     trialsECOG_AC  = dataAC.trialsECOG(idx);
     trialsECOG_PFC = dataPFC.trialsECOG(idx);
-    windowGranger = [0, 500];
 elseif protocolType == 2 % DM
     windowData = dataAC.windowDM;
     if trialType == 1
@@ -31,24 +30,21 @@ elseif protocolType == 2 % DM
     else
         trialsECOG_AC  = dataAC.trialsECOG_wrong;
         trialsECOG_PFC = dataPFC.trialsECOG_wrong;
-        dRatio0 = 1;
+        dRatio0 = [1.02, 1.04, 1.06, 1.08];
         titleStr = 'DM wrong - Dev onset';
     end
-    windowGranger = [0, 500];
 else % Prediction
     windowData = dataAC.windowP;
     dRatio0 = 1;
     trialsECOG_AC  = dataAC.trialsECOG;
     trialsECOG_PFC = dataPFC.trialsECOG;
     titleStr = 'Prediction - Trial onset';
-    nStd = trialType; % No.[nStd] std sound
-    windowGranger = [500 * (nStd - 1), 500 * nStd];
 end
 
 fs = dataAC.fs;
 params.fs = fs;
-params.windowData = windowGranger;
 params.SAVEPATH = MONKEYPATH;
+params.windowData = windowGranger;
 params.labelStr = [titleStr, ' [', num2str(windowGranger(1)), ',', num2str(windowGranger(2)), ']ms (dRatio=', char(join(string(num2str(dRatio0')), ',')), ')'];
 
 tIdx = fix((windowGranger(1) - windowData(1)) / 1000 * fs) + 1:fix((windowGranger(2) - windowData(1)) / 1000 * fs);

@@ -6,6 +6,7 @@ params.processFcn = @ActiveProcess_7_10Freq;
 
 params.monkeyID = 1; % 1-CC, 2-XX
 
+%% Parameter setting
 if params.monkeyID == 1
     params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Active\';
     DATESTRs = {'cc20220520', 'cc20220706', 'cc20220801', 'cc20221014', 'cc20221015'};
@@ -16,9 +17,9 @@ else
     MONKEYPATH = 'XX\Population\';
 end
 
-params.icaOpt = "off"; % on or off
+params.icaOpt = "on"; % on or off
 params.DATESTRs = DATESTRs;
-params.PrePATH = [MONKEYPATH, 'Population\Preprocess\'];
+params.PrePATH = [MONKEYPATH, 'Preprocess\'];
 
 %% Exclude trials and bad channels
 Pre_ProcessFcn(params);
@@ -65,6 +66,7 @@ params.DATAPATH = [];
 params.protocolType = 1; % 1-PE, 2-DM, 3-Prediction
 params.DATAPATH{1} = [MONKEYPATH, 'PE\AC_PE_Data.mat'];
 params.DATAPATH{2} = [MONKEYPATH, 'PE\PFC_PE_Data.mat'];
+params.windowGranger = [0, 500]; % ms
 params.trialType = 1; % 1-dev, 2-std
 Granger_ProcessFcn(params);
 params.trialType = 2; % 1-dev, 2-std
@@ -73,6 +75,7 @@ Granger_ProcessFcn(params);
 params.protocolType = 2; % 1-PE, 2-DM, 3-Prediction
 params.DATAPATH{1} = [MONKEYPATH, 'DM\AC_DM_Data.mat'];
 params.DATAPATH{2} = [MONKEYPATH, 'DM\PFC_DM_Data.mat'];
+params.windowGranger = [0, 500]; % ms
 params.trialType = 1; % 1-correct, 2-wrong
 Granger_ProcessFcn(params);
 params.trialType = 2; % 1-correct, 2-wrong
@@ -81,35 +84,7 @@ Granger_ProcessFcn(params);
 params.protocolType = 3; % 1-PE, 2-DM, 3-Prediction
 params.DATAPATH{1} = [MONKEYPATH, 'Prediction\AC_Prediction_Data.mat'];
 params.DATAPATH{2} = [MONKEYPATH, 'Prediction\PFC_Prediction_Data.mat'];
-params.trialType = 1; % 1-nStd=1, 2-nStd=7
-Granger_ProcessFcn(params);
-params.trialType = 2; % 1-nStd=1, 2-nStd=7
-Granger_ProcessFcn(params);
-
-%% Granger Permutation Test
-% params.MONKEYPATH = [MONKEYPATH, 'Granger PT\'];
-% params.DATAPATH = [];
-% 
-% params.protocolType = 1; % 1-PE, 2-DM, 3-Prediction
-% params.DATAPATH{1} = [MONKEYPATH, 'PE\AC_PE_Data.mat'];
-% params.DATAPATH{2} = [MONKEYPATH, 'PE\PFC_PE_Data.mat'];
-% params.trialType = 1; % 1-dev, 2-std
-% GrangerPT_ProcessFcn(params);
-% params.trialType = 2; % 1-dev, 2-std
-% GrangerPT_ProcessFcn(params);
-% 
-% params.protocolType = 2; % 1-PE, 2-DM, 3-Prediction
-% params.DATAPATH{1} = [MONKEYPATH, 'DM\AC_DM_Data.mat'];
-% params.DATAPATH{2} = [MONKEYPATH, 'DM\PFC_DM_Data.mat'];
-% params.trialType = 1; % 1-correct, 2-wrong
-% GrangerPT_ProcessFcn(params);
-% params.trialType = 2; % 1-correct, 2-wrong
-% GrangerPT_ProcessFcn(params);
-% 
-% params.protocolType = 3; % 1-PE, 2-DM, 3-Prediction
-% params.DATAPATH{1} = [MONKEYPATH, 'Prediction\AC_Prediction_Data.mat'];
-% params.DATAPATH{2} = [MONKEYPATH, 'Prediction\PFC_Prediction_Data.mat'];
-% params.trialType = 1; % 1-nStd=1, 2-nStd=7
-% GrangerPT_ProcessFcn(params);
-% params.trialType = 2; % 1-nStd=1, 2-nStd=7
-% GrangerPT_ProcessFcn(params);
+for nStd = 1:7
+    params.windowGranger = [500 * (nStd - 1), 500 * nStd];
+    Granger_ProcessFcn(params);
+end

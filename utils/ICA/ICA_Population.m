@@ -1,37 +1,65 @@
-function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs, windowICA)
+function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs, windowICA, chs2doICA)
     % Description: perform ICA on data and loop reconstructing data with input ICs until you are satisfied
     % Input:
     %     trialsECOG: nTrial*1 cell array of trial data (nCh*nSample matrix)
     %     fs: raw sample rate for [trialsECOG], in Hz
     %     windowICA: time window for [trialsECOG], in ms
+    %     chs2doICA: channel number to perform ICA on (e.g. [1:25,27:64], default='all')
     % Output:
     %     comp: result of ICA (FieldTrip) without field [trial]
     %     ICs: the input IC number array for data reconstruction
     %     FigTopoICA: figure of topo of all ICs
 
-    comp0 = mICA(trialsECOG, windowICA, fs);
+    narginchk(3, 4);
+
+    if nargin < 4
+        chs2doICA = 'all';
+    end
+
+    comp0 = mICA(trialsECOG, windowICA, fs, "chs2doICA", chs2doICA);
     comp = realignIC(comp0, windowICA);
 
+    % IC Wave
     ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
     ICStd = cell2mat(cellfun(@(x) std(x, [], 1), changeCellRowNum(comp.trial), "UniformOutput", false));
     FigIC = plotRawWave(ICMean, ICStd, windowICA, "ICA");
-    FigTopoICA = plotTopoICA(comp, [8, 8], [8, 8]);
-    colormap('jet');
-    FigWave(1) = plotRawWave(cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG), "UniformOutput", false)), [], windowICA, "origin");
+
+    % IC topo
+    channels = 1:size(trialsECOG{1}, 1);
+    badCHs = channels(~ismember(channels, chs2doICA));
+    topo = insertRows(comp.topo, badCHs);
+    FigTopoICA = plotTopoICA(topo, [8, 8], [8, 8]);
+    
+    % Origin raw wave
+    chMean = cell2mat(cellfun(@mean, changeCellRowNum(interpolateBadChs(trialsECOG, badCHs)), "UniformOutput", false));
+    FigWave(1) = plotRawWave(chMean, [], windowICA, "origin");
     scaleAxes(FigWave(1), "y", "on", "symOpts", "max");
+
+    % Remove bad channels in trialsECOG
+    trialsECOG = changeCellRowNum(trialsECOG);
+    trialsECOG(badCHs) = [];
+    trialsECOG = changeCellRowNum(trialsECOG);
+    
     k = 'N';
     while ~strcmp(k, 'y') && ~strcmp(k, 'Y')
-
         try
             close(FigWave(2));
         end
 
-        ICs = input('Input IC number for data reconstruction: ');
+        ICs = input('Input IC number for data reconstruction (empty for all): ');
+        if isempty(ICs)
+            ICs = 1:length(chs2doICA);
+        end
         badICs = input('Input bad IC number: ');
         ICs(ismember(ICs, badICs)) = [];
-        [~, temp] = reconstructData(trialsECOG, comp, ICs);
-        FigWave(2) = plotRawWave(temp, [], windowICA, "reconstruct");
+
+        temp = reconstructData(trialsECOG, comp, ICs);
+        temp = cellfun(@(x) insertRows(x, badCHs), temp, "UniformOutput", false);
+        temp = interpolateBadChs(temp, badCHs);
+        chMean = cell2mat(cellfun(@mean, changeCellRowNum(temp), "UniformOutput", false));
+        FigWave(2) = plotRawWave(chMean, [], windowICA, "reconstruct");
         scaleAxes(FigWave(2), "y", "on", "symOpts", "max");
+
         k = validateInput('Press Y to continue or N to reselect ICs: ', @(x) any(validatestring(x, {'y', 'n', 'N', 'Y'})), 's');
     end
 

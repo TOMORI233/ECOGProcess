@@ -57,26 +57,27 @@ catch
     fs = ECOGDataset.fs;
     channels = ECOGDataset.channels;
 
-    % Replace bad chs by averaging neighbour chs before performing ICA
-    [~, neighbours] = mPrepareNeighbours(channels);
-    for bIndex = 1:numel(badCHs)
-        for tIndex = 1:length(trialsECOG)
-            chsTemp = neighbours{badCHs(bIndex)};
-            trialsECOG{tIndex}(badCHs(bIndex), :) = mean(trialsECOG{tIndex}(chsTemp(~ismember(chsTemp, badCHs)), :), 1);
-        end
-    end
+    chs2doICA = channels;
+    chs2doICA(ismember(chs2doICA, badCHs)) = [];
 
     % ICA
     if strcmp(icaOpt, "on")
         try
-            load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs");
+            load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs", "badCHs");
         catch
-            [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA);
+            [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA, chs2doICA);
             mPrint(FigTopoICA, strcat(PrePATH, AREANAME, "_Topo_ICA"), "-djpeg", "-r400");
-            mSave([PrePATH, AREANAME, '_ICA.mat'], "comp", "ICs");
+            mSave([PrePATH, AREANAME, '_ICA.mat'], "comp", "ICs", "badCHs");
         end
+        trialsECOG = changeCellRowNum(trialsECOG);
+        trialsECOG(badCHs) = [];
+        trialsECOG = changeCellRowNum(trialsECOG);
         trialsECOG = reconstructData(trialsECOG, comp, ICs);
     end
+
+    % Replace bad chs by averaging neighbour chs
+    trialsECOG = cellfun(@(x) insertRows(x, badCHs), trialsECOG, "UniformOutput", false);
+    trialsECOG = interpolateBadChs(trialsECOG, badCHs);
 
     [dRatioAll, dRatio] = computeDevRatio(trialAll([trialAll.correct]));
 
