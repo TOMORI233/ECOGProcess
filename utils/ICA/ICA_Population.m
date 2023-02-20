@@ -31,14 +31,14 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
     FigTopoICA = plotTopoICA(topo, [8, 8], [8, 8]);
     
     % Origin raw wave
-    chMean = cell2mat(cellfun(@mean, changeCellRowNum(interpolateBadChs(trialsECOG, badCHs)), "UniformOutput", false));
-    FigWave(1) = plotRawWave(chMean, [], windowICA, "origin");
+    temp = changeCellRowNum(interpolateBadChs(trialsECOG, badCHs));
+    chMean = cell2mat(cellfun(@mean, temp, "UniformOutput", false));
+    chStd = cell2mat(cellfun(@std, temp, "UniformOutput", false));
+    FigWave(1) = plotRawWave(chMean, chStd, windowICA, "origin");
     scaleAxes(FigWave(1), "y", "on", "symOpts", "max");
 
     % Remove bad channels in trialsECOG
-    trialsECOG = changeCellRowNum(trialsECOG);
-    trialsECOG(badCHs) = [];
-    trialsECOG = changeCellRowNum(trialsECOG);
+    trialsECOG = cellfun(@(x) x(chs2doICA, :), trialsECOG, "UniformOutput", false);
     
     k = 'N';
     while ~strcmp(k, 'y') && ~strcmp(k, 'Y')
@@ -57,7 +57,8 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
         temp = cellfun(@(x) insertRows(x, badCHs), temp, "UniformOutput", false);
         temp = interpolateBadChs(temp, badCHs);
         chMean = cell2mat(cellfun(@mean, changeCellRowNum(temp), "UniformOutput", false));
-        FigWave(2) = plotRawWave(chMean, [], windowICA, "reconstruct");
+        chStd = cell2mat(cellfun(@std, changeCellRowNum(temp), "UniformOutput", false));
+        FigWave(2) = plotRawWave(chMean, chStd, windowICA, "reconstruct");
         scaleAxes(FigWave(2), "y", "on", "symOpts", "max");
 
         k = validateInput('Press Y to continue or N to reselect ICs: ', @(x) any(validatestring(x, {'y', 'n', 'N', 'Y'})), 's');

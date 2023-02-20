@@ -21,6 +21,7 @@ params.DATESTRs = DATESTRs;
 params.PrePATH = [MONKEYPATH, 'Preprocess\'];
 
 %% Exclude trials and bad channels
+params.userDefineOpt = "off";
 Pre_ProcessFcn(params);
 
 %% PE

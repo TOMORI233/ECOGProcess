@@ -35,6 +35,13 @@ channels = 1:size(trialsECOG_AC{1}, 1);
 channels = mat2cell(reshape(channels, topoSize), nSmooth * ones(topoSize(1) / nSmooth, 1), nSmooth * ones(topoSize(1) / nSmooth, 1));
 channels = reshape(channels, [numel(channels), 1]);
 channels = cellfun(@(x) reshape(x, [1, numel(x)]), channels, "UniformOutput", false);
+channelsAC = cellfun(@(x) x(~ismember(x, badCHsAC)), channels, "UniformOutput", false);
+channelsPFC = cellfun(@(x) x(~ismember(x, badCHsPFC)), channels, "UniformOutput", false);
+
+if any(cellfun(@isempty, channelsAC)) || any(cellfun(@isempty, channelsPFC))
+    error("Too many channels excluded!");
+end
+
 areaAC = 1:length(channels);
 areaPFC = 1:length(channels);
 
@@ -42,10 +49,10 @@ areaPFC = 1:length(channels);
 try
     load([SAVEPATH, 'GrangerData_', labelStr, '.mat']);
 catch
-    trialsECOG_AC  = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, :), 1), channels, "UniformOutput", false)), trialsECOG_AC, "UniformOutput", false);
-    trialsECOG_PFC = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, :), 1), channels, "UniformOutput", false)), trialsECOG_PFC, "UniformOutput", false);
-    [granger, coh, cohm] = mGranger(trialsECOG_AC, trialsECOG_PFC, windowData, fs);
-    mSave([SAVEPATH, 'GrangerData_', labelStr, '.mat'], "granger", "coh", "cohm");
+    trialsECOG_AC  = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, :), 1), channelsAC, "UniformOutput", false)), trialsECOG_AC, "UniformOutput", false);
+    trialsECOG_PFC = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, :), 1), channelsPFC, "UniformOutput", false)), trialsECOG_PFC, "UniformOutput", false);
+    granger = mGranger(trialsECOG_AC, trialsECOG_PFC, windowData, fs);
+    mSave([SAVEPATH, 'GrangerData_', labelStr, '.mat'], "granger");
 end
 
 %% ft plot
@@ -149,7 +156,7 @@ set(gca, "BoxStyle", "full");
 set(gca, "LineWidth", 3);
 
 cb = colorbar('position', [0.9, 0.1, 0.015, 0.8]);
-cb.Label.String = 'Granger spectrem';
+cb.Label.String = 'Granger spectrum';
 cb.Label.FontSize = 15;
 cb.Label.FontWeight = 'bold';
 cb.Label.Rotation = -90;
@@ -176,7 +183,7 @@ set(gca, "BoxStyle", "full");
 set(gca, "LineWidth", 3);
 
 cb = colorbar('position', [0.75, 0.12, 0.01, 0.8]);
-cb.Label.String = '\Delta Granger spectrem (Red: AC as source / Blue: PFC as source)';
+cb.Label.String = '\Delta Granger spectrum (Red: AC as source / Blue: PFC as source)';
 cb.Label.FontSize = 14;
 cb.Label.FontWeight = 'bold';
 cb.Label.Rotation = -90;
@@ -221,7 +228,7 @@ for index = 1:length(temp)
 end
 
 cb = colorbar('Location', 'south', 'position', [0.2, 0.06, 0.6, 0.02]);
-cb.Label.String = '\Delta Granger spectrem (Red: AC as source / Blue: PFC as source)';
+cb.Label.String = '\Delta Granger spectrum (Red: AC as source / Blue: PFC as source)';
 cb.Label.FontSize = 14;
 cb.Label.FontWeight = 'bold';
 cb.Label.VerticalAlignment = 'top';
@@ -229,3 +236,45 @@ colormap('jet');
 scaleAxes("c", "on", "symOpts", "max", "cutoffRange", [-ub, ub]);
 
 mPrint(Fig3, [SAVEPATH, labelStr, '_diffplot_topo.jpg'], "-djpeg", "-r600");
+
+%% Grangerspectrm topo
+Fig4 = figure;
+maximizeFig;
+
+% AC topo
+mAxe = mSubplot(topoSize(1) / nSmooth, topoSize(2) / nSmooth, 1, [topoSize(1) / nSmooth, topoSize(2) / nSmooth], "margins", zeros(1, 4), "paddings", [(1 - adjIdx + 0.13 - shiftFromCenter) / 2, (1 - adjIdx + 0.13 + shiftFromCenter) / 2, 0.09, 0.04], "alignment", "top-left");
+text(mAxe, 0.5, 1.02, ['AC | ', labelStr], "FontSize", 15, "FontWeight", "bold", "HorizontalAlignment", "center");
+set(mAxe, "Visible", "off");
+temp = rowFcn(@(x) flip(reshape(x, [topoSize(1) / nSmooth, topoSize(2) / nSmooth])', 1), AC2PFC, "UniformOutput", false);
+for index = 1:length(temp)
+    mSubplot(topoSize(1) / nSmooth, topoSize(2) / nSmooth, index, "margins", ones(1, 4) * 0.01, "paddings", [(1 - adjIdx + 0.13 - shiftFromCenter) / 2, (1 - adjIdx + 0.13 + shiftFromCenter) / 2, 0.09, 0.04]);
+    imagesc("XData", 1:topoSize(1) / nSmooth, "YData", 1:topoSize(2) / nSmooth, "CData", temp{index});
+    xlim([0.5, 4.5]);
+    ylim([0.5, 4.5]);
+    xticklabels('');
+    yticklabels('');
+end
+
+% PFC topo
+mAxe = mSubplot(topoSize(1) / nSmooth, topoSize(2) / nSmooth, 1, [topoSize(1) / nSmooth, topoSize(2) / nSmooth], "margins", zeros(1, 4), "paddings", [(1 - adjIdx + 0.13 + shiftFromCenter) / 2, (1 - adjIdx + 0.13 - shiftFromCenter) / 2, 0.09, 0.04], "alignment", "top-left");
+text(mAxe, 0.5, 1.02, ['PFC | ', labelStr], "FontSize", 15, "FontWeight", "bold", "HorizontalAlignment", "center");
+set(mAxe, "Visible", "off");
+temp = rowFcn(@(x) flip(reshape(x, [topoSize(1) / nSmooth, topoSize(2) / nSmooth])', 1), PFC2AC, "UniformOutput", false);
+for index = 1:length(temp)
+    mSubplot(topoSize(1) / nSmooth, topoSize(2) / nSmooth, index, "margins", ones(1, 4) * 0.01, "paddings", [(1 - adjIdx + 0.13 + shiftFromCenter) / 2, (1 - adjIdx + 0.13 - shiftFromCenter) / 2, 0.09, 0.04]);
+    imagesc("XData", 1:topoSize(1) / nSmooth, "YData", 1:topoSize(2) / nSmooth, "CData", temp{index});
+    xlim([0.5, 4.5]);
+    ylim([0.5, 4.5]);
+    xticklabels('');
+    yticklabels('');
+end
+
+cb = colorbar('Location', 'south', 'position', [0.2, 0.06, 0.6, 0.02]);
+cb.Label.String = 'Granger spectrum';
+cb.Label.FontSize = 14;
+cb.Label.FontWeight = 'bold';
+cb.Label.VerticalAlignment = 'top';
+colormap('jet');
+scaleAxes("c", "on", "symOpts", "max", "cutoffRange", [-ub, ub]);
+
+mPrint(Fig4, [SAVEPATH, labelStr, '_topo.jpg'], "-djpeg", "-r600");

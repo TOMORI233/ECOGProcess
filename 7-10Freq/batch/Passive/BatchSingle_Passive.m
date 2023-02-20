@@ -16,14 +16,14 @@ else
     MONKEYPATH = 'XX\Single\';
 end
 
-params.icaOpt = "off"; % on or off
-
 %% Single day
 for index = 1:length(DATESTRs)
     params.DATESTRs = DATESTRs(index);
     params.PrePATH = [MONKEYPATH, 'Preprocess\', DATESTRs{index}, '\'];
 
     %% exclude trials
+    params.icaOpt = "on"; % on or off
+    params.userDefineOpt = "on";
     Pre_ProcessFcn(params);
 
     %% PE

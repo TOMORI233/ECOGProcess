@@ -54,18 +54,16 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     disp(['Possible bad channel numbers are: ', num2str(find(~goodChIdx)')]);
 
     if strcmp(userDefineOpt, "on")
-        badCHs = validateInput('Please input bad channel number (empty for auto, 0 for preview): ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'nonnegative'}));
+        badCHs = validateInput('Please input bad channel number (0 for preview): ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'nonnegative'}));
 
         if isequal(badCHs, 0)
+            plotRawWave(chMean, chStd, [0, 1], 'origin');
             previewRawWave(trialsData, badtrialIdx, V);
-            badCHs = validateInput('Please input bad channel number (empty for auto): ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
+            badCHs = validateInput('Please input bad channel number: ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
         end
 
-        if ~isempty(badCHs)
-            goodChIdx = true(1, length(goodChIdx));
-            goodChIdx(badCHs) = false;
-        end
-
+        goodChIdx = true(1, length(goodChIdx));
+        goodChIdx(badCHs) = false;
     end
 
     % sort trials
@@ -81,7 +79,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     end
 
     chIdx = find(~goodChIdx)';
-    disp(['Bad Channels: ', num2str(chIdx)]);
+    disp(['Bad Channels: ', num2str(reshape(chIdx, [1, numel(chIdx)]))]);
 
     return;
 end

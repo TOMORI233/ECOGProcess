@@ -1,4 +1,4 @@
-function [granger, coh, cohm] = mGranger(trialsECOG_AC, trialsECOG_PFC, windowData, fs)
+function [granger, varargout] = mGranger(trialsECOG_AC, trialsECOG_PFC, windowData, fs)
 % Description: return granger spectrum, and coherence of parametric computation 
 %              of the spectral transfer function and of non-parametric computation 
 %              of the cross-spectral density matrix
@@ -35,21 +35,28 @@ cfg        = [];
 cfg.method = 'mvar';
 mfreq      = ft_freqanalysis(cfg, mdata);
 
-%% Non-parametric computation of the cross-spectral density matrix
-cfg           = [];
-cfg.method    = 'mtmfft';
-cfg.taper     = 'dpss';
-cfg.output    = 'fourier';
-cfg.tapsmofrq = 2;
-freq          = ft_freqanalysis(cfg, data);
-
-%% Coherence
-cfg           = [];
-cfg.method    = 'coh';
-coh           = ft_connectivityanalysis(cfg, freq);
-cohm          = ft_connectivityanalysis(cfg, mfreq);
-
 %% Granger
 cfg           = [];
 cfg.method    = 'granger';
 granger       = ft_connectivityanalysis(cfg, mfreq);
+
+%% Non-parametric computation of the cross-spectral density matrix
+if nargout > 1
+    cfg           = [];
+    cfg.method    = 'mtmfft';
+    cfg.taper     = 'dpss';
+    cfg.output    = 'fourier';
+    cfg.tapsmofrq = 2;
+    freq          = ft_freqanalysis(cfg, data);
+end
+
+%% Coherence
+cfg           = [];
+cfg.method    = 'coh';
+if nargout == 2
+    coh           = ft_connectivityanalysis(cfg, freq);
+    varargout{1}  = coh;
+elseif nargout == 3
+    cohm          = ft_connectivityanalysis(cfg, mfreq);
+    varargout{2}  = cohm;
+end
