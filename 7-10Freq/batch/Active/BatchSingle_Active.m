@@ -88,7 +88,7 @@ for index = 1:length(DATESTRs)
     params.protocolType = 3; % 1-PE, 2-DM, 3-Prediction
     params.DATAPATH{1} = [SINGLEROOTPATH, 'Prediction\', DATESTRs{index}, '\AC_Prediction_Data.mat'];
     params.DATAPATH{2} = [SINGLEROOTPATH, 'Prediction\', DATESTRs{index}, '\PFC_Prediction_Data.mat'];
-    for nStd = 1:7
+    for nStd = [1 3 7]
         params.windowGranger = [500 * (nStd - 1), 500 * nStd];
         Granger_ProcessFcn(params);
     end
@@ -188,7 +188,7 @@ Granger_ProcessFcn(params);
 params.protocolType = 3; % 1-PE, 2-DM, 3-Prediction
 params.DATAPATH{1} = [POPUROOTPATH, 'Prediction\AC_Prediction_Data.mat'];
 params.DATAPATH{2} = [POPUROOTPATH, 'Prediction\PFC_Prediction_Data.mat'];
-for nStd = 1:7
+for nStd = [1 3 7]
     params.windowGranger = [500 * (nStd - 1), 500 * nStd];
     Granger_ProcessFcn(params);
 end
