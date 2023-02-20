@@ -34,7 +34,7 @@ catch
             trialsECOG_wrong = [trialsECOG_wrong; dataSingle(index).trialsECOG_wrong];
             resultC = [resultC; dataSingle(index).resultC];
             resultW = [resultW; dataSingle(index).resultW];
-            badCHs = [badCHs, dataSingle(index).badCHs];
+            badCHs = [badCHs; dataSingle(index).badCHs];
         end
         badCHs = unique(badCHs);
         fs = dataSingle(1).fs;
@@ -71,7 +71,7 @@ catch
             trialsECOG_temp(excludeIdxAll{mIndex}) = [];
             trialAll = [trialAll; trials];
             trialsECOG = [trialsECOG; trialsECOG_temp];
-            badCHs = [badCHs, badCHsAll{mIndex}];
+            badCHs = [badCHs; badCHsAll{mIndex}];
         end
 
         badCHs = unique(badCHs);

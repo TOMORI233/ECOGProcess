@@ -8,8 +8,8 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     %     userDefineOpt: If set "on", bad channels will be defined by user.
     %                    If set "off", use [chTh] setting to exclude bad channels. (default: "off")
     % Output:
-    %     tIdx: excluded trial index (double)
-    %     chIdx: bad channel index (double)
+    %     tIdx: excluded trial index (double column vector)
+    %     chIdx: bad channel index (double column vector)
     % Example:
     %     window = [-200, 1000];
     %     topoSize = [8, 8]; % [x, y]

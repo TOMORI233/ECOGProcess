@@ -23,7 +23,7 @@ catch
         for index = 1:length(SINGLEPATH)
             dataSingle(index) = load(SINGLEPATH{index});
             trialsECOG = [trialsECOG; dataSingle(index).trialsECOG];
-            badCHs = [badCHs, dataSingle(index).badCHs];
+            badCHs = [badCHs; dataSingle(index).badCHs];
         end
         badCHs = unique(badCHs);
         fs = dataSingle(1).fs;
@@ -59,7 +59,7 @@ catch
             trialsECOG_temp(excludeIdxAll{mIndex}) = [];
             % trialsECOG_temp = cellfun(@(x) cell2mat(rowFcn(@(y) y * length(y) ./ norm(y), x)), trialsECOG_temp, "UniformOutput", false);
             trialsECOG = [trialsECOG; trialsECOG_temp];
-            badCHs = [badCHs, badCHsAll{mIndex}];
+            badCHs = [badCHs; badCHsAll{mIndex}];
         end
 
         badCHs = unique(badCHs);

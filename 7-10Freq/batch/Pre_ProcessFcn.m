@@ -70,7 +70,7 @@ if strcmp(icaOpt, "on")
             trialsECOG_temp(excludeIdxAll{mIndex}) = [];
             trialAll = [trialAll; trials];
             trialsECOG = [trialsECOG; trialsECOG_temp];
-            badCHs = [badCHs, idxAC.badChIdx{mIndex}];
+            badCHs = [badCHs; idxAC.badChIdx{mIndex}];
         end
         badCHs = unique(badCHs);
         fs = ECOGDataset.fs;
@@ -78,9 +78,9 @@ if strcmp(icaOpt, "on")
         chs2doICA = channels;
         chs2doICA(ismember(chs2doICA, badCHs)) = [];
         [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, window, chs2doICA);
-        temp = validateInput(['Input bad channel number (empty for default: ', num2str(badCHs), '): '], @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
+        temp = validateInput(['Input bad channel number (empty for default: ', num2str(badCHs'), '): '], @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
         if ~isempty(temp)
-            badCHs = temp;
+            badCHs = reshape(temp, [numel(temp), 1]);
         end
         mPrint(FigTopoICA, strcat(PrePATH, "AC_Topo_ICA"), "-djpeg", "-r400");
         mSave([PrePATH, 'AC_ICA.mat'], "comp", "ICs", "badCHs");
@@ -103,7 +103,7 @@ if strcmp(icaOpt, "on")
             trialsECOG_temp(excludeIdxAll{mIndex}) = [];
             trialAll = [trialAll; trials];
             trialsECOG = [trialsECOG; trialsECOG_temp];
-            badCHs = [badCHs, idxPFC.badChIdx{mIndex}];
+            badCHs = [badCHs; idxPFC.badChIdx{mIndex}];
         end
         badCHs = unique(badCHs);
         fs = ECOGDataset.fs;
@@ -111,9 +111,9 @@ if strcmp(icaOpt, "on")
         chs2doICA = channels;
         chs2doICA(ismember(chs2doICA, badCHs)) = [];
         [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, window, chs2doICA);
-        temp = validateInput(['Input bad channel number (empty for default: ', num2str(badCHs), '): '], @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
+        temp = validateInput(['Input bad channel number (empty for default: ', num2str(badCHs'), '): '], @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
         if ~isempty(temp)
-            badCHs = temp;
+            badCHs = reshape(temp, [numel(temp), 1]);
         end
         mPrint(FigTopoICA, strcat(PrePATH, "PFC_Topo_ICA"), "-djpeg", "-r400");
         mSave([PrePATH, 'PFC_ICA.mat'], "comp", "ICs", "badCHs");

@@ -25,7 +25,7 @@ catch
             dataSingle(index) = load(SINGLEPATH{index});
             trialsECOG = [trialsECOG; dataSingle(index).trialsECOG];
             dRatioAll = [dRatioAll, dataSingle(index).dRatioAll];
-            badCHs = [badCHs, dataSingle(index).badCHs];
+            badCHs = [badCHs; dataSingle(index).badCHs];
         end
         dRatio = unique(dRatioAll);
         badCHs = unique(badCHs);
@@ -61,7 +61,7 @@ catch
             trialsECOG_temp(excludeIdxAll{mIndex}) = [];
             trialAll = [trialAll; trials];
             trialsECOG = [trialsECOG; trialsECOG_temp];
-            badCHs = [badCHs, badCHsAll{mIndex}];
+            badCHs = [badCHs; badCHsAll{mIndex}];
         end
 
         badCHs = unique(badCHs);
