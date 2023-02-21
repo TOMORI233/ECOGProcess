@@ -62,7 +62,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
             badCHs = validateInput('Please input bad channel number: ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
         end
 
-        goodChIdx = true(1, length(goodChIdx));
+        goodChIdx = true(length(goodChIdx), 1);
         goodChIdx(badCHs) = false;
     end
 
@@ -78,7 +78,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
         disp('All pass');
     end
 
-    chIdx = find(~goodChIdx)';
+    chIdx = find(~goodChIdx);
     disp(['Bad Channels: ', num2str(reshape(chIdx, [1, numel(chIdx)]))]);
 
     return;
