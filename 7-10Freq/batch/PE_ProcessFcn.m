@@ -103,14 +103,15 @@ end
 tIdx1 = (-500 - windowPE(1)) / 1000 * fs + 1:(0 - windowPE(1)) / 1000 * fs;
 tIdx2 = (0 - windowPE(1)) / 1000 * fs + 1:(500 - windowPE(1)) / 1000 * fs;
 
+trialsECOG_MMN = cellfun(@(x) x(:, tIdx2) - x(:, tIdx1), trialsECOG, "UniformOutput", false);
+
 for dIndex = 1:length(dRatio)
     temp = trialsECOG(dRatioAll == dRatio(dIndex));
     chData(dIndex).chMean = cell2mat(cellfun(@(x) mean(x, 1), changeCellRowNum(temp), "UniformOutput", false));
     chData(dIndex).dataNorm = cellfun(@(x) x - chData(1).chMean, temp, "UniformOutput", false);
     chData(dIndex).color = colors{dIndex};
 
-    trialsECOG_MMN = cellfun(@(x) x(:, tIdx2), temp, "UniformOutput", false) - cellfun(@(x) x(:, tIdx1), temp, "UniformOutput", false);
-    chDataMMN(dIndex).chMean = cell2mat(cellfun(@(x) mean(x, 1), changeCellRowNum(trialsECOG_MMN), "UniformOutput", false));
+    chDataMMN(dIndex).chMean = cell2mat(cellfun(@(x) mean(x, 1), changeCellRowNum(trialsECOG_MMN(dRatioAll == dRatio(dIndex))), "UniformOutput", false));
     chDataMMN(dIndex).color = colors{dIndex};
 end
 

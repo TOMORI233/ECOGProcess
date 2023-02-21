@@ -23,6 +23,7 @@ catch
         for index = 1:length(SINGLEPATH)
             dataSingle(index) = load(SINGLEPATH{index});
             trialsECOG = [trialsECOG; dataSingle(index).trialsECOG];
+            trialAll = [trialAll; dataSingle(index).trialAll];
             badCHs = [badCHs; dataSingle(index).badCHs];
         end
         badCHs = unique(badCHs);
