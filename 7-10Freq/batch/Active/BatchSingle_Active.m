@@ -24,7 +24,7 @@ for index = 1:length(DATESTRs)
     params.PrePATH = [SINGLEROOTPATH, 'Preprocess\', DATESTRs{index}, '\'];
 
     % Exclude trials and bad channels
-    params.icaOpt = "on"; % on or off
+    params.icaOpt = "off"; % on or off
     params.userDefineOpt = "on";
     Pre_ProcessFcn(params);
 

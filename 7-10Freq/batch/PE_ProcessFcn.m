@@ -56,7 +56,7 @@ catch
 
         for mIndex = 1:length(MATPATHs)
             [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHs{mIndex}, params);
-            trials = trialAll_temp(~[trialAll_temp.interrupt]);
+            trials = trialAll_temp(~cellfun(@(x) isequal(x, true), {trialAll_temp.interrupt}));
             trialsECOG_temp = selectEcog(ECOGDataset, trials, "dev onset", windowICA);
             trials(excludeIdxAll{mIndex}) = [];
             trialsECOG_temp(excludeIdxAll{mIndex}) = [];
@@ -89,11 +89,11 @@ catch
         % Replace bad chs by averaging neighbour chs
         trialsECOG = interpolateBadChs(trialsECOG, badCHs);
 
-        [dRatioAll, dRatio] = computeDevRatio(trialAll([trialAll.correct]));
+        [dRatioAll, dRatio] = computeDevRatio(trialAll(~cellfun(@(x) isequal(x, false), {trialAll.correct})));
 
         startIdx = fix((windowPE(1) - windowICA(1)) / 1000 * fs);
         endIdx = fix((windowPE(2) - windowICA(1)) / 1000 * fs);
-        trialsECOG = cellfun(@(x) x(:, startIdx:endIdx), trialsECOG([trialAll.correct]), "UniformOutput", false);
+        trialsECOG = cellfun(@(x) x(:, startIdx:endIdx), trialsECOG(~cellfun(@(x) isequal(x, false), {trialAll.correct})), "UniformOutput", false);
     end
     
     mSave([MONKEYPATH, AREANAME, '_PE_Data.mat'], "windowPE", "trialsECOG", "dRatioAll", "dRatio", "fs", "channels", "badCHs");

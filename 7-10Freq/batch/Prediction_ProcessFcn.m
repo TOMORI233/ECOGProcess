@@ -53,7 +53,7 @@ catch
 
         for mIndex = 1:length(MATPATHs)
             [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHs{mIndex}, params);
-            trials = trialAll_temp(~[trialAll_temp.interrupt]);
+            trials = trialAll_temp(~cellfun(@(x) isequal(x, true), {trialAll_temp.interrupt}));
             trialsECOG_temp = selectEcog(ECOGDataset, trials, "trial onset", windowP);
             trials(excludeIdxAll{mIndex}) = [];
             trialAll = [trialAll; trials];

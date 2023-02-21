@@ -1,40 +1,44 @@
-%% Batch
+%% Batch raw data
 clear; clc; close all;
 
 params.choiceWin = [100, 600];
 params.processFcn = @PassiveProcess_7_10Freq;
 
-params.monkeyID = 1; % 1-CC, 2-XX
+params.monkeyID = 2; % 1-CC, 2-XX
 
+%% Parameter setting
 if params.monkeyID == 1
     params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Passive\';
     DATESTRs = {'cc20220520', 'cc20220801', 'cc20220814', 'cc20221014', 'cc20221015'};
-    MONKEYPATH = 'CC\Population\';
+    POPUROOTPATH = 'CC\Population\';
+    SINGLEROOTPATH = 'CC\Single\';
 else
     params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\XX\7-10Freq Passive\';
     DATESTRs = {'xx20220711', 'xx20220820', 'xx20220822', 'xx20220913', 'xx20220914'};
-    MONKEYPATH = 'XX\Population\';
+    POPUROOTPATH = 'XX\Population\';
+    SINGLEROOTPATH = 'XX\Single\';
 end
 
-params.icaOpt = "off"; % on or off
 params.DATESTRs = DATESTRs;
-params.PrePATH = [MONKEYPATH, 'Preprocess\'];
+params.PrePATH = [POPUROOTPATH, 'Preprocess\'];
 
 %% Exclude trials and bad channels
+params.icaOpt = "off"; % on or off
 params.userDefineOpt = "off";
 Pre_ProcessFcn(params);
 
 %% PE
-params.MONKEYPATH = [MONKEYPATH, 'PE\'];
+params.MONKEYPATH = [POPUROOTPATH, 'PE\'];
 params.AREANAME = 'AC';
 params.posIndex = 1; % 1-AC, 2-PFC
 PE_ProcessFcn(params);
+
 params.AREANAME = 'PFC';
 params.posIndex = 2; % 1-AC, 2-PFC
 PE_ProcessFcn(params);
 
 %% Prediction
-params.MONKEYPATH = [MONKEYPATH, 'Prediction\'];
+params.MONKEYPATH = [POPUROOTPATH, 'Prediction\'];
 params.AREANAME = 'AC';
 params.posIndex = 1; % 1-AC, 2-PFC
 Prediction_ProcessFcn(params);
@@ -43,21 +47,22 @@ params.posIndex = 2; % 1-AC, 2-PFC
 Prediction_ProcessFcn(params);
 
 %% Granger
-params.MONKEYPATH = [MONKEYPATH, 'Granger\'];
+params.MONKEYPATH = [POPUROOTPATH, 'Granger\'];
 params.DATAPATH = [];
 
 params.protocolType = 1; % 1-PE, 2-DM, 3-Prediction
-params.DATAPATH{1} = [MONKEYPATH, 'PE\AC_PE_Data.mat'];
-params.DATAPATH{2} = [MONKEYPATH, 'PE\PFC_PE_Data.mat'];
+params.DATAPATH{1} = [POPUROOTPATH, 'PE\AC_PE_Data.mat'];
+params.DATAPATH{2} = [POPUROOTPATH, 'PE\PFC_PE_Data.mat'];
+params.windowGranger = [0, 500]; % ms
 params.trialType = 1; % 1-dev, 2-std
 Granger_ProcessFcn(params);
 params.trialType = 2; % 1-dev, 2-std
 Granger_ProcessFcn(params);
 
 params.protocolType = 3; % 1-PE, 2-DM, 3-Prediction
-params.DATAPATH{1} = [MONKEYPATH, 'Prediction\AC_Prediction_Data.mat'];
-params.DATAPATH{2} = [MONKEYPATH, 'Prediction\PFC_Prediction_Data.mat'];
-params.trialType = 1; % 1-nStd=1, 2-nStd=7
-Granger_ProcessFcn(params);
-params.trialType = 2; % 1-nStd=1, 2-nStd=7
-Granger_ProcessFcn(params);
+params.DATAPATH{1} = [POPUROOTPATH, 'Prediction\AC_Prediction_Data.mat'];
+params.DATAPATH{2} = [POPUROOTPATH, 'Prediction\PFC_Prediction_Data.mat'];
+for nStd = [1 3 7]
+    params.windowGranger = [500 * (nStd - 1), 500 * nStd];
+    Granger_ProcessFcn(params);
+end
