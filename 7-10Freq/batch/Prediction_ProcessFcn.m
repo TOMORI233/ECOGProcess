@@ -43,7 +43,7 @@ catch
             idxPFC = load([PrePATH, 'PFC_excludeIdx']);
         end
 
-        excludeIdxAll = cellfun(@(x, y) [x, y], idxAC.excludeIdx, idxPFC.excludeIdx, "UniformOutput", false);
+        excludeIdxAll = cellfun(@(x, y) [x; y], idxAC.excludeIdx, idxPFC.excludeIdx, "UniformOutput", false);
 
         if posIndex == 1
             badCHsAll = idxAC.badChIdx;

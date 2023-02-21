@@ -71,15 +71,15 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     tIdx = cellfun(@(x) ~any(x > tTh), tIdx); % marked true means reserved trials
 
     if any(~tIdx)
-        tIdx = find(~tIdx)';
-        disp(['Trial ', num2str(tIdx), ' excluded.']);
+        tIdx = find(~tIdx);
+        disp(['Trial ', num2str(tIdx'), ' excluded.']);
     else
         tIdx = [];
         disp('All pass');
     end
 
     chIdx = find(~goodChIdx);
-    disp(['Bad Channels: ', num2str(reshape(chIdx, [1, numel(chIdx)]))]);
+    disp(['Bad Channels: ', num2str(chIdx')]);
 
     return;
 end
