@@ -13,7 +13,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
     narginchk(3, 4);
 
     if nargin < 4
-        chs2doICA = 'all';
+        chs2doICA = 1:size(trialsECOG{1}, 1);
     end
 
     comp0 = mICA(trialsECOG, windowICA, fs, "chs2doICA", chs2doICA);
