@@ -11,7 +11,7 @@ protocols = string({temp.name}');
 %% select data
 % areaSel = "AC";
 dateSel = "";
-protSel = "MSTI_BG-5_S1-4o5_S2-4_ISI-800_Dur-300";
+protSel = "";
 
 % validate areaSel
 if ~matches(areaSel, ["AC", "PFC"]) || length(areaSel) > 1

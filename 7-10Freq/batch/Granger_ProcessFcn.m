@@ -1,5 +1,6 @@
 function Granger_ProcessFcn(params)
 close all;
+ft_setPath2Top;
 parseStruct(params);
 
 dataAC  = load(DATAPATH{1});

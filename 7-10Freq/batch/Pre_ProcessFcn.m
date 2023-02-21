@@ -83,7 +83,7 @@ if strcmp(icaOpt, "on")
             badCHs = reshape(temp, [numel(temp), 1]);
         end
         mPrint(FigTopoICA, strcat(PrePATH, "AC_Topo_ICA"), "-djpeg", "-r400");
-        mSave([PrePATH, 'AC_ICA.mat'], "comp", "ICs", "badCHs");
+        mSave([PrePATH, 'AC_ICA.mat'], "comp", "ICs", "badCHs", "chs2doICA");
     else
         disp('File already exists. Skip ICA in AC recording.');
     end
@@ -116,7 +116,7 @@ if strcmp(icaOpt, "on")
             badCHs = reshape(temp, [numel(temp), 1]);
         end
         mPrint(FigTopoICA, strcat(PrePATH, "PFC_Topo_ICA"), "-djpeg", "-r400");
-        mSave([PrePATH, 'PFC_ICA.mat'], "comp", "ICs", "badCHs");
+        mSave([PrePATH, 'PFC_ICA.mat'], "comp", "ICs", "badCHs", "chs2doICA");
     else
         disp('File already exists. Skip ICA in PFC recording.');
     end

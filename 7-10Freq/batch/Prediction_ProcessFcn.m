@@ -71,10 +71,10 @@ catch
 
         % ICA
         if strcmp(icaOpt, "on")
-            load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs", "badCHs");
+            load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs", "badCHs", "chs2doICA");
             trialsECOG = cellfun(@(x) x(chs2doICA, :), trialsECOG, "UniformOutput", false);
             trialsECOG = reconstructData(trialsECOG, comp, ICs);
-            trialsECOG = cellfun(@(x) insertRows(x, badCHs), trialsECOG, "UniformOutput", false);
+            trialsECOG = cellfun(@(x) insertRows(x, channels(ismember(channels, badCHs) & ~ismember(channels, chs2doICA))), trialsECOG, "UniformOutput", false);
         end
 
         % Replace bad chs by averaging neighbour chs

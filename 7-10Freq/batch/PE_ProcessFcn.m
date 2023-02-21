@@ -18,6 +18,7 @@ catch
     windowICA = [-2000, 1000];
     trialsECOG = [];
     trialAll = [];
+    dRatioAll = [];
     badCHs = [];
 
     if exist("SINGLEPATH", "var") % For population batch after daily process
@@ -74,15 +75,15 @@ catch
         % ICA
         if strcmp(icaOpt, "on")
             try
-                load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs", "badCHs");
+                load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs", "badCHs", "chs2doICA");
             catch
                 [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA, chs2doICA);
                 mPrint(FigTopoICA, strcat(PrePATH, AREANAME, "_Topo_ICA"), "-djpeg", "-r400");
-                mSave([PrePATH, AREANAME, '_ICA.mat'], "comp", "ICs", "badCHs");
+                mSave([PrePATH, AREANAME, '_ICA.mat'], "comp", "ICs", "badCHs", "chs2doICA");
             end
             trialsECOG = cellfun(@(x) x(chs2doICA, :), trialsECOG, "UniformOutput", false);
             trialsECOG = reconstructData(trialsECOG, comp, ICs);
-            trialsECOG = cellfun(@(x) insertRows(x, badCHs), trialsECOG, "UniformOutput", false);
+            trialsECOG = cellfun(@(x) insertRows(x, channels(ismember(channels, badCHs) & ~ismember(channels, chs2doICA))), trialsECOG, "UniformOutput", false);
         end
 
         % Replace bad chs by averaging neighbour chs
