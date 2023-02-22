@@ -4,7 +4,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     %     trialsData: nTrials*1 cell vector with each cell containing an nCh*nSample matrix of data
     %     tTh: threshold of percentage of bad data. For one trial, if nSamples(bad) > tTh*nSamples(total)
     %          in any reserved channel, it will be excluded. (default: 0.2)
-    %     chTh: threshold for excluding bad channels. The smaller, the stricter and the more bad channels. (default: 0.05)
+    %     chTh: threshold for excluding bad channels. The smaller, the stricter and the more bad channels. (default: 0.1)
     %     userDefineOpt: If set "on", bad channels will be defined by user.
     %                    If set "off", use [chTh] setting to exclude bad channels. (default: "off")
     % Output:
@@ -28,7 +28,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     mIp = inputParser;
     mIp.addRequired("trialsData", @(x) iscell(x));
     mIp.addOptional("tTh", 0.2, @(x) validateattributes(x, {'numeric'}, {'scalar', '>', 0, '<', 1}));
-    mIp.addOptional("chTh", 0.05, @(x) validateattributes(x, {'numeric'}, {'scalar', '>', 0, '<', 1}));
+    mIp.addOptional("chTh", 0.1, @(x) validateattributes(x, {'numeric'}, {'scalar', '>', 0, '<', 1}));
     mIp.addParameter("userDefineOpt", "off", @(x) any(validatestring(x, {'on', 'off'})));
     mIp.parse(trialsData, varargin{:});
 
@@ -59,7 +59,24 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
         if isequal(badCHs, 0)
             plotRawWave(chMean, chStd, [0, 1], 'origin');
             previewRawWave(trialsData, badtrialIdx, V);
+        end
+
+        k = 'N';
+        while ~any(strcmpi(k, {'y', ''})) || isequal(badCHs, 0)
             badCHs = validateInput('Please input bad channel number: ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
+            
+            % sort trials - preview
+            goodChIdx = true(length(goodChIdx), 1);
+            goodChIdx(badCHs) = false;
+            tIdx = cellfun(@(x) sum(x(goodChIdx, :) > chMean(goodChIdx, :) + 3 * chStd(goodChIdx, :) | x(goodChIdx, :) < chMean(goodChIdx, :) - 3 * chStd(goodChIdx, :), 2) / size(x, 2), trialsData, "UniformOutput", false);
+            tIdx = cellfun(@(x) ~any(x > tTh), tIdx); % marked true means reserved trials
+            if any(~tIdx)
+                disp(['Preview: Trial ', num2str(find(~tIdx)'), ' excluded.']);
+            else
+                disp('Preview: All pass');
+            end
+
+            k = validateInput('Press Y or Enter to continue or N to reselect bad channels: ', @(x) any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');
         end
 
         goodChIdx = true(length(goodChIdx), 1);

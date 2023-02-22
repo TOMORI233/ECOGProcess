@@ -28,6 +28,7 @@ params.userDefineOpt = "on";
 Pre_ProcessFcn(params);
 
 %% PE
+params.icaOpt = "on"; % on or off
 params.MONKEYPATH = [POPUROOTPATH, 'PE\'];
 params.AREANAME = 'AC';
 params.posIndex = 1; % 1-AC, 2-PFC

@@ -25,7 +25,7 @@ for index = 1:length(DATESTRs)
 
     % Exclude trials and bad channels
     params.icaOpt = "off"; % on or off
-    params.userDefineOpt = "on";
+    params.userDefineOpt = "off";
     Pre_ProcessFcn(params);
 
     % PE
