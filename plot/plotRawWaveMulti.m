@@ -1,7 +1,11 @@
 function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible)
     % Description: plot serveral raw waves in one subplot
     % Input:
-    %     chData: n*1 struct with fields [chMean], [color], [lines] and [legend]
+    %     chData: n*1 struct of
+    %         - chMean: [nCh,nSample]
+    %         - color: [R,G,B]
+    %         - legend
+    %         - skipChs: channels not to plot
     %     window: xlim
     %     titleStr: title of subplot
     %     plotSize: [nRows, nColumns]
@@ -60,6 +64,12 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
                 chMean = chData(index).chMean;
                 color = getOr(chData(index), "color", "r");
                 chData(index).legend = getOr(chData(index), "legend", []);
+                skipChs = getOr(chData(index), "skipChs");
+
+                if ismember(chNum, skipChs)
+                    continue;
+                end
+
                 t = linspace(window(1), window(2), size(chMean, 2));
 
                 if ~isempty(chData(index).legend)
@@ -93,7 +103,7 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
 
     end
 
-    yRange = scaleAxes(Fig, "y");
+    yRange = scaleAxes(Fig, "y", "on");
     
     allAxes = findobj(Fig, "Type", "axes");
 

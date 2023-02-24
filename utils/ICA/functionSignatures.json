@@ -17,7 +17,8 @@
                     {"name": "fsD", "kind": "ordered", "type": ["numeric", "positive", "numel=1"]},
                     {"name": "segOption", "kind": "ordered", "type": ["char", "choices={'trial onset', 'dev onset', 'push onset', 'last std'}"]}
                 ]
-            ]}
+            ]},
+            {"name": "chs2doICA", "kind": "namevalue"}
         ]
     }
 

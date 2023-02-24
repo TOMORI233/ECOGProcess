@@ -7,72 +7,80 @@ paddings = [0.01, 0.03, 0.01, 0.01];
 
 mkdir(MONKEYPATH);
 mkdir(PrePATH);
-badCHs = [];
 
+%% Data loading
 try
     load([MONKEYPATH, AREANAME, '_Prediction_Data.mat']);
 catch
-
-    for sIndex = 1:length(DATESTRs)
-        MATPATHs{sIndex, 1} = [ROOTPATH, DATESTRs{sIndex}, '\', DATESTRs{sIndex}, '_', AREANAME];
-    end
-
-    %% Load
     windowP = [-3000, 7000];
     windowT0 = [0, 500];
 
     trialAll = [];
     trialsECOG = [];
-
-    try
-        idxAC = load([PrePATH, 'AC_excludeIdx']);
-        idxPFC = load([PrePATH, 'PFC_excludeIdx']);
-    catch
-        Pre_ProcessFcn(params);
-        idxAC = load([PrePATH, 'AC_excludeIdx']);
-        idxPFC = load([PrePATH, 'PFC_excludeIdx']);
-    end
-
-    excludeIdxAll = cellfun(@(x, y) [x, y], idxAC.excludeIdx, idxPFC.excludeIdx, "UniformOutput", false);
-
-    if posIndex == 1
-        badCHsAll = idxAC.badChIdx;
-    else
-        badCHsAll = idxPFC.badChIdx;
-    end
+    badCHs = [];
     
-    for mIndex = 1:length(MATPATHs)
-        [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHs{mIndex}, params);
-        trials = trialAll_temp(~[trialAll_temp.interrupt]);
-        trialsECOG_temp = selectEcog(ECOGDataset, trials, "trial onset", windowP);
-        trials(excludeIdxAll{mIndex}) = [];
-        trialAll = [trialAll; trials];
-        trialsECOG_temp(excludeIdxAll{mIndex}) = [];
-        % trialsECOG_temp = cellfun(@(x) cell2mat(rowFcn(@(y) y * length(y) ./ norm(y), x)), trialsECOG_temp, "UniformOutput", false);
-        trialsECOG = [trialsECOG; trialsECOG_temp];
-        badCHs = [badCHs, badCHsAll{mIndex}];
-    end
-
-    badCHs = unique(badCHs);
-    fs = ECOGDataset.fs;
-    channels = ECOGDataset.channels;
-
-    % Replace bad chs by averaging neighbour chs
-    [~, neighbours] = mPrepareNeighbours(channels);
-    for bIndex = 1:numel(badCHs)
-        for tIndex = 1:length(trialsECOG)
-            chsTemp = neighbours{badCHs(bIndex)};
-            trialsECOG{tIndex}(badCHs(bIndex), :) = mean(trialsECOG{tIndex}(chsTemp(~ismember(chsTemp, badCHs)), :), 1);
+    if exist("SINGLEPATH", "var") % For population batch after daily process
+        for index = 1:length(SINGLEPATH)
+            dataSingle(index) = load(SINGLEPATH{index});
+            trialsECOG = [trialsECOG; dataSingle(index).trialsECOG];
+            trialAll = [trialAll; dataSingle(index).trialAll];
+            badCHs = [badCHs; dataSingle(index).badCHs];
         end
-    end
+        badCHs = unique(badCHs);
+        fs = dataSingle(1).fs;
+        channels = dataSingle(1).channels;
+    else
+        for sIndex = 1:length(DATESTRs)
+            MATPATHs{sIndex, 1} = [ROOTPATH, DATESTRs{sIndex}, '\', DATESTRs{sIndex}, '_', AREANAME];
+        end
 
-    % ICA
-    if strcmp(icaOpt, "on")
-        load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs");
-        trialsECOG = reconstructData(trialsECOG, comp, ICs);
-        badCHs = [];
-    end
+        try
+            idxAC = load([PrePATH, 'AC_excludeIdx']);
+            idxPFC = load([PrePATH, 'PFC_excludeIdx']);
+        catch
+            Pre_ProcessFcn(params);
+            idxAC = load([PrePATH, 'AC_excludeIdx']);
+            idxPFC = load([PrePATH, 'PFC_excludeIdx']);
+        end
 
+        excludeIdxAll = cellfun(@(x, y) [x; y], idxAC.excludeIdx, idxPFC.excludeIdx, "UniformOutput", false);
+
+        if posIndex == 1
+            badCHsAll = idxAC.badChIdx;
+        else
+            badCHsAll = idxPFC.badChIdx;
+        end
+
+        for mIndex = 1:length(MATPATHs)
+            [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHs{mIndex}, params);
+            trials = trialAll_temp(~cellfun(@(x) isequal(x, true), {trialAll_temp.interrupt}));
+            trialsECOG_temp = selectEcog(ECOGDataset, trials, "trial onset", windowP);
+            trials(excludeIdxAll{mIndex}) = [];
+            trialAll = [trialAll; trials];
+            trialsECOG_temp(excludeIdxAll{mIndex}) = [];
+            % trialsECOG_temp = cellfun(@(x) cell2mat(rowFcn(@(y) y * length(y) ./ norm(y), x)), trialsECOG_temp, "UniformOutput", false);
+            trialsECOG = [trialsECOG; trialsECOG_temp];
+            badCHs = [badCHs; badCHsAll{mIndex}];
+        end
+
+        badCHs = unique(badCHs);
+        fs = ECOGDataset.fs;
+        channels = ECOGDataset.channels;
+
+        chs2doICA = channels;
+        chs2doICA(ismember(chs2doICA, badCHs)) = [];
+
+        % ICA
+        if strcmp(icaOpt, "on")
+            load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs", "badCHs", "chs2doICA");
+            trialsECOG = cellfun(@(x) x(chs2doICA, :), trialsECOG, "UniformOutput", false);
+            trialsECOG = reconstructData(trialsECOG, comp, ICs);
+            trialsECOG = cellfun(@(x) insertRows(x, channels(ismember(channels, badCHs) & ~ismember(channels, chs2doICA))), trialsECOG, "UniformOutput", false);
+        end
+
+        % Replace bad chs by averaging neighbour chs
+        trialsECOG = interpolateBadChs(trialsECOG, badCHs);
+    end
     mSave([MONKEYPATH, AREANAME, '_Prediction_Data.mat'], "windowP", "windowT0", "trialsECOG", "trialAll", "channels", "fs", "badCHs");
 end
 
@@ -149,7 +157,7 @@ for cIndex = 1:nCh
     else
         title(['CH ', num2str(cIndex)]);
     end
-    
+
     if cIndex < 57
         xticklabels('');
     end
@@ -181,10 +189,10 @@ mPrint(FigAOITopo, [MONKEYPATH, AREANAME, '_AOIF_Topo.jpg'], "-djpeg", "-r600");
 
 %% Example
 % ch = input('Input example channel: ');
-% 
+%
 % resultTFR = [AoiMean(ch, :)', AoiSE(ch, :)'];
 % resultWave = [t / 1000, chMean(ch, :)'];
-% 
+%
 % FigWaveExample = plotRawWave(chMean, [], windowP, [], [1, 1], ch);
 % FigTFAExample = plotTFA(chMean, fs, [], windowP, [], [1, 1], ch);
 % scaleAxes([FigTFAExample, FigWaveExample], "x", [0, ISI * nStd]);
@@ -192,7 +200,7 @@ mPrint(FigAOITopo, [MONKEYPATH, AREANAME, '_AOIF_Topo.jpg'], "-djpeg", "-r600");
 % lines = struct("X", mat2cell((0:nStd - 1)' * ISI, ones(nStd, 1)));
 % addLines2Axes(FigWaveExample, lines);
 % mPrint(FigTFAExample, [MONKEYPATH, AREANAME, '_TFR_CH', num2str(ch), '.jpg'], "-djpeg", "-r600");
-% 
+%
 % idx = [trialAll.oddballType] == "STD" & [trialAll.correct];
 % [~, temp, ~, window] = joinSTD(trialAll(idx), trialsECOG(idx), fs, "reserveTail", true);
 % resultSTD = [t / 1000, temp(ch, :)'];

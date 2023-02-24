@@ -67,16 +67,8 @@
         "inputs": [
             {"name": "trialsData", "kind": "required", "type": ["cell"]},
             {"name": "tTh", "kind": "ordered", "type": ["scalar", "numeric"]},
-            {"mutuallyExclusiveGroup": [
-                [
-                    {"name": "chTh", "kind": "ordered", "type": ["scalar", "numeric"]},
-                    {"name": "userDefineOpt", "kind": "namevalue", "type": ["choices={'on', 'off'}"]},
-                    {"name": "previewOpt", "kind": "namevalue", "type": ["choices={'on', 'off'}"]}
-                ],
-                [
-                    {"name": "userDefineOpt", "kind": "ordered", "type": ["choices={'on', 'off'}"]}
-                ]
-            ]}
+            {"name": "chTh", "kind": "ordered", "type": ["scalar", "numeric"]},
+            {"name": "userDefineOpt", "kind": "namevalue", "type": ["choices={'on', 'off'}"]}
         ]
     }
     

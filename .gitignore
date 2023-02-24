@@ -3,16 +3,20 @@
 #This file is created by: touch.gitignore 
 #put it in the root folder
 #ignore slprj folder
-*/slprj/
+**/slprj/
 /slprj/
 #ignore codegen folder
-*/codegen/
+**/codegen/
 /codegen/
 
+#ignore figures
+**/CC/
+**/XX/
+
 #ignore following files;
-*asv
-*slxc
-*mexmaci64
-*mexmaci32
-*jpg
-*png
+*.asv
+*.slxc
+*.mexmaci64
+*.mexmaci32
+*.jpg
+*.png

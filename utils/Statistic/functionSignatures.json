@@ -28,5 +28,13 @@
             ]},
             {"name": "reserveTail", "kind": "namevalue", "type": ["logical", "scalar"]}
         ]
+    },
+
+    "insertRows": {
+        "inputs": [
+            {"name": "X", "kind": "required", "type": ["2d", "numeric"]},
+            {"name": "rows", "kind": "required", "type": ["vector", "integer", "positive"]}
+        ]
     }
+
 }

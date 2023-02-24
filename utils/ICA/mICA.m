@@ -11,6 +11,7 @@ function comp = mICA(dataset, windowICA, arg3, varargin)
 %         2. fs: ECOGDataset.fs, Hz
 %     fsD: sample rate for downsampling, < fs
 %     segOption: "trial onset" | "dev onset" | "push onset" | "last std"
+%     chs2doICA: channel number to perform ICA on (e.g. [1:25,27:64], default='all')
 % Output:
 %     comp: result of ICA (FieldTrip)
 % Example:
@@ -23,10 +24,12 @@ mIp.addRequired("windowICA", @(x) validateattributes(x, {'numeric'}, {'2d', 'inc
 mIp.addRequired("arg3", @(x) isnumeric(x) || isstruct(x));
 mIp.addOptional("fsD", 500, @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
 mIp.addOptional("segOption", "trial onset", @(x) any(validatestring(x, {'trial onset', 'dev onset', 'push onset', 'last std'})));
+mIp.addParameter("chs2doICA", 'all');
 mIp.parse(dataset, windowICA, arg3, varargin{:});
 
 fsD = mIp.Results.fsD;
 segOption = mIp.Results.segOption;
+chs2doICA = mIp.Results.chs2doICA;
 
 switch class(arg3)
     case 'double'
@@ -49,6 +52,12 @@ switch class(dataset)
         [trialsECOG, ~, ~, sampleinfo] = selectEcog(ECOGDataset, trials, segOption, windowICA);
     otherwise
         error("Invalid syntax");
+end
+
+if ~strcmp(chs2doICA, 'all')
+    temp = channels;
+    temp(~ismember(temp, chs2doICA)) = [];
+    chs2doICA = cellfun(@(x) num2str(x), num2cell(temp)', 'UniformOutput', false);
 end
 
 %% Preprocessing
@@ -93,6 +102,7 @@ end
 disp("Performing ICA...");
 cfg = [];
 cfg.method = 'runica';
+cfg.channel = chs2doICA;
 comp = ft_componentanalysis(cfg, data);
 
 disp("ICA done.");

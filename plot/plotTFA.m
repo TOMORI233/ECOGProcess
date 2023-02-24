@@ -1,4 +1,4 @@
-function [Fig, res] = plotTFA(chMean, fs0, fs, window, titleStr, plotSize, chs, visible)
+function [Fig, res] = plotTFA(chMean, fs0, fsD, window, titleStr, plotSize, chs, visible)
     narginchk(4, 8);
     
     if nargin < 5
@@ -43,7 +43,7 @@ function [Fig, res] = plotTFA(chMean, fs0, fs, window, titleStr, plotSize, chs, 
 
             chNum = chs(rIndex, cIndex);
             mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
-            [t, Y, CData, coi] = mCWT(double(chMean(chNum, :)), fs0, 'morlet', fs);
+            [t, Y, CData, coi] = mCWT(double(chMean(chNum, :)), fs0, 'morlet', fsD);
             X = t * 1000 + window(1);
             imagesc('XData', X, 'YData', Y, 'CData', CData);
             res.TFR = [res.TFR; {CData}];

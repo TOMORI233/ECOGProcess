@@ -9,81 +9,93 @@ colors = cellfun(@(x) x / 255, {[200 200 200], [0 0 0], [0 0 255], [255 128 0], 
 
 mkdir(MONKEYPATH);
 mkdir(PrePATH);
-badCHs = [];
 
 %% Data loading
 try
     load([MONKEYPATH, AREANAME, '_PE_Data.mat']);
 catch
-    % Load
-    for index = 1:length(DATESTRs)
-        MATPATHs{index, 1} = [ROOTPATH, DATESTRs{index}, '\', DATESTRs{index}, '_', AREANAME];
-    end
-
     windowPE = [-500, 800];
     windowICA = [-2000, 1000];
     trialsECOG = [];
     trialAll = [];
+    dRatioAll = [];
+    badCHs = [];
 
-    try
-        idxAC = load([PrePATH, 'AC_excludeIdx']);
-        idxPFC = load([PrePATH, 'PFC_excludeIdx']);
-    catch
-        Pre_ProcessFcn(params);
-        idxAC = load([PrePATH, 'AC_excludeIdx']);
-        idxPFC = load([PrePATH, 'PFC_excludeIdx']);
-    end
-    
-    excludeIdxAll = cellfun(@(x, y) [x, y], idxAC.excludeIdx, idxPFC.excludeIdx, "UniformOutput", false);
-    
-    if posIndex == 1
-        badCHsAll = idxAC.badChIdx;
+    if exist("SINGLEPATH", "var") % For population batch after daily process
+        for index = 1:length(SINGLEPATH)
+            dataSingle(index) = load(SINGLEPATH{index});
+            trialsECOG = [trialsECOG; dataSingle(index).trialsECOG];
+            dRatioAll = [dRatioAll, dataSingle(index).dRatioAll];
+            badCHs = [badCHs; dataSingle(index).badCHs];
+        end
+        dRatio = unique(dRatioAll);
+        badCHs = unique(badCHs);
+        fs = dataSingle(1).fs;
+        channels = dataSingle(1).channels;
     else
-        badCHsAll = idxPFC.badChIdx;
-    end
-
-    for mIndex = 1:length(MATPATHs)
-        [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHs{mIndex}, params);
-        trials = trialAll_temp(~[trialAll_temp.interrupt]);
-        trialsECOG_temp = selectEcog(ECOGDataset, trials, "dev onset", windowICA);
-        trials(excludeIdxAll{mIndex}) = [];
-        trialsECOG_temp(excludeIdxAll{mIndex}) = [];
-        trialAll = [trialAll; trials];
-        trialsECOG = [trialsECOG; trialsECOG_temp];
-        badCHs = [badCHs, badCHsAll{mIndex}];
-    end
-
-    badCHs = unique(badCHs);
-    fs = ECOGDataset.fs;
-    channels = ECOGDataset.channels;
-
-    % Replace bad chs by averaging neighbour chs before performing ICA
-    [~, neighbours] = mPrepareNeighbours(channels);
-    for bIndex = 1:numel(badCHs)
-        for tIndex = 1:length(trialsECOG)
-            chsTemp = neighbours{badCHs(bIndex)};
-            trialsECOG{tIndex}(badCHs(bIndex), :) = mean(trialsECOG{tIndex}(chsTemp(~ismember(chsTemp, badCHs)), :), 1);
+        for index = 1:length(DATESTRs)
+            MATPATHs{index, 1} = [ROOTPATH, DATESTRs{index}, '\', DATESTRs{index}, '_', AREANAME];
         end
-    end
 
-    % ICA
-    if strcmp(icaOpt, "on")
         try
-            load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs");
+            idxAC = load([PrePATH, 'AC_excludeIdx']);
+            idxPFC = load([PrePATH, 'PFC_excludeIdx']);
         catch
-            [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA);
-            mPrint(FigTopoICA, strcat(PrePATH, AREANAME, "_Topo_ICA"), "-djpeg", "-r400");
-            mSave([PrePATH, AREANAME, '_ICA.mat'], "comp", "ICs");
+            Pre_ProcessFcn(params);
+            idxAC = load([PrePATH, 'AC_excludeIdx']);
+            idxPFC = load([PrePATH, 'PFC_excludeIdx']);
         end
-        trialsECOG = reconstructData(trialsECOG, comp, ICs);
+
+        excludeIdxAll = cellfun(@(x, y) [x; y], idxAC.excludeIdx, idxPFC.excludeIdx, "UniformOutput", false);
+
+        if posIndex == 1
+            badCHsAll = idxAC.badChIdx;
+        else
+            badCHsAll = idxPFC.badChIdx;
+        end
+
+        for mIndex = 1:length(MATPATHs)
+            [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHs{mIndex}, params);
+            trials = trialAll_temp(~cellfun(@(x) isequal(x, true), {trialAll_temp.interrupt}));
+            trialsECOG_temp = selectEcog(ECOGDataset, trials, "dev onset", windowICA);
+            trials(excludeIdxAll{mIndex}) = [];
+            trialsECOG_temp(excludeIdxAll{mIndex}) = [];
+            trialAll = [trialAll; trials];
+            trialsECOG = [trialsECOG; trialsECOG_temp];
+            badCHs = [badCHs; badCHsAll{mIndex}];
+        end
+
+        badCHs = unique(badCHs);
+        fs = ECOGDataset.fs;
+        channels = ECOGDataset.channels;
+
+        chs2doICA = channels;
+        chs2doICA(ismember(chs2doICA, badCHs)) = [];
+
+        % ICA
+        if strcmp(icaOpt, "on")
+            try
+                load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs", "badCHs", "chs2doICA");
+            catch
+                [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA, chs2doICA);
+                mPrint(FigTopoICA, strcat(PrePATH, AREANAME, "_Topo_ICA"), "-djpeg", "-r400");
+                mSave([PrePATH, AREANAME, '_ICA.mat'], "comp", "ICs", "badCHs", "chs2doICA");
+            end
+            trialsECOG = cellfun(@(x) x(chs2doICA, :), trialsECOG, "UniformOutput", false);
+            trialsECOG = reconstructData(trialsECOG, comp, ICs);
+            trialsECOG = cellfun(@(x) insertRows(x, channels(ismember(channels, badCHs) & ~ismember(channels, chs2doICA))), trialsECOG, "UniformOutput", false);
+        end
+
+        % Replace bad chs by averaging neighbour chs
+        trialsECOG = interpolateBadChs(trialsECOG, badCHs);
+
+        [dRatioAll, dRatio] = computeDevRatio(trialAll(~cellfun(@(x) isequal(x, false), {trialAll.correct})));
+
+        startIdx = fix((windowPE(1) - windowICA(1)) / 1000 * fs);
+        endIdx = fix((windowPE(2) - windowICA(1)) / 1000 * fs);
+        trialsECOG = cellfun(@(x) x(:, startIdx:endIdx), trialsECOG(~cellfun(@(x) isequal(x, false), {trialAll.correct})), "UniformOutput", false);
     end
-
-    [dRatioAll, dRatio] = computeDevRatio(trialAll([trialAll.correct]));
-
-    startIdx = fix((windowPE(1) - windowICA(1)) / 1000 * fs);
-    endIdx = fix((windowPE(2) - windowICA(1)) / 1000 * fs);
-    trialsECOG = cellfun(@(x) x(:, startIdx:endIdx), trialsECOG([trialAll.correct]), "UniformOutput", false);
-
+    
     mSave([MONKEYPATH, AREANAME, '_PE_Data.mat'], "windowPE", "trialsECOG", "dRatioAll", "dRatio", "fs", "channels", "badCHs");
 end
 
@@ -91,21 +103,22 @@ end
 tIdx1 = (-500 - windowPE(1)) / 1000 * fs + 1:(0 - windowPE(1)) / 1000 * fs;
 tIdx2 = (0 - windowPE(1)) / 1000 * fs + 1:(500 - windowPE(1)) / 1000 * fs;
 
+trialsECOG_MMN = cellfun(@(x) x(:, tIdx2) - x(:, tIdx1), trialsECOG, "UniformOutput", false);
+
 for dIndex = 1:length(dRatio)
     temp = trialsECOG(dRatioAll == dRatio(dIndex));
     chData(dIndex).chMean = cell2mat(cellfun(@(x) mean(x, 1), changeCellRowNum(temp), "UniformOutput", false));
     chData(dIndex).dataNorm = cellfun(@(x) x - chData(1).chMean, temp, "UniformOutput", false);
     chData(dIndex).color = colors{dIndex};
 
-    trialsECOG_MMN = cellfun(@(x) x(:, tIdx2), temp, "UniformOutput", false) - cellfun(@(x) x(:, tIdx1), temp, "UniformOutput", false);
-    chDataMMN(dIndex).chMean = cell2mat(cellfun(@(x) mean(x, 1), changeCellRowNum(trialsECOG_MMN), "UniformOutput", false));
+    chDataMMN(dIndex).chMean = cell2mat(cellfun(@(x) mean(x, 1), changeCellRowNum(trialsECOG_MMN(dRatioAll == dRatio(dIndex))), "UniformOutput", false));
     chDataMMN(dIndex).color = colors{dIndex};
 end
 
 %% Multiple comparison
 t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
 
-try 
+try
     load([MONKEYPATH, AREANAME, '_PE_CBPT'], "stat", "-mat");
 catch
     data = [];
@@ -122,7 +135,7 @@ catch
         % trialinfo nTrial*1
         data(dIndex).trialinfo = repmat(dIndex, [length(temp), 1]);
     end
-    
+
     stat = CBPT(data);
     mSave([MONKEYPATH, AREANAME, '_PE_CBPT.mat'], "stat");
 end
@@ -162,9 +175,8 @@ mPrint(FigCBPT, [MONKEYPATH, AREANAME, '_PE_CBPT.jpg'], "-djpeg", "-r600");
 t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
 FigPE = plotRawWaveMulti(chData(2:end), windowPE);
 scaleAxes(FigPE, "x", [0, windowPE(2)]);
-yRange = scaleAxes(FigPE);
+scaleAxes(FigPE, "y", "on");
 setAxes(FigPE, "visible", "off");
-mAxes = findobj(FigPE, "Type", "axes");
 plotLayout(FigPE, (monkeyID - 1) * 2 + posIndex, 0.4);
 drawnow;
 mPrint(FigPE, [MONKEYPATH, AREANAME, '_PE_RawWave.jpg'], "-djpeg", "-r600");
@@ -228,14 +240,11 @@ PEI = chData(end).chMean - chData(2).chMean;
 mSave([MONKEYPATH, AREANAME, '_PE_tuning.mat'], "windowPE", "PEI", "tuningSlope", "V0", "chIdx", "mask", "P");
 
 %% MMN
-% chDataMMN(end).color = [0 0 0];
-% FigMMN = plotRawWaveMulti(chDataMMN(end), [0, 500], 'MMN');
-% scaleAxes("y", "on", "symOpts", "max");
-% addLines2Axes(struct("X", 0));
-% plotLayout((monkeyID - 1) * 2 + posIndex);
-% mPrint(FigMMN, [MONKEYPATH, AREANAME, '_PE_MMN0.jpg'], "-djpeg", "-r600");
-% setAxes(FigMMN, "Visible", "off");
-% mPrint(FigMMN, [MONKEYPATH, AREANAME, '_PE_MMN.jpg'], "-djpeg", "-r600");
+FigMMN = plotRawWaveMulti(chDataMMN, [0, 500], 'MMN');
+plotLayout(FigMMN, (monkeyID - 1) * 2 + posIndex);
+mPrint(FigMMN, [MONKEYPATH, AREANAME, '_PE_MMN0.jpg'], "-djpeg", "-r600");
+setAxes(FigMMN, "Visible", "off");
+mPrint(FigMMN, [MONKEYPATH, AREANAME, '_PE_MMN.jpg'], "-djpeg", "-r600");
 
 %% Example
 % ch = input('Input example channel: ');
@@ -257,7 +266,11 @@ mSave([MONKEYPATH, AREANAME, '_PE_tuning.mat'], "windowPE", "PEI", "tuningSlope"
 % t(V0(ch, :) == 0) = [];
 % hold on;
 % plot(t, a, "Color", [128 128 128]/255, "Marker", "square", "MarkerSize", 10, "MarkerFaceColor", [128 128 128]/255);
-% 
+%
+% plotRawWaveMulti(chDataMMN, [0, 500], 'MMN', [1, 1], ch);
+% hold on;
+% plot(t, a, "Color", [128 128 128]/255, "Marker", "square", "MarkerSize", 10, "MarkerFaceColor", [128 128 128]/255);
+%
 % resultTuning = cellfun(@(x, y) [x(:, ch), y(:, ch)], tuningMean, tuningSE, "UniformOutput", false);
 % figure;
 % maximizeFig;

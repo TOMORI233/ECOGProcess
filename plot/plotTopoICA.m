@@ -1,4 +1,4 @@
-function Fig = plotTopoICA(comp, topoSize, plotSize, ICs)
+function Fig = plotTopoICA(topo, topoSize, plotSize, ICs)
     narginchk(1, 4);
 
     if nargin < 2
@@ -22,15 +22,13 @@ function Fig = plotTopoICA(comp, topoSize, plotSize, ICs)
     maximizeFig(Fig);
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
-    topo = comp.topo;
     
     for rIndex = 1:plotSize(1)
     
         for cIndex = 1:plotSize(2)
             ICNum = ICs(rIndex, cIndex);
 
-
-            if ICs(rIndex, cIndex) > size(topo, 1)
+            if ICs(rIndex, cIndex) > size(topo, 2)
                 continue;
             end
 

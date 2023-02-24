@@ -12,13 +12,18 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     % Output:
     %     trialAll: n*1 struct of trial information
     %     ECOGDataset: TDT dataset of [streams.(posStr(posIndex))]
+    % Example:
+    %     TDTPath = 'D:\Data\xx\xx20230220\Block-1';
+    %     params.posIndex = 1; % AC
+    %     params.choiceWin = [100, 800]; % ms
+    %     params.processFcn = @ActiveProcess_7_10Freq;
+    %     [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params);
 
     mIp = inputParser;
     mIp.addRequired("DATAPATH");
     mIp.addRequired("params", @(x) isstruct(x));
     mIp.addParameter("behaviorOnly", false, @(x) validateattrbutes(x, 'logical', {'scalar'}));
-    mIp.addParameter("patch", "reject", @(x) any(validatestring(x, {'reject','matchIssue','bankIssue'})));
-
+    mIp.addParameter("patch", "reject", @(x) any(validatestring(x, {'reject', 'matchIssue', 'bankIssue'})));
     mIp.parse(DATAPATH, params, varargin{:});
 
     behaviorOnly = mIp.Results.behaviorOnly;
