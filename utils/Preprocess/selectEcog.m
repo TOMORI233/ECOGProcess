@@ -44,6 +44,9 @@ else
     if segIndex(1) <= 0
         segIndex(1) = 1;
     end
+      if segIndex(1) == 1000
+        segIndex(1) = 1001;
+    end
     segIndex(segIndex + windowIndex(2) > size(ECOGDataset.data, 2)) = [];
 
     % by trial

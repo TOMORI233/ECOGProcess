@@ -1,5 +1,5 @@
 clear; clc;
-rootPathMat = "E:\ECoG\MAT Data\CC\ClickTrainLongTerm\SpeciesNew\";
+rootPathMat = "E:\ECoG\MAT Data\XX\ClickTrainLongTerm\SpeciesNew\";
 rootPathFig = "E:\ECoG\corelDraw\ClickTrainLongTerm\Species\";
 
 %% set protocols
@@ -9,8 +9,8 @@ protocols = string({temp.name}');
 
 %% select data
 areaSel = "AC";
-dateSel = "";
-protSel = "";
+dateSel = "xx20221121";
+protSel = "Species_2_4_6_8_Duaration_1o5";
 
 % validate areaSel
 if ~matches(areaSel, ["AC", "PFC"]) || length(areaSel) > 1
@@ -39,7 +39,7 @@ for rIndex = 1 : length(protocols)
         if matches(protocolStr, ["Species_2_4ms_Ratio", "Species_6_8ms_Ratio"])
             run("Figure_Example_Species_Basic.m");
         elseif matches(protocolStr, ["Species_2_4_6_8_Duaration_1o5", "Species_2_4_6_8_Duaration_1o015"])
-            continue
+            run("Figure_Example_Species_Basic.m");
         elseif matches(protocolStr, ["Species2_4_Oscillation_1o5", "Species6_8_Oscillation_1o5", "Species2_4_Oscillation_1o015", "Species6_8_Oscillation_1o015"])
             continue
         elseif matches(protocolStr, ["Species2_4_Variance_1o5", "Species6_8_Variance_1o5", "Species2_4_Variance_1o015", "Species6_8_Variance_1o015"])

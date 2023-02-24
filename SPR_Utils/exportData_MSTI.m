@@ -2,6 +2,7 @@
 
 %% CC
 clear ; clc
+params.processFcn = @PassiveProcess_clickTrainContinuous;
 fd = 600;
 recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\SPR_Utils\ClickTrainLongTermFigure\MSTI\ME_MSTIRecording_CC.xlsx");
 recordInfo = table2struct(readtable(recordPath));
@@ -23,6 +24,7 @@ end
 
 %% XX
 clear ; clc
+params.processFcn = @PassiveProcess_clickTrainContinuous;
 fd = 600;
 recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\SPR_Utils\ClickTrainLongTermFigure\MSTI\ME_MSTIRecording_XX.xlsx");
 recordInfo = table2struct(readtable(recordPath));

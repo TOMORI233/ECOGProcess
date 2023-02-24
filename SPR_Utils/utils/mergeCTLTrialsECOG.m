@@ -13,7 +13,7 @@ temp = string(split(MATPATH, '\'));
 Protocol = temp(end - 2);
 
 segOption = ["trial onset", "dev onset"];
-flp = 600;
+flp = 300;
 fhp = 0.1;
 
 
