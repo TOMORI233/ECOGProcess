@@ -140,9 +140,16 @@ end
 p = stat.stat;
 mask = stat.mask;
 V0 = p .* mask;
-windowSortCh = [0, 500];
+windowSortCh = [0, 400];
 tIdx = fix((windowSortCh(1) - windowDM(1)) / 1000 * fs) + 1:fix((windowSortCh(2) - windowDM(1)) / 1000 * fs);
-[~, chIdx] = sort(sum(abs(V0(:, tIdx)), 2), 'descend');
+[rankVs, chIdx] = sort(sum(mask(:, tIdx), 2), 'descend');
+rankVsTemp = sort(sum(abs(V0(:, tIdx)), 2), 'descend');
+rankV = unique(rankVs);
+rankV = rankV(arrayfun(@(x) length(rankVs(rankVs == x)) > 1, rankV));
+for index = 1:length(rankV)
+    chIdxTemp = chIdx(rankVs == rankV(index));
+    chIdx(rankVs == rankV(index)) = chIdxTemp(obtainArgoutN(@sort, 2, rankVsTemp(rankVs == rankV(index)), 'descend'));
+end
 V = V0(chIdx, :);
 
 FigCBPT = figure;
@@ -276,6 +283,7 @@ for wIndex = 1:12
     mAxesDRP(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumDRP(wIndex), 1, "paddings", paddings, "shape", "square-min");
     tuning = resDP(wIndex).v - 0.5;
     plotTopo(tuning, "contourOpt", "off");
+    plotLayout(gca, (monkeyID - 1) * 2 + posIndex, 0.4);
     title(['DRP topo [', num2str(resDP(wIndex).window(1)), ' ', num2str(resDP(wIndex).window(2)), ']']);
 
     % p
@@ -284,6 +292,7 @@ for wIndex = 1:12
     P(P == 0) = 1 / nIter;
     P = log(P / alpha) / log(alpha);
     plotTopo(P, "contourOpt", "off");
+    plotLayout(gca, (monkeyID - 1) * 2 + posIndex, 0.4);
     title(['p topo [', num2str(resDP(wIndex).window(1)), ' ', num2str(resDP(wIndex).window(2)), '] | p=log_{', num2str(alpha), '}(p/', num2str(alpha), ')']);
 end
 colormap('jet');

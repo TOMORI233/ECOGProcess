@@ -42,59 +42,105 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     chStd = cell2mat(cellfun(@std, temp, "UniformOutput", false));
     chMeanAll = mean(cell2mat(trialsData));
     chStdAll = std(cell2mat(trialsData));
-    V = cellfun(@(x) sum(x > chMeanAll + 3 * chStdAll | x < chMeanAll - 3 * chStdAll, 2) / size(x, 2), temp, "UniformOutput", false);
-    V = cellfun(@(x) x > tTh, V, "UniformOutput", false);
+    V0 = cellfun(@(x) sum(x > chMeanAll + 3 * chStdAll | x < chMeanAll - 3 * chStdAll, 2) / size(x, 2), temp, "UniformOutput", false);
+    V = cellfun(@(x) x > tTh, V0, "UniformOutput", false);
     badtrialIdx = cellfun(@(x) any(x), changeCellRowNum(V));
     V = cellfun(@(x) sum(x), V);
+
+    % sort trials
+    tIdx = cellfun(@(x) sum(x > chMean + 3 * chStd | x < chMean - 3 * chStd, 2) / size(x, 2), trialsData, "UniformOutput", false);
+
+    % show channel-bad trials
     goodChIdx = V < chTh * length(trialsData); % marked true means reserved channels
-    channels = (1:length(goodChIdx))';
+    channels = (1:length(goodChIdx))'; % all channels
     nTrial_bad = arrayfun(@(x) [num2str(x), '/', num2str(length(trialsData))], V, "UniformOutput", false);
     mark = goodChIdx;
     disp(table(channels, nTrial_bad, mark));
-    disp(['Possible bad channel numbers are: ', num2str(find(~goodChIdx)')]);
+    if all(goodChIdx)
+        disp('All channels are good.');
+    else
+        disp(['Possible bad channel numbers are: ', num2str(find(~goodChIdx)')]);
+    end
 
+    % bad channels defined by user
     if strcmp(userDefineOpt, "on")
         badCHs = validateInput('Please input bad channel number (0 for preview): ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'nonnegative'}));
 
         if isequal(badCHs, 0)
+            % raw wave
             plotRawWave(chMean, chStd, [0, 1], 'origin');
+
+            % good trials (mean, red) against bad trials (single, grey)
             previewRawWave(trialsData, badtrialIdx, V);
+
+            % histogram
+            temp = changeCellRowNum(tIdx);
+            figure;
+            maximizeFig;
+            margins = [0.05, 0.05, 0.1, 0.1];
+            paddings = [0.01, 0.03, 0.01, 0.01];
+            for index = 1:length(channels)
+                mSubplot(8, 8, index, "margins", margins, "paddings", paddings);
+                binSize = 0.05;
+                histogram(temp{index}, "Normalization", "probability", "BinWidth", binSize, "FaceColor", "b", "DisplayName", "Single");
+                hold on;
+                histogram(V0{index}, "Normalization", "probability", "BinWidth", binSize, "FaceColor", "r", "DisplayName", "All");
+                if ismember(index, find(~goodChIdx))
+                    title(['CH ', num2str(index), ' (bad)']);
+                else
+                    title(['CH ', num2str(index)]);
+                end
+                if index <= 56
+                    xticklabels('');
+                end
+                if mod(index - 1, 8) ~= 0
+                    yticklabels('');
+                end
+                if index == 1
+                    legend(gca, "show");
+                else
+                    legend(gca, "hide");
+                end
+            end
+            scaleAxes("x", [0.1, inf]);
+            scaleAxes("y", "on", "type", "hist");
+            lines.X = tTh;
+            addLines2Axes(gcf, lines);
+
+            k = 'N';
+        else
+            k = 'Y';
+            goodChIdx = true(length(goodChIdx), 1);
+            goodChIdx(badCHs) = false;
         end
 
-        k = 'N';
-        while ~any(strcmpi(k, {'y', ''})) || isequal(badCHs, 0)
+        while strcmpi(k, 'n')
             badCHs = validateInput('Please input bad channel number: ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
             
             % sort trials - preview
             goodChIdx = true(length(goodChIdx), 1);
             goodChIdx(badCHs) = false;
-            tIdx = cellfun(@(x) sum(x(goodChIdx, :) > chMean(goodChIdx, :) + 3 * chStd(goodChIdx, :) | x(goodChIdx, :) < chMean(goodChIdx, :) - 3 * chStd(goodChIdx, :), 2) / size(x, 2), trialsData, "UniformOutput", false);
-            tIdx = cellfun(@(x) ~any(x > tTh), tIdx); % marked true means reserved trials
-            if any(~tIdx)
-                disp(['Preview: Trial ', num2str(find(~tIdx)'), ' excluded.']);
+            tIdxTemp = cellfun(@(x) sum(x(goodChIdx, :) > chMean(goodChIdx, :) + 3 * chStd(goodChIdx, :) | x(goodChIdx, :) < chMean(goodChIdx, :) - 3 * chStd(goodChIdx, :), 2) / size(x, 2), trialsData, "UniformOutput", false);
+            tIdxTemp = cellfun(@(x) ~any(x > tTh), tIdxTemp); % marked true means reserved trials
+            if any(~tIdxTemp)
+                disp(['Preview: Trial ', num2str(find(~tIdxTemp)'), ' will be excluded.']);
             else
-                disp('Preview: All pass');
+                disp('Preview: All will pass.');
             end
 
             k = validateInput('Press Y or Enter to continue or N to reselect bad channels: ', @(x) any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');
         end
 
-        goodChIdx = true(length(goodChIdx), 1);
-        goodChIdx(badCHs) = false;
     end
 
-    % sort trials
-    tIdx = cellfun(@(x) sum(x(goodChIdx, :) > chMean(goodChIdx, :) + 3 * chStd(goodChIdx, :) | x(goodChIdx, :) < chMean(goodChIdx, :) - 3 * chStd(goodChIdx, :), 2) / size(x, 2), trialsData, "UniformOutput", false);
-    tIdx = cellfun(@(x) ~any(x > tTh), tIdx); % marked true means reserved trials
-
+    tIdx = cellfun(@(x) ~any(x(goodChIdx) > tTh), tIdx); % marked true means reserved trials
     if any(~tIdx)
         tIdx = find(~tIdx);
         disp(['Trial ', num2str(tIdx'), ' excluded.']);
     else
         tIdx = [];
-        disp('All pass');
+        disp('All pass.');
     end
-
     chIdx = find(~goodChIdx);
     disp(['Bad Channels: ', num2str(chIdx')]);
 

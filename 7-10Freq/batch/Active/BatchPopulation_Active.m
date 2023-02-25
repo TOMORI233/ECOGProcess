@@ -4,7 +4,7 @@ clear; clc; close all;
 params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
 
-params.monkeyID = 2; % 1-CC, 2-XX
+params.monkeyID = 1; % 1-CC, 2-XX
 
 %% Parameter setting
 if params.monkeyID == 1
@@ -24,7 +24,7 @@ params.PrePATH = [POPUROOTPATH, 'Preprocess\'];
 
 %% Exclude trials and bad channels
 params.icaOpt = "off"; % on or off
-params.userDefineOpt = "on";
+params.userDefineOpt = "off";
 Pre_ProcessFcn(params);
 
 %% PE
@@ -65,8 +65,14 @@ params.DATAPATH{4} = [POPUROOTPATH, 'DM\PFC_DM_tuning.mat'];
 Compare_ProcessFcn(params);
 
 %% Granger
-params.MONKEYPATH = [POPUROOTPATH, 'Granger\'];
 params.DATAPATH = [];
+
+% no smoothing
+params.MONKEYPATH = [POPUROOTPATH, 'Granger (no smoothing)\'];
+params.nSmooth = 1;
+% smoothing
+% params.MONKEYPATH = [POPUROOTPATH, 'Granger\'];
+% params.nSmooth = 2;
 
 params.protocolType = 1; % 1-PE, 2-DM, 3-Prediction
 params.DATAPATH{1} = [POPUROOTPATH, 'PE\AC_PE_Data.mat'];

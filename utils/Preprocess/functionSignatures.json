@@ -65,9 +65,9 @@
 
     "excludeTrials": {
         "inputs": [
-            {"name": "trialsData", "kind": "required", "type": ["cell"]},
-            {"name": "tTh", "kind": "ordered", "type": ["scalar", "numeric"]},
-            {"name": "chTh", "kind": "ordered", "type": ["scalar", "numeric"]},
+            {"name": "trialsData", "kind": "required", "type": ["cell"], "description": "trial data"},
+            {"name": "tTh", "kind": "ordered", "type": ["scalar", "numeric"], "description": "trial threshold"},
+            {"name": "chTh", "kind": "ordered", "type": ["scalar", "numeric"], "description": "channel threshold"},
             {"name": "userDefineOpt", "kind": "namevalue", "type": ["choices={'on', 'off'}"]}
         ]
     }

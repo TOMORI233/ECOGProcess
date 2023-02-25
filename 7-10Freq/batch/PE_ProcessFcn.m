@@ -145,7 +145,14 @@ mask = stat.mask;
 V0 = p .* mask;
 windowSortCh = [0, 500];
 tIdx = fix((windowSortCh(1) - windowPE(1)) / 1000 * fs) + 1:fix((windowSortCh(2) - windowPE(1)) / 1000 * fs);
-[~, chIdx] = sort(sum(V0(:, tIdx), 2), 'descend');
+[rankVs, chIdx] = sort(sum(mask(:, tIdx), 2), 'descend');
+rankVsTemp = sort(sum(abs(V0(:, tIdx)), 2), 'descend');
+rankV = unique(rankVs);
+rankV = rankV(arrayfun(@(x) length(rankVs(rankVs == x)) > 1, rankV));
+for index = 1:length(rankV)
+    chIdxTemp = chIdx(rankVs == rankV(index));
+    chIdx(rankVs == rankV(index)) = chIdxTemp(obtainArgoutN(@sort, 2, rankVsTemp(rankVs == rankV(index)), 'descend'));
+end
 V = V0(chIdx, :);
 
 FigCBPT = figure;
@@ -213,6 +220,8 @@ for wIndex = 1:length(edge)
     mAxesDiff(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumDiff(wIndex), 1, "paddings", paddings, "shape", "square-min");
     tuningSlope(:, wIndex) = (tuningMean{wIndex}(end, :) - tuningMean{wIndex}(2, :))';
     plotTopo(tuningSlope(:, wIndex), "contourOpt", "off");
+    hold on;
+    plotLayout(gca, (monkeyID - 1) * 2 + posIndex, 0.4);
     title(mAxesDiff(wIndex), ['PEI topo [', num2str(windowT(1)), ' ', num2str(windowT(2)), ']']);
 
     % p
@@ -220,6 +229,8 @@ for wIndex = 1:length(edge)
     P(:, wIndex) = cellfun(@(x1, x2, x3, x4) anova1([x1; x2; x3; x4], [ones(length(x1), 1); 2 * ones(length(x2), 1); 3 * ones(length(x3), 1); 4 * ones(length(x4), 1)], "off"), tuning{2, wIndex}, tuning{3, wIndex}, tuning{4, wIndex}, tuning{5, wIndex});
     temp = log(P(:, wIndex) / alpha) / log(alpha);
     plotTopo(temp, "contourOpt", "off");
+    hold on;
+    plotLayout(gca, (monkeyID - 1) * 2 + posIndex, 0.4);
     title(mAxesP(wIndex), ['p topo [', num2str(edge(wIndex)), ' ', num2str(edge(wIndex) + binSize), '] | p=log_{', num2str(alpha), '}(p/', num2str(alpha), ')']);
 end
 colormap('jet');
@@ -254,7 +265,7 @@ mPrint(FigMMN, [MONKEYPATH, AREANAME, '_PE_MMN.jpg'], "-djpeg", "-r600");
 % yRange = scaleAxes(FigExampleWave, "y");
 % a = ones(length(t), 1) * (-100);
 % a(V0(ch, :) > 0) = yRange(2);
-% % a(V(ch, :) > 0) = 30;
+% % a(V0(ch, :) > 0) = 40;
 % resultWave = [t, ...
 %               chData(1).chMean(ch, :)', ...
 %               chData(2).chMean(ch, :)', ...
@@ -266,11 +277,11 @@ mPrint(FigMMN, [MONKEYPATH, AREANAME, '_PE_MMN.jpg'], "-djpeg", "-r600");
 % t(V0(ch, :) == 0) = [];
 % hold on;
 % plot(t, a, "Color", [128 128 128]/255, "Marker", "square", "MarkerSize", 10, "MarkerFaceColor", [128 128 128]/255);
-%
+% 
 % plotRawWaveMulti(chDataMMN, [0, 500], 'MMN', [1, 1], ch);
 % hold on;
 % plot(t, a, "Color", [128 128 128]/255, "Marker", "square", "MarkerSize", 10, "MarkerFaceColor", [128 128 128]/255);
-%
+% 
 % resultTuning = cellfun(@(x, y) [x(:, ch), y(:, ch)], tuningMean, tuningSE, "UniformOutput", false);
 % figure;
 % maximizeFig;

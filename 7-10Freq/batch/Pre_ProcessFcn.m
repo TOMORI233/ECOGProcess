@@ -2,6 +2,8 @@ function Pre_ProcessFcn(params)
 close all;
 parseStruct(params);
 window = [-2000, 1000];
+tTh = 0.2;
+chTh = 0.2;
 
 mkdir(PrePATH);
 
@@ -16,10 +18,12 @@ if ~exist([PrePATH, 'AC_excludeIdx.mat'], "file")
     excludeIdx = [];
 
     for mIndex = 1:length(MATPATHsAC)
+        close all;
         [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHsAC{mIndex}, params);
         disp(['AC - Current data: ', DATESTRs{mIndex}]);
         idx = ~cellfun(@(x) isequal(x, true), {trialAll_temp.interrupt});
         [excludeIdx{mIndex}, badChIdx{mIndex}] = excludeTrials(selectEcog(ECOGDataset, trialAll_temp(idx), "dev onset", window), ...
+                                                               tTh, chTh, ...
                                                                "userDefineOpt", userDefineOpt);
     end
 
@@ -39,10 +43,12 @@ if ~exist([PrePATH, 'PFC_excludeIdx.mat'], "file")
     excludeIdx = [];
 
     for mIndex = 1:length(MATPATHsPFC)
+        close all;
         [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHsPFC{mIndex}, params);
         disp(['PFC - Current data: ', DATESTRs{mIndex}]);
         idx = ~cellfun(@(x) isequal(x, true), {trialAll_temp.interrupt});
         [excludeIdx{mIndex}, badChIdx{mIndex}] = excludeTrials(selectEcog(ECOGDataset, trialAll_temp(idx), "dev onset", window), ...
+                                                               tTh, chTh, ...
                                                                "userDefineOpt", userDefineOpt);
     end
 

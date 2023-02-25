@@ -4,7 +4,7 @@ function mAxe = plotTopo(varargin)
     %     mAxe: target axes
     %     Data: data to plot, make sure numel(data) == topoSize(1) * topoSize(2)
     %     topoSize: [x,y], Data will be remapped as a [x,y] matrix
-    %     contourOpt: contour option "on" or "off"
+    %     contourOpt: contour option "on" or "off" (default="on")
     %     resolution: apply 2-D interpolation to the remapped [Data], which is an
     %                 N-point insertion. Thus, resolution = N.
     % Output:
