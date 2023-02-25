@@ -4,7 +4,7 @@ clear; clc; close all;
 params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
 
-params.monkeyID = 1; % 1-CC, 2-XX
+params.monkeyID = 2; % 1-CC, 2-XX
 
 if params.monkeyID == 1
     params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Active\';

@@ -3,14 +3,14 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotS
 
     narginchk(5, 8);
 
-    if nargin < 6
+    if nargin < 6 || isempty(titleStr)
         titleStr = '';
     else
         titleStr = [' | ', char(titleStr)];
     end
 
     if nargin < 7
-        plotSize = [8, 8];
+        plotSize = autoPlotSize(size(chData(1).chMean, 1));
     end
 
     if nargin < 8

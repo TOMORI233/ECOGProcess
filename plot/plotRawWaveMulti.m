@@ -28,7 +28,7 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
     end
 
     if nargin < 4
-        plotSize = [8, 8];
+        plotSize = autoPlotSize(size(chData(1).chMean, 1));
     end
 
     if nargin < 5

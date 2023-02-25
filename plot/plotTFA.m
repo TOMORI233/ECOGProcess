@@ -10,7 +10,7 @@ function [Fig, res] = plotTFA(chMean, fs0, fsD, window, titleStr, plotSize, chs,
     end
 
     if nargin < 6
-        plotSize = [8, 8];
+        plotSize = autoPlotSize(size(chData(1).chMean, 1));
     end
     
     if nargin < 7
