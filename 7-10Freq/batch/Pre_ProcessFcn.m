@@ -1,8 +1,8 @@
 function Pre_ProcessFcn(params)
 close all;
 parseStruct(params);
-window = [-2000, 1000];
-tTh = 0.2;
+window = [-1000, 1000];
+tTh = 0.1;
 chTh = 0.2;
 
 mkdir(PrePATH);

@@ -163,9 +163,9 @@ xlim([0, windowPE(2)]);
 ylim([0.5, 64.5]);
 yticks(channels);
 yticklabels(num2str(channels(chIdx)'));
-cm = colormap('jet');
-cm(1:129, :) = repmat([1 1 1], [129, 1]);
-colormap(cm);
+cmSig = colormap('jet');
+cmSig(1:129, :) = repmat([1 1 1], [129, 1]);
+colormap(cmSig);
 title('F-value of comparison among 4 deviant frequency ratio in all channels (significant)');
 ylabel('Ranked channels');
 xlabel('Time (ms)');
@@ -219,7 +219,7 @@ for wIndex = 1:length(edge)
     % tuning value
     mAxesDiff(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumDiff(wIndex), 1, "paddings", paddings, "shape", "square-min");
     tuningSlope(:, wIndex) = (tuningMean{wIndex}(end, :) - tuningMean{wIndex}(2, :))';
-    plotTopo(tuningSlope(:, wIndex), "contourOpt", "off");
+    plotTopo(tuningSlope(:, wIndex), "contourOpt", "on");
     hold on;
     plotLayout(gca, (monkeyID - 1) * 2 + posIndex, 0.4);
     title(mAxesDiff(wIndex), ['PEI topo [', num2str(windowT(1)), ' ', num2str(windowT(2)), ']']);
@@ -228,12 +228,12 @@ for wIndex = 1:length(edge)
     mAxesP(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumP(wIndex), 1, "paddings", paddings, "shape", "square-min");
     P(:, wIndex) = cellfun(@(x1, x2, x3, x4) anova1([x1; x2; x3; x4], [ones(length(x1), 1); 2 * ones(length(x2), 1); 3 * ones(length(x3), 1); 4 * ones(length(x4), 1)], "off"), tuning{2, wIndex}, tuning{3, wIndex}, tuning{4, wIndex}, tuning{5, wIndex});
     temp = log(P(:, wIndex) / alpha) / log(alpha);
-    plotTopo(temp, "contourOpt", "off");
+    plotTopo(temp, "contourOpt", "on");
     hold on;
     plotLayout(gca, (monkeyID - 1) * 2 + posIndex, 0.4);
     title(mAxesP(wIndex), ['p topo [', num2str(edge(wIndex)), ' ', num2str(edge(wIndex) + binSize), '] | p=log_{', num2str(alpha), '}(p/', num2str(alpha), ')']);
+    colormap(mAxesP(wIndex), cmSig);
 end
-colormap('jet');
 scaleAxes(mAxesDiff, "c", "symOpts", "max");
 scaleAxes(mAxesP, "c", "symOpts", "max", "cutoffRange", [-2, 2]);
 cb1 = colorbar(mAxesDiff(end), 'position', [0.95, 0.1, 0.01, 0.8]);
@@ -258,39 +258,39 @@ setAxes(FigMMN, "Visible", "off");
 mPrint(FigMMN, [MONKEYPATH, AREANAME, '_PE_MMN.jpg'], "-djpeg", "-r600");
 
 %% Example
-% ch = input('Input example channel: ');
-% t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
-% FigExampleWave = plotRawWaveMulti(chData, windowPE, '', [1, 1], ch);
-% scaleAxes(FigExampleWave, "x", [0, 800]);
-% yRange = scaleAxes(FigExampleWave, "y");
-% a = ones(length(t), 1) * (-100);
-% a(V0(ch, :) > 0) = yRange(2);
-% % a(V0(ch, :) > 0) = 40;
-% resultWave = [t, ...
-%               chData(1).chMean(ch, :)', ...
-%               chData(2).chMean(ch, :)', ...
-%               chData(3).chMean(ch, :)', ...
-%               chData(4).chMean(ch, :)', ...
-%               chData(5).chMean(ch, :)', ...
-%               a];
-% a(V0(ch, :) == 0) = [];
-% t(V0(ch, :) == 0) = [];
-% hold on;
-% plot(t, a, "Color", [128 128 128]/255, "Marker", "square", "MarkerSize", 10, "MarkerFaceColor", [128 128 128]/255);
-% 
-% plotRawWaveMulti(chDataMMN, [0, 500], 'MMN', [1, 1], ch);
-% hold on;
-% plot(t, a, "Color", [128 128 128]/255, "Marker", "square", "MarkerSize", 10, "MarkerFaceColor", [128 128 128]/255);
-% 
-% resultTuning = cellfun(@(x, y) [x(:, ch), y(:, ch)], tuningMean, tuningSE, "UniformOutput", false);
-% figure;
-% maximizeFig;
-% for wIndex = 1:length(resultTuning)
-%     mSubplot(3, 4, wIndex, 1, margins, paddings);
-%     errorbar(resultTuning{wIndex}(:, 1), resultTuning{wIndex}(:, 2), "k-", "LineWidth", 1);
-%     title(['[', num2str(edge(wIndex)), ', ', num2str(edge(wIndex) + binSize), '] | p=', num2str(P(ch, wIndex))]);
-%     xlim([0.5, 5.5]);
-%     xticks(1:5);
-%     xticklabels(num2str(dRatio'));
-% end
-% scaleAxes;
+ch = input('Input example channel: ');
+t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
+FigExampleWave = plotRawWaveMulti(chData, windowPE, '', [1, 1], ch);
+scaleAxes(FigExampleWave, "x", [0, 800]);
+yRange = scaleAxes(FigExampleWave, "y");
+a = ones(length(t), 1) * (-100);
+a(V0(ch, :) > 0) = yRange(2);
+% a(V0(ch, :) > 0) = 40;
+resultWave = [t, ...
+              chData(1).chMean(ch, :)', ...
+              chData(2).chMean(ch, :)', ...
+              chData(3).chMean(ch, :)', ...
+              chData(4).chMean(ch, :)', ...
+              chData(5).chMean(ch, :)', ...
+              a];
+a(V0(ch, :) == 0) = [];
+t(V0(ch, :) == 0) = [];
+hold on;
+plot(t, a, "Color", [128 128 128]/255, "Marker", "square", "MarkerSize", 10, "MarkerFaceColor", [128 128 128]/255);
+
+plotRawWaveMulti(chDataMMN, [0, 500], 'MMN', [1, 1], ch);
+hold on;
+plot(t, a, "Color", [128 128 128]/255, "Marker", "square", "MarkerSize", 10, "MarkerFaceColor", [128 128 128]/255);
+
+resultTuning = cellfun(@(x, y) [x(:, ch), y(:, ch)], tuningMean, tuningSE, "UniformOutput", false);
+figure;
+maximizeFig;
+for wIndex = 1:length(resultTuning)
+    mSubplot(3, 4, wIndex, 1, margins, paddings);
+    errorbar(resultTuning{wIndex}(:, 1), resultTuning{wIndex}(:, 2), "k-", "LineWidth", 1);
+    title(['[', num2str(edge(wIndex)), ', ', num2str(edge(wIndex) + binSize), '] | p=', num2str(P(ch, wIndex))]);
+    xlim([0.5, 5.5]);
+    xticks(1:5);
+    xticklabels(num2str(dRatio'));
+end
+scaleAxes;

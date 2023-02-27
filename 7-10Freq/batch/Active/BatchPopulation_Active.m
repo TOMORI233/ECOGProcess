@@ -24,7 +24,7 @@ params.PrePATH = [POPUROOTPATH, 'Preprocess\'];
 
 %% Exclude trials and bad channels
 params.icaOpt = "off"; % on or off
-params.userDefineOpt = "off";
+params.userDefineOpt = "on";
 Pre_ProcessFcn(params);
 
 %% PE

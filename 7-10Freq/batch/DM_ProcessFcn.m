@@ -278,11 +278,14 @@ paddings = [0.1, 0.1, 0.01, 0.01];
 subplotNumDRP = [1:6, 13:18];
 subplotNumP = [7:12, 19:24];
 
+cmSig = colormap('jet');
+cmSig(1:129, :) = repmat([1 1 1], [129, 1]);
+
 for wIndex = 1:12
     % DRP
     mAxesDRP(wIndex) = mSubplot(FigTopo, 4, 6, subplotNumDRP(wIndex), 1, "paddings", paddings, "shape", "square-min");
     tuning = resDP(wIndex).v - 0.5;
-    plotTopo(tuning, "contourOpt", "off");
+    plotTopo(tuning, "contourOpt", "on");
     plotLayout(gca, (monkeyID - 1) * 2 + posIndex, 0.4);
     title(['DRP topo [', num2str(resDP(wIndex).window(1)), ' ', num2str(resDP(wIndex).window(2)), ']']);
 
@@ -291,11 +294,11 @@ for wIndex = 1:12
     P = resDP(wIndex).p;
     P(P == 0) = 1 / nIter;
     P = log(P / alpha) / log(alpha);
-    plotTopo(P, "contourOpt", "off");
+    plotTopo(P, "contourOpt", "on");
     plotLayout(gca, (monkeyID - 1) * 2 + posIndex, 0.4);
     title(['p topo [', num2str(resDP(wIndex).window(1)), ' ', num2str(resDP(wIndex).window(2)), '] | p=log_{', num2str(alpha), '}(p/', num2str(alpha), ')']);
+    colormap(mAxesP(wIndex), cmSig);
 end
-colormap('jet');
 scaleAxes(mAxesDRP, "c", "symOpts", "max");
 scaleAxes(mAxesP, "c", "symOpts", "max");
 cb1 = colorbar(mAxesDRP(end), 'position', [0.95, 0.1, 0.01, 0.8]);
@@ -310,54 +313,54 @@ setAxes(FigTopo, "visible", "off");
 mPrint(FigTopo, [MONKEYPATH, AREANAME, '_DM_Topo.jpg'], "-djpeg", "-r600");
 
 %% Example
-% t = linspace(windowDM(1), windowDM(2), size(trialsECOG_correct{1}, 2))';
-% ch = input('Input example channel: ');
-% % Z-scored wave
-% FigExampleWave = plotRawWaveMulti(chData, windowDM, '', [1, 1], ch);
-% scaleAxes(FigExampleWave, "x", [0, 800]);
-% yRange = scaleAxes(FigExampleWave, "y");
-% a = ones(length(t), 1) * (-100);
-% a(V0(ch, :) ~= 0) = yRange(2);
-% resultZscore = [t, ...
-%     chData(1).chMean(ch, :)', ...
-%     t, ...
-%     chData(2).chMean(ch, :)', ...
-%     t, ...
-%     a];
-% a(V0(ch, :) == 0) = [];
-% t(V0(ch, :) == 0) = [];
-% hold on;
-% plot(t, a, "Color", [1 0.5 0], "Marker", "square", "MarkerSize", 10, "MarkerFaceColor", [1 0.5 0]);
-%
-% t = linspace(windowDM(1), windowDM(2), size(trialsECOG_correct{1}, 2))';
-% resultRawWave = [t, ...
-%     chData0(1).chMean(ch, :)', ...
-%     t, ...
-%     chData0(2).chMean(ch, :)'];
-% plotRawWaveMulti(chData0, windowDM, '', [1, 1], ch);
-%
-% % DRP
-% figure;
-% maximizeFig(gcf);
-% V_s = [];
-% W_s = [];
-% V_ns = [];
-% W_ns = [];
-% for wIndex = 1:length(resDP)
-%     if resDP(wIndex).p(ch) < alpha
-%         V_s = [V_s; resDP(wIndex).v(ch)];
-%         W_s = [W_s; mean(resDP(wIndex).window)];
-%     else
-%         V_ns = [V_ns; resDP(wIndex).v(ch)];
-%         W_ns = [W_ns; mean(resDP(wIndex).window)];
-%     end
-% end
-% scatter(W_s, V_s, sz, "black", "filled");
-% hold on;
-% scatter(W_ns, V_ns, sz, "black");
-% X = cellfun(@mean, {resDP.window});
-% Y = cellfun(@(x) x(ch), {resDP.v});
-% plot(X, Y, "k", "LineWidth", 1);
-% resultDRP_s = [W_s, V_s];
-% resultDRP_ns = [W_ns, V_ns];
-% resultDRP_line = [X', Y'];
+t = linspace(windowDM(1), windowDM(2), size(trialsECOG_correct{1}, 2))';
+ch = input('Input example channel: ');
+% Z-scored wave
+FigExampleWave = plotRawWaveMulti(chData, windowDM, '', [1, 1], ch);
+scaleAxes(FigExampleWave, "x", [0, 800]);
+yRange = scaleAxes(FigExampleWave, "y");
+a = ones(length(t), 1) * (-100);
+a(V0(ch, :) ~= 0) = yRange(2);
+resultZscore = [t, ...
+    chData(1).chMean(ch, :)', ...
+    t, ...
+    chData(2).chMean(ch, :)', ...
+    t, ...
+    a];
+a(V0(ch, :) == 0) = [];
+t(V0(ch, :) == 0) = [];
+hold on;
+plot(t, a, "Color", [1 0.5 0], "Marker", "square", "MarkerSize", 10, "MarkerFaceColor", [1 0.5 0]);
+
+t = linspace(windowDM(1), windowDM(2), size(trialsECOG_correct{1}, 2))';
+resultRawWave = [t, ...
+    chData0(1).chMean(ch, :)', ...
+    t, ...
+    chData0(2).chMean(ch, :)'];
+plotRawWaveMulti(chData0, windowDM, '', [1, 1], ch);
+
+% DRP
+figure;
+maximizeFig(gcf);
+V_s = [];
+W_s = [];
+V_ns = [];
+W_ns = [];
+for wIndex = 1:length(resDP)
+    if resDP(wIndex).p(ch) < alpha
+        V_s = [V_s; resDP(wIndex).v(ch)];
+        W_s = [W_s; mean(resDP(wIndex).window)];
+    else
+        V_ns = [V_ns; resDP(wIndex).v(ch)];
+        W_ns = [W_ns; mean(resDP(wIndex).window)];
+    end
+end
+scatter(W_s, V_s, sz, "black", "filled");
+hold on;
+scatter(W_ns, V_ns, sz, "black");
+X = cellfun(@mean, {resDP.window});
+Y = cellfun(@(x) x(ch), {resDP.v});
+plot(X, Y, "k", "LineWidth", 1);
+resultDRP_s = [W_s, V_s];
+resultDRP_ns = [W_ns, V_ns];
+resultDRP_line = [X', Y'];

@@ -29,6 +29,7 @@ for index = 1:length(DATESTRs)
     Pre_ProcessFcn(params);
 
     % PE
+    params.icaOpt = "on"; % on or off
     params.MONKEYPATH = [SINGLEROOTPATH, 'PE\', DATESTRs{index}, '\'];
     params.AREANAME = 'AC';
     params.posIndex = 1; % 1-AC, 2-PFC

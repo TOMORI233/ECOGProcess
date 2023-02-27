@@ -8,7 +8,7 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize, chs, visib
     end
 
     if nargin < 5
-        plotSize = autoPlotSize(size(chData(1).chMean, 1));
+        plotSize = autoPlotSize(size(chMean, 1));
     end
 
     if nargin < 6
