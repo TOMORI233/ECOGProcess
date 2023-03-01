@@ -67,7 +67,7 @@ cfg_default.correctm         = 'cluster';
 cfg_default.clusterstatistic = 'maxsum';             % test statistic that will be evaluated under the permutation distribution.
 
 cfg_default.clusteralpha     = 0.05;                 % alpha level of the sample-specific test statistic that will be used for thresholding
-cfg_default.alpha            = 0.025;                % alpha level of the permutation test
+cfg_default.alpha            = 0.05;                 % alpha level of the permutation test
 
 cfg_default.neighbours       = mPrepareNeighbours(); % the neighbours specify for each sensor with which other sensors it can form clusters
 cfg_default.minnbchan        = 0;                    % minimum number of neighborhood channels that is

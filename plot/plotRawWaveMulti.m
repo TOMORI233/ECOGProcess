@@ -1,14 +1,14 @@
 function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible)
     % Description: plot serveral raw waves in one subplot
     % Input:
-    %     chData: n*1 struct of
+    %     chData: n*1 struct of fields:
     %         - chMean: [nCh,nSample]
     %         - color: [R,G,B]
-    %         - legend
+    %         - legend: string
     %         - skipChs: channels not to plot
     %     window: xlim
     %     titleStr: title of subplot
-    %     plotSize: [nRows, nColumns]
+    %     plotSize: [nRows, nColumns] or nSubplots(for auto mapping)
     %     chs: a nRows*nColumns matrix with each element specifying a channel number
     % Output:
     %     Fig: figure object
@@ -29,6 +29,10 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
 
     if nargin < 4
         plotSize = autoPlotSize(size(chData(1).chMean, 1));
+    end
+
+    if numel(plotSize) == 1
+        plotSize = autoPlotSize(plotSize);
     end
 
     if nargin < 5
@@ -63,7 +67,7 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
             for index = 1:length(chData)
                 chMean = chData(index).chMean;
                 color = getOr(chData(index), "color", "r");
-                chData(index).legend = getOr(chData(index), "legend", []);
+                chData(index).legend = string(getOr(chData(index), "legend", []));
                 skipChs = getOr(chData(index), "skipChs");
 
                 if ismember(chNum, skipChs)

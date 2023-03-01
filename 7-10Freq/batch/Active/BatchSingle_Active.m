@@ -9,13 +9,13 @@ params.monkeyID = 2; % 1-CC, 2-XX
 if params.monkeyID == 1
     params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Active\';
     DATESTRs = {'cc20220520', 'cc20220706', 'cc20220801', 'cc20221014', 'cc20221015'};
-    POPUROOTPATH = 'CC\Population\';
-    SINGLEROOTPATH = 'CC\Single\';
+    POPUROOTPATH = [pwd, '\CC\Population\'];
+    SINGLEROOTPATH = [pwd, '\CC\Single\'];
 else
     params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\XX\7-10Freq Active\';
     DATESTRs = {'xx20220711', 'xx20220812', 'xx20220820', 'xx20220822', 'xx20220913'};
-    POPUROOTPATH = 'XX\Population\';
-    SINGLEROOTPATH = 'XX\Single\';
+    POPUROOTPATH = [pwd, '\XX\Population\'];
+    SINGLEROOTPATH = [pwd, '\XX\Single\'];
 end
 
 %% Single day ----------------------------------------------------------------

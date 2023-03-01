@@ -10,13 +10,13 @@ params.monkeyID = 1; % 1-CC, 2-XX
 if params.monkeyID == 1
     params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Active\';
     DATESTRs = {'cc20220520', 'cc20220706', 'cc20220801', 'cc20221014', 'cc20221015'};
-    POPUROOTPATH = 'CC\Population\';
-    SINGLEROOTPATH = 'CC\Single\';
+    POPUROOTPATH = [pwd, '\CC\Population\'];
+    SINGLEROOTPATH = [pwd, '\CC\Single\'];
 else
     params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\XX\7-10Freq Active\';
     DATESTRs = {'xx20220711', 'xx20220812', 'xx20220820', 'xx20220822', 'xx20220913'};
-    POPUROOTPATH = 'XX\Population\';
-    SINGLEROOTPATH = 'XX\Single\';
+    POPUROOTPATH = [pwd, '\XX\Population\'];
+    SINGLEROOTPATH = [pwd, '\XX\Single\'];
 end
 
 params.DATESTRs = DATESTRs;
@@ -24,7 +24,7 @@ params.PrePATH = [POPUROOTPATH, 'Preprocess\'];
 
 %% Exclude trials and bad channels
 params.icaOpt = "off"; % on or off
-params.userDefineOpt = "on";
+params.userDefineOpt = "off";
 Pre_ProcessFcn(params);
 
 %% PE
@@ -58,8 +58,8 @@ Prediction_ProcessFcn(params);
 
 %% Compare single
 params.MONKEYPATH = [POPUROOTPATH, 'Compare\'];
-params.DATAPATH{1} = [POPUROOTPATH, 'PE\AC_PE_tuning.mat'];
-params.DATAPATH{2} = [POPUROOTPATH, 'PE\PFC_PE_tuning.mat'];
+params.DATAPATH{1} = [POPUROOTPATH, 'PE\AC_PE_MMN_tuning.mat'];
+params.DATAPATH{2} = [POPUROOTPATH, 'PE\PFC_PE_MMN_tuning.mat'];
 params.DATAPATH{3} = [POPUROOTPATH, 'DM\AC_DM_tuning.mat'];
 params.DATAPATH{4} = [POPUROOTPATH, 'DM\PFC_DM_tuning.mat'];
 Compare_ProcessFcn(params);
@@ -95,7 +95,7 @@ Granger_ProcessFcn(params);
 params.protocolType = 3; % 1-PE, 2-DM, 3-Prediction
 params.DATAPATH{1} = [POPUROOTPATH, 'Prediction\AC_Prediction_Data.mat'];
 params.DATAPATH{2} = [POPUROOTPATH, 'Prediction\PFC_Prediction_Data.mat'];
-for nStd = [1 3 7]
-    params.windowGranger = [500 * (nStd - 1), 500 * nStd];
-    Granger_ProcessFcn(params);
-end
+params.windowGranger = [0, 1000];
+Granger_ProcessFcn(params);
+params.windowGranger = [1000, 3500];
+Granger_ProcessFcn(params);

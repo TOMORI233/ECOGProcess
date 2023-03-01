@@ -11,6 +11,10 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize, chs, visib
         plotSize = autoPlotSize(size(chMean, 1));
     end
 
+    if numel(plotSize) == 1
+        plotSize = autoPlotSize(plotSize);
+    end
+
     if nargin < 6
         chs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
     end

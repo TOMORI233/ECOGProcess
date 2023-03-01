@@ -38,7 +38,7 @@ data.label = mat2cell(char([rowFcn(@(x) strcat('AC-', strrep(x, ' ', '0')), stri
 
 %% Multivariate autoregressive model
 cfg         = [];
-cfg.order   = 5;
+% cfg.order   = 5; % lag, default=10
 cfg.method  = 'bsmart';
 cfg.channel = data.label([chsAC, chsPFC + size(trialsECOG_AC{1}, 1)]);
 mdata       = ft_mvaranalysis(cfg, data);
