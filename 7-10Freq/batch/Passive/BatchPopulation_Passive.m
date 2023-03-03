@@ -4,7 +4,7 @@ clear; clc; close all;
 params.choiceWin = [100, 600];
 params.processFcn = @PassiveProcess_7_10Freq;
 
-params.monkeyID = 2; % 1-CC, 2-XX
+params.monkeyID = 1; % 1-CC, 2-XX
 
 %% Parameter setting
 if params.monkeyID == 1
@@ -23,11 +23,14 @@ params.DATESTRs = DATESTRs;
 params.PrePATH = [POPUROOTPATH, 'Preprocess\'];
 
 %% Exclude trials and bad channels
-params.icaOpt = "off"; % on or off
+params.icaOpt = "on"; % "on": do ICA with all channels and manually define bad channels
 params.userDefineOpt = "off";
 Pre_ProcessFcn(params);
 
 %% PE
+% If ICA is not performed at preprocessing stage, 
+% that icaOpt is set "on" will do ICA without bad channels
+params.icaOpt = "on";
 params.MONKEYPATH = [POPUROOTPATH, 'PE\'];
 params.AREANAME = 'AC';
 params.posIndex = 1; % 1-AC, 2-PFC

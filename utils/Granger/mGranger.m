@@ -19,11 +19,11 @@ function [granger, varargout] = mGranger(trialsECOG_AC, trialsECOG_PFC, windowDa
 narginchk(4, 6);
 
 if nargin < 5
-    chsAC = 1:size(trialsECOG_AC);
+    chsAC = 1:size(trialsECOG_AC{1}, 1);
 end
 
 if nargin < 6
-    chsPFC = 1:size(trialsECOG_PFC);
+    chsPFC = 1:size(trialsECOG_PFC{1}, 1);
 end
 
 ft_setPath2Top;

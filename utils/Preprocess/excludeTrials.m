@@ -36,26 +36,35 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     chTh = mIp.Results.chTh;
     userDefineOpt = mIp.Results.userDefineOpt;
 
-    % sort channels
+    % statistics
+    chMeanAll = mean(cell2mat(trialsData));
+    chStdAll = std(cell2mat(trialsData));
+    tIdxAll = cellfun(@(x) sum(x > chMeanAll + 3 * chStdAll | x < chMeanAll - 3 * chStdAll, 2) / size(x, 2), trialsData, "UniformOutput", false);
+
     temp = changeCellRowNum(trialsData);
     chMean = cell2mat(cellfun(@mean, temp, "UniformOutput", false));
     chStd = cell2mat(cellfun(@std, temp, "UniformOutput", false));
-    chMeanAll = mean(cell2mat(trialsData));
-    chStdAll = std(cell2mat(trialsData));
-    V0 = cellfun(@(x) sum(x > chMeanAll + 3 * chStdAll | x < chMeanAll - 3 * chStdAll, 2) / size(x, 2), temp, "UniformOutput", false);
+    tIdx = cellfun(@(x) sum(x > chMean + 3 * chStd | x < chMean - 3 * chStd, 2) / size(x, 2), trialsData, "UniformOutput", false);
+    
+    % sort channels
+    V0_All = cellfun(@(x) sum(x > chMeanAll + 3 * chStdAll | x < chMeanAll - 3 * chStdAll, 2) / size(x, 2), temp, "UniformOutput", false);
+    V_All = cellfun(@(x) x > tTh, V0_All, "UniformOutput", false);
+    V0 = cellfun(@(x) sum(x > mean(x, 1) + 3 * std(x, [], 1) | x < mean(x, 1) - 3 * std(x, [], 1), 2) / size(x, 2), temp, "UniformOutput", false);
     V = cellfun(@(x) x > tTh, V0, "UniformOutput", false);
-    badtrialIdx = cellfun(@(x) any(x), changeCellRowNum(V));
+
+    badtrialIdx = cellfun(@(x, y) any(x) | any(y), changeCellRowNum(V_All), changeCellRowNum(V));
+
+    V_All = cellfun(@(x) sum(x), V_All);
     V = cellfun(@(x) sum(x), V);
 
-    % sort trials
-    tIdx = cellfun(@(x) sum(x > chMean + 3 * chStd | x < chMean - 3 * chStd, 2) / size(x, 2), trialsData, "UniformOutput", false);
-
     % show channel-bad trials
-    goodChIdx = V < chTh * length(trialsData); % marked true means reserved channels
+    goodChIdx = V_All < chTh * length(trialsData) & V < chTh * length(trialsData); % marked true means reserved channels
     channels = (1:length(goodChIdx))'; % all channels
-    nTrial_bad = arrayfun(@(x) [num2str(x), '/', num2str(length(trialsData))], V, "UniformOutput", false);
-    mark = goodChIdx;
-    disp(table(channels, nTrial_bad, mark));
+    nTrial_bad_All = arrayfun(@(x) [num2str(x), '/', num2str(length(trialsData))], V_All, "UniformOutput", false);
+    nTrial_bad_Single = arrayfun(@(x) [num2str(x), '/', num2str(length(trialsData))], V, "UniformOutput", false);
+    mark = repmat("good", [length(channels), 1]);
+    mark(~goodChIdx) = "bad";
+    disp(table(channels, nTrial_bad_All, nTrial_bad_Single, mark));
     if all(goodChIdx)
         disp('All channels are good.');
     else
@@ -69,9 +78,10 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
         if isequal(badCHs, 0)
             % raw wave
             plotRawWave(chMean, chStd, [0, 1], 'origin');
+            scaleAxes("y", "cutoffRange", [-100, 100], "symOpts", "max");
 
             % good trials (mean, red) against bad trials (single, grey)
-            previewRawWave(trialsData, badtrialIdx, V);
+            previewRawWave(trialsData, badtrialIdx, V_All);
 
             % histogram
             temp = changeCellRowNum(tIdx);
@@ -84,7 +94,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
                 binSize = 0.05;
                 histogram(temp{index}, "Normalization", "probability", "BinWidth", binSize, "FaceColor", "b", "DisplayName", "Single");
                 hold on;
-                histogram(V0{index}, "Normalization", "probability", "BinWidth", binSize, "FaceColor", "r", "DisplayName", "All");
+                histogram(V0_All{index}, "Normalization", "probability", "BinWidth", binSize, "FaceColor", "r", "DisplayName", "All");
                 if ismember(index, find(~goodChIdx))
                     title(['CH ', num2str(index), ' (bad)']);
                 else
@@ -133,7 +143,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
 
     end
 
-    tIdx = cellfun(@(x) ~any(x(goodChIdx) > tTh), tIdx); % marked true means reserved trials
+    tIdx = cellfun(@(x, y) ~any(x(goodChIdx) > tTh | y(goodChIdx) > tTh), tIdx, tIdxAll); % marked true means reserved trials
     if any(~tIdx)
         tIdx = find(~tIdx);
         disp(['Trial ', num2str(tIdx'), ' excluded.']);
@@ -141,8 +151,13 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
         tIdx = [];
         disp('All pass.');
     end
+
     chIdx = find(~goodChIdx);
-    disp(['Bad Channels: ', num2str(chIdx')]);
+    if ~isempty(chIdx)
+        disp(['Bad Channels: ', num2str(chIdx')]);
+    else
+        disp('All channels are good.');
+    end
 
     return;
 end
