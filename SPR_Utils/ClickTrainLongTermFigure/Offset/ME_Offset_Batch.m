@@ -10,7 +10,7 @@ protocols = string({temp.name}');
 %% select data
 areaSel = "AC";
 dateSel = "";
-protSel = "Offset_Duration_Effect_8ms_Reg_New";
+protSel = "Offset_2_128_4s_New";
 
 % validate areaSel
 if ~matches(areaSel, ["AC", "PFC"]) || length(areaSel) > 1

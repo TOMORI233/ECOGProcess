@@ -1,7 +1,7 @@
 close all; clc; clear;
 
 monkeyStr = ["CC", "XX"];
-ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
+ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\TB\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 
@@ -17,7 +17,7 @@ FFTMethod = 2; %1: power(dB); 2: magnitude
 fftScale = [60, 60; 400, 400];
 correspFreq = 1000./[60, 30];
 
-flp = 400;
+flp = 300;
 fhp = 0.1;
 segOption = ["trial onset", "dev onset"];
 s1OnsetOrS2Onset = 1; % 1, s1onset; 2, s2Onset

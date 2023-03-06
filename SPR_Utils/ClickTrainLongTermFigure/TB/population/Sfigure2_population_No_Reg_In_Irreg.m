@@ -1,7 +1,7 @@
 close all; clc; clear;
 
-MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_ICI4\';
-MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_ICI4\';
+MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Basic_ICI4\';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Basic_ICI4\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
@@ -9,7 +9,7 @@ params.processFcn = @PassiveProcess_clickTrainContinuous;
 
 CRIMethod = 2;
 CRIMethodStr = ["Resp_devided_by_Spon", "R_minus_S_devide_R_plus_S"];
-CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.3]};
+CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.5]};
 CRITest = [1, 0];
 
 colors = ["#FF0000", "#FFA500", "#0000FF", "#000000"];
@@ -24,7 +24,7 @@ badCh = {[], []};
 yScale = [40, 50];
 quantWin = [0 300];
 sponWin = [-300 0];
-for mIndex =  2 : length(MATPATH)
+for mIndex =  1 : length(MATPATH)
  
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
@@ -88,7 +88,6 @@ for mIndex =  2 : length(MATPATH)
         tIndex = [trialAll.devOrdr] == devType(dIndex);
         trials = trialAll(tIndex);
         trialsECOG = trialsECOG_Merge(tIndex);
-
         chMean{dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG), 'UniformOutput', false));
         chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG), 'UniformOutput', false));
         for ch = 1 : size(chMean{dIndex}, 1)

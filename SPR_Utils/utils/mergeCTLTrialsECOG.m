@@ -1,6 +1,7 @@
 function [trialAll, trialsECOG, trialsECOG_S1] = mergeCTLTrialsECOG(MATPATH, posIndex, CTLParams)
 narginchk(2, 3);
 if nargin < 3
+    Protocol = evalin("base", "Protocol");
     run("CTLconfig.m");
 else
     parseStruct(CTLParams);
@@ -49,7 +50,7 @@ trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 
 % filter
 ECOGFDZ = mFTHP(ECOGDataset, fhp, flp);% filtered, dowmsampled, zoomed
-ECOGFDZ = ECOGResample(ECOGFDZ, fs);
+% ECOGFDZ = ECOGResample(ECOGFDZ, fs);
 trialsECOG = selectEcog(ECOGFDZ, trialAll, segOption(2), Window);
 trialsECOG_S1 = selectEcog(ECOGFDZ, trialAll, segOption(1), Window);
 

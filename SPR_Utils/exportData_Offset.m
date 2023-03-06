@@ -12,7 +12,7 @@ for i = iIndex'
     SAVEPATH = strcat("E:\ECOG\MAT Data\CC\ClickTrainLongTerm\Offset\", string(recordInfo(i).paradigm), "\");
     BLOCKPATH{1} = recordInfo(i).tankPath;
     params.processFcn = @PassiveProcess_clickTrainContinuous;
-    exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+    exportDataFcn(BLOCKPATH, SAVEPATH, params, 600, 1);
     recordInfo(i).Exported = 1;
     writetable(struct2table(recordInfo), recordPath);
 end
@@ -32,7 +32,7 @@ for i = iIndex'
     SAVEPATH = strcat("E:\ECOG\MAT Data\XX\ClickTrainLongTerm\Offset\", string(recordInfo(i).paradigm), "\");
     BLOCKPATH{1} = recordInfo(i).tankPath;
     params.processFcn = @PassiveProcess_clickTrainContinuous;
-    exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+    exportDataFcn(BLOCKPATH, SAVEPATH, params, 600, 1);
     recordInfo(i).Exported = 1;
     writetable(struct2table(recordInfo), recordPath);
 end

@@ -3,17 +3,17 @@ close all; clc; clear;
 monkeyId = 1;  % 1：chouchou; 2：xiaoxiao
 
 if monkeyId == 1
-    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI4\';
-    MATPATH{2} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI8\';
-    MATPATH{3} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI20\';
-    MATPATH{4} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI40\';
-    MATPATH{5} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI80\';
+    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Basic_ICI4\';
+    MATPATH{2} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Basic_ICI8\';
+    MATPATH{3} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Basic_ICI20\';
+    MATPATH{4} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Basic_ICI40\';
+    MATPATH{5} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Basic_ICI80\';
 elseif monkeyId == 2
-    MATPATH{1} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI4\';
-    MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI8\';
-    MATPATH{3} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI20\';
-    MATPATH{4} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI40\';
-    MATPATH{5} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI80\';
+    MATPATH{1} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Basic_ICI4\';
+    MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Basic_ICI8\';
+    MATPATH{3} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Basic_ICI20\';
+    MATPATH{4} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Basic_ICI40\';
+    MATPATH{5} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Basic_ICI80\';
 end
 
 stimSelect = 1; % "RegOrd", "RegRev", "IrregOrd", "IrregRev"
@@ -215,8 +215,15 @@ for mIndex = 1 : length(MATPATH)
     pause(1);
     set(FigTopo(mIndex), "outerposition", [300, 100, 800, 670]);
     print(FigTopo(mIndex), strcat(FIGPATH, "_pValue_Topo_", protStr(mIndex), "_", stimStrs(stimSelect)), "-djpeg", "-r200");
-end
 
+
+end
+    %% S1 wave plot
+    BaseICIs = [5005,5005,5005,5005,4965];
+    toPlot_S1Wave = toPlot_Wave;
+    for dIndex = 1 : 5
+        toPlot_S1Wave(:, 2*dIndex-1) = toPlot_S1Wave(:, 2*dIndex-1)+BaseICIs(dIndex);
+    end
 
 
 
@@ -275,6 +282,8 @@ for mIndex = 1 : length(MATPATH)
     set(FigTopo, "outerposition", [300, 100, 800, 670]);
     print(FigTopo, strcat(FIGPATH, "_latency_Topo_", protStr(mIndex), "_", stimStrs(stimSelect)), "-djpeg", "-r200");
     close(FigTopo);
+
+    
 end
 
 ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");

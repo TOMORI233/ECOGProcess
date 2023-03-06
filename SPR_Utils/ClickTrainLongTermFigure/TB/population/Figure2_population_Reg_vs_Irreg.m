@@ -1,7 +1,7 @@
 close all; clc; clear;
 
-MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_ICI4\';
-MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_ICI4\';
+MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Basic_ICI4\';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Basic_ICI4\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
@@ -16,7 +16,7 @@ pBase = 0.01;
 colors = ["#FF0000", "#FFA500", "#0000FF", "#000000"];
 
 AREANAME = ["AC", "PFC"];
-AREANAME = AREANAME(params.posIndex);
+AREANAME = AREANAME(params.posIndex); 
 fs = 500;
 
 
@@ -26,7 +26,7 @@ yScale = [40, 60];
 S1Frac = [1.5 1.7];
 quantWin = [0 300];
 sponWin = [-300 0];
-for mIndex =  1 : length(MATPATH)
+for mIndex =  2 : length(MATPATH)
     if isempty(MATPATH{mIndex})
         continue
     end

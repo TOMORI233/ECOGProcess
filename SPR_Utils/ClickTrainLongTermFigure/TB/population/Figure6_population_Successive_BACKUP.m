@@ -3,13 +3,13 @@
 monkeyId = 1;  % 1：chouchou; 2：xiaoxiao
 
 if monkeyId == 1
-    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Successive_0o3_0o5\';
-    MATPATH{2} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Successive_0o1_0o2\';
-    MATPATH{3} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Successive_0o025_0o05\';
+    MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Successive_0o3_0o5\';
+    MATPATH{2} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Successive_0o1_0o2\';
+    MATPATH{3} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Successive_0o025_0o05\';
 elseif monkeyId == 2
-    MATPATH{1} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Successive_0o3_0o5\';
-    MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Successive_0o1_0o2\';
-    MATPATH{3} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Successive_0o025_0o05\';
+    MATPATH{1} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Successive_0o3_0o5\';
+    MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Successive_0o1_0o2\';
+    MATPATH{3} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Successive_0o025_0o05\';
 end
 
 stimSelect = 4; % changed reg", "frozen irreg", "rand irreg", "changed reg", "frozen irreg", "rand irreg"

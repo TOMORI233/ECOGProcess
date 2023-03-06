@@ -1,4 +1,8 @@
 function idx = ECOGSitePatch(Area, patchType)
+narginchk(1, 2);
+if nargin < 2
+    patchType = "matchIssue";
+end
 
 if strcmpi(patchType, "matchIssue")
     if strcmpi(Area, "AC") || strcmpi(Area, "LAuC")
