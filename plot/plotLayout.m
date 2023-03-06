@@ -51,7 +51,7 @@ function plotLayout(varargin)
         FigsOrAxes = getObjVal(FigsOrAxes, target, [], "Tag", tag);
     end
 
-    load('layout.mat');
+    load(fullfile(fileparts(mfilename("fullpath")), 'layout\layout.mat'));
 
     for fIndex = 1:length(FigsOrAxes)
         

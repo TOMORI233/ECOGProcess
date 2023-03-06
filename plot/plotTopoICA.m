@@ -6,7 +6,7 @@ function Fig = plotTopoICA(topo, topoSize, plotSize, ICs)
     end
 
     if nargin < 3
-        plotSize = [8, 8];
+        plotSize = autoPlotSize(size(topo, 2));
     end
 
     if nargin < 4

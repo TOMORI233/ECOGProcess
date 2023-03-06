@@ -91,19 +91,6 @@ fRange = [1000 / ISI - 0.1, 1000 / ISI + 0.1]; % 2 ± 0.1 Hz
 nStdAll = unique([trialAll.stdNum]);
 nStd = nStdAll(end);
 
-%% Raw
-[~, chMean] = joinSTD(trialAll, trialsECOG, fs);
-FigWave = plotRawWave(chMean, [], windowP);
-FigTFA = plotTFA(chMean, fs, [], windowP);
-scaleAxes([FigWave, FigTFA], "x", [0, ISI * nStd]);
-scaleAxes(FigWave, "y", "on", "symOpts", "max");
-scaleAxes(FigTFA, "c", "on", "cutoffRange", [0, 10]);
-lines = struct("X", mat2cell((0:nStd - 1)' * ISI, ones(nStd, 1)));
-addLines2Axes(FigWave, lines);
-lines = struct("X", mat2cell((0:nStd - 1)' * ISI, ones(nStd, 1)), "color", repmat({"w"}, nStd, 1));
-addLines2Axes(FigTFA, lines);
-drawnow;
-
 %% CWT
 % smooth
 try
@@ -143,7 +130,20 @@ for sIndex = 1:nStd
     AoiSE(:, sIndex) = SE(resultTuning{sIndex}, 2);
 end
 
-%% Prediction-TFR
+%% Raw wave and its TFR
+[~, chMean] = joinSTD(trialAll, trialsECOG, fs);
+FigWave = plotRawWave(chMean, [], windowP);
+FigTFA = plotTFA(chMean, fs, [], windowP);
+scaleAxes([FigWave, FigTFA], "x", [0, ISI * nStd]);
+scaleAxes(FigWave, "y", "on", "symOpts", "max");
+scaleAxes(FigTFA, "c", "on", "cutoffRange", [0, 10]);
+lines = struct("X", mat2cell((0:nStd - 1)' * ISI, ones(nStd, 1)));
+addLines2Axes(FigWave, lines);
+lines = struct("X", mat2cell((0:nStd - 1)' * ISI, ones(nStd, 1)), "color", repmat({"w"}, nStd, 1));
+addLines2Axes(FigTFA, lines);
+drawnow;
+
+%% Tuning and topo
 FigTuning = figure;
 maximizeFig;
 for cIndex = 1:nCh
@@ -189,10 +189,10 @@ mPrint(FigAOITopo, [MONKEYPATH, AREANAME, '_AOIF_Topo.jpg'], "-djpeg", "-r600");
 
 %% Example
 % ch = input('Input example channel: ');
-%
+% 
 % resultTFR = [AoiMean(ch, :)', AoiSE(ch, :)'];
 % resultWave = [t / 1000, chMean(ch, :)'];
-%
+% 
 % FigWaveExample = plotRawWave(chMean, [], windowP, [], [1, 1], ch);
 % FigTFAExample = plotTFA(chMean, fs, [], windowP, [], [1, 1], ch);
 % scaleAxes([FigTFAExample, FigWaveExample], "x", [0, ISI * nStd]);
@@ -200,7 +200,7 @@ mPrint(FigAOITopo, [MONKEYPATH, AREANAME, '_AOIF_Topo.jpg'], "-djpeg", "-r600");
 % lines = struct("X", mat2cell((0:nStd - 1)' * ISI, ones(nStd, 1)));
 % addLines2Axes(FigWaveExample, lines);
 % mPrint(FigTFAExample, [MONKEYPATH, AREANAME, '_TFR_CH', num2str(ch), '.jpg'], "-djpeg", "-r600");
-%
+% 
 % idx = [trialAll.oddballType] == "STD" & [trialAll.correct];
 % [~, temp, ~, window] = joinSTD(trialAll(idx), trialsECOG(idx), fs, "reserveTail", true);
 % resultSTD = [t / 1000, temp(ch, :)'];
