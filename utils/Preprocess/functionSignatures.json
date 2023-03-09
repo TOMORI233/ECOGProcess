@@ -67,7 +67,7 @@
         "inputs": [
             {"name": "trialsData", "kind": "required", "type": ["cell"], "description": "trial data"},
             {"name": "tTh", "kind": "ordered", "type": ["scalar", "numeric"], "description": "trial threshold"},
-            {"name": "chTh", "kind": "ordered", "type": ["scalar", "numeric"], "description": "channel threshold"},
+            {"name": "chTh", "kind": "ordered", "type": ["scalar", "numeric"], "description": "channel threshold (percentage or nTrials)"},
             {"name": "userDefineOpt", "kind": "namevalue", "type": ["choices={'on', 'off'}"]}
         ]
     }

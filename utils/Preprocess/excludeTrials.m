@@ -4,7 +4,10 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     %     trialsData: nTrials*1 cell vector with each cell containing an nCh*nSample matrix of data
     %     tTh: threshold of percentage of bad data. For one trial, if nSamples(bad) > tTh*nSamples(total)
     %          in any reserved channel, it will be excluded. (default: 0.2)
-    %     chTh: threshold for excluding bad channels. The smaller, the stricter and the more bad channels. (default: 0.1)
+    %     chTh: threshold for excluding bad channels.
+    %           If set [0, 1], it stands for percentage of trials.
+    %           If set integer > 1, it stands for nTrials.
+    %           The smaller, the stricter and the more bad channels. (default: 0.1)
     %     userDefineOpt: If set "on", bad channels will be defined by user.
     %                    If set "off", use [chTh] setting to exclude bad channels. (default: "off")
     % Output:
@@ -28,7 +31,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     mIp = inputParser;
     mIp.addRequired("trialsData", @(x) iscell(x));
     mIp.addOptional("tTh", 0.2, @(x) validateattributes(x, {'numeric'}, {'scalar', '>', 0, '<', 1}));
-    mIp.addOptional("chTh", 0.1, @(x) validateattributes(x, {'numeric'}, {'scalar', '>', 0, '<', 1}));
+    mIp.addOptional("chTh", 0.1, @(x) validateattributes(x, {'numeric'}, {'scalar', '>=', 0}));
     mIp.addParameter("userDefineOpt", "off", @(x) any(validatestring(x, {'on', 'off'})));
     mIp.parse(trialsData, varargin{:});
 
@@ -58,7 +61,14 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     V = cellfun(@(x) sum(x), V);
 
     % show channel-bad trials
-    goodChIdx = V_All < chTh * length(trialsData) & V < chTh * length(trialsData); % marked true means reserved channels
+    if chTh > 1 && chTh == fix(chTh)
+        goodChIdx = V_All < chTh & V < chTh; % marked true means reserved channels
+    elseif chTh < 1
+        goodChIdx = V_All < chTh * length(trialsData) & V < chTh * length(trialsData); % marked true means reserved channels
+    else
+        error('Invalid channel threshold input.');
+    end
+    
     channels = (1:length(goodChIdx))'; % all channels
     nTrial_bad_All = arrayfun(@(x) [num2str(x), '/', num2str(length(trialsData))], V_All, "UniformOutput", false);
     nTrial_bad_Single = arrayfun(@(x) [num2str(x), '/', num2str(length(trialsData))], V, "UniformOutput", false);

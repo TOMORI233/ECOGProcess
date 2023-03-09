@@ -1,4 +1,3 @@
-% function [Fig, mAxe, nPush, nTotal] = plotBehaviorOnly(trials, color, legendStr, Fig, mAxe, cueType)
 function [Fig, mAxe, nPush, nTotal] = plotBehaviorOnly(trials, color, varargin)
     mIp = inputParser;
     mIp.addRequired("trials", @isstruct);

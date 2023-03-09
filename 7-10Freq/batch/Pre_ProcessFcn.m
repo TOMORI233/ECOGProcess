@@ -3,7 +3,7 @@ close all;
 parseStruct(params);
 window = [-2000, 1000];
 tTh = 0.2;
-chTh = 0.2;
+chTh = 0.1;
 
 mkdir(PrePATH);
 
