@@ -143,7 +143,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
 
     end
 
-    tIdx = cellfun(@(x, y) ~any(x(goodChIdx) > tTh | y(goodChIdx) > tTh), tIdx, tIdxAll); % marked true means reserved trials
+    tIdx = cellfun(@(x) ~any(x(goodChIdx) > tTh), tIdx); % marked true means reserved trials
     if any(~tIdx)
         tIdx = find(~tIdx);
         disp(['Trial ', num2str(tIdx'), ' excluded.']);

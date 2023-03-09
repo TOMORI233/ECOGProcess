@@ -40,8 +40,8 @@ addLines2Axes(a2, lines);
 
 mSubplot(2, 2, 1, "shape", "fill", "paddings", paddings);
 imagesc("XData", areaAC, "YData", areaPFC, "CData", AC2PFC');
-xlim([areaAC(1) - 0.5, areaAC(end) + 0.5]);
-ylim([areaPFC(1) - 0.5, areaPFC(end) + 0.5]);
+set(gca, "XLimitMethod", "tight");
+set(gca, "YLimitMethod", "tight");
 xticklabels('');
 yticklabels('');
 ylabel('To PFC', 'FontSize', 12, 'FontWeight', 'bold');
@@ -51,8 +51,8 @@ set(gca, "LineWidth", 3);
 
 mSubplot(2, 2, 3, "shape", "fill", "paddings", paddings);
 imagesc("XData", areaAC, "YData", areaAC, "CData", AC2AC');
-xlim([areaAC(1) - 0.5, areaAC(end) + 0.5]);
-ylim([areaAC(1) - 0.5, areaAC(end) + 0.5]);
+set(gca, "XLimitMethod", "tight");
+set(gca, "YLimitMethod", "tight");
 xticklabels('');
 yticklabels('');
 xlabel('From AC', 'FontSize', 12, 'FontWeight', 'bold');
@@ -63,8 +63,8 @@ set(gca, "LineWidth", 3);
 
 mSubplot(2, 2, 2, "shape", "fill", "paddings", paddings);
 imagesc("XData", areaPFC, "YData", areaPFC, "CData", PFC2PFC');
-xlim([areaPFC(1) - 0.5, areaPFC(end) + 0.5]);
-ylim([areaPFC(1) - 0.5, areaPFC(end) + 0.5]);
+set(gca, "XLimitMethod", "tight");
+set(gca, "YLimitMethod", "tight");
 xticklabels('');
 yticklabels('');
 set(gca, "Box", "on");
@@ -73,8 +73,8 @@ set(gca, "LineWidth", 3);
 
 mSubplot(2, 2, 4, "shape", "fill", "paddings", paddings);
 imagesc("XData", areaPFC, "YData", areaAC, "CData", PFC2AC');
-xlim([areaPFC(1) - 0.5, areaPFC(end) + 0.5]);
-ylim([areaAC(1) - 0.5, areaAC(end) + 0.5]);
+set(gca, "XLimitMethod", "tight");
+set(gca, "YLimitMethod", "tight");
 xticklabels('');
 yticklabels('');
 xlabel('From PFC', 'FontSize', 12, 'FontWeight', 'bold');

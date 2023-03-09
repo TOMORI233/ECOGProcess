@@ -55,6 +55,16 @@ catch
             [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHs{mIndex}, params);
             trials = trialAll_temp(~cellfun(@(x) isequal(x, true), {trialAll_temp.interrupt}));
             trialsECOG_temp = selectEcog(ECOGDataset, trials, "trial onset", windowP);
+
+            if strcmpi(normOpt, "on")
+                chMeanBase{mIndex, 1} = cellfun(@(x) mean(x, "all"), changeCellRowNum(selectEcog(ECOGDataset, trials, "trial onset", windowBase)));
+                chStdBase{mIndex, 1} = cellfun(@(x) std(x, [], "all"), changeCellRowNum(selectEcog(ECOGDataset, trials, "trial onset", windowBase)));
+                trialsECOG_temp = cellfun(@(x) (x - chMeanBase{mIndex}) ./ chStdBase{mIndex}, trialsECOG_temp, "UniformOutput", false);
+            else
+                chMeanBase = [];
+                chStdBase = [];
+            end
+
             trials(excludeIdxAll{mIndex}) = [];
             trialAll = [trialAll; trials];
             trialsECOG_temp(excludeIdxAll{mIndex}) = [];
@@ -81,7 +91,10 @@ catch
         % Replace bad chs by averaging neighbour chs
         trialsECOG = interpolateBadChs(trialsECOG, badCHs);
     end
-    mSave([MONKEYPATH, AREANAME, '_Prediction_Data.mat'], "windowP", "windowT0", "trialsECOG", "trialAll", "channels", "fs", "badCHs");
+    mSave([MONKEYPATH, AREANAME, '_Prediction_Data.mat'], ...
+          "windowP", "windowT0", "trialsECOG", "trialAll", ...
+          "channels", "fs", "badCHs", ...
+          "windowBase", "chMeanBase", "chStdBase");
 end
 
 t = (0:size(trialsECOG{1}, 2) - 1)' / fs * 1000 + windowP(1);

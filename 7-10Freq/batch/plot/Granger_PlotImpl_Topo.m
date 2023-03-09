@@ -10,8 +10,8 @@ temp = rowFcn(@(x) flip(reshape(x, [topoSize(1) / nSmooth, topoSize(2) / nSmooth
 for index = 1:length(temp)
     mSubplot(topoSize(1) / nSmooth, topoSize(2) / nSmooth, index, "margins", ones(1, 4) * 0.01, "paddings", [(1 - adjIdx + 0.13 - shiftFromCenter) / 2, (1 - adjIdx + 0.13 + shiftFromCenter) / 2, 0.09, 0.04]);
     imagesc("XData", 1:topoSize(1) / nSmooth, "YData", 1:topoSize(2) / nSmooth, "CData", temp{index});
-    xlim([0.5, topoSize(1) / nSmooth + 0.5]);
-    ylim([0.5, topoSize(2) / nSmooth + 0.5]);
+    set(gca, "XLimitMethod", "tight");
+    set(gca, "YLimitMethod", "tight");
     xticklabels('');
     yticklabels('');
 end
@@ -24,8 +24,8 @@ temp = rowFcn(@(x) flip(reshape(x, [topoSize(1) / nSmooth, topoSize(2) / nSmooth
 for index = 1:length(temp)
     mSubplot(topoSize(1) / nSmooth, topoSize(2) / nSmooth, index, "margins", ones(1, 4) * 0.01, "paddings", [(1 - adjIdx + 0.13 + shiftFromCenter) / 2, (1 - adjIdx + 0.13 - shiftFromCenter) / 2, 0.09, 0.04]);
     imagesc("XData", 1:topoSize(1) / nSmooth, "YData", 1:topoSize(2) / nSmooth, "CData", temp{index});
-    xlim([0.5, topoSize(1) / nSmooth + 0.5]);
-    ylim([0.5, topoSize(2) / nSmooth + 0.5]);
+    set(gca, "XLimitMethod", "tight");
+    set(gca, "YLimitMethod", "tight");
     xticklabels('');
     yticklabels('');
 end

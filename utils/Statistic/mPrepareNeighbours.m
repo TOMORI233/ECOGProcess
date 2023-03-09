@@ -10,7 +10,7 @@ function [neighbours, neighboursInDouble] = mPrepareNeighbours(channels, topoSiz
     end
 
     % neighbours
-    A0 = reshape(channels, topoSize)';
+    A0 = reshape(channels, topoSize);
     A = padarray(A0, [1, 1]);
     neighbours = struct("label", cellfun(@(x) num2str(x), num2cell(channels), 'UniformOutput', false), "neighblabel", cell(1, numel(A0)));
     for index = 1:numel(A0)

@@ -18,6 +18,7 @@ catch
     windowPE = [-500, 800];
     windowICA = [-2000, 1000];
     windowMMN = [0, 500];
+
     trialsECOG = [];
     trialAll = [];
     dRatioAll = [];
@@ -60,6 +61,17 @@ catch
             [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHs{mIndex}, params);
             trials = trialAll_temp(~cellfun(@(x) isequal(x, true), {trialAll_temp.interrupt}));
             trialsECOG_temp = selectEcog(ECOGDataset, trials, "dev onset", windowICA);
+            
+            % Normalization
+            if strcmpi(normOpt, "on")
+                chMeanBase{mIndex, 1} = cellfun(@(x) mean(x, "all"), changeCellRowNum(selectEcog(ECOGDataset, trials, "trial onset", windowBase)));
+                chStdBase{mIndex, 1} = cellfun(@(x) std(x, [], "all"), changeCellRowNum(selectEcog(ECOGDataset, trials, "trial onset", windowBase)));
+                trialsECOG_temp = cellfun(@(x) (x - chMeanBase{mIndex}) ./ chStdBase{mIndex}, trialsECOG_temp, "UniformOutput", false);
+            else
+                chMeanBase = [];
+                chStdBase = [];
+            end
+
             trials(excludeIdxAll{mIndex}) = [];
             trialsECOG_temp(excludeIdxAll{mIndex}) = [];
             trialAll = [trialAll; trials];
@@ -74,7 +86,7 @@ catch
         chs2doICA = channels;
         chs2doICA(ismember(chs2doICA, badCHs)) = [];
 
-        % ICA
+        % Perform ICA on good channels
         if strcmp(icaOpt, "on")
             try
                 load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs", "badCHs", "chs2doICA");
@@ -99,7 +111,10 @@ catch
     end
     
     ISI = roundn(mean([trialAll.ISI]), 0);
-    mSave([MONKEYPATH, AREANAME, '_PE_Data.mat'], "windowPE", "windowMMN", "trialsECOG", "ISI", "dRatioAll", "dRatio", "fs", "channels", "badCHs");
+    mSave([MONKEYPATH, AREANAME, '_PE_Data.mat'], ...
+          "windowPE", "windowMMN", "trialsECOG", "ISI", ...
+          "dRatioAll", "dRatio", "fs", "channels", "badCHs", ...
+          "windowBase", "chMeanBase", "chStdBase");
 end
 
 %% Categorization

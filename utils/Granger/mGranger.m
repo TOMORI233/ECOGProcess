@@ -1,5 +1,5 @@
-function [granger, varargout] = mGranger(trialsECOG_AC, trialsECOG_PFC, windowData, fs, chsAC, chsPFC)
-% Description: return granger spectrum, and coherence of parametric computation 
+function [granger, coh] = mGranger(trialsECOG_AC, trialsECOG_PFC, windowData, fs, varargin)
+% Description: return Granger spectrum, and coherence of parametric computation 
 %              of the spectral transfer function and of non-parametric computation 
 %              of the cross-spectral density matrix
 % Input:
@@ -9,22 +9,30 @@ function [granger, varargout] = mGranger(trialsECOG_AC, trialsECOG_PFC, windowDa
 %     fs: sample rate, in Hz
 %     chsAC: channel number of AC to perform Granger analysis on (double row vector)
 %     chsPFC: channel number of PFC to perform Granger analysis on (double row vector)
+%     parametricOpt: 'P' or 'NP'
 % Output:
-%     granger: granger spectrum containing fields:
+%     1. Parametric
+%     granger (P): parametric Granger spectrum containing fields:
 %              - grangerspctrm: nChs*nChs*length(0:fs/2)
 %              - freq: vector 0:fs/2
-%     coh: coherence of non-parametric computation of the cross-spectral density matrix
-%     cohm: coherence of parametric computation of the spectral transfer function
+%     coh (P): coherence of parametric computation of the spectral transfer function
+%     2. Nonparametric
+%     granger (NP): nonparametric Granger spectrum
+%     coh (NP): coherence of non-parametric computation of the cross-spectral density matrix
 
-narginchk(4, 6);
+mIp = inputParser;
+mIp.addRequired("trialsECOG_AC", @iscell);
+mIp.addRequired("trialsECOG_PFC", @iscell);
+mIp.addRequired("windowData", @(x) validateattributes(x, {'numeric'}, {'numel', 2, 'increasing'}));
+mIp.addRequired("fs", @(x) validateattributes(x, {'numeric'}, {'positive', 'scalar'}));
+mIp.addOptional("chsAC", 1:size(trialsECOG_AC{1}, 1), @(x) validateattributes(x, {'numeric'}, {'nrows', 1, 'positive', 'integer', '<=', size(trialsECOG_AC{1}, 1)}));
+mIp.addOptional("chsPFC", 1:size(trialsECOG_PFC{1}, 1), @(x) validateattributes(x, {'numeric'}, {'nrows', 1, 'positive', 'integer', '<=', size(trialsECOG_PFC{1}, 1)}));
+mIp.addParameter("parametricOpt", "P", @(x) any(validatestring(x, {'P', 'NP'})));
+mIp.parse(trialsECOG_AC, trialsECOG_PFC, windowData, fs, varargin{:});
 
-if nargin < 5
-    chsAC = 1:size(trialsECOG_AC{1}, 1);
-end
-
-if nargin < 6
-    chsPFC = 1:size(trialsECOG_PFC{1}, 1);
-end
+chsAC = mIp.Results.chsAC;
+chsPFC = mIp.Results.chsPFC;
+parametricOpt = mIp.Results.parametricOpt;
 
 ft_setPath2Top;
 
@@ -35,45 +43,59 @@ data.fsample = fs;
 data.label = mat2cell(char([rowFcn(@(x) strcat('AC-', strrep(x, ' ', '0')), string(num2str((1:size(trialsECOG_AC{1}, 1))'))); ...
                             rowFcn(@(x) strcat('PFC-', strrep(x, ' ', '0')), string(num2str((1:size(trialsECOG_PFC{1}, 1))')))]), ...
                       ones(size(data.trial{1}, 1), 1));
+labelIdx = [chsAC, chsPFC + size(trialsECOG_AC{1}, 1)];
 
-%% Multivariate autoregressive model
-cfg         = [];
-% cfg.order   = 5; % lag, default=10
-cfg.method  = 'bsmart';
-cfg.channel = data.label([chsAC, chsPFC + size(trialsECOG_AC{1}, 1)]);
-mdata       = ft_mvaranalysis(cfg, data);
+if strcmpi(parametricOpt, "P")
+    % Multivariate autoregressive model
+    cfg         = [];
+    % cfg.order   = 5; % lag, default=10
+    cfg.method  = 'bsmart';
+    cfg.channel = data.label(labelIdx);
+    mdata       = ft_mvaranalysis(cfg, data);
+    
+    % Parametric computation of the spectral transfer function
+    cfg         = [];
+    cfg.method  = 'mvar';
+    cfg.channel = data.label(labelIdx);
+    mfreq       = ft_freqanalysis(cfg, mdata);
+    
+    % Parametric computation of Granger causality
+    cfg         = [];
+    cfg.method  = 'granger';
+    cfg.channel = data.label(labelIdx);
+    granger     = ft_connectivityanalysis(cfg, mfreq);
 
-%% Parametric computation of the spectral transfer function
-cfg         = [];
-cfg.method  = 'mvar';
-cfg.channel = data.label([chsAC, chsPFC + size(trialsECOG_AC{1}, 1)]);
-mfreq       = ft_freqanalysis(cfg, mdata);
-
-%% Granger
-cfg         = [];
-cfg.method  = 'granger';
-cfg.channel = data.label([chsAC, chsPFC + size(trialsECOG_AC{1}, 1)]);
-granger     = ft_connectivityanalysis(cfg, mfreq);
-
-%% Non-parametric computation of the cross-spectral density matrix
-if nargout > 1
+    if nargout == 2
+        % Parametric computation of coherence
+        cfg         = [];
+        cfg.method  = 'coh';
+        cfg.channel = data.label(labelIdx);
+        coh         = ft_connectivityanalysis(cfg, mfreq);
+    end
+else
+    % Nonparametric computation of the cross-spectral density matrix
     cfg           = [];
     cfg.method    = 'mtmfft';
     cfg.taper     = 'dpss';
     cfg.output    = 'fourier';
     cfg.tapsmofrq = 2;
-    cfg.channel   = data.label([chsAC, chsPFC + size(trialsECOG_AC{1}, 1)]);
+    cfg.channel   = data.label(labelIdx);
     freq          = ft_freqanalysis(cfg, data);
+
+    % Nonparametric computation of Granger causality
+    cfg = [];
+    cfg.method    = 'granger';
+    cfg.channel   = data.label(labelIdx);
+    granger       = ft_connectivityanalysis(cfg, freq);
+
+    if nargout == 2
+        % Nonparametric computation of coherence
+        cfg           = [];
+        cfg.method    = 'coh';
+        cfg.channel   = data.label(labelIdx);
+        coh           = ft_connectivityanalysis(cfg, freq);
+    end
 end
 
-%% Coherence
-cfg           = [];
-cfg.method    = 'coh';
-cfg.channel   = data.label([chsAC, chsPFC + size(trialsECOG_AC{1}, 1)]);
-if nargout == 2
-    coh           = ft_connectivityanalysis(cfg, freq);
-    varargout{1}  = coh;
-elseif nargout == 3
-    cohm          = ft_connectivityanalysis(cfg, mfreq);
-    varargout{2}  = cohm;
+return;
 end
