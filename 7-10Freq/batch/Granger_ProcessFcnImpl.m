@@ -49,7 +49,7 @@ catch
     trialsECOG_PFC = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, :), 1), chMapPFC, "UniformOutput", false)), trialsECOG_PFC, "UniformOutput", false);
     chsAC = channels(~cellfun(@isempty, chMapAC));
     chsPFC = channels(~cellfun(@isempty, chMapPFC));
-    [granger, grangerNP] = mGranger(trialsECOG_AC, trialsECOG_PFC, windowData, fs, chsAC, chsPFC);
+    granger = mGranger(trialsECOG_AC, trialsECOG_PFC, windowData, fs, chsAC, chsPFC, "parametricOpt", "P");
     mSave([SAVEPATH, 'GrangerData_', labelStr, '.mat'], "granger");
 end
 

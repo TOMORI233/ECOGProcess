@@ -176,7 +176,7 @@ function previewRawWave(trialsData, badtrialIdx, V)
     % Preview good trials (mean, red) against bad trials (single, grey)
     temp = find(badtrialIdx);
 
-    if ~isempty(temp)
+    if ~isempty(temp) || all(badtrialIdx)
         
         for index = 1:length(temp)
             chData(index).chMean = trialsData{temp(index)};

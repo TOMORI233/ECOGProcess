@@ -68,14 +68,15 @@ for index = 1:length(DATESTRs)
 
     % Compare single
     params.MONKEYPATH = [SINGLEROOTPATH, 'Compare\', DATESTRs{index}, '\'];
-    params.DATAPATH{1} = [SINGLEROOTPATH, 'PE\', DATESTRs{index}, '\AC_PE_tuning.mat'];
-    params.DATAPATH{2} = [SINGLEROOTPATH, 'PE\', DATESTRs{index}, '\PFC_PE_tuning.mat'];
+    params.DATAPATH{1} = [SINGLEROOTPATH, 'PE\', DATESTRs{index}, '\AC_PE_MMN_tuning.mat'];
+    params.DATAPATH{2} = [SINGLEROOTPATH, 'PE\', DATESTRs{index}, '\PFC_PE_MMN_tuning.mat'];
     params.DATAPATH{3} = [SINGLEROOTPATH, 'DM\', DATESTRs{index}, '\AC_DM_tuning.mat'];
     params.DATAPATH{4} = [SINGLEROOTPATH, 'DM\', DATESTRs{index}, '\PFC_DM_tuning.mat'];
     Compare_ProcessFcn(params);
 
     % Granger
     params.MONKEYPATH = [SINGLEROOTPATH, 'Granger\', DATESTRs{index}, '\'];
+    params.nSmooth = 2;
     params.DATAPATH = [];
     
     params.protocolType = 1; % 1-PE, 2-DM, 3-Prediction
@@ -168,8 +169,8 @@ Prediction_ProcessFcn(params);
 %% Compare single
 params.MONKEYPATH = [POPUROOTPATH, 'Compare\'];
 params.DATAPATH = [];
-params.DATAPATH{1} = [POPUROOTPATH, 'PE\AC_PE_tuning.mat'];
-params.DATAPATH{2} = [POPUROOTPATH, 'PE\PFC_PE_tuning.mat'];
+params.DATAPATH{1} = [POPUROOTPATH, 'PE\AC_PE_MMN_tuning.mat'];
+params.DATAPATH{2} = [POPUROOTPATH, 'PE\PFC_PE_MMN_tuning.mat'];
 params.DATAPATH{3} = [POPUROOTPATH, 'DM\AC_DM_tuning.mat'];
 params.DATAPATH{4} = [POPUROOTPATH, 'DM\PFC_DM_tuning.mat'];
 Compare_ProcessFcn(params);
