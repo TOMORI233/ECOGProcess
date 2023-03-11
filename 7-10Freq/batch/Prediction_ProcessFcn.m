@@ -103,6 +103,10 @@ catch
           "windowBase", "chMeanBase", "chStdBase");
 end
 
+if strcmpi(dataOnlyOpt, "on")
+    return;
+end
+
 t = (0:size(trialsECOG{1}, 2) - 1)' / fs * 1000 + windowP(1);
 nCh = size(trialsECOG{1}, 1);
 ISI = fix(mean(cellfun(@(x, y) (x(end) - x(1)) / y, {trialAll.soundOnsetSeq}, {trialAll.stdNum})));

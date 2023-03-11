@@ -28,6 +28,7 @@ end
 params.DATESTRs = DATESTRs;
 params.PrePATH = [POPUROOTPATH, 'Preprocess\'];
 params.windowBase = [-3500, -3000]; % Normalization among days
+params.dataOnlyOpt = "off"; % "on" will save data only
 
 %% Exclude trials and bad channels
 params.icaOpt = "off"; % % "on" here will perform ICA on all channels and decide bad channels after ICA

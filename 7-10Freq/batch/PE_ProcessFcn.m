@@ -123,6 +123,10 @@ catch
           "windowBase", "chMeanBase", "chStdBase");
 end
 
+if strcmpi(dataOnlyOpt, "on")
+    return;
+end
+
 %% Categorization
 % MMN
 tIdx1 = (-ISI + windowMMN(1) - windowPE(1)) / 1000 * fs + 1:(windowMMN(1) - windowPE(1)) / 1000 * fs;

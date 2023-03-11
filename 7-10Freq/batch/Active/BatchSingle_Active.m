@@ -4,13 +4,9 @@ clear; clc; close all;
 params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
 
-params.monkeyID = 1; % 1-CC, 2-XX
+params.monkeyID = 2; % 1-CC, 2-XX
 
-CURRENTPATH = fileparts(mfilename('fullpath'));
-
-if isempty(CURRENTPATH)
-    CURRENTPATH = pwd;
-end
+CURRENTPATH = pwd;
 
 if params.monkeyID == 1
     params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Active\';
@@ -27,7 +23,9 @@ end
 params.windowBase = [-3500, -3000];
 
 %% Single day ----------------------------------------------------------------
-for index = 1:length(DATESTRs)
+params.dataOnlyOpt = "on"; % "on" will save data only
+
+for index = 5:length(DATESTRs)
     params.DATESTRs = DATESTRs(index);
     params.PrePATH = [SINGLEROOTPATH, 'Preprocess\', DATESTRs{index}, '\'];
 
@@ -65,6 +63,10 @@ for index = 1:length(DATESTRs)
     params.AREANAME = 'PFC';
     params.posIndex = 2; % 1-AC, 2-PFC
     Prediction_ProcessFcn(params);
+
+    if strcmpi(params.dataOnlyOpt, "on")
+        continue;
+    end
 
     % Compare single
     params.MONKEYPATH = [SINGLEROOTPATH, 'Compare\', DATESTRs{index}, '\'];
@@ -111,6 +113,7 @@ end
 %% Population ----------------------------------------------------------------
 params.DATESTRs = DATESTRs;
 params.PrePATH = [POPUROOTPATH, 'Preprocess\'];
+params.dataOnlyOpt = "off"; % "on" will save data only
 
 %% PE
 params.MONKEYPATH = [POPUROOTPATH, 'PE\'];
@@ -176,8 +179,15 @@ params.DATAPATH{4} = [POPUROOTPATH, 'DM\PFC_DM_tuning.mat'];
 Compare_ProcessFcn(params);
 
 %% Granger
-params.MONKEYPATH = [POPUROOTPATH, 'Granger\'];
 params.DATAPATH = [];
+
+% smooth
+% params.MONKEYPATH = [POPUROOTPATH, 'Granger\'];
+% params.nSmooth = 2;
+
+% no smooth
+params.MONKEYPATH = [POPUROOTPATH, 'Granger (no smoothing)\'];
+params.nSmooth = 1;
 
 params.protocolType = 1; % 1-PE, 2-DM, 3-Prediction
 params.DATAPATH{1} = [POPUROOTPATH, 'PE\AC_PE_Data.mat'];
@@ -200,7 +210,7 @@ Granger_ProcessFcn(params);
 params.protocolType = 3; % 1-PE, 2-DM, 3-Prediction
 params.DATAPATH{1} = [POPUROOTPATH, 'Prediction\AC_Prediction_Data.mat'];
 params.DATAPATH{2} = [POPUROOTPATH, 'Prediction\PFC_Prediction_Data.mat'];
-params.windowGranger = [0, 1000];
+params.windowGranger = [0, 500];
 Granger_ProcessFcn(params);
-params.windowGranger = [1000, 3500];
+params.windowGranger = [3000, 3500];
 Granger_ProcessFcn(params);

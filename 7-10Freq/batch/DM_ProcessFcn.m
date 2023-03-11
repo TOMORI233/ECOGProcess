@@ -116,6 +116,10 @@ catch
     mSave([MONKEYPATH, AREANAME, '_DM_Data.mat'], "windowDM", "trialsECOG_correct", "trialsECOG_wrong", "resultC", "resultW", "fs", "channels", "badCHs");
 end
 
+if strcmpi(dataOnlyOpt, "on")
+    return;
+end
+
 % Raw
 chData0(1).chMean = cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG_correct), "UniformOutput", false));
 chData0(1).color = "r";
