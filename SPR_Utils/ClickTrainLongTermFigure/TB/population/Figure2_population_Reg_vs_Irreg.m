@@ -245,7 +245,7 @@ for mIndex =  2 : length(MATPATH)
     end
 drawnow
 ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
-save(ResName, "cdrPlot", "chMean", "Protocol", "compare", "-mat");
+save(ResName, "cdrPlot", "chMean", "Protocol", "compare", "trialAll", "-mat");
 
 %% ANOVA between Reg and Irreg
 % mAnova1()

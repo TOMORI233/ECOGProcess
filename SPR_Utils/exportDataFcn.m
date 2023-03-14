@@ -21,7 +21,11 @@ function exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, startIdx, endIdx)
         disp("Loading AC Data...");
         params.posIndex = 1;
         tic
-        [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
+        if isfield(params, "patch")
+            [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params, "patch", params.patch);
+        else
+            [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
+        end
         ECOGDataset = ECOGResample(ECOGDataset, fd);
         disp("Saving...");
         save(strcat(SAVEPATH, DateStr, "\", DateStr, "_", AREANAME(params.posIndex), ".mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");
@@ -31,7 +35,11 @@ function exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, startIdx, endIdx)
         disp("Loading PFC Data...");
         params.posIndex = 2;
         tic
-        [~, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
+        if isfield(params, "patch")
+            [~, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params, "patch", params.patch);
+        else
+            [~, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
+        end        
         ECOGDataset = ECOGResample(ECOGDataset, fd);
         disp("Saving...");
         save(strcat(SAVEPATH, DateStr, "\", DateStr, "_", AREANAME(params.posIndex), ".mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");

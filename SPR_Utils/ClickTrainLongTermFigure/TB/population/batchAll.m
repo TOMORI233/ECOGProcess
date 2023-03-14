@@ -1,4 +1,4 @@
-% run("Figure2_population_Reg_vs_Irreg.m");
+run("Figure2_population_Reg_vs_Irreg.m");
 run("Figure3_population_Diff_ICI.m");
 run("Figure4_population_ICIThr.m");
 run("Figure5_population_IrregVar.m");

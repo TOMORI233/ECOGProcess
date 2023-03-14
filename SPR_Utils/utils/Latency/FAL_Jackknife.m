@@ -1,12 +1,15 @@
-function [fal_mean, fal_se, fal_jackknife] = FAL_Jackknife(data, time, chNP, fraction, thrFrac)
-narginchk(3, 5);
-if nargin < 4
+function [fal_mean, fal_se, fal_jackknife] = FAL_Jackknife(data, t, testWin, sponWin, chNP, fraction, thrFrac, sigma, smthBin )
+narginchk(5, 9);
+
+if nargin < 6
     % Define the fraction for the FAL (e.g., 0.5 for 50% of the area under the curve)
     fraction = 0.5;
 end
-if nargin < 5
+if nargin < 7
     thrFrac = 0.3;
 end
+tIndex = t >= testWin(1) & t <= testWin(2);
+sponIndex = t >= sponWin(1) & t <= sponWin(2);
 % Number of trials
 n_trials = size(data,1);
 
@@ -20,7 +23,11 @@ for i = 1:n_trials
     data_jackknife(i,:) = [];
 
     % Compute the FAL for the current jackknife replicate
-    data_mean = mean(data_jackknife,1);
+    if n_trials > 1
+        data_mean = mean(data_jackknife,1);
+    else
+        data_mean = data;
+    end
 
     [~, area_under_curve, data_mean] = AreaAboveThr(data_mean, time, chNP, thrFrac);
     %     area_under_curve = trapz(time, data_mean);

@@ -7,7 +7,7 @@ function trialsECOG = interpolateBadChs(trialsECOG, badCHs, topoSize)
 
     % Replace bad chs by averaging neighbour chs
     channels = 1:size(trialsECOG{1}, 1);
-    [~, neighbours] = mPrepareNeighbours(channels, topoSize);
+    [~, neighbours] = mPrepareNeighboursSPR(channels, topoSize);
     for bIndex = 1:numel(badCHs)
         for tIndex = 1:length(trialsECOG)
             chsTemp = neighbours{badCHs(bIndex)};

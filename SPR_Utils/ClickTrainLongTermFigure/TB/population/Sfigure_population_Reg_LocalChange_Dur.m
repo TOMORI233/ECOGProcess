@@ -1,44 +1,49 @@
 close all; clc; clear;
-
-MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Basic_ICI4\';
-MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Basic_ICI4\';
+MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Reg_Rep1_Dur\';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Reg_Rep1_Dur\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-
+icaOpt = "off";
 CRIMethod = 2;
 CRIMethodStr = ["Resp_devided_by_Spon", "R_minus_S_devide_R_plus_S"];
-CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.5]};
+CRIScale = {[0.8, 2; -0.1 0.4], [0.8, 2; -0.1 0.5]};
 CRITest = [1, 0];
 
+plotWhole = false;
 colors = ["#FF0000", "#FFA500", "#0000FF", "#000000"];
-
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
-fs = 500;
+fs = 600;
 pBase = 0.01;
 
 selectCh = [13 9];
-badCHs = {[49], [49]};
+% badCHs = {[49], [49]};
 yScale = [40, 50];
 quantWin = [0 300];
 sponWin = [-300 0];
-compareStim = [1, 3];
-for mIndex =  2 : length(MATPATH)
+tTh = 0.2;
+chTh = 0.2;
+for mIndex =  1 : length(MATPATH)
 
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
-    FIGPATH = strcat(ROOTPATH, "\Pop_Sfigure2_No_Reg_In_Irreg\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+    FIGPATH = strcat(ROOTPATH, "\Pop_Sfigure2_Reg_Insert_Rep1\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
     mkdir(FIGPATH);
 
     %% merge population data
     if ~exist(strcat(FIGPATH, "PopulationData.mat"), "file")
-        [trialsECOG_Merge, trialsECOG_S1_Merge , ~, ~, trialAll] = mergeECOGPreprocess(MATPATH{mIndex}, AREANAME);
-        save(strcat(FIGPATH, "PopulationData.mat"), "trialsECOG_S1_Merge", "trialsECOG_Merge", "trialAll");
+        [trialsECOG_Merge, trialsECOG_S1_Merge , ~, ~, trialAll, badCHs] = mergeECOGPreprocess(MATPATH{mIndex}, AREANAME);
+        save(strcat(FIGPATH, "PopulationData.mat"), "trialsECOG_S1_Merge", "trialsECOG_Merge", "trialAll", "badCHs");
+
     else
         load(strcat(FIGPATH, "PopulationData.mat"));
     end
+
+    disp(strcat("bad channels are:", strjoin(string(badCHs), ",")));
+
+
 
     %% ICA
     % align to certain duration
@@ -47,43 +52,54 @@ for mIndex =  2 : length(MATPATH)
 
     trialsECOG_MergeTemp = trialsECOG_Merge;
     trialsECOG_S1_MergeTemp = trialsECOG_S1_Merge;
+    channels = 1 : size(trialsECOG_Merge{1}, 1);
     if ~exist(ICAName, "file")
-        [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG_MergeTemp, fs, Window);
+        chs2doICA = channels;
+        chs2doICA(ismember(chs2doICA, badCHs)) = [];
+        [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG_MergeTemp, fs, Window, chs2doICA);
+        %         temp = validateInput(['Input bad channel number (empty for default: ', num2str(badCHs'), '): '], @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
+        %         if ~isempty(temp)
+        %             badCHs = unique([badCHs; reshape(temp, [numel(temp), 1])]);
+        %         end
         compT = comp;
         compT.topo(:, ~ismember(1:size(compT.topo, 2), ICs)) = 0;
-        trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
-        trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
+        if length(chs2doICA) < length(channels)
+            icaOpt = "on";
+            trialsECOG_Merge = cellfun(@(x) x(chs2doICA, :), trialsECOG_Merge, "UniformOutput", false);
+            trialsECOG_Merge = reconstructData(trialsECOG_Merge, comp, ICs);
+            trialsECOG_Merge = cellfun(@(x) insertRows(x, channels(ismember(channels, badCHs) & ~ismember(channels, chs2doICA))), trialsECOG_Merge, "UniformOutput", false);
+
+            trialsECOG_S1_Merge = cellfun(@(x) x(chs2doICA, :), trialsECOG_S1_Merge, "UniformOutput", false);
+            trialsECOG_S1_Merge = reconstructData(trialsECOG_S1_Merge, comp, ICs);
+            trialsECOG_S1_Merge = cellfun(@(x) insertRows(x, channels(ismember(channels, badCHs) & ~ismember(channels, chs2doICA))), trialsECOG_S1_Merge, "UniformOutput", false);
+        else
+            trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
+            trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
+        end
         close(FigTopoICA);
-        save(ICAName, "compT", "comp", "ICs", "-mat");
+        save(ICAName, "compT", "comp", "ICs", "icaOpt", "chs2doICA", "-mat");
     else
         load(ICAName);
-        %         [~, ICs, FigTopoICA] = ICA_Exclude(trialsECOG_MergeTemp, comp, Window);
-        trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
-        trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
+        if strcmpi(icaOpt, "on")
+            trialsECOG_Merge = cellfun(@(x) x(chs2doICA, :), trialsECOG_Merge, "UniformOutput", false);
+            trialsECOG_Merge = reconstructData(trialsECOG_Merge, comp, ICs);
+            trialsECOG_Merge = cellfun(@(x) insertRows(x, channels(ismember(channels, badCHs) & ~ismember(channels, chs2doICA))), trialsECOG_Merge, "UniformOutput", false);
+
+            trialsECOG_S1_Merge = cellfun(@(x) x(chs2doICA, :), trialsECOG_S1_Merge, "UniformOutput", false);
+            trialsECOG_S1_Merge = reconstructData(trialsECOG_S1_Merge, comp, ICs);
+            trialsECOG_S1_Merge = cellfun(@(x) insertRows(x, channels(ismember(channels, badCHs) & ~ismember(channels, chs2doICA))), trialsECOG_S1_Merge, "UniformOutput", false);
+        else
+            trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
+            trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
+        end
     end
 
-
-    %% Patch
-    temp = changeCellRowNum(trialsECOG_Merge);
-    temp = temp(ECOGSitePatch(AREANAME));
-    trialsECOG_Merge = changeCellRowNum(temp);
-    trialsECOG_Merge = interpolateBadChs(trialsECOG_Merge, 49);
-
-    temp = changeCellRowNum(trialsECOG_S1_Merge);
-    temp = temp(ECOGSitePatch(AREANAME));
-    trialsECOG_S1_Merge = changeCellRowNum(temp);
-    trialsECOG_S1_Merge = interpolateBadChs(trialsECOG_S1_Merge, badCHs{mIndex});
+    % badCH
+    trialsECOG_Merge = interpolateBadChs(trialsECOG_Merge,  badCHs);
+    trialsECOG_S1_Merge = interpolateBadChs(trialsECOG_S1_Merge, badCHs);
 
     %% process
     devType = unique([trialAll.devOrdr]);
-    % anova test
-    for compareIdx = 1 : length(compareStim)
-        Trials{compareIdx, 1} = trialsECOG_Merge([trialAll.devOrdr] == devType(compareStim(compareIdx)));
-        labels{compareIdx, 1} = compareIdx * ones(length(reg_Trials{compareIdx, 1}), 1);
-    end
-    anovaTrials = changeCellRowNum(vertcat(Trials{:}));
-    anovaLables = cell2mat(labels);
-    [P{mIndex, 1}, H{mIndex, 1}] = mAnova1(anovaTrials{selectCh(mIndex)}, anovaLables);
 
 
     % initialize
@@ -124,45 +140,42 @@ for mIndex =  2 : length(MATPATH)
 
 
 
-    %% plot rawWave
-    FigWave_Reg(mIndex) = plotRawWave(chMean{1}, [], Window, titleStr, [8, 8]);
-    FigWave_Irreg(mIndex) = plotRawWave(chMean{3}, [], Window, titleStr, [8, 8]);
-    FigWave_Whole_Reg(mIndex) = plotRawWave(chMean{1}, [], Window, titleStr, [8, 8]);
-    FigWave_Whole_Irreg(mIndex) = plotRawWave(chMean{3}, [], Window, titleStr, [8, 8]);
-    setLine([FigWave_Whole_Irreg, FigWave_Irreg], "Color", [0 0 0], "Color", [1 0 0]);
-
-
-    topo_Reg = ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"));
-    topo_Irreg = ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"));
-
-    FigTopo_Reg(mIndex) = plotTopo_Raw(topo_Reg, [8, 8]);
-    FigTopo_Irreg(mIndex) = plotTopo_Raw(topo_Irreg, [8, 8]);
-    colormap(FigTopo_Reg(mIndex), "jet");
-    colormap(FigTopo_Irreg(mIndex), "jet");
-
-    %% change figure scale
-    scaleAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigTopo_Reg(mIndex), FigTopo_Irreg(mIndex)], "c", CRIScale{mIndex}(CRIMethod, :));
-    scaleAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "y", [-yScale(mIndex) yScale(mIndex)]);
-
-    setAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], 'yticklabel', '');
-    setAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], 'xticklabel', '');
-    setAxes([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], 'visible', 'off');
-    setLine([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "YData", [-yScale(mIndex) yScale(mIndex)], "LineStyle", "--");
+    %% plot single wave
+    for dIndex = 1 : length(devType)
+        singleStim.chMean = chMean{dIndex}; singleStim.color = colors(dIndex);
+        FigWave(dIndex) = plotRawWaveMulti_SPR(singleStim, Window, stimStr(1), [8, 8]);
+    end
+    setAxes(FigWave, 'yticklabel', '');
+    setAxes(FigWave, 'xticklabel', '');
+    setAxes(FigWave, 'visible', 'off');
+    setLine(FigWave, "YData", [-yScale(mIndex) yScale(mIndex)], "LineStyle", "--");
     pause(1);
-    set([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigTopo_Reg(mIndex), FigTopo_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "outerposition", [300, 100, 800, 670]);
+    set(FigWave, "outerposition", [300, 100, 800, 670]);
+    scaleAxes(FigWave, "x", [-10 600]);
+    plotLayout(FigWave, params.posIndex + 2 * (mIndex - 1), 0.3);
+    for dIndex = 1 : length(devType)
+        print(FigWave(dIndex), strcat(FIGPATH,  stimStr(dIndex), "_CRI_Wave"), "-djpeg", "-r200");
+    end
 
-    scaleAxes([FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], "x", [-10 600]);
-    plotLayout([FigWave_Whole_Reg(mIndex), FigWave_Whole_Irreg(mIndex), FigWave_Reg(mIndex), FigWave_Irreg(mIndex)], params.posIndex + 2 * (mIndex - 1), 0.3);
+    % whole wave
+    if plotWhole
+        for dIndex = 1 : length(devType)
+            singleStim.chMean = chMean{dIndex}; singleStim.color = colors(dIndex);
+            FigWave_Whole(dIndex) = plotRawWaveMulti_SPR(singleStim, Window, stimStr(1), [8, 8]);
+        end
+        setAxes(FigWave_Whole, 'yticklabel', '');
+        setAxes(FigWave_Whole, 'xticklabel', '');
+        setAxes(FigWave_Whole, 'visible', 'off');
+        setLine(FigWave_Whole, "YData", [-yScale(mIndex) yScale(mIndex)], "LineStyle", "--");
+        pause(1);
+        set(FigWave_Whole, "outerposition", [300, 100, 800, 670]);
+        scaleAxes(FigWave, "x", [-10 600]);
+        plotLayout(FigWave_Whole, params.posIndex + 2 * (mIndex - 1), 0.3);
+        for dIndex = 1 : length(devType)
+            print(FigWave_Whole(dIndex), strcat(FIGPATH, stimStr(dIndex), "_CRI_Wave_Whole"), "-djpeg", "-r200");
+        end
+    end
 
-    print(FigWave_Whole_Reg(mIndex), strcat(FIGPATH, Protocol, "_whole_Reg_Wave"), "-djpeg", "-r200");
-    print(FigWave_Whole_Irreg(mIndex), strcat(FIGPATH, Protocol, "_whole_Irreg_Wave"), "-djpeg", "-r200");
-
-
-    print(FigWave_Reg(mIndex), strcat(FIGPATH, Protocol, "_Reg_Wave"), "-djpeg", "-r200");
-    print(FigWave_Irreg(mIndex), strcat(FIGPATH, Protocol, "_Irreg_Wave"), "-djpeg", "-r200");
-
-    print(FigTopo_Reg(mIndex), strcat(FIGPATH, Protocol, "_Topo_Reg"), "-djpeg", "-r200");
-    print(FigTopo_Irreg(mIndex), strcat(FIGPATH, Protocol, "_Topo_Irreg"), "-djpeg", "-r200");
 
     %% Reg Irreg comparison, for Reg-Irreg tuning and topo
     % ttest between 4ms Reg and 4ms Irreg
@@ -206,7 +219,6 @@ for mIndex =  2 : length(MATPATH)
     close(FigTopo);
 
     %% p-value of CRI and sponRes
-    stimStr = ["4_4o06msReg", "4o06_4msReg", "4_4o06msIrreg", "4o06_4msIrreg"];
     for dIndex = [1 3]
         % compare change resp and spon resp
         amp = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_amp"));

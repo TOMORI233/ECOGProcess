@@ -231,7 +231,7 @@ for mIndex =  1 : length(MATPATH)
     end
 drawnow
 ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
-save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
+save(ResName, "cdrPlot", "compare", "chMean", "latency", "ampNorm", "Protocol", "-mat");
 end
 
 close all

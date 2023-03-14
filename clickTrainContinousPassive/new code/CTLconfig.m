@@ -1,4 +1,70 @@
 switch Protocol
+            case "Add_on_Reg_Rep1_TimeCourse"
+        %% 1：1-2-3-4-5
+        titleStr = "LocalChange_Dur";
+        S1Duration = 0;
+        winStart = -1000;
+        Window = [winStart 7500];
+        ICAWin = [0 5000];
+        FFTWin = [0 5000];
+        tTh = 0.1;
+        chTh = 0.1;
+        case "Add_on_Reg_Rep1_Dur"
+        %% 1. 0.5s  2. 1s   3. 3s 4. 5s
+        titleStr = "LocalChange_Dur";
+%         colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#000000"];
+%         stimStrs = ["4ms", "8ms", "20ms", "40ms", "80ms"];
+        S1Duration = [500.5, 1001, 3002.9, 5004.8];
+        winStart = -1000;
+        Window = [winStart 1500];
+        ICAWin = [-1000 1500];
+        tTh = 0.2;
+        chTh = 0.2;
+    case "DiffICI_Merge"
+        %% 1. Reg4-4.06_2s-1s  2. Reg4-4.06-4_2s-1s   3. Reg4-4.06_5s-2s 4.Reg4-4.06-4_5s-2s
+        titleStr = "DiffICI_Merge";
+        colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#000000"];
+        stimStrs = ["4ms", "8ms", "20ms", "40ms", "80ms"];
+        S1Duration = [5009,2001.9, 5013, 2025, 5045, 5045];
+        winStart = -5500;
+        Window = [winStart 5500];
+        ICAWin = [-1500 1500];
+        FFTWin = [-4500 -500];
+        tTh = 0.2;
+        chTh = 0.2;
+    case "Add_on_Reg_Insert_Rep1_mix"
+        %% 1. Reg4-4.06_2s-1s  2. Reg4-4.06-4_2s-1s   3. Reg4-4.06_5s-2s 4.Reg4-4.06-4_5s-2s
+        titleStr = "Add_on_TB_Reg_Insert_Rep1_mix";
+        stimStr = ["Reg4_4o06-2s", "Reg4_4o06_4-2s", "Reg4_4o06-5s", "Reg4_4o06_4-5s"];
+        S1Duration = [2001.9,2001.9, 5004.8,5004.8];
+        winStart = -2500;
+        Window = [winStart 1500];
+        FFTWin = [0,1000];
+        ICAWin = [-2500 1500];
+        tTh = 0.2;
+        chTh = 0.2;
+        case "Add_on_Reg_Insert_5s-2s"
+        %% 1. Reg4-4.06   2. Reg4-4   3. Reg4-4.06-4
+        titleStr = "Add_on_TB_Reg_Insert_5s";
+        stimStr = ["Reg4_4o06", "Reg4_4", "Reg4_4o06_4"];
+        S1Duration = [5004.8,5004.8,5004.8];
+        winStart = -5500;
+        Window = [winStart 1500];
+        FFTWin = [0,1500];
+        ICAWin = [-5500 1500];
+        tTh = 0.2;
+        chTh = 0.2;
+    case "Add_on_Reg_Insert_2s-1s"
+        %% 1. Reg4-4.06   2. Reg4-4   3. Reg4-4.06-4
+        titleStr = "Add_on_TB_Reg_Insert_2s";
+        stimStr = ["Reg4_4o06", "Reg4_4", "Reg4_4o06_4"];
+        S1Duration = [2001.9,2001.9,2001.9];
+        winStart = -1800;
+        Window = [winStart 1000];
+        FFTWin = [0,1000];
+        ICAWin = [-1000 800];
+        tTh = 0.2;
+        chTh = 0.2;
     %% TITS 框架：
     % 1. 发现offset(reg & Irreg， 10+ VS 1-8， 跟随， 纯音/噪声对照)
     % 2. 改变duration(时间整合需要时间， 纯音/噪声对照）

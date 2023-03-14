@@ -1,4 +1,4 @@
-function [avl_mean, avl_se, avl_jackknife] = AVL_Jackknife(data, t, testWin, sponWin, chNP, stdFrac, sigma, smthBin)
+function [avl_mean, avl_se, avl_jackknife] = AVL_Boostrap(data, t, testWin, sponWin, chNP, stdFrac, sigma, smthBin)
 narginchk(6, 8);
 
 tIndex = t >= testWin(1) & t <= testWin(2);
@@ -6,9 +6,9 @@ time = t(tIndex);
 sponIndex = t >= sponWin(1) & t <= sponWin(2);
 
 % Preallocate memory for the jackknife replicates
-data_jackknife = jackknife(@mean, data);
+data_boostrap = bootstrp(1000, @mean, data);
 if nargin > 7
-    data_mean = mGaussionSmth(data_jackknife, sigma, smthBin, 2);
+    data_mean = mGaussionSmth(data_boostrap, sigma, smthBin, 2);
 end
 
 % Loop over the trials to compute the jackknife replicates

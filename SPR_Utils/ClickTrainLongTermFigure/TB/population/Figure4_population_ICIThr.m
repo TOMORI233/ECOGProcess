@@ -26,10 +26,10 @@ badCh = {[], []};
 yScale = [50, 50];
 quantWin = [0 300];
 sponWin = [-300 0];
-latencyWin = [80, 200];
-for mIndex = 2 : length(MATPATH)
-    NegOrPos{1} = -1 * ones(64, 1);
-    NegOrPos{2} = [ones(24, 1); -1*ones(40, 1)];
+latencyWin = [60, 200];
+for mIndex = 1 : length(MATPATH)
+    NegOrPos{1} = ones(64, 1);
+    NegOrPos{2} = ones(64, 1);
     chNP = NegOrPos{mIndex};
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
@@ -96,17 +96,17 @@ for mIndex = 2 : length(MATPATH)
         tIndex = [trialAll.devOrdr] == devType(dIndex);
         trials = trialAll(tIndex);
         trialsECOG = trialsECOG_Merge(tIndex);
-        %         trialsECOG_S1 = trialsECOG_S1_Merge(tIndex);
-
-        chMean{dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG), 'UniformOutput', false));
-        chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG), 'UniformOutput', false));
+%         trialsECOG_S1{dIndex, 1} = trialsECOG_S1_Merge(tIndex);
+        
+        chMean{dIndex} = cell2mat(cellfun(@mean , changeCellRowNum(trialsECOG{dIndex,1}), 'UniformOutput', false));
+        chStd = cell2mat(cellfun(@(x) std(x)/sqrt(length(tIndex)), changeCellRowNum(trialsECOG{dIndex,1}), 'UniformOutput', false));
         for ch = 1 : size(chMean{dIndex}, 1)
             cdrPlot(ch).(strcat(monkeyStr(mIndex), "Wave"))(:, 2 * dIndex - 1) = t';
             cdrPlot(ch).(strcat(monkeyStr(mIndex), "Wave"))(:, cdrPlotIdx(dIndex)) = chMean{dIndex}(ch, :)';
         end
 
         % quantization amplitude
-        [temp, amp, rmsSpon] = cellfun(@(x) waveAmp_Norm(x, Window, quantWin, CRIMethod, sponWin), trialsECOG, 'UniformOutput', false);
+        [temp, amp, rmsSpon] = cellfun(@(x) waveAmp_Norm(x, Window, quantWin, CRIMethod, sponWin), trialsECOG{dIndex,1}, 'UniformOutput', false);
         ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = cellfun(@mean, changeCellRowNum(temp));
         ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_se")) = cellfun(@(x) std(x)/sqrt(length(x)), changeCellRowNum(temp));
         ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_raw")) = changeCellRowNum(temp);
@@ -114,8 +114,10 @@ for mIndex = 2 : length(MATPATH)
         ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_rmsSpon")) = rmsSpon;
 
         % quantization latency
+        sigma = 5;
+        smthBin = 30;
         % %         [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","FAL", "fraction", 0.5, "thrFrac", 0.3);
-        [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG, Window, chNP, latencyWin, 1, "Method","AVL");
+        [latency_mean, latency_se, latency_raw]  = Latency_Jackknife(trialsECOG{dIndex,1}, Window, chNP, latencyWin, sponWin, sigma, smthBin, "Method", "ByTrials");
 
         %         [latency_mean, latency_se, latency_raw] = waveLatency_trough(trialsECOG, Window, latencyWin, 50, fs); %        latency(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = latency_mean;
         latency(dIndex).(strcat(monkeyStr(mIndex), "_mean")) = latency_mean;
@@ -125,18 +127,12 @@ for mIndex = 2 : length(MATPATH)
         RegRatio(dIndex).chMean = chMean{dIndex}; RegRatio(dIndex).color = colors(dIndex);
         %% CRI topo
         topo_Reg = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_mean"));
-        if ~isempty(badCh{mIndex})
-            topo_Reg(badCh{mIndex}) = CRITest(CRIMethod);
-        end
         FigTopo(dIndex) = plotTopo_Raw(topo_Reg, [8, 8]);
         colormap(FigTopo(dIndex), "jet");
         scaleAxes(FigTopo(dIndex), "c", CRIScale{mIndex}(CRIMethod, :));
         pause(1);
         set(FigTopo(dIndex), "outerposition", [300, 100, 800, 670]);
         print(FigTopo(dIndex), strcat(FIGPATH,  Protocol, "_", stimStrs(dIndex), "_Topo_Reg"), "-djpeg", "-r200");
-
-
-
     end
 
     %% significance of s1 onset response
@@ -244,7 +240,9 @@ for mIndex = 2 : length(MATPATH)
 
     drawnow
     ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
-    save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
+    save(ResName, "cdrPlot", "compare", "chMean", "latency", "ampNorm", "Protocol", "-mat");
+    ResName = strcat(FIGPATH, "trialsECOG_", AREANAME, ".mat");
+    save(ResName, "trialsECOG", "trialsECOG_S1", "t", "Window", "-mat");
 
 end
 

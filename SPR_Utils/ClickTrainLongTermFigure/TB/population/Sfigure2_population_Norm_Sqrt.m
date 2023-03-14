@@ -20,7 +20,7 @@ fs = 500;
 pBase = 0.01;
 
 selectCh = [13 9];
-badCh = {[], []};
+badCHs = {[49], [49]};
 yScale = [50, 90];
 quantWin = [0 300];
 sponWin = [-300 0];
@@ -66,10 +66,14 @@ for mIndex =  1 : length(MATPATH)
     temp = changeCellRowNum(trialsECOG_Merge);
     temp = temp(ECOGSitePatch(AREANAME));
     trialsECOG_Merge = changeCellRowNum(temp);
+    trialsECOG_Merge = interpolateBadChs(trialsECOG_Merge, 49);
 
     temp = changeCellRowNum(trialsECOG_S1_Merge);
     temp = temp(ECOGSitePatch(AREANAME));
     trialsECOG_S1_Merge = changeCellRowNum(temp);
+    trialsECOG_S1_Merge = interpolateBadChs(trialsECOG_S1_Merge, badCHs{mIndex});
+    %% 
+           
 
 %% process
     devType = unique([trialAll.devOrdr]);
@@ -125,10 +129,6 @@ for mIndex =  1 : length(MATPATH)
     topo_Reg = ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"));
     topo_Irreg = ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"));
 
-    if ~isempty(badCh{mIndex})
-        topo_Reg(badCh{mIndex}) = 1;
-        topo_Irreg(badCh{mIndex}) = 1;
-    end
 
     FigTopo_Reg(mIndex) = plotTopo_Raw(topo_Reg, [8, 8]);
     FigTopo_Irreg(mIndex) = plotTopo_Raw(topo_Irreg, [8, 8]);
@@ -170,24 +170,24 @@ for mIndex =  1 : length(MATPATH)
 %     sigCh{mIndex} = find(cell2mat(H));
 % nSigCh{mIndex} = find(~cell2mat(H));
 
-    compare(mIndex).info = monkeyStr(mIndex);
+    compare.info = monkeyStr(mIndex);
     temp = reshape([ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))'; ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))';...
         ampNorm(1).(strcat(monkeyStr(mIndex), "_se"))'; ampNorm(3).(strcat(monkeyStr(mIndex), "_se"))'], 2, []) ;
-    compare(mIndex).mean_se = [[1; 2], temp];
-    compare(mIndex).mean_scatter = [[1; 2] [ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))'; ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))']];
-    compare(mIndex).H = cell2mat(H);
-    compare(mIndex).P = cell2mat(P);
+    compare.mean_se = [[1; 2], temp];
+    compare.mean_scatter = [[1; 2] [ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))'; ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))']];
+    compare.H = cell2mat(H);
+    compare.P = cell2mat(P);
 
     temp = reshape([ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))(sigCh{mIndex})'; ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))(sigCh{mIndex})';...
         ampNorm(1).(strcat(monkeyStr(mIndex), "_se"))(sigCh{mIndex})'; ampNorm(3).(strcat(monkeyStr(mIndex), "_se"))(sigCh{mIndex})'], 2, []) ;
-    compare(mIndex).selectMean_SE_S1Sig = [[1; 2], temp];
+    compare.selectMean_SE_S1Sig = [[1; 2], temp];
 
     temp = reshape([ampNorm(1).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh{mIndex})'; ampNorm(3).(strcat(monkeyStr(mIndex), "_mean"))(nSigCh{mIndex})';...
         ampNorm(1).(strcat(monkeyStr(mIndex), "_se"))(nSigCh{mIndex})'; ampNorm(3).(strcat(monkeyStr(mIndex), "_se"))(nSigCh{mIndex})'], 2, []) ;
-    compare(mIndex).selectMean_SE_S1nSig = [[1; 2], temp];
+    compare.selectMean_SE_S1nSig = [[1; 2], temp];
 
     % plot reg vs irreg topo
-    topo = logg(pBase, compare(mIndex).P / pBase);
+    topo = logg(pBase, compare.P / pBase);
         topo(isinf(topo)) = 5;
         topo(topo > 5) = 5;
         FigTopo = plotTopo_Raw(topo, [8, 8]);
@@ -201,12 +201,15 @@ for mIndex =  1 : length(MATPATH)
     close(FigTopo);
 
     %% p-value of CRI and sponRes
-    stiStr = ["4_4o06msReg", "4o06_4msReg", "4_4o06msIrreg", "4o06_4msIrreg"];
+    stimStr = ["4_4o06msReg", "4o06_4msReg", "4_4o06msIrreg", "4o06_4msIrreg"];
     for dIndex = [1 3]
         % compare change resp and spon resp
         amp = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_amp"));
         rmsSpon = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_rmsSpon"));
         [sponH, sponP] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(amp), changeCellRowNum(rmsSpon), "UniformOutput", false);
+        compare.sponRsp(dIndex).info = stimStr(dIndex);
+        compare.sponRsp(dIndex).H = sponH;
+        compare.sponRsp(dIndex).P = sponP;
         % compare ampNorm and 1
 %         temp = ampNorm(dIndex).(strcat(monkeyStr(mIndex), "_raw"));
 %         OneArray = repmat({ones(length(temp{1}) , 1) * CRITest(CRIMethod)}, length(temp), 1);
@@ -223,12 +226,12 @@ for mIndex =  1 : length(MATPATH)
         set(FigTopo, "outerposition", [300, 100, 800, 670]);
         %         title("p-value (log(log(pBase, p)) distribution of [0 300] response and baseline");
 
-        print(FigTopo, strcat(FIGPATH, Protocol, "_", stiStr(dIndex), "_pValue_Topo_Reg"), "-djpeg", "-r200");
+        print(FigTopo, strcat(FIGPATH, Protocol, "_", stimStr(dIndex), "_pValue_Topo_Reg"), "-djpeg", "-r200");
         close(FigTopo);
     end
 drawnow
 ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
-save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
+save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "ampNorm", "-mat");
 end
 
 close all

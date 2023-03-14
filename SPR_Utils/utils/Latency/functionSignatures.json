@@ -1,20 +1,25 @@
 {
     "_schemaVersion": "1.0.0",
 
-    "Latency_Jackknife": {
+    "Latency_Resample": {
         "inputs": [
             {"name": "trialsECOG", "kind": "required", "type": ["cell"], "purpose": "data by trials"},
-            {"name": "chNP", "kind": "required", "type": ["numeric", "vector"], "purpose": "Positive:1|Negative:-1"},
             {"name": "window", "kind": "required", "type": ["numeric", "numel=2"]},
+            {"name": "chNP", "kind": "required", "type": ["numeric", "vector"], "purpose": "Positive:1|Negative:-1"},
             {"name": "testWin", "kind": "ordered", "type": ["numeric", "numel=2"], "purpose": "the range of latency"},
-            {"name": "smthBin", "kind": "ordered", "type": ["numeric", "positive", "numel=1"], "purpose": "binSize for smooth"},
+            {"name": "sponWin", "kind": "ordered", "type": ["numeric", "numel=2"], "purpose": "window to determine spontaneous activity"},
+            {"name": "sigma", "kind": "ordered", "type": ["numeric", "positive", "numel=1"], "purpose": "sigma for gaussion smooth"},
+            {"name": "smthBin", "kind": "ordered", "type": ["numeric", "positive", "numel=1"], "purpose": "binSize for gaussion smooth"},
             {"name": "fs", "kind": "ordered", "type": ["numeric", "positive", "numel=1"], "purpose": "sample rate"},
+             
             {"mutuallyExclusiveGroup": [
                 [
-                    {"name": "Method", "kind": "namevalue", "type": ["char", "choices={'AVL'}"]}
+                    {"name": "stdFrac", "kind": "namevalue", "type": ["numeric", "positive", "numel=1"]},
+                    {"name": "Method", "kind": "namevalue", "type": ["char", "choices={'AVL_Jackknife', 'AVL_Single', 'AVL_Boostrap'}"]}
                 ],
                 [
-                    {"name": "Method", "kind": "namevalue", "type": ["char", "choices={'FAL'}"]},
+                    {"name": "stdFrac", "kind": "namevalue", "type": ["numeric", "positive", "numel=1"]},
+                    {"name": "Method", "kind": "namevalue", "type": ["char", "choices={'FAL_Jackknife'}"]},
                     {"name": "fraction", "kind": "namevalue", "type": ["numeric", "positive", "numel=1"]},
                     {"name": "thrFrac", "kind": "namevalue", "type": ["numeric", "positive", "numel=1"]}
                 ]

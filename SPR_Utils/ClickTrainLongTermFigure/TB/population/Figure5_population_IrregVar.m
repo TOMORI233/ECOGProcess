@@ -234,7 +234,7 @@ for mIndex = 1 : length(MATPATH)
         print(FigTopo_Latency(dIndex), strcat(FIGPATH,  Protocol, "_", stimStrs(dIndex), "_Latency_Topo_Reg"), "-djpeg", "-r200");
     end
 ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
-save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
+    save(ResName, "cdrPlot", "compare", "chMean", "latency", "ampNorm", "Protocol", "-mat");
 end
 
 close all

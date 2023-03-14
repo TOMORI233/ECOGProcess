@@ -1,7 +1,5 @@
 DATA = compare;
-H = DATA.H;
-
-
+H = cell2mat(compare.sponRsp(1).H);
 CRI.all.data = DATA.mean_scatter(1, 2:end)';
 CRI.all.mean = mean(CRI.all.data);
 CRI.all.se = std(CRI.all.data)/sqrt(length(CRI.all.data));

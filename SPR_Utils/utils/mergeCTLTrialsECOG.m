@@ -1,4 +1,4 @@
-function [trialAll, trialsECOG, trialsECOG_S1] = mergeCTLTrialsECOG(MATPATH, posIndex, CTLParams)
+function [trialAll, trialsECOG, trialsECOG_S1, chIdx] = mergeCTLTrialsECOG(MATPATH, posIndex, CTLParams)
 narginchk(2, 3);
 if nargin < 3
     Protocol = evalin("base", "Protocol");
@@ -54,7 +54,10 @@ ECOGFDZ = mFTHP(ECOGDataset, fhp, flp);% filtered, dowmsampled, zoomed
 trialsECOG = selectEcog(ECOGFDZ, trialAll, segOption(2), Window);
 trialsECOG_S1 = selectEcog(ECOGFDZ, trialAll, segOption(1), Window);
 
-[trialsECOG, ~, idx] = excludeTrialsChs(trialsECOG, 0.1);
-
-trialsECOG_S1 = trialsECOG_S1(idx);
-trialAll = trialAll(idx);
+% [trialsECOG, ~, idx] = excludeTrialsChs(trialsECOG, 0.1);
+% trialsECOG_S1 = trialsECOG_S1(idx);
+% trialAll = trialAll(idx);
+[tIdx, chIdx] = excludeTrials(trialsECOG, tTh, chTh);
+trialsECOG(tIdx) = [];
+trialsECOG_S1(tIdx) = [];
+trialAll(tIdx) = [];

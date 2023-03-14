@@ -287,6 +287,6 @@ for mIndex = 1 : length(MATPATH)
 end
 
 ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
-save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
+save(ResName, "cdrPlot", "compare", "chMean", "latency", "ampNorm", "Protocol", "-mat");
 % clearvars -except toPlot_Wave compare sigch cdrPlot ampNorm latency temp
 close all
