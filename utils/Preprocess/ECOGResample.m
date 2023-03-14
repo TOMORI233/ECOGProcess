@@ -13,8 +13,8 @@ function varargout = ECOGResample(dataset, fResample, varargin)
     %     fResample
     % Example:
     %     fd = 300;
-    %     ECOGDataset = mECOGResample(ECOGDataset, fd);
-    %     trialsECOG = mECOGResample(trialsECOG, fd, fs);
+    %     ECOGDataset = ECOGResample(ECOGDataset, fd);
+    %     trialsECOG = ECOGResample(trialsECOG, fd, fs);
 
     mIp = inputParser;
     mIp.addRequired("dataset");

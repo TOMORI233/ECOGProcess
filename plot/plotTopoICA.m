@@ -2,7 +2,7 @@ function Fig = plotTopoICA(topo, topoSize, plotSize, ICs)
     narginchk(1, 4);
 
     if nargin < 2
-        topoSize = [8, 8];
+        topoSize = [8, 8]; % [nx, ny]
     end
 
     if nargin < 3
@@ -34,7 +34,7 @@ function Fig = plotTopoICA(topo, topoSize, plotSize, ICs)
 
             mAxe = mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
             plotTopo(mAxe, topo(:, ICNum), topoSize);
-            [~, idx] = max(topo(:, ICNum));
+            [~, idx] = max(abs(topo(:, ICNum)));
             title(['IC ', num2str(ICNum), ' | max - ', num2str(idx)]);
             scaleAxes(mAxe, "c", "on", "symOpts", "max");
             colorbar;

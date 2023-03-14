@@ -25,6 +25,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
     ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
     ICStd = cell2mat(cellfun(@(x) std(x, [], 1), changeCellRowNum(comp.trial), "UniformOutput", false));
     FigIC = plotRawWave(ICMean, ICStd, windowICA, "ICA");
+    scaleAxes(FigIC, "y", "cutoffRange", [-50, 50], "symOpts", "max");
 
     % IC topo
     channels = 1:size(trialsECOG{1}, 1);
@@ -37,7 +38,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
     chMean = cell2mat(cellfun(@mean, temp, "UniformOutput", false));
     chStd = cell2mat(cellfun(@std, temp, "UniformOutput", false));
     FigWave(1) = plotRawWave(chMean, chStd, windowICA, "origin");
-    scaleAxes(FigWave(1), "y", "on", "symOpts", "max");
+    scaleAxes(FigWave(1), "y", "cutoffRange", [-100, 100], "symOpts", "max");
 
     % Remove bad channels in trialsECOG
     trialsECOG = cellfun(@(x) x(chs2doICA, :), trialsECOG, "UniformOutput", false);

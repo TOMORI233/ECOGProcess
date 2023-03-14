@@ -3,7 +3,7 @@ close all;
 parseStruct(params);
 window = [-2000, 1000];
 tTh = 0.2;
-chTh = 0.2;
+chTh = 0.1;
 
 mkdir(PrePATH);
 
@@ -57,11 +57,11 @@ else
     disp('File already exists. Skip excluding trials in PFC recording.');
 end
 
-%% ICA
+%% Perform ICA on all channels
 if strcmp(icaOpt, "on")
     idxAC = load([PrePATH, 'AC_excludeIdx']);
     idxPFC = load([PrePATH, 'PFC_excludeIdx']);
-    excludeIdxAll = cellfun(@(x, y) [x, y], idxAC.excludeIdx, idxPFC.excludeIdx, "UniformOutput", false);
+    excludeIdxAll = cellfun(@(x, y) [x; y], idxAC.excludeIdx, idxPFC.excludeIdx, "UniformOutput", false);
 
     % AC
     close all;
@@ -82,14 +82,10 @@ if strcmp(icaOpt, "on")
         end
         badCHs = unique(badCHs);
         fs = ECOGDataset.fs;
-        channels = ECOGDataset.channels;
-        chs2doICA = channels;
-        chs2doICA(ismember(chs2doICA, badCHs)) = [];
+        chs2doICA = ECOGDataset.channels;
         [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, window, chs2doICA);
-        temp = validateInput(['Input bad channel number (empty for default: ', num2str(badCHs'), '): '], @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
-        if ~isempty(temp)
-            badCHs = unique([badCHs; reshape(temp, [numel(temp), 1])]);
-        end
+        temp = validateInput(['Input bad channel number (default: ', num2str(badCHs'), '): '], @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
+        badCHs = reshape(temp, [numel(temp), 1]);
         mPrint(FigTopoICA, strcat(PrePATH, "AC_Topo_ICA"), "-djpeg", "-r400");
         mSave([PrePATH, 'AC_ICA.mat'], "comp", "ICs", "badCHs", "chs2doICA");
     else
@@ -115,14 +111,10 @@ if strcmp(icaOpt, "on")
         end
         badCHs = unique(badCHs);
         fs = ECOGDataset.fs;
-        channels = ECOGDataset.channels;
-        chs2doICA = channels;
-        chs2doICA(ismember(chs2doICA, badCHs)) = [];
+        chs2doICA = ECOGDataset.channels;
         [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, window, chs2doICA);
-        temp = validateInput(['Input bad channel number (empty for default: ', num2str(badCHs'), '): '], @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
-        if ~isempty(temp)
-            badCHs = unique([badCHs; reshape(temp, [numel(temp), 1])]);
-        end
+        temp = validateInput(['Input bad channel number (default: ', num2str(badCHs'), '): '], @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
+        badCHs = reshape(temp, [numel(temp), 1]);
         mPrint(FigTopoICA, strcat(PrePATH, "PFC_Topo_ICA"), "-djpeg", "-r400");
         mSave([PrePATH, 'PFC_ICA.mat'], "comp", "ICs", "badCHs", "chs2doICA");
     else

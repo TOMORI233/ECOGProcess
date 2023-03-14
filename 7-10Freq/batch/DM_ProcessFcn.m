@@ -7,7 +7,7 @@ alpha_log = 0.01; % For log scale
 margins = [0.05, 0.05, 0.1, 0.1];
 paddings = [0.01, 0.03, 0.01, 0.01];
 
-nIter = 1e4; % For DRP
+nIter = 1e3; % For DRP
 step = 50;
 binSize = 100;
 
@@ -76,7 +76,7 @@ catch
         end
 
         badCHs = unique(badCHs);
-        FigB = plotBehaviorOnly(trialAll, "r", "7-10 Freq");
+        FigB = plotBehaviorOnly(trialAll, "r", "legendStr", "7-10 Freq", "xlabelStr", "DEV / STD frequency difference ratio");
         mPrint(FigB, strcat(MONKEYPATH, "Behavior"), "-djpeg", "-r400");
 
         fs = ECOGDataset.fs;
@@ -114,6 +114,10 @@ catch
     end
 
     mSave([MONKEYPATH, AREANAME, '_DM_Data.mat'], "windowDM", "trialsECOG_correct", "trialsECOG_wrong", "resultC", "resultW", "fs", "channels", "badCHs");
+end
+
+if strcmpi(dataOnlyOpt, "on")
+    return;
 end
 
 % Raw
