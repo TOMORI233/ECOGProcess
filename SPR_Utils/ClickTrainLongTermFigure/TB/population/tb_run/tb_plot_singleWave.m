@@ -11,8 +11,11 @@ t = linspace(Window(1), Window(2), diff(Window) /1000 * fs + 1)';
     setLine(FigWave, "YData", [-yScale(mIndex) yScale(mIndex)], "LineStyle", "--");
     pause(1);
     set(FigWave, "outerposition", [300, 100, 800, 670]);
-    scaleAxes(FigWave, "x", [-10 600]);
+    scaleAxes(FigWave, "x", plotWin);
     scaleAxes(FigWave, "y", [-yScale(mIndex) yScale(mIndex)]);
+    if exist("lines", "var")
+        addLines2Axes(FigWave, lines);
+    end
     plotLayout(FigWave, params.posIndex + 2 * (mIndex - 1), 0.3);
     for dIndex = 1 : length(devType)
         print(FigWave(dIndex), strcat(FIGPATH,  stimStrs(dIndex), "_CRI_Wave"), "-djpeg", "-r200");
@@ -28,9 +31,10 @@ t = linspace(Window(1), Window(2), diff(Window) /1000 * fs + 1)';
         setAxes(FigWave_Whole, 'xticklabel', '');
         setAxes(FigWave_Whole, 'visible', 'off');
         setLine(FigWave_Whole, "YData", [-yScale(mIndex) yScale(mIndex)], "LineStyle", "--");
+
         pause(1);
         set(FigWave_Whole, "outerposition", [300, 100, 800, 670]);
-        scaleAxes(FigWave, "x", [-10 600]);
+        
         plotLayout(FigWave_Whole, params.posIndex + 2 * (mIndex - 1), 0.3);
         for dIndex = 1 : length(devType)
             print(FigWave_Whole(dIndex), strcat(FIGPATH, stimStrs(dIndex), "_CRI_Wave_Whole"), "-djpeg", "-r200");

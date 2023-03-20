@@ -8,6 +8,8 @@
         
         if contains(MATPATH{mIndex}, "XX")
             sponH([2, 16,18, 25, 26, 27, 32]) = num2cell(zeros(7, 1));
+        elseif contains(MATPATH{mIndex}, "CC")
+            sponH([43, 47, 49, 54,57, 58]) = num2cell(zeros(6, 1));
         end
         compare.sponRsp(dIndex).info = stimStrs(dIndex);
         compare.sponRsp(dIndex).H = sponH;

@@ -16,7 +16,8 @@ Protocol = temp(end - 2);
 segOption = ["trial onset", "dev onset"];
 flp = 300;
 fhp = 0.1;
-
+tTh = 0.1;
+chTh = 0.1;
 
 %% Processing
 [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);

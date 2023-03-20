@@ -1,4 +1,5 @@
-function [trialsECOG_ACMerge, trialsECOG_S1_ACMerge, trialsECOG_PFCMerge, trialsECOG_S1_PFCMerge,trialAll_merge, chIdx] = mergeECOGPreprocess(rootPathMat, areaSelect)
+function [trialsECOG_ACMerge, trialsECOG_S1_ACMerge, trialsECOG_PFCMerge, trialsECOG_S1_PFCMerge,trialAll_merge, chIdx] = mergeECOGPreprocess(rootPathMat, areaSelect, params)
+narginchk(2, 3);
 
 
 temp = dir(rootPathMat);
@@ -17,11 +18,18 @@ for fIndex = 1:length(temp)
     for mIndex = 1:length(MATFiles)
         [~, name] = fileparts(MATFiles{mIndex});
         splitName = split(name, '_');
-
-        if isequal(splitName{end}, 'AC') && isequal(string(areaSelect), 'AC')
-           [trialAll{fIndex}, trialsECOG.AC{fIndex}, trialsECOG_S1.AC{fIndex}, chIdx{fIndex}] =  mergeCTLTrialsECOG([rootPathMat, temp(fIndex).name, '\', MATFiles{mIndex}], 1);
-        elseif isequal(splitName{end}, 'PFC') && isequal(string(areaSelect), 'PFC')
-           [trialAll{fIndex}, trialsECOG.PFC{fIndex}, trialsECOG_S1.PFC{fIndex}, chIdx{fIndex}] =  mergeCTLTrialsECOG([rootPathMat, temp(fIndex).name, '\', MATFiles{mIndex}], 2);
+        if nargin < 3
+            if isequal(splitName{end}, 'AC') && isequal(string(areaSelect), 'AC')
+                [trialAll{fIndex}, trialsECOG.AC{fIndex}, trialsECOG_S1.AC{fIndex}, chIdx{fIndex}] =  mergeCTLTrialsECOG([rootPathMat, temp(fIndex).name, '\', MATFiles{mIndex}], 1);
+            elseif isequal(splitName{end}, 'PFC') && isequal(string(areaSelect), 'PFC')
+                [trialAll{fIndex}, trialsECOG.PFC{fIndex}, trialsECOG_S1.PFC{fIndex}, chIdx{fIndex}] =  mergeCTLTrialsECOG([rootPathMat, temp(fIndex).name, '\', MATFiles{mIndex}], 2);
+            end
+        else
+            if isequal(splitName{end}, 'AC') && isequal(string(areaSelect), 'AC')
+                [trialAll{fIndex}, trialsECOG.AC{fIndex}, trialsECOG_S1.AC{fIndex}, chIdx{fIndex}] =  mergeCTLTrialsECOG([rootPathMat, temp(fIndex).name, '\', MATFiles{mIndex}], 1, params);
+            elseif isequal(splitName{end}, 'PFC') && isequal(string(areaSelect), 'PFC')
+                [trialAll{fIndex}, trialsECOG.PFC{fIndex}, trialsECOG_S1.PFC{fIndex}, chIdx{fIndex}] =  mergeCTLTrialsECOG([rootPathMat, temp(fIndex).name, '\', MATFiles{mIndex}], 2, params);
+            end
         end
     end
 

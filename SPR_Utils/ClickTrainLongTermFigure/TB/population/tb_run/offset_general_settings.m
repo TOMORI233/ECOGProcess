@@ -1,13 +1,13 @@
 % basic
 monkeyStr = ["CC", "XX"];
-ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
+ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Offset\";
 params.posIndex = 1; % 1-AC, 2-PFC
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
 
 % for ICA
-badCH_self = {[49], [2, 48,49,57,64]};
+badCH_self = {[34, 49], [2, 48,49,57,64]};
 
 % for CRI
 CRIMethod = 2;

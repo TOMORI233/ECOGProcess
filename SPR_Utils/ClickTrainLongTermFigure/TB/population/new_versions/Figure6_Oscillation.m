@@ -18,7 +18,8 @@ pBase = 0.05;
 FFTMethod = 2; %1: power(dB); 2: magnitude
 fftScale = [60, 60; 400, 400];
 correspFreq = 1000./[500, 250, 125, 60, 30, 1000];
-
+icaOpt = "off";
+badCH_self = {[32, 49, 60], [2, 48,49,57,64]};
 flp = 300;
 fhp = 0.1;
 segOption = ["trial onset", "dev onset"];
@@ -43,54 +44,16 @@ for mIndex = 1 : length(MATPATH)
     FIGPATH = strcat(ROOTPATH, "\Pop_Figure6_Osci_Control\",  SRIMethodStr(SRIMethod), "\", monkeyStr(mIndex), "\");
     mkdir(FIGPATH);
     %% process
-    disp("loading data...");
-    tic
-    if ~exist(strcat(FIGPATH, "PopulationData.mat"), "file")
-        [trialsECOG_Merge, trialsECOG_S1_Merge , ~, ~, trialAll] = mergeECOGPreprocess(MATPATH{mIndex}, AREANAME);
-        save(strcat(FIGPATH, "PopulationData.mat"), "trialsECOG_S1_Merge", "trialsECOG_Merge", "trialAll");
-    else
-        load(strcat(FIGPATH, "PopulationData.mat"));
-    end
-    toc
-
-
-    %% ICA
-    % align to certain duration
+    run("tb_loadData.m");
     run("CTLconfig.m");
-    ICAName = strcat(FIGPATH, "comp_", AREANAME, ".mat");
-    trialsECOG_MergeTemp = trialsECOG_Merge;
-    trialsECOG_S1_MergeTemp = trialsECOG_S1_Merge;
+    run("tb_ICA.m");
+    run("tb_chPatch.m");
+    run("tb_interpolateBadChs");
 
-    if ~exist(ICAName, "file")
-        [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG_MergeTemp, fs, Window);
-        compT = comp;
-        compT.topo(:, ~ismember(1:size(compT.topo, 2), ICs)) = 0;
-        trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
-        trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
-        close(FigTopoICA);
-        save(ICAName, "compT", "comp", "ICs", "-mat");
-    else
-        load(ICAName);
-        trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
-        trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
-    end
-    
-    %% Patch
-    temp = changeCellRowNum(trialsECOG_Merge);
-    temp = temp(ECOGSitePatch(AREANAME));
-    trialsECOG_Merge = changeCellRowNum(temp);
-
-    temp = changeCellRowNum(trialsECOG_S1_Merge);
-    temp = temp(ECOGSitePatch(AREANAME));
-    trialsECOG_S1_Merge = changeCellRowNum(temp);
-
-
-    %% process
+%% diff stim type
     devType = unique([trialAll.devOrdr]);
     % initialize
     t = linspace(Window(1), Window(2), diff(Window) /1000 * fs + 1)';
-
-%% diff stim type
     for dIndex = 1:length(devType)
         
         tIndex = [trialAll.devOrdr] == devType(dIndex);

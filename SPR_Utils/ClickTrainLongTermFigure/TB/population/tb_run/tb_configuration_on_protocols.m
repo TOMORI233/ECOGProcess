@@ -48,18 +48,18 @@ elseif contains(Protocol, ["Add_on_Basic_ICI4", "Add_on_Basic_NormSqrt_ICI4", "B
     cdrPlotIdx = [1,2,3,4];
     CR_Ref = 1;% Reg4-4.06
     fs = 500;
-    CRIScale = {[0.8, 2; -0.1 1], [0.8, 2; -0.1 0.4]};
+    CRIScale = {[0.8, 2; -0.1 1], [0.8, 2; -0.1 0.6]};
     switch Protocol
         case "Basic_ICI4"
             yScale = [40, 60];
             FIGPATH = strcat(ROOTPATH, "Pop_Figure2_RegIrreg\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
         case "Add_on_Basic_ICI4"
             badCH_self = {[48,49,63, 64], [25, 41, 46, 48,49, 57,62, 64]};
-            yScale = [40, 50];
+            yScale = [40, 40];
             FIGPATH = strcat(ROOTPATH, "Pop_Sfigure2_No_Reg_In_Irreg\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
         case "Add_on_Basic_NormSqrt_ICI4"
             badCH_self = {[48,49,63, 64], [25, 41, 46, 48,49, 57,62, 64]};
-            yScale = [50, 90];
+            yScale = [50, 40];
             FIGPATH = strcat(ROOTPATH, "Pop_Sfigure2_Norm_Sqrt\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
     end
 
@@ -124,8 +124,10 @@ elseif strcmpi(Protocol, "Add_on_Reg_Rep1_TimeCourse")
     CR_Ref = 1;% 
     fs = 600;
     yScale = [20, 20];
+    plotWin = [0, 5500];
     CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.3]};
-    FIGPATH = strcat(ROOTPATH, "Pop_Sfigure6_Reg_localChange_TimeCourse\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+    lines = cell2struct(num2cell([1001;2002;2999.1;4000.1;5001.1]), "X", 2);
+    FIGPATH = strcat(ROOTPATH, "Pop_Sfigure7_Reg_localChange_TimeCourse\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
 end
 
 

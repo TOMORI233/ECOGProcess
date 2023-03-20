@@ -24,15 +24,22 @@ for dIndex = 1:length(devType)
 
         latency_T = findWithinInterval(t, latencyWin);
         trialsTemp = cellfun(@(x) findWithinWindow(x, t, latencyWin), trialsECOG, "UniformOutput", false);
-        [latency_mean, latency_se, latency_raw]  = Latency_Resample(trialsTemp, latencyWin, latency(wIndex).NP , latencySet(wIndex).Win, sponWin, sigma, smthBin, "Method", "AVL_Boostrap");
+        if strcmpi(Protocol, "Basic_IrregVar")
+            [latency_mean, latency_se, latency_raw]  = Latency_Resample(trialsTemp, latencyWin, latency(wIndex).NP , latencySet(wIndex).Win, sponWin, sigma, smthBin, "Method", "AVL_Boostrap", "stdFrac", 0.5);
+        else
+            [latency_mean, latency_se, latency_raw]  = Latency_Resample(trialsTemp, latencyWin, latency(wIndex).NP , latencySet(wIndex).Win, sponWin, sigma, smthBin, "Method", "AVL_Boostrap");
+        end
 
         latency(wIndex).CR(dIndex).info = stimStrs(dIndex);
         latency(wIndex).CR(dIndex).mean = latency_mean;
         latency(wIndex).CR(dIndex).se = latency_se;
         latency(wIndex).CR(dIndex).raw = latency_raw;
-%        compute change response latency-sinlge
-        [latency_mean, latency_se, latency_raw]  = Latency_Resample(trialsTemp, latencyWin, latency(wIndex).NP , latencySet(wIndex).Win, sponWin, sigma, smthBin, "Method", "AVL_Single");
-
+        %        compute change response latency-sinlge
+        if strcmpi(Protocol, "Basic_IrregVar")
+            [latency_mean, latency_se, latency_raw]  = Latency_Resample(trialsTemp, latencyWin, latency(wIndex).NP , latencySet(wIndex).Win, sponWin, sigma, smthBin, "Method", "AVL_Single", "stdFrac", 0.5);
+        else
+            [latency_mean, latency_se, latency_raw]  = Latency_Resample(trialsTemp, latencyWin, latency(wIndex).NP , latencySet(wIndex).Win, sponWin, sigma, smthBin, "Method", "AVL_Single");
+        end
         latencySingle(wIndex).CR(dIndex).info = stimStrs(dIndex);
         latencySingle(wIndex).CR(dIndex).mean = latency_mean;
         latencySingle(wIndex).CR(dIndex).se = latency_se;
