@@ -9,7 +9,7 @@ mPrint(FigMMN, [MONKEYPATH, AREANAME, '_PE_MMN.jpg'], "-djpeg", "-r600");
 pMMN = statMMN.stat;
 maskMMN = statMMN.mask;
 V0_MMN = pMMN .* maskMMN;
-windowSortCh = [0, 500];
+windowSortCh = windowMMN;
 tIdx = fix((windowSortCh(1) - windowMMN(1)) / 1000 * fs) + 1:fix((windowSortCh(2) - windowMMN(1)) / 1000 * fs);
 [rankVs, chIdxMMN] = sort(sum(maskMMN(:, tIdx), 2), 'descend');
 rankVsTemp = sort(sum(abs(V0_MMN(:, tIdx)), 2), 'descend');

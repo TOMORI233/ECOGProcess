@@ -22,9 +22,13 @@ end
 params.DATESTRs = DATESTRs;
 params.PrePATH = [POPUROOTPATH, 'Preprocess\'];
 
+params = windowConfig_7_10Freq(params);
+params.normOpt = "on"; % normalization option
+params.dataOnlyOpt = "off"; % "on" will save data only
+
 %% Exclude trials and bad channels
 params.icaOpt = "on"; % "on": do ICA with all channels and manually define bad channels
-params.userDefineOpt = "off";
+params.userDefineOpt = "on";
 Pre_ProcessFcn(params);
 
 %% PE

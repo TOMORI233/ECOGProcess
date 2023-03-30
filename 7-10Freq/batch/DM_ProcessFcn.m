@@ -18,11 +18,7 @@ mkdir(PrePATH);
 try
     load([MONKEYPATH, AREANAME, '_DM_Data.mat']);
 catch
-    windowDM = [-200, 800];
-    windowICA = [-2000, 1000];
-    
     badCHs = [];
-
     resultC = [];
     resultW = [];
     trialsECOG_correct = [];

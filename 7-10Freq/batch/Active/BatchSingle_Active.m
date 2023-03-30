@@ -4,28 +4,31 @@ clear; clc; close all;
 params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
 
-params.monkeyID = 2; % 1-CC, 2-XX
+params.monkeyID = 1; % 1-CC, 2-XX
 
 CURRENTPATH = pwd;
 
 if params.monkeyID == 1
     params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Active\';
     DATESTRs = {'cc20220520', 'cc20220706', 'cc20220801', 'cc20221014', 'cc20221015'};
+%     DATESTRs = {'cc20220908'}; % ISI=700
+%     DATESTRs = {'cc20221019'}; % ISI=400
     POPUROOTPATH = [CURRENTPATH, '\CC\Population\'];
     SINGLEROOTPATH = [CURRENTPATH, '\CC\Single\'];
 else
     params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\XX\7-10Freq Active\';
     DATESTRs = {'xx20220711', 'xx20220812', 'xx20220820', 'xx20220822', 'xx20220913'};
+%     DATESTRs = {'xx20221017'}; % ISI=400
     POPUROOTPATH = [CURRENTPATH, '\XX\Population\'];
     SINGLEROOTPATH = [CURRENTPATH, '\XX\Single\'];
 end
 
-params.windowBase = [-3500, -3000];
+params = windowConfig_7_10Freq(params);
 
 %% Single day ----------------------------------------------------------------
-params.dataOnlyOpt = "on"; % "on" will save data only
+params.dataOnlyOpt = "off"; % "on" will save data only
 
-for index = 5:length(DATESTRs)
+for index = 1:length(DATESTRs)
     params.DATESTRs = DATESTRs(index);
     params.PrePATH = [SINGLEROOTPATH, 'Preprocess\', DATESTRs{index}, '\'];
 

@@ -68,6 +68,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
     end
 
     comp.trial = [];
+    comp.chs2doICA = chs2doICA;
 
     return;
 end

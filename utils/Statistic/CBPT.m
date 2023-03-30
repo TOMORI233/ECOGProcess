@@ -8,7 +8,7 @@ function stat = CBPT(data, cfg)
 %           - time: [1, nSample]
 %           - label: channel label, [nCh, 1] char cell array
 %           - trial: trial data, [nTrial, nCh, nSample]
-%           - trialinfo: trial type label, [nTrial, 1]
+%           - trialinfo: trial type label (>=1 and begins with 1), [nTrial, 1]
 %     cfg: configurations (you can alter settings marked * for better performance)
 %          - method: method to calculate significance probability (default: 'montecarlo')
 %        * - statistic: 'indepsamplesT'(for 2 groups), 'indepsamplesF'(for more than 2 groups)
@@ -55,6 +55,7 @@ function stat = CBPT(data, cfg)
 %     xlim([0, windowPE(2)]);
 %     ylim([0.5, 63.5]);
 %     scaleAxes(gcf, "c", [], [], "max");
+
 ft_setPath2Top
 narginchk(1, 2);
 

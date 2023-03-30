@@ -12,9 +12,6 @@ mkdir(PrePATH);
 try
     load([MONKEYPATH, AREANAME, '_Prediction_Data.mat']);
 catch
-    windowP = [-3000, 7000];
-    windowT0 = [0, 500];
-
     trialAll = [];
     trialsECOG = [];
     badCHs = [];

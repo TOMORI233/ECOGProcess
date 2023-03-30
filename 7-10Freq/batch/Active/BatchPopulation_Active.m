@@ -27,7 +27,8 @@ end
 
 params.DATESTRs = DATESTRs;
 params.PrePATH = [POPUROOTPATH, 'Preprocess\'];
-params.windowBase = [-3500, -3000]; % Normalization among days
+
+params = windowConfig_7_10Freq(params);
 params.dataOnlyOpt = "off"; % "on" will save data only
 
 %% Exclude trials and bad channels

@@ -91,7 +91,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
             scaleAxes("y", "cutoffRange", [-100, 100], "symOpts", "max");
 
             % good trials (mean, red) against bad trials (single, grey)
-            previewRawWave(trialsData, badtrialIdx, V_All);
+%             previewRawWave(trialsData, badtrialIdx, V_All);
 
             % histogram
             temp = changeCellRowNum(tIdx);

@@ -1,7 +1,8 @@
 %% Data loading
 clear; clc; close all;
-BLOCKPATH = 'E:\ECoG\xiaoxiao\xx20220907\Block-1';
+% BLOCKPATH = 'E:\ECoG\xiaoxiao\xx20220907\Block-1';
 % BLOCKPATH = 'E:\ECoG\chouchou\cc20220825\Block-3';
+BLOCKPATH = 'F:\Monkey LA\TDT Data\CM\cm20230323\Block-9';
 temp = TDTbin2mat(BLOCKPATH, 'TYPE', {'epocs'});
 epocs = temp.epocs;
 
@@ -28,8 +29,8 @@ choiceWin = [100, 600]; % ms
 
 % % % %% 7-10 
 
-% trialAll = ActiveProcess_7_10Freq(epocs, choiceWin);
-% plotBehaviorOnly(trialAll, "r", "7-10 Freq");
+trialAll = ActiveProcess_7_10Freq(epocs, choiceWin);
+plotBehaviorOnly(trialAll, "r", "xlabelStr", "7-10 Freq");
 
 
 % %freqLoc
