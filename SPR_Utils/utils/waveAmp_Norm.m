@@ -24,19 +24,6 @@ tIndex = t > testWin(1) & t < testWin(2);
 temp = wave(:, tIndex);
 amp = rms(temp, 2);
 area = sum(abs(temp), 2);
-% switch method
-%     case 1 % rms
-%         amp = rms(temp, 2);
-%     case 2 % area
-%         amp = sum(abs(temp), 2) / diff(window);
-%     case 3 % peak
-%         amp = max(temp, [], 2);
-%     case 4 % trough
-%         amp = min(temp, [], 2);
-%     case 5 % mean
-%         amp = mean(temp, 2);
-% end
-
 
 switch method
     case 1 % Resp_devided_by_Spon

@@ -1,7 +1,9 @@
-function [H, P] = waveFFTPower_pValue(soundTrialsFFT, sponTrialFFT, ff, fScale, method)
+function [H, P, FFT_Ratio] = waveFFTPower_pValue(soundTrialsFFT, sponTrialFFT, ff, fScale, method, testMethod)
 
-narginchk(4, 5);
-
+narginchk(4, 6);
+if nargin < 6
+    testMethod = "ttest2";
+end
 if nargin < 5
     method = 2;
 end
@@ -44,10 +46,17 @@ switch method
         end
 end
 
-
-[H, P] = cellfun(@(x, y) ttest2(x, y, 'Alpha', 0.05), target, base, "UniformOutput", false);
+smallIdx = cell2mat(cellfun(@(x, y) mean(x) < mean(y), target, base, "UniformOutput", false))';
+FFT_Ratio = cell2mat(cellfun(@(x, y) mean(x)/mean(y), target, base, "UniformOutput", false));
+if strcmpi(testMethod, "ttest2")
+    [H, P] = cellfun(@(x, y) ttest2(x, y, 'Alpha', 0.01), target, base, "UniformOutput", false);
+elseif strcmpi(testMethod, "ttest")
+    [H, P] = cellfun(@(x, y) ttest(x, y, 'Alpha', 0.01), target, base, "UniformOutput", false);
+end
 H = cell2mat(H)';
+H(smallIdx) = 0;
 P = cell2mat(P)';
+
 
 
 

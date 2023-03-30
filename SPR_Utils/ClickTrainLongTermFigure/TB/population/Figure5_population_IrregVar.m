@@ -1,7 +1,7 @@
 close all; clc; clear;
 
-MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Basic_IrregVar\';
-MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Basic_IrregVar\';
+MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Basic_IrregVar\';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Basic_IrregVar\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
@@ -234,7 +234,7 @@ for mIndex = 1 : length(MATPATH)
         print(FigTopo_Latency(dIndex), strcat(FIGPATH,  Protocol, "_", stimStrs(dIndex), "_Latency_Topo_Reg"), "-djpeg", "-r200");
     end
 ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
-save(ResName, "cdrPlot", "compare", "chMean", "Protocol", "-mat");
+    save(ResName, "cdrPlot", "compare", "chMean", "latency", "ampNorm", "Protocol", "-mat");
 end
 
 close all

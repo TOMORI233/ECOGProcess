@@ -1,5 +1,9 @@
+%%
+
 %% CC
 clear ; clc
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+fd = 600;
 recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\SPR_Utils\ClickTrainLongTermFigure\MSTI\ME_MSTIRecording_CC.xlsx");
 recordInfo = table2struct(readtable(recordPath));
 exported = [recordInfo.Exported]';
@@ -11,8 +15,8 @@ for i = iIndex'
     recordInfo = table2struct(readtable(recordPath));
     SAVEPATH = strcat("E:\ECOG\MAT Data\CC\ClickTrainLongTerm\MSTI\", string(recordInfo(i).paradigm), "\");
     BLOCKPATH{1} = recordInfo(i).tankPath;
-    params.processFcn = @PassiveProcess_clickTrainContinuous;
-    exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+    
+    exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
     recordInfo(i).Exported = 1;
     writetable(struct2table(recordInfo), recordPath);
 end
@@ -20,6 +24,8 @@ end
 
 %% XX
 clear ; clc
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+fd = 600;
 recordPath = strcat(fileparts(fileparts(mfilename("fullpath"))), "\SPR_Utils\ClickTrainLongTermFigure\MSTI\ME_MSTIRecording_XX.xlsx");
 recordInfo = table2struct(readtable(recordPath));
 exported = [recordInfo.Exported]';
@@ -32,7 +38,7 @@ for i = iIndex'
     SAVEPATH = strcat("E:\ECOG\MAT Data\XX\ClickTrainLongTerm\MSTI\", string(recordInfo(i).paradigm), "\");
     BLOCKPATH{1} = recordInfo(i).tankPath;
     params.processFcn = @PassiveProcess_clickTrainContinuous;
-    exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+    exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
     recordInfo(i).Exported = 1;
     writetable(struct2table(recordInfo), recordPath);
 end

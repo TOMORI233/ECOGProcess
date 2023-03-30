@@ -1,7 +1,7 @@
 close all; clc; clear;
 
-MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Add_on_Basic_Oscillation_Tone_250_5000\';
-MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Add_on_Basic_Oscillation_Tone_250_5000\';
+MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Basic_Oscillation_Tone_250_5000\';
+MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Basic_Oscillation_Tone_250_5000\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC
@@ -19,7 +19,7 @@ FFTMethod = 2; %1: power(dB); 2: magnitude
 fftScale = [60, 60; 400, 400];
 correspFreq = 1000./[60, 60, 30, 30];
 
-flp = 400;
+flp = 300;
 fhp = 0.1;
 segOption = ["trial onset", "dev onset"];
 s1OnsetOrS2Onset = 1; % 1, s1onset; 2, s2Onset

@@ -27,6 +27,7 @@ function varargout = ECOGResample(dataset, fResample, varargin)
             trialsECOG = dataset;
             channels = 1:size(trialsECOG{1}, 1);
             sampleinfo = ones(length(trialsECOG), 2);
+            fs = mIp.Results.fs;
         case 'struct'
             trialsECOG = {dataset.data};
             fs = dataset.fs;

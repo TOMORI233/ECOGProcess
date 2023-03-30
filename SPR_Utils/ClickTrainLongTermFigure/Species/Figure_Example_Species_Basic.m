@@ -15,12 +15,9 @@ AREANAME = AREANAME(params.posIndex);
 
 %% load parameters
 CTLParams = ME_Species_ParseCTLParams(protocolStr);
-CTL_Fields = fields(CTLParams);
-for pIndex = 1 : length(CTL_Fields)
-    eval(strcat(CTL_Fields(pIndex), "= CTLParams.", CTL_Fields(pIndex), ";"));
-end
+parseStruct(CTLParams);
 
-fs = 500;
+fs = 600;
 correspFreq = 1000./ICI2;
 
 

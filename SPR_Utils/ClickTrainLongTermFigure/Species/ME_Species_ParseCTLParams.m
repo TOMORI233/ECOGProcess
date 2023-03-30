@@ -33,6 +33,7 @@ for cIndex = 1 : length(group_Index)
 end
 CTLParams.group_Str = strrep(string(strsplit(mProtocol.group_Str, ",")), "_", "-");
 CTLParams.colors = string(strsplit(mProtocol.colors, ","));
+CTLParams.fs = str2double(string(mProtocol.fs));
 
 
 end

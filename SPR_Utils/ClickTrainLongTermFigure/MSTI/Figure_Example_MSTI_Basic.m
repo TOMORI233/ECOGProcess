@@ -26,7 +26,11 @@ FIGPATH = strcat(rootPathFig, "Figure_", protStr,"\", DateStr, "_", AREANAME, "\
 % if exist(FIGPATH, "dir")
 %     return
 % end
-
+if str2double(regexpi(DateStr, "\d*", "match")) < 20230204
+    MSTIParams.patch = "matchIssue";
+else
+    MSTIParams.patch = "bankIssue";
+end
 tic
 [trialAll, trialsECOG_Merge] =  mergeMSTITrialsECOG(MATPATH, params.posIndex, MSTIParams);
 toc
@@ -66,7 +70,11 @@ else
     load(ICAName);
     trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
 end
-
+%% double exclude
+[~, ~, idx] = excludeTrialsChs(trialsECOG_Merge,0.1, Window, DevPlotWin);
+trialAll = trialAll(idx);
+trialsECOG_Merge = trialsECOG_Merge(idx);
+% trialsECOG_Test = trialsECOG_Merge(idx);
 %% filter
 trialsECOG_Merge_Filtered = ECOGFilter(trialsECOG_Merge, fhp2, flp2, fs);
 
@@ -126,7 +134,8 @@ if ~exist(FIGPATH, "dir")
     mkdir(FIGPATH);
 end
 %% comparison between devTypes
-legendStr = ["Odd Dev", "Odd Std", "ManyStd Dev"];
+% legendStr = ["Odd Dev", "Odd Std", "ManyStd Dev"];
+legendStr = ["Odd Dev", "Odd Std"];
 for gIndex = 1 : length(comparePool)
 
     parseStruct(comparePool, gIndex);
@@ -136,9 +145,9 @@ for gIndex = 1 : length(comparePool)
     % Odd_Std
     group(2).chMean = chMeanLag{1, Odd_Std_Index};
     group(2).color = colors(2);
-    % ManyStd_Dev
-    group(3).chMean = chMean{1, ManyStd_Dev_Index};
-    group(3).color = colors(3);
+%     % ManyStd_Dev
+%     group(3).chMean = chMean{1, ManyStd_Dev_Index};
+%     group(3).color = colors(3);
 
     % plot
     FigGroup(gIndex) = plotRawWaveMulti_SPR(group, Window, DevStr);

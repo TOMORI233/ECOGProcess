@@ -1,15 +1,15 @@
-function exportDataFcn(BLOCKPATH, SAVEPATH, params, startIdx, endIdx)
-    narginchk(3, 5);
+function exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, startIdx, endIdx)
+    narginchk(5, 6);
 
-    if nargin < 4
+    if nargin < 5
         startIdx = 1;
     end
 
-    if nargin < 5
+    if nargin < 6
         endIdx = length(BLOCKPATH);
     end
 
-    fd = 600; % Hz
+
 
     for index = startIdx:endIdx
         AREANAME = ["AC", "PFC"];
@@ -21,7 +21,11 @@ function exportDataFcn(BLOCKPATH, SAVEPATH, params, startIdx, endIdx)
         disp("Loading AC Data...");
         params.posIndex = 1;
         tic
-        [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
+        if isfield(params, "patch")
+            [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params, "patch", params.patch);
+        else
+            [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
+        end
         ECOGDataset = ECOGResample(ECOGDataset, fd);
         disp("Saving...");
         save(strcat(SAVEPATH, DateStr, "\", DateStr, "_", AREANAME(params.posIndex), ".mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");
@@ -31,7 +35,11 @@ function exportDataFcn(BLOCKPATH, SAVEPATH, params, startIdx, endIdx)
         disp("Loading PFC Data...");
         params.posIndex = 2;
         tic
-        [~, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
+        if isfield(params, "patch")
+            [~, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params, "patch", params.patch);
+        else
+            [~, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
+        end        
         ECOGDataset = ECOGResample(ECOGDataset, fd);
         disp("Saving...");
         save(strcat(SAVEPATH, DateStr, "\", DateStr, "_", AREANAME(params.posIndex), ".mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");

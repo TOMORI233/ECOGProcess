@@ -20,6 +20,7 @@ function [granger, coh] = mGranger(trialsECOG_AC, trialsECOG_PFC, windowData, fs
 %     granger (NP): nonparametric Granger spectrum
 %     coh (NP): coherence of non-parametric computation of the cross-spectral density matrix
 
+
 mIp = inputParser;
 mIp.addRequired("trialsECOG_AC", @iscell);
 mIp.addRequired("trialsECOG_PFC", @iscell);

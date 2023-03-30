@@ -1,6 +1,7 @@
-function [trialAll, trialsECOG, trialsECOG_S1] = mergeCTLTrialsECOG(MATPATH, posIndex, CTLParams)
+function [trialAll, trialsECOG, trialsECOG_S1, chIdx] = mergeCTLTrialsECOG(MATPATH, posIndex, CTLParams)
 narginchk(2, 3);
 if nargin < 3
+    Protocol = evalin("base", "Protocol");
     run("CTLconfig.m");
 else
     parseStruct(CTLParams);
@@ -13,9 +14,10 @@ temp = string(split(MATPATH, '\'));
 Protocol = temp(end - 2);
 
 segOption = ["trial onset", "dev onset"];
-flp = 600;
+flp = 300;
 fhp = 0.1;
-
+tTh = 0.1;
+chTh = 0.1;
 
 %% Processing
 [trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params);
@@ -49,11 +51,14 @@ trialAll = addFieldToStruct(trialAll, temp, "devOnset");
 
 % filter
 ECOGFDZ = mFTHP(ECOGDataset, fhp, flp);% filtered, dowmsampled, zoomed
-ECOGFDZ = ECOGResample(ECOGFDZ, fs);
+% ECOGFDZ = ECOGResample(ECOGFDZ, fs);
 trialsECOG = selectEcog(ECOGFDZ, trialAll, segOption(2), Window);
 trialsECOG_S1 = selectEcog(ECOGFDZ, trialAll, segOption(1), Window);
 
-[trialsECOG, ~, idx] = excludeTrialsChs(trialsECOG, 0.1);
-
-trialsECOG_S1 = trialsECOG_S1(idx);
-trialAll = trialAll(idx);
+% [trialsECOG, ~, idx] = excludeTrialsChs(trialsECOG, 0.1);
+% trialsECOG_S1 = trialsECOG_S1(idx);
+% trialAll = trialAll(idx);
+[tIdx, chIdx] = excludeTrials(trialsECOG, tTh, chTh);
+trialsECOG(tIdx) = [];
+trialsECOG_S1(tIdx) = [];
+trialAll(tIdx) = [];

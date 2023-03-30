@@ -1,4 +1,54 @@
 clear; clc; close all;
+fd = 600;
+%% add_on, 4.06 in 4 Rep1, time course
+disp("Exporting ClickTrainLongTerm add_on 4.06 in 4,Rep1, time course...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Reg_Rep1_TimeCourse\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230314\Block-6'; % 20230315 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
+%% add_on, 0.5,1,2,4s 4.06 in 4 Rep1
+disp("Exporting ClickTrainLongTerm add_on 0.5,1,3,5,4.06 in 4,Rep1...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Reg_Rep1_Dur\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230311\Block-4'; % 20230313 export
+BLOCKPATH{2} = 'G:\ECOG\chouchou\cc20230314\Block-5'; % 20230315 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 2);
+
+%% add_on, 4.06 in 4 Rep1 mix
+disp("Exporting ClickTrainLongTerm add_on 4.06 in 4,Rep1 mix...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Reg_Insert_Rep1_mix\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230308\Block-4'; % 20230308 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+%% add_on, 4.06 in 4 5s-2s
+disp("Exporting ClickTrainLongTerm add_on 4.06 in 4,5s-2s...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Reg_Insert_5s-2s\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230307\Block-3'; % 20230307 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
+%% add_on, 4.06 in 4 2s-1s
+disp("Exporting ClickTrainLongTerm add_on 4.06 in 4,2s-1s...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Reg_Insert_2s-1s\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230306\Block-3'; % 20230306 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Species_2_4ms_Ratio
 disp("Exporting ClickTrainLongTerm Species_2_4ms_Ratio  ...");
@@ -6,7 +56,8 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\SpeciesNew\Species_2_4ms_Rati
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221118\Block-1'; % 20221118 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 
 %% Species_6_8ms_Ratio
@@ -15,7 +66,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\SpeciesNew\Species_6_8ms_Rati
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221118\Block-2'; % 20221118 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Species_2_4_6_8_Duaration_1o5
 disp("Exporting ClickTrainLongTerm Species_2_4_6_8_Duaration_1o5  ...");
@@ -23,7 +74,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\SpeciesNew\Species_2_4_6_8_Du
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221119\Block-1'; % 20221119 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Species_2_4_6_8_Duaration_1o015
 disp("Exporting ClickTrainLongTerm Species_2_4_6_8_Duaration_1o015  ...");
@@ -31,7 +82,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\SpeciesNew\Species_2_4_6_8_Du
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221119\Block-2'; % 20221119 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm,TITS_4_15_20_25_noise_3s_4s_Reg_Irreg_Rev
 disp("Exporting ClickTrainLongTerm TITS_4_25_noise_3s_4s_Reg_Irreg_Rev  ...");
@@ -39,7 +90,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_4_25_noise_3s_4s_Reg_Irr
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221115\Block-3'; % 20221115 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm,TITS_Offset_15_Reg_Irreg_Noise_DiffDur_500_1000ms
 disp("Exporting ClickTrainLongTerm TITS_Offset_15_Reg_Irreg_Noise_DiffDur_500_1000ms  ...");
@@ -47,7 +98,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_15_Reg_Irreg_Nois
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221114\Block-3'; % 20221114 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm,TITS_15_30_3s_13s_Reg_Irreg_Rev
 disp("Exporting ClickTrainLongTerm TITS_15_30_3s_13s_Reg_Irreg_Rev  ...");
@@ -55,7 +106,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_15_30_3s_13s_Reg_Irreg_R
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221114\Block-4'; % 20221114 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm,TITS_Offset_15_Reg_Irreg_Noise_DiffDur
 disp("Exporting ClickTrainLongTerm TITS_Offset_15_Reg_Irreg_Noise_DiffDur  ...");
@@ -63,7 +114,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_15_Reg_Irreg_Nois
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221112\Block-3'; % 20221112 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm,TITS_15_30_60_Reg_Irreg_Rev
 disp("Exporting ClickTrainLongTerm TITS_15_30_60_Reg_Irreg_Rev  ...");
@@ -71,7 +122,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_15_30_60_Reg_Irreg_Rev\"
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221112\Block-4'; % 20221112 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm,TITS_Offset_30_DiffRep_5_40
 disp("Exporting ClickTrainLongTerm TITS_Offset_15_DiffRep_5_40  ...");
@@ -79,7 +130,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_15_DiffRep_5_40\"
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221111\Block-3'; % 20221111 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm,TITS_Offset_15_DiffRep 
 disp("Exporting ClickTrainLongTerm TITS_Offset_15_DiffRep  ...");
@@ -87,7 +138,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_15_DiffRep\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221110\Block-4'; % 20221110 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm,TITS_Offset_30_DiffRep 
 disp("Exporting ClickTrainLongTerm TITS_Offset_30_DiffRep  ...");
@@ -95,7 +146,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_30_DiffRep\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221110\Block-3'; % 20221110 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm,TITS_Offset_60_24_26o4 
 disp("Exporting ClickTrainLongTerm TITS_Offset_60_24_26o4  ...");
@@ -103,7 +154,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_60_24_26o4\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221109\Block-5'; % 20221109 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 
 %% Rhythm,TITS_Offset_SPL 
@@ -112,7 +163,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_SPL\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221108\Block-5'; % 20221108 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm,TITS_Offset_Irreg_15_120 
 disp("Exporting ClickTrainLongTerm TITS_Offset_Reg_Irreg_15_120 ...");
@@ -121,7 +172,7 @@ BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221108\Block-4'; % 20221108 export,
 BLOCKPATH{2} = 'G:\ECoG\chouchou\cc20221109\Block-4'; % 20221109 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 2);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 2);
 
 %% Rhythm,TITS_X_24_Reg_Irreg    
 disp("Exporting ClickTrainLongTerm TITS_X_24_Reg_Irreg ...");
@@ -129,7 +180,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_X_24_Reg_Irreg\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221108\Block-3'; % 20221108 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm,TITS_ToneFixed    
 disp("Exporting ClickTrainLongTerm TITS_ToneFixed ...");
@@ -137,7 +188,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_ToneFixed\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221107\Block-2'; % 20221107 export, 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm, TITS 400_700     
 disp("Exporting ClickTrainLongTerm TITS 400_700 ...");
@@ -145,7 +196,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_400_700\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221107\Block-1'; % 20221107 export,
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm, TITS_Offset_Irreg
 disp("Exporting ClickTrainLongTerm TITS_Offset_Irreg ...");
@@ -153,7 +204,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Offset_Irreg\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221105\Block-6'; % 20221105 export
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm, TITS_24_60_Tone
 disp("Exporting ClickTrainLongTerm TITS_Tone ...");
@@ -161,7 +212,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Tone\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221105\Block-5'; % 20221105 export
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm, TITS_Reg_Irreg  
 disp("Exporting ClickTrainLongTerm TITS_Reg_Irreg ...");
@@ -169,7 +220,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_Reg_Irreg\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221105\Block-4'; % 20221105 export
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm, TITS 160_400     
 disp("Exporting ClickTrainLongTerm TITS 160_400 ...");
@@ -177,7 +228,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TITS_160_400\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221105\Block-3'; % 20221105 export, use offset2 20221105 sound
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm, Offset
 disp("Exporting ClickTrainLongTerm Offset, ratio ...");
@@ -185,7 +236,7 @@ SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\Rhythm_Offset\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221104\Block-4'; % 20221104 export, use offset 20221104 sound
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm, Base ICI & Ratio Rev
 disp("Exporting ClickTrainLongTerm Rhythm_ICI Rev, ratio ...");
@@ -194,7 +245,7 @@ BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221103\Block-3'; % 20221103 export
 BLOCKPATH{2} = 'G:\ECoG\chouchou\cc20221104\Block-3'; % 20221104 export
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 2);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 2);
 
 %% Rhythm, Base ICI & Ratio 48ms
 disp("Exporting ClickTrainLongTerm Rhythm_ICI 48ms, ratio ...");
@@ -203,7 +254,7 @@ BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221103\Block-4'; % 20221103 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm, Base ICI & Ratio 36ms
 disp("Exporting ClickTrainLongTerm Rhythm_ICI 36ms, ratio ...");
@@ -212,7 +263,7 @@ BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221103\Block-5'; % 20221103 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Rhythm, Base ICI & Ratio 24ms
 disp("Exporting ClickTrainLongTerm Rhythm_ICI 24ms, ratio ...");
@@ -221,7 +272,7 @@ BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221103\Block-6'; % 20221103 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% species, Base ICI & Ratio 20ms
 disp("Exporting ClickTrainLongTerm species_ICI 20ms, ratio ...");
@@ -230,7 +281,7 @@ BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221102\Block-3'; % 20221102 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% species, Base ICI & Ratio 16ms
 disp("Exporting ClickTrainLongTerm species_ICI 16ms, ratio ...");
@@ -240,7 +291,7 @@ BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221101\Block-3'; % 20221101 export
 BLOCKPATH{2} = 'G:\ECoG\chouchou\cc20221102\Block-4'; % 20221102 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 2);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 2);
 
 %% species, Base ICI & Ratio 12ms
 disp("Exporting ClickTrainLongTerm species_ICI 12ms, ratio ...");
@@ -250,7 +301,7 @@ BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221101\Block-4'; % 20221101 export
 BLOCKPATH{2} = 'G:\ECoG\chouchou\cc20221102\Block-5'; % 20221102 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 2);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 2);
 
 
 %% species, Base ICI & Ratio 8ms
@@ -260,7 +311,7 @@ BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221101\Block-5'; % 20221101 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% add_on, part1, reg vs irreg, no reg in irreg
 disp("Exporting ClickTrainLongTerm add_on part 1, reg VS irreg ...");
@@ -273,7 +324,7 @@ BLOCKPATH{4} = 'G:\ECoG\chouchou\cc20221026\Block-1'; % 20221026 export
 BLOCKPATH{5} = 'G:\ECoG\chouchou\cc20221027\Block-1'; % 20221027 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 5);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 5);
 
 %% add_on, part2, tone 250_246, 250_240
 disp("Exporting ClickTrainLongTerm add_on part 2, tone ...");
@@ -287,7 +338,7 @@ BLOCKPATH{5} = 'G:\ECoG\chouchou\cc20221026\Block-2'; % 20221026 export
 BLOCKPATH{6} = 'G:\ECoG\chouchou\cc20221027\Block-2'; % 20221026 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 6);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 6);
 
 %% add_on, part3, norm_sqrt, base ICI = 4ms
 disp("Exporting ClickTrainLongTerm add_on part 3, reg VS irreg, base ICI = 4 ...");
@@ -299,7 +350,7 @@ BLOCKPATH{3} = 'G:\ECoG\chouchou\cc20221026\Block-3'; % 20221026 export
 BLOCKPATH{4} = 'G:\ECoG\chouchou\cc20221027\Block-3'; % 20221027 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 4);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 4);
 
 %% add_on, part4, norm_sqrt, base ICI = 8ms
 disp("Exporting ClickTrainLongTerm add_on part 4, reg VS irreg, base ICI = 8 ...");
@@ -311,7 +362,7 @@ BLOCKPATH{3} = 'G:\ECoG\chouchou\cc20221026\Block-4'; % 20221026 export
 BLOCKPATH{4} = 'G:\ECoG\chouchou\cc20221027\Block-4'; % 20221027 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 4);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 4);
 
 %% add_on, part5, duration 0.5,1,2,3,4,5
 disp("Exporting ClickTrainLongTerm add_on part 5, duration 0.5,1,2,3,4,5 ...");
@@ -325,7 +376,7 @@ BLOCKPATH{5} = 'G:\ECoG\chouchou\cc20221026\Block-5'; % 20221026 export
 BLOCKPATH{6} = 'G:\ECoG\chouchou\cc20221027\Block-5'; % 20221027 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 6);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 6);
 
 % %% add_on, part6, click train oscillation 500_250_125_60_30
 % disp("Exporting ClickTrainLongTerm add_on part 6, click train oscillation 500_250_125_60_30 ...");
@@ -334,7 +385,7 @@ exportDataFcn(BLOCKPATH, SAVEPATH, params, 6);
 % BLOCKPATH{1} = 'G:\ECoG\chouchou\cc20221022\Block-3'; % 20221024 export, do not have control 
 % 
 % params.processFcn = @PassiveProcess_clickTrainContinuous;
-% exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+% exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% add_on, part6.2, click train oscillation 500_250_125_60_30_control
 disp("Exporting ClickTrainLongTerm add_on part 6.2, click train oscillation 500_250_125_60_30 ...");
@@ -346,7 +397,7 @@ BLOCKPATH{3} = 'G:\ECoG\chouchou\cc20221026\Block-6'; % 20221026 export
 BLOCKPATH{4} = 'G:\ECoG\chouchou\cc20221027\Block-6'; % 20221027 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 4);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 4);
 
 %% add_on, part7, click train oscillation Tone 250_200_5000_4000
 disp("Exporting ClickTrainLongTerm add_on part 7, click train oscillation Tone 250_200_5000_4000 ...");
@@ -358,7 +409,7 @@ BLOCKPATH{3} = 'G:\ECoG\chouchou\cc20221026\Block-7'; % 20221026 export
 BLOCKPATH{4} = 'G:\ECoG\chouchou\cc20221027\Block-7'; % 20221027 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 4);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 4);
 
 %% add_on, part8, click train variance 50_2
 disp("Exporting ClickTrainLongTerm add_on part 9, click train variance 50_2 ...");
@@ -370,7 +421,7 @@ BLOCKPATH{3} = 'G:\ECoG\chouchou\cc20221026\Block-8'; % 20221026 export
 BLOCKPATH{4} = 'G:\ECoG\chouchou\cc20221027\Block-8'; % 20221027 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 4);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 4);
 
 %% add_on, part9, click train variance 400_50
 disp("Exporting ClickTrainLongTerm add_on part 8, click train variance 400_50 ...");
@@ -382,7 +433,7 @@ BLOCKPATH{3} = 'G:\ECoG\chouchou\cc20221026\Block-9'; % 20221026 export
 BLOCKPATH{4} = 'G:\ECoG\chouchou\cc20221027\Block-9'; % 20221027 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 4);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 4);
 
 
 %% duration 1s 2s 3s 4s 5s-1sm 4.06-4
@@ -393,7 +444,7 @@ BLOCKPATH{1} = 'F:\ECoG\chouchou\cc20221012\Block-3'; % 20221012 export
 BLOCKPATH{2} = 'F:\ECoG\chouchou\cc20221013\Block-3'; % 20221013 export
 BLOCKPATH{3} = 'F:\ECoG\chouchou\cc20221014\Block-3'; % 20221016 export
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 3);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 3);
 
 %% duration 1s 2s 3s 4s 5s-1sm 4.06-4
 disp("Exporting ClickTrainLongTerm duration...");
@@ -404,7 +455,7 @@ BLOCKPATH{2} = 'F:\ECoG\chouchou\cc20221013\Block-4'; % 20221013 export
 BLOCKPATH{3} = 'F:\ECoG\chouchou\cc20221014\Block-4'; % 20221016 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 3);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 3);
 
 
 %% successive tone 250-246,240,200
@@ -414,7 +465,7 @@ BLOCKPATH = [];
 BLOCKPATH{1} = 'F:\ECoG\chouchou\cc20221011\Block-5'; % 20221011 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 
 %% clickTrainLongTerm successive 0.025_0.05
@@ -424,7 +475,7 @@ BLOCKPATH = [];
 BLOCKPATH{1} = 'F:\ECoG\chouchou\cc20221011\Block-4'; % 20221011 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% clickTrainLongTerm successive 0.1_0.2
 disp("Exporting ClickTrainLongTerm successive...");
@@ -435,7 +486,7 @@ BLOCKPATH{2} = 'E:\ECoG\chouchou\cc20220928\Block-5';
 BLOCKPATH{3} = 'E:\ECoG\chouchou\cc20221004\Block-3'; % 20221011 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% clickTrainLongTerm successive 0.3_0.5
 disp("Exporting ClickTrainLongTerm successive...");
@@ -447,7 +498,7 @@ BLOCKPATH{3} = 'E:\ECoG\chouchou\cc20220930\Block-6';
 BLOCKPATH{4} = 'E:\ECoG\chouchou\cc20221004\Block-4'; % 20221007 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% clickTrainLongTerm successive 1_2
 disp("Exporting ClickTrainLongTerm successive...");
@@ -458,7 +509,7 @@ BLOCKPATH{1} = 'E:\ECoG\chouchou\cc20221005\Block-8';
 BLOCKPATH{2} = 'E:\ECoG\chouchou\cc20221006\Block-1'; % 20221007 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% clickTrainLongTerm Basic 4-4.06
 disp("Exporting ClickTrainLongTerm Basic 4-4.06...");
@@ -475,7 +526,7 @@ BLOCKPATH{8} = 'E:\ECoG\chouchou\cc20220721\Block-1';
 BLOCKPATH{9} = 'E:\ECoG\chouchou\cc20220724\Block-1'; % 20221007 export
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% clickTrainLongTerm Basic 8-8.12
 disp("Exporting ClickTrainLongTerm Basic 8-8.12...");
@@ -493,7 +544,7 @@ BLOCKPATH{9} = 'E:\ECoG\chouchou\cc20220724\Block-2'; % 20221007 export
 
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 
 %% clickTrainLongTerm Basic 20-20.3
@@ -512,7 +563,7 @@ BLOCKPATH{9} = 'E:\ECoG\chouchou\cc20220724\Block-4'; % 20221007 export
 
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% clickTrainLongTerm Basic 40-40.6
 disp("Exporting ClickTrainLongTerm Basic 40-40.6...");
@@ -530,7 +581,7 @@ BLOCKPATH{9} = 'E:\ECoG\chouchou\cc20220724\Block-5'; % 20221007 export
 
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% clickTrainLongTerm Basic 80-81.2
 disp("Exporting ClickTrainLongTerm Basic 80-81.2...");
@@ -548,7 +599,7 @@ BLOCKPATH{9} = 'E:\ECoG\chouchou\cc20220724\Block-6'; % 20221007 export
 
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% clickTrainLongTerm Basic ICI Threshold
 disp("Exporting ClickTrainLongTerm Basic ICI Threshold...");
@@ -565,7 +616,7 @@ BLOCKPATH{8} = 'E:\ECoG\chouchou\cc20220722\Block-2'; % 20221007 export
 
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% clickTrainLongTerm Basic IrregVar
 disp("Exporting ClickTrainLongTerm Basic IrregVar...");
@@ -582,7 +633,7 @@ BLOCKPATH{8} = 'E:\ECoG\chouchou\cc20220722\Block-4'; % 20221007 export
 
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% clickTrainLongTerm Basic Insert
 disp("Exporting ClickTrainLongTerm Basic Insert...");
@@ -595,7 +646,7 @@ BLOCKPATH{4} = 'E:\ECoG\chouchou\cc20220714\Block-3';
 BLOCKPATH{5} = 'E:\ECoG\chouchou\cc20220720\Block-3';
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 
 
@@ -607,7 +658,7 @@ BLOCKPATH{1} = 'E:\ECoG\chouchou\cc20220827\Block-1';
 
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% clickTrainLongTerm Species ICIBind248204080Ratio1o1
 disp("Exporting ClickTrainLongTerm Species ICIBind248204080Ratio1o1...");
@@ -623,7 +674,7 @@ BLOCKPATH{7} = 'E:\ECoG\chouchou\cc20220906\Block-5';
 
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 
 %% clickTrainLongTerm Species RatioDetect4o1o2o3o4
@@ -640,47 +691,6 @@ BLOCKPATH{7} = 'E:\ECoG\chouchou\cc20220906\Block-4';
 
 
 params.processFcn = @PassiveProcess_clickTrainContinuous;
-exportDataFcn(BLOCKPATH, SAVEPATH, params, 1);
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 
 %% Fcn
-function exportDataFcn(BLOCKPATH, SAVEPATH, params, startIdx, endIdx)
-    narginchk(3, 5);
-
-    if nargin < 4
-        startIdx = 1;
-    end
-
-    if nargin < 5
-        endIdx = length(BLOCKPATH);
-    end
-
-    fd = 500; % Hz
-
-    for index = startIdx:endIdx
-        AREANAME = ["AC", "PFC"];
-        temp = string(split(BLOCKPATH{index}, '\'));
-        DateStr = temp(end - 1);
-        mkdir(fullfile(SAVEPATH, DateStr));
-        
-        % AC
-        disp("Loading AC Data...");
-        params.posIndex = 1;
-        tic
-        [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
-        ECOGDataset = ECOGDownsample(ECOGDataset, fd);
-        disp("Saving...");
-        save(strcat(SAVEPATH, DateStr, "\", DateStr, "_", AREANAME(params.posIndex), ".mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");
-        toc
-        
-        % PFC
-        disp("Loading PFC Data...");
-        params.posIndex = 2;
-        tic
-        [~, ECOGDataset] = ECOGPreprocess(BLOCKPATH{index}, params);
-        ECOGDataset = ECOGDownsample(ECOGDataset, fd);
-        disp("Saving...");
-        save(strcat(SAVEPATH, DateStr, "\", DateStr, "_", AREANAME(params.posIndex), ".mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");
-        toc
-    end
-
-end
