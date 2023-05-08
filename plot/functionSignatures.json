@@ -1,0 +1,56 @@
+{
+    "_schemaVersion": "1.0.0",
+
+    "plotLayout": {
+        "inputs": [
+            {"mutuallyExclusiveGroup": [
+                [
+                    {"name": "posIndex", "kind": "required", "type": ["numeric", "choices = {1, 2, 3, 4}"]},
+                    {"name": "alphaValue", "kind": "ordered", "type": ["numeric", "scalar"]},
+                    {"name": "tag", "kind": "ordered", "type": [["string"], ["char"]]},
+                    {"name": "target", "kind": "ordered", "type": ["choices = {'figure','axes','FigOrAxes'}"]}
+                ],
+                [
+                    {"name": "FigOrAxes", "kind": "required", "type": ["@(args) all(isgraphics(args))"]},
+                    {"name": "posIndex", "kind": "required", "type": ["numeric", "choices = {1, 2, 3, 4}"]},
+                    {"name": "alphaValue", "kind": "ordered", "type": ["numeric", "scalar"]},
+                    {"name": "tag", "kind": "ordered", "type": [["string"], ["char"]]},
+                    {"name": "target", "kind": "ordered", "type": ["choices = {'figure','axes','FigOrAxes'}"]}
+                ]
+            ]}
+        ]
+    },
+
+    "plotTopo": {
+        "inputs": [
+            {"mutuallyExclusiveGroup": [
+                [
+                    {"name": "Data", "kind": "required", "type": ["numeric"]},
+                    {"name": "topoSize", "kind": "ordered", "type": ["numel=2", "positive", "integer"]},
+                    {"name": "contourOpt", "kind": "namevalue", "type": ["choices = {'on', 'off'}"]},
+                    {"name": "resolution", "kind": "namevalue", "type": ["scalar", "positive", "integer"]}
+                ],
+                [
+                    {"name": "FigOrAxes", "kind": "required", "type": ["@(args) isgraphics(args(1), 'axes')"]},
+                    {"name": "Data", "kind": "required", "type": ["numeric"]},
+                    {"name": "topoSize", "kind": "ordered", "type": ["numel=2", "positive", "integer"]},
+                    {"name": "contourOpt", "kind": "namevalue", "type": ["choices = {'on', 'off'}"]},
+                    {"name": "resolution", "kind": "namevalue", "type": ["scalar", "positive", "integer"]}
+                ]
+            ]}
+        ]
+    },
+
+    "plotBehaviorOnly": {
+        "inputs": [
+            {"name": "trials", "kind": "required", "type": ["@(x) isstruct(x)"]},
+            {"name": "color", "kind": "required", "type": ["@(x) numel(x) == 3 || any(validatestring(x, {'r', 'g', 'b', 'k', 'y', 'c', 'm', 'w'}))"]},
+            {"name": "Fig", "kind": "ordered"},
+            {"name": "mAxe", "kind": "ordered"},
+            {"name": "cueType", "kind": "namevalue", "type": ["choices = {'freq','loc'}"]},
+            {"name": "legendStr", "kind": "namevalue"},
+            {"name": "xlabelStr", "kind": "namevalue"}
+        ]
+    }
+
+}
