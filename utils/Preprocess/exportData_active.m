@@ -78,7 +78,7 @@ function Exported = exportDataFcn(BLOCKPATHs, SAVEPATHs, params, Exported, skipI
         disp("Loading AC Data...");
         params.posIndex = 1;
         tic
-        [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params, "patch", true);
+        [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params, "patch", "bankIssue");
         ECOGDataset = ECOGResample(ECOGDataset, fd);
         ECOGDataset = ECOGFilter(ECOGDataset, fhp, flp);
         disp("Saving...");
@@ -89,7 +89,7 @@ function Exported = exportDataFcn(BLOCKPATHs, SAVEPATHs, params, Exported, skipI
         disp("Loading PFC Data...");
         params.posIndex = 2;
         tic
-        [~, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params, "patch", true);
+        [~, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params, "patch", "bankIssue");
         ECOGDataset = ECOGResample(ECOGDataset, fd);
         ECOGDataset = ECOGFilter(ECOGDataset, fhp, flp);
         disp("Saving...");

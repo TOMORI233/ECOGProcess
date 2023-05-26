@@ -1,11 +1,20 @@
 clear; clc; close all;
 
-%% 7-10Freq active
-TBPATH = "D:\Education\Lab\Projects\ECOG\MAT Data\PEOdd7-10.xlsx"; % table path
-BLOCKROOTPATH = "E:\ECoG\TDT Data"; % TDT Block path
-SAVEROOTPATH = "D:\Education\Lab\Projects\ECOG\MAT Data"; % MAT path to save
-PROTOCOL = "7-10Freq Passive";
+% PEOdd7-10
+% TBPATH = "D:\Education\Lab\Projects\ECOG\MAT Data\PEOdd7-10.xlsx"; % table path
+% BLOCKROOTPATH = "E:\ECoG\TDT Data"; % TDT Block path
+% SAVEROOTPATH = "D:\Education\Lab\Projects\ECOG\MAT Data"; % MAT path to save
+% PROTOCOL = "7-10Freq Passive";
+% params.processFcn = @PassiveProcess_7_10Freq;
 
+% Corr
+TBPATH = "D:\Education\Lab\Projects\ECOG\MAT Data\Corr.xlsx"; % table path
+BLOCKROOTPATH = "F:\Monkey ECoG\TDT Data"; % TDT Block path
+SAVEROOTPATH = "D:\Education\Lab\Projects\ECOG\MAT Data"; % MAT path to save
+PROTOCOL = "Corr";
+params.processFcn = @CorrProcess;
+
+%% 
 tb = readtable(TBPATH);
 Blocks = tb.PassiveBlock;
 
@@ -23,7 +32,7 @@ SAVEPATHs = arrayfun(@(x) char(fullfile(SAVEROOTPATH, upper(x), PROTOCOL, "\")),
 params.fd = 500; % downsample, Hz
 params.fhp = 0.1;
 params.flp = 200;
-params.processFcn = @PassiveProcess_7_10Freq;
+
 tb.Exported_passive = exportDataFcn(BLOCKPATHs, SAVEPATHs, params, Exported, skipIdx);
 tb.Exported_passive(skipIdx) = Exported(skipIdx);
 writetable(tb, TBPATH);
@@ -47,7 +56,7 @@ function Exported = exportDataFcn(BLOCKPATHs, SAVEPATHs, params, Exported, skipI
         disp("Loading AC Data...");
         params.posIndex = 1;
         tic
-        [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params, "patch", true);
+        [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params, "patch", "bankIssue");
         ECOGDataset = ECOGResample(ECOGDataset, fd);
         ECOGDataset = ECOGFilter(ECOGDataset, fhp, flp);
         disp("Saving...");
@@ -58,7 +67,7 @@ function Exported = exportDataFcn(BLOCKPATHs, SAVEPATHs, params, Exported, skipI
         disp("Loading PFC Data...");
         params.posIndex = 2;
         tic
-        [~, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params, "patch", true);
+        [~, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params, "patch", "bankIssue");
         ECOGDataset = ECOGResample(ECOGDataset, fd);
         ECOGDataset = ECOGFilter(ECOGDataset, fhp, flp);
         disp("Saving...");

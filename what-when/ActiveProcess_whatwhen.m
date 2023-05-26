@@ -1,4 +1,4 @@
-function trialAll = ActiveProcess_whatwhen(epocs, choiceWin)
+function trialAll = ActiveProcess_WhatWhen(epocs, choiceWin)
     narginchk(1, 2);
 
     if nargin < 2

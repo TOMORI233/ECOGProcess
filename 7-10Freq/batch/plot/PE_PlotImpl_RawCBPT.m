@@ -2,7 +2,7 @@
 t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
 FigPE = plotRawWaveMulti(chData(2:end), windowPE);
 scaleAxes(FigPE, "x", [0, windowPE(2)]);
-scaleAxes(FigPE, "y", "on");
+scaleAxes(FigPE, "y", "on", "uiOpt", "show");
 setAxes(FigPE, "visible", "off");
 plotLayout(FigPE, (monkeyID - 1) * 2 + posIndex, 0.4);
 drawnow;

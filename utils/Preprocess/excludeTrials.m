@@ -78,7 +78,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     if all(goodChIdx)
         disp('All channels are good.');
     else
-        disp(['Possible bad channel numbers are: ', num2str(find(~goodChIdx)')]);
+        disp(['Possible bad channel numbers: ', num2str(find(~goodChIdx)')]);
     end
 
     % bad channels defined by user
@@ -88,7 +88,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
         if isequal(badCHs, 0)
             % raw wave
             plotRawWave(chMean, chStd, [0, 1], 'origin');
-            scaleAxes("y", "cutoffRange", [-100, 100], "symOpts", "max", "uiOpt", "show");
+            scaleAxes("y", "symOpts", "max", "uiOpt", "show");
 
             % good trials (mean, red) against bad trials (single, grey)
 %             previewRawWave(trialsData, badtrialIdx, V_All);
@@ -156,7 +156,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     tIdx = cellfun(@(x) ~any(x(goodChIdx) > tTh), tIdx); % marked true means reserved trials
     if any(~tIdx)
         tIdx = find(~tIdx);
-        disp(['Trial ', num2str(tIdx'), ' excluded.']);
+        disp(['Trials excluded: ', num2str(tIdx')]);
     else
         tIdx = [];
         disp('All pass.');

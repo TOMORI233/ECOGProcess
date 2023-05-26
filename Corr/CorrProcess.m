@@ -1,6 +1,6 @@
 function trialAll = CorrProcess(epocs, varargin)
     orderAll = epocs.ordr.data;
-    trialOnsetTime = epocs.order.onset * 1000; % ms
+    trialOnsetTime = epocs.ordr.onset * 1000; % ms
     
     n = length(orderAll);
     temp = cell(n, 1);
@@ -13,6 +13,9 @@ function trialAll = CorrProcess(epocs, varargin)
         trialAll(tIndex).soundOnsetSeq = trialOnsetTime(tIndex);
         trialAll(tIndex).order = orderAll(tIndex);
     end
+
+    % Abort the first trial
+    trialAll(1) = [];
 
     return;
 end

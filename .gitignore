@@ -5,6 +5,7 @@
 #ignore slprj folder
 **/slprj/
 /slprj/
+
 #ignore codegen folder
 **/codegen/
 /codegen/
@@ -12,6 +13,9 @@
 #ignore figures
 **/CC/
 **/XX/
+
+#ignore data
+**/ac.mat
 
 #ignore following files;
 *.asv

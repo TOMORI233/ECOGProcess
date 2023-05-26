@@ -34,12 +34,12 @@ function mAxe = plotTopo(varargin)
         error("Numel of input data should be topoSize(1)*topoSize(2)");
     end
     
-    C = flipud(reshape(Data, topoSize)');
+    C = flipud(reshape(Data, topoSize)'); % starts from top-left
     C = padarray(C, [1, 1], "replicate");
     C = interp2(C, N);
     C = imgaussfilt(C, 8);
-    X = linspace(0, topoSize(1) + 1, size(C, 1));
-    Y = linspace(0, topoSize(2) + 1, size(C, 2));
+    X = linspace(0, topoSize(1) + 1, size(C, 1)); % extend 1 ch
+    Y = linspace(0, topoSize(2) + 1, size(C, 2)); % extend 1 ch
     imagesc(mAxe, "XData", X, "YData", Y, "CData", C);
 
     if strcmpi(contourOpt, "on")
@@ -51,9 +51,9 @@ function mAxe = plotTopo(varargin)
 
     end
 
-    xlim([0.5, topoSize(1) + 0.5]);
-    ylim([0.5, topoSize(2) + 0.5]);
-    xticklabels('');
-    yticklabels('');
+    set(mAxe, "XLimitMethod", "tight");
+    set(mAxe, "YLimitMethod", "tight");
+    xticklabels(mAxe, '');
+    yticklabels(mAxe, '');
     colormap(mAxe, 'jet');
 end
