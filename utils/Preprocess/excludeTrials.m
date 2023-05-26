@@ -63,7 +63,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     % show channel-bad trials
     if chTh > 1 && chTh == fix(chTh)
         goodChIdx = V_All < chTh & V < chTh; % marked true means reserved channels
-    elseif chTh < 1
+    elseif chTh <= 1
         goodChIdx = V_All < chTh * length(trialsData) & V < chTh * length(trialsData); % marked true means reserved channels
     else
         error('Invalid channel threshold input.');
@@ -88,7 +88,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
         if isequal(badCHs, 0)
             % raw wave
             plotRawWave(chMean, chStd, [0, 1], 'origin');
-            scaleAxes("y", "cutoffRange", [-100, 100], "symOpts", "max");
+            scaleAxes("y", "cutoffRange", [-100, 100], "symOpts", "max", "uiOpt", "show");
 
             % good trials (mean, red) against bad trials (single, grey)
 %             previewRawWave(trialsData, badtrialIdx, V_All);
