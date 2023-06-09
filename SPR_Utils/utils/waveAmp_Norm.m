@@ -28,7 +28,7 @@ area = sum(abs(temp), 2);
 switch method
     case 1 % Resp_devided_by_Spon
         normAmp = amp./rmsSpon;
-    case 2 % R_minus_S_devide_R_plus_S
+    case 2 % R_minus_S_devide_S
         normAmp = (amp - rmsSpon) ./ rmsSpon;
     case 3
         normAmp = (area - areaSpon) ./ areaSpon;

@@ -6,5 +6,6 @@ else
     [~, ampS1, rmsSponS1] = cellfun(@(x) waveAmp_Norm(x, Window, quantWin, CRIMethod, sponWin), trialsECOG_S1_Merge, 'UniformOutput', false);
 end
 [S1H, S1P] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(ampS1), changeCellRowNum(rmsSponS1), "UniformOutput", false);
-conpare.OR_SigCHs = find(cell2mat(S1H));
-conpare.OR_SigCHs = find(~cell2mat(S1H));
+S1H = cellfun(@(x) replaceVal(x, 0, @isnan), S1H, "UniformOutput", false );
+compare.OR_SigCHs = find(cell2mat(S1H));
+compare.OR_SigCHs = find(~cell2mat(S1H));

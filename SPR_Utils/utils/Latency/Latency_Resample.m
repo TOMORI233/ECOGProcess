@@ -32,7 +32,7 @@ trialsECOG = changeCellRowNum(trialsECOG);
 
 %% compute latency according to different methods
 
-if strcmpi(Method, "FAL)Jackknife")
+if strcmpi(Method, "FAL_Jackknife")
     [latency_mean, latency_se, latency_raw] = cellfun(@(x,y) FAL_Jackknife(x, tTest, y, fraction, thrFrac), smthWave, num2cell(chNP), "UniformOutput", false);
 elseif strcmpi(Method, "AVL_Jackknife")
     [latency_mean, latency_se, latency_raw] = cellfun(@(x,y) AVL_Jackknife(x, t, testWin, sponWin, y, stdFrac, sigma, smthBin), trialsECOG, num2cell(chNP), "UniformOutput", false);

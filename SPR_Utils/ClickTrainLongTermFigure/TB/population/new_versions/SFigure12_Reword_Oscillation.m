@@ -1,6 +1,6 @@
 close all; clc; clear;
 
-MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Basic_Oscillation_control_500_250_125_60_30\';
+MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Reword_Oscillation\';
 % MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Basic_Oscillation_control_500_250_125_60_30\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
@@ -25,12 +25,12 @@ fhp = 0.1;
 segOption = ["trial onset", "dev onset"];
 s1OnsetOrS2Onset = 1; % 1, s1onset; 2, s2Onset
 colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#AAAAAA"];
-stimStrs = ["Osc_500ms", "Osc_250ms", "Osc_125ms", "Osc_60ms", "Osc_30ms", "control"];
+stimStrs = ["Osc_500ms", "Osc_250ms", "Osc_125ms", "Osc_60ms", "Osc_30ms"];
 
 AREANAME = ["AC", "PFC"];
 AREANAME = AREANAME(params.posIndex);
 
-fs = 500;
+fs = 600;
 
 badCh = {[], []};
 
@@ -41,7 +41,7 @@ for mIndex = 1 : length(MATPATH)
 
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 1);
-    FIGPATH = strcat(ROOTPATH, "\Pop_Figure6_Osci_Control\",  SRIMethodStr(SRIMethod), "\", monkeyStr(mIndex), "\");
+    FIGPATH = strcat(ROOTPATH, "\Pop_SFigure12_Reword_Oscillation\",  SRIMethodStr(SRIMethod), "\", monkeyStr(mIndex), "\");
     mkdir(FIGPATH);
     %% process
     run("tb_loadData.m");
@@ -79,10 +79,10 @@ for mIndex = 1 : length(MATPATH)
     end
 
     %% compare and plot rawWave
-    for  dIndex = 1 : length(devType)-1
+    for  dIndex = 1 : length(devType)
         fftPValue(dIndex).info = stimStrs(dIndex);
         Successive(1).chMean = PMean{dIndex}; Successive(1).color = "r";
-        Successive(2).chMean = PMean{length(devType)}; Successive(2).color = "k";
+%         Successive(2).chMean = PMean{length(devType)}; Successive(2).color = "k";
         [H, P] = waveFFTPower_pValue(trialsFFT{dIndex}, trialsFFT{length(devType)}, [{ff}, {ff}], targetIdx(dIndex), 2);
         fftPValue(dIndex).(strcat(stimStrs(dIndex), "_pValue")) = P;
         fftPValue(dIndex).(strcat(stimStrs(dIndex), "_H")) = H;

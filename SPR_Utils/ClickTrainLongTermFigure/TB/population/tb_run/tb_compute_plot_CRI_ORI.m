@@ -16,6 +16,10 @@ for dIndex = 1:length(devType)
     CRI(dIndex).rsp = changeCellRowNum(amp);
     CRI(dIndex).base = changeCellRowNum(rmsSpon);
 
+    CRMS(dIndex).mean = cellfun(@mean, CRI(dIndex).rsp); 
+    CRMS(dIndex).se =  cellfun(@(x) std(x)/sqrt(length(x)), CRI(dIndex).rsp);
+
+
 
     % compute ORI
     [temp, ampS1, rmsSponS1] = cellfun(@(x) waveAmp_Norm(x, Window, quantWin, CRIMethod, sponWin), trialsECOG_S1, 'UniformOutput', false);
