@@ -1,7 +1,6 @@
 close all; clc; clear;
 MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Annoying_BaseICI_12_16\cc20230505\';
-% MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Annoying_BaseICI_12_16\xx20230504\';
-% MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Basic_ICIThr\';
+
 for mIndex = 1 : length(MATPATH)
     temp = string(split(MATPATH{mIndex}, '\'));
     Protocol = temp(end - 2);

@@ -15,6 +15,7 @@
         "inputs": [
             {"name": "DATAPATH", "kind": "required", "type": ["string", "char"]},
             {"name": "params", "kind": "required", "type": ["struct"]},
+            {"name": "RHDPATH", "kind": "namevalue", "type": ["string", "char"]},
             {"name": "behaviorOnly", "kind": "namevalue", "type": ["logical", "scalar"]},
             {"name": "patch", "kind": "namevalue", "type": ["choices={'reject', 'matchIssue', 'bankIssue'}"]}
         ]
@@ -65,9 +66,9 @@
 
     "excludeTrials": {
         "inputs": [
-            {"name": "trialsData", "kind": "required", "type": ["cell"], "description": "trial data"},
-            {"name": "tTh", "kind": "ordered", "type": ["scalar", "numeric"], "description": "trial threshold"},
-            {"name": "chTh", "kind": "ordered", "type": ["scalar", "numeric"], "description": "channel threshold (percentage or nTrials)"},
+            {"name": "trialsData", "kind": "required", "type": ["cell"], "purpose": "trial data"},
+            {"name": "tTh", "kind": "ordered", "type": ["scalar", "numeric"], "purpose": "trial threshold"},
+            {"name": "chTh", "kind": "ordered", "type": ["scalar", "numeric"], "purpose": "channel threshold (percentage or nTrials)"},
             {"name": "userDefineOpt", "kind": "namevalue", "type": ["choices={'on', 'off'}"]}
         ]
     }

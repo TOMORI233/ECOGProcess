@@ -1,4 +1,4 @@
-function [amplifier_data, frequency_parameters] = load_Intan_RHD2000_file(DATAPATH)
+function [amplifier_data, frequency_parameters, board_dig_in_data] = load_Intan_RHD2000_file(DATAPATH)
 
 % read_Intan_RHD2000_file
 %
