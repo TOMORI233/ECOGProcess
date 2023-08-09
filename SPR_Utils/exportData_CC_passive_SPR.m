@@ -1,5 +1,96 @@
 clear; clc; close all;
 fd = 600;
+
+%% Annoying TB Base ICI, 12, 16
+disp("Exporting Annoying TB Base ICI, 12, 16...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Annoying_BaseICI_12_16\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230504\Block-1'; % 20230504 export
+BLOCKPATH{2} = 'G:\ECOG\chouchou\cc20230504\Block-4'; % 20230504 export
+BLOCKPATH{3} = 'G:\ECOG\chouchou\cc20230505\Block-3'; % 20230508 export
+BLOCKPATH{4} = 'G:\ECOG\chouchou\cc20230505\Block-6'; % 20230508 export
+
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 3);
+
+%% Reword TB Base ICI, 12, 16
+disp("Exporting Reword TB Base ICI, 12, 16...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Reword_BaseICI_12_16\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230504\Block-2'; % 20230504 export
+BLOCKPATH{2} = 'G:\ECOG\chouchou\cc20230504\Block-5'; % 20230504 export
+BLOCKPATH{3} = 'G:\ECOG\chouchou\cc20230505\Block-4'; % 20230508 export
+BLOCKPATH{4} = 'G:\ECOG\chouchou\cc20230505\Block-7'; % 20230508 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 3);
+
+%% Control TB Base ICI, 12, 16
+disp("Exporting Control TB Base ICI, 12, 16...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Control_BaseICI_12_16\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230504\Block-3'; % 20230504 export
+BLOCKPATH{2} = 'G:\ECOG\chouchou\cc20230504\Block-6'; % 20230504 export
+BLOCKPATH{3} = 'G:\ECOG\chouchou\cc20230505\Block-5'; % 20230508 export
+BLOCKPATH{4} = 'G:\ECOG\chouchou\cc20230505\Block-8'; % 20230508 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 3);
+
+%% Annoying TB Oscillation, 4ms ICI----500ms,250ms,125ms, 60ms, 30ms
+disp("Annoying TB Oscillation, 4ms ICI----500ms,250ms,125ms, 60ms, 30ms...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Annoying_Oscillation\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230501\Block-2'; % 20230502 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
+%% Annoying TB Base ICI, 4,8,16,32
+disp("Exporting Annoying TB Base ICI, 4,8,16,32...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Annoying_BaseICI\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230501\Block-1'; % 20230502 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
+%% Reword TB Oscillation, 4ms ICI----500ms,250ms,125ms, 60ms, 30ms
+disp("Exporting Reword TB Oscillation, 4ms ICI----500ms,250ms,125ms, 60ms, 30ms...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Reword_Oscillation\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230501\Block-5'; % 20230502 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
+%% Reword TB Base ICI, 4,8,16,32
+disp("Exporting Reword TB Base ICI, 4,8,16,32...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Reword_BaseICI\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230501\Block-6'; % 20230502 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
+%% LocalChange, 4.06 in 4, N=0,1,2,4,8
+disp("Exporting ClickTrainLongTerm LocalChange, 4.06 in 4, N=0,1,2,4,8...");
+SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_LocalChange_4ms_2s-1s_N01248\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\chouchou\cc20230404\Block-3'; % 20230404 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
 %% add_on, 4.06 in 4 Rep1, time course
 disp("Exporting ClickTrainLongTerm add_on 4.06 in 4,Rep1, time course...");
 SAVEPATH = "E:\ECOG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Reg_Rep1_TimeCourse\";

@@ -16,8 +16,8 @@ style = getOr(lineSetting, "style", "-");
         for cIndex = 1:plotSize(2)
             chNum = (rIndex - 1) * plotSize(2) + cIndex;
 
-            if chNum > size(chMean, 1)
-                continue;
+            if chNum > length(allAxes)
+                return;
             end
             
             t = linspace(window(1), window(2), size(chMean, 2));

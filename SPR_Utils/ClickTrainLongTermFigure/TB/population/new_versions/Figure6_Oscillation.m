@@ -1,7 +1,7 @@
 close all; clc; clear;
 
 MATPATH{1} = 'E:\ECoG\MAT Data\CC\ClickTrainLongTerm\TB\Add_on_Basic_Oscillation_control_500_250_125_60_30\';
-MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Basic_Oscillation_control_500_250_125_60_30\';
+% MATPATH{2} = 'E:\ECoG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Basic_Oscillation_control_500_250_125_60_30\';
 monkeyStr = ["CC", "XX"];
 ROOTPATH = "E:\ECoG\corelDraw\ClickTrainLongTerm\Basic\";
 params.posIndex = 1; % 1-AC, 2-PFC

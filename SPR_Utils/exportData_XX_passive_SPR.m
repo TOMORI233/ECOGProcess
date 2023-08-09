@@ -1,5 +1,78 @@
 clear; clc; close all;
 fd = 600;
+%% Anesthesia: awake
+disp("Exporting Anesthesia: awake...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TB\TB_Anesthesia_Osci_Awake\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\xiaoxiao\xx20230531\Block-2'; % 20230531 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
+%% Anesthesia: 20mg/kg/h
+disp("Anesthesia: 20mg/kg/h...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TB\TB_Anesthesia_Osci_Rate_20\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\xiaoxiao\xx20230531\Block-5'; % 20230531 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
+%% Anesthesia: 40mg/kg/h
+disp("Anesthesia: 40mg/kg/h...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TB\TB_Anesthesia_Osci_Rate_40\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\xiaoxiao\xx20230531\Block-9'; % 20230531 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
+%% Annoying TB Base ICI, 12, 16
+disp("Exporting Annoying TB Base ICI, 12, 16...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Annoying_BaseICI_12_16\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\xiaoxiao\xx20230504\Block-3'; % 20230504 export
+BLOCKPATH{2} = 'G:\ECOG\xiaoxiao\xx20230504\Block-6'; % 20230504 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
+%% Reword TB Base ICI, 12, 16
+disp("Exporting Reword TB Base ICI, 12, 16...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Reword_BaseICI_12_16\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\xiaoxiao\xx20230504\Block-4'; % 20230504 export
+BLOCKPATH{2} = 'G:\ECOG\xiaoxiao\xx20230504\Block-7'; % 20230504 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
+%% Control TB Base ICI, 12, 16
+disp("Exporting Control TB Base ICI, 12, 16...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Control_BaseICI_12_16\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\xiaoxiao\xx20230504\Block-5'; % 20230504 export
+BLOCKPATH{2} = 'G:\ECOG\xiaoxiao\xx20230504\Block-8'; % 20230504 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
+
+
+%% LocalChange, 4.06 in 4, N=0,1,2,4,8
+disp("Exporting ClickTrainLongTerm LocalChange, 4.06 in 4, N=0,1,2,4,8...");
+SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_LocalChange_4ms_2s-1s_N01248\";
+BLOCKPATH = [];
+BLOCKPATH{1} = 'G:\ECOG\xiaoxiao\xx20230404\Block-2'; % 20230404 export
+
+params.processFcn = @PassiveProcess_clickTrainContinuous;
+params.patch = "matchIssue";
+exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
 %% add_on, 4.06 in 4 Rep1, time course
 disp("Exporting ClickTrainLongTerm add_on 4.06 in 4,Rep1, time course...");
 SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Reg_Rep1_TimeCourse\";

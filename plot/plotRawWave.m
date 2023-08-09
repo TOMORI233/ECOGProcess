@@ -37,7 +37,7 @@ function Fig = plotRawWave(chMean, chStd, window, titleStr, plotSize, chs, visib
 
         for cIndex = 1:plotSize(2)
             
-            if chs(rIndex, cIndex) > size(chMean, 1)
+            if chs(rIndex, cIndex) > size(chMean, 1) || chs(rIndex, cIndex) == 0
                 continue;
             end
 

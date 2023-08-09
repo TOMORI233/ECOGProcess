@@ -1,4 +1,6 @@
 clear; clc; close all;
+fd = 600;
+
 
 %% Click Train Odd
 disp("Exporting ClickTrainOdd...");

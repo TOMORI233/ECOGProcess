@@ -128,6 +128,92 @@ elseif strcmpi(Protocol, "Add_on_Reg_Rep1_TimeCourse")
     CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.3]};
     lines = cell2struct(num2cell([1001;2002;2999.1;4000.1;5001.1]), "X", 2);
     FIGPATH = strcat(ROOTPATH, "Pop_Sfigure7_Reg_localChange_TimeCourse\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+
+elseif strcmpi(Protocol, "Add_on_LocalChange_4ms_2s-1s_N01248")
+    badCH_self = {[49], [48,49,57,64]};
+    icaOpt = "off";
+    plotWhole = false;
+    colors = ["#FF0000", "#AAAAAA", "#000000", "#0000FF", "#FFA500"];
+    stimStrs = ["RegChange", "localChangeN1", "localChangeN2", "localChangeN4", "localChangeN8"];
+    cdrPlotIdx = [1, 2, 3, 4, 5];
+    CR_Ref = 1;% localChangeN0
+    fs = 600;
+    plotWin = [-10, 400];
+    yScale = [20, 25];
+    CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.3]};
+    FIGPATH = strcat(ROOTPATH, "Pop_Sfigure8_LocalChange_4ms_N01248\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+
+
+
+elseif strcmpi(Protocol, "Add_on_Annoying_BaseICI")
+    badCH_self = {[49], [48,49,57,64]};
+    icaOpt = "off";
+    plotWhole = false;
+    colors = ["#FF0000", "#FFA500", "#0000FF", "#000000"];
+    stimStrs = ["Annoy-4ms", "Annoy-8ms", "Annoy-16ms", "Annoy-32ms"];
+    cdrPlotIdx = [1, 2, 3, 4, ];
+    CR_Ref = 1;% localChangeN0
+    fs = 600;
+    plotWin = [-10, 400];
+    yScale = [20, 25];
+    CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.3]};
+    FIGPATH = strcat(ROOTPATH, "Pop_Sfigure9_Add_on_Annoying_BaseICI\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+elseif strcmpi(Protocol, "Add_on_Reword_BaseICI")
+    badCH_self = {[49], [48,49,57,64]};
+    icaOpt = "off";
+    plotWhole = false;
+    colors = ["#FF0000", "#FFA500", "#0000FF", "#000000"];
+    stimStrs = ["Reword-4ms", "Reword-8ms", "Reword-16ms", "Reword-32ms"];
+    cdrPlotIdx = [1, 2, 3, 4, ];
+    CR_Ref = 1;% localChangeN0
+    fs = 600;
+    plotWin = [-10, 400];
+    yScale = [20, 25];
+    CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.3]};
+    FIGPATH = strcat(ROOTPATH, "Pop_Sfigure10_Add_on_Reword_BaseICI\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+
+
+elseif strcmpi(Protocol, "Add_on_Annoying_BaseICI_12_16")
+    badCH_self = {[49], [48,49,57,64]};
+    icaOpt = "off";
+    plotWhole = false;
+    colors = ["#FF0000", "#0000FF"];
+    stimStrs = ["Annoy-12ms", "Annoy-16ms"];
+    cdrPlotIdx = [1, 2];
+    CR_Ref = 1;% localChangeN0
+    fs = 600;
+    plotWin = [-10, 400];
+    yScale = [20, 25];
+    CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.3]};
+    FIGPATH = strcat(ROOTPATH, "Pop_Sfigure13_Add_on_Annoying_BaseICI_12_16\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+elseif strcmpi(Protocol, "Add_on_Reword_BaseICI_12_16")
+    badCH_self = {[49], [48,49,57,64]};
+    icaOpt = "off";
+    plotWhole = false;
+    colors = ["#FF0000", "#0000FF"];
+    stimStrs = ["Reword-12ms", "Reword-16ms"];
+    cdrPlotIdx = [1, 2];
+    CR_Ref = 1;% localChangeN0
+    fs = 600;
+    plotWin = [-10, 400];
+    yScale = [20, 25];
+    CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.3]};
+    FIGPATH = strcat(ROOTPATH, "Pop_Sfigure14_Add_on_Reword_BaseICI_12-16\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+
+elseif strcmpi(Protocol, "Add_on_Control_BaseICI_12_16")
+    badCH_self = {[49], [48,49,57,64]};
+    icaOpt = "off";
+    plotWhole = false;
+    colors = ["#FF0000", "#0000FF"];
+    stimStrs = ["Control-12ms", "Control-16ms"];
+    cdrPlotIdx = [1, 2];
+    CR_Ref = 1;% localChangeN0
+    fs = 600;
+    plotWin = [-10, 400];
+    yScale = [20, 25];
+    CRIScale = {[0.8, 2; -0.1 0.7], [0.8, 2; -0.1 0.3]};
+    FIGPATH = strcat(ROOTPATH, "Pop_Sfigure15_Add_on_Control_BaseICI_12-16\", CRIMethodStr(CRIMethod), "\", monkeyStr(mIndex), "\");
+
 end
 
 

@@ -1,20 +1,20 @@
 %% Data loading
 clear; clc; close all;
 %% chouchou
-% BLOCKPATH{1} = 'E:\ECoG\chouchou\cc20220816\Block-1';
-% BLOCKPATH{2} = 'E:\ECoG\chouchou\cc20220817\Block-1';
-% BLOCKPATH{3} = 'E:\ECoG\chouchou\cc20220819\Block-4';
-% BLOCKPATH{4} = 'E:\ECoG\chouchou\cc20220822\Block-1';
-% BLOCKPATH{5} = 'E:\ECoG\chouchou\cc20220823\Block-1';
-% BLOCKPATH{6} = 'E:\ECoG\chouchou\cc20220824\Block-1';
+BLOCKPATH{1} = 'E:\ECoG\chouchou\cc20220816\Block-1';
+BLOCKPATH{2} = 'E:\ECoG\chouchou\cc20220817\Block-1';
+BLOCKPATH{3} = 'E:\ECoG\chouchou\cc20220819\Block-4';
+BLOCKPATH{4} = 'E:\ECoG\chouchou\cc20220822\Block-1';
+BLOCKPATH{5} = 'E:\ECoG\chouchou\cc20220823\Block-1';
+BLOCKPATH{6} = 'E:\ECoG\chouchou\cc20220824\Block-1';
 
-%% xiaoxiao
-
-BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221124\Block-1';
-BLOCKPATH{2} = 'G:\ECoG\xiaoxiao\xx20221128\Block-1';
-BLOCKPATH{3} = 'G:\ECoG\xiaoxiao\xx20221129\Block-1';
-BLOCKPATH{4} = 'G:\ECoG\xiaoxiao\xx20221216\Block-1';
-BLOCKPATH{5} = 'G:\ECoG\xiaoxiao\xx20221221\Block-1';
+% %% xiaoxiao
+% 
+% BLOCKPATH{1} = 'G:\ECoG\xiaoxiao\xx20221124\Block-1';
+% BLOCKPATH{2} = 'G:\ECoG\xiaoxiao\xx20221128\Block-1';
+% BLOCKPATH{3} = 'G:\ECoG\xiaoxiao\xx20221129\Block-1';
+% BLOCKPATH{4} = 'G:\ECoG\xiaoxiao\xx20221216\Block-1';
+% BLOCKPATH{5} = 'G:\ECoG\xiaoxiao\xx20221221\Block-1';
 
 x = [1,2, 4,5, 7,8, 10,11];
 stimArray = repmat(x, length(BLOCKPATH), 1);

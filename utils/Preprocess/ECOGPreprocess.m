@@ -22,10 +22,13 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     mIp = inputParser;
     mIp.addRequired("DATAPATH");
     mIp.addRequired("params", @(x) isstruct(x));
+    mIp.addParameter("RHDPATH", []);
     mIp.addParameter("behaviorOnly", false, @(x) validateattrbutes(x, 'logical', {'scalar'}));
     mIp.addParameter("patch", "reject", @(x) any(validatestring(x, {'reject', 'matchIssue', 'bankIssue'})));
     mIp.parse(DATAPATH, params, varargin{:});
 
+
+    RHDPATH = mIp.Results.RHDPATH;
     behaviorOnly = mIp.Results.behaviorOnly;
     patch = mIp.Results.patch;
 
@@ -38,6 +41,7 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     if isempty(processFcn)
         error("Process function is not specified");
     end
+
 
     %% Loading data
     try
@@ -53,12 +57,19 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     catch e
         disp(e.message);
         disp("Try loading data from TDT BLOCK...");
-        temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'epocs'});
-        epocs = temp.epocs;
-        trialAll = processFcn(epocs, choiceWin);
+
     
         if ~behaviorOnly
-            temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'streams'}, 'STORE', {char(posStr(posIndex))});
+            if isempty(RHDPATH)
+                temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'epocs'});
+                epocs = temp.epocs;
+                trialAll = processFcn(epocs, choiceWin);
+                temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'streams'}, 'STORE', {char(posStr(posIndex))});
+            else
+                temp = rhd2mat(char(RHDPATH), char(DATAPATH));
+                epocs = temp.epocs;
+                trialAll = processFcn(epocs, choiceWin);
+            end
             streams = temp.streams;
 
             if ~strcmpi(patch, "reject")
