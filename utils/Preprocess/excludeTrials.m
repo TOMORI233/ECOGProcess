@@ -33,11 +33,13 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     mIp.addOptional("tTh", 0.2, @(x) validateattributes(x, {'numeric'}, {'scalar', '>', 0, '<', 1}));
     mIp.addOptional("chTh", 0.1, @(x) validateattributes(x, {'numeric'}, {'scalar', '>=', 0}));
     mIp.addParameter("userDefineOpt", "off", @(x) any(validatestring(x, {'on', 'off'})));
+    mIp.addParameter("absTh", [], @(x) validateattributes(x, {'numeric'}, {'scalar'}));
     mIp.parse(trialsData, varargin{:});
 
     tTh = mIp.Results.tTh;
     chTh = mIp.Results.chTh;
     userDefineOpt = mIp.Results.userDefineOpt;
+    absTh = mIp.Results.absTh;
 
     % statistics
     chMeanAll = mean(cell2mat(trialsData));
@@ -154,6 +156,12 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     end
 
     tIdx = cellfun(@(x) ~any(x(goodChIdx) > tTh), tIdx); % marked true means reserved trials
+    
+    % Absolute threshold
+    if ~isempty(absTh)
+        tIdx = tIdx & cellfun(@(x) all(x(goodChIdx, :) < absTh, "all"), trialsData);
+    end
+
     if any(~tIdx)
         tIdx = find(~tIdx);
         disp(['Trials excluded: ', num2str(tIdx')]);

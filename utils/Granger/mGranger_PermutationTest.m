@@ -48,24 +48,39 @@ parfor index = 1:nIter
     data.fsample = fs;
     data.trial   = cellfun(@(x, y) [x; y], trialsECOG_AC(randOrderAC(index, :)), trialsECOG_PFC(randOrderPFC(index, :)), "UniformOutput", false)';
 
-    %% Multivariate autoregressive model
-    cfg         = [];
-    cfg.order   = 10; % lag, default=10
-    cfg.toolbox = 'bsmart';
-    cfg.channel = data.label([chsAC, chsPFC + size(trialsECOG_AC{1}, 1)]);
-    mdata       = ft_mvaranalysis(cfg, data);
-    
-    %% Parametric computation of the spectral transfer function
-    cfg         = [];
-    cfg.method  = 'mvar';
-    cfg.channel = data.label([chsAC, chsPFC + size(trialsECOG_AC{1}, 1)]);
-    mfreq       = ft_freqanalysis(cfg, mdata);
-    
-    %% Granger
-    cfg         = [];
-    cfg.method  = 'granger';
-    cfg.channel = data.label([chsAC, chsPFC + size(trialsECOG_AC{1}, 1)]);
-    granger     = ft_connectivityanalysis(cfg, mfreq);
+%     %% Multivariate autoregressive model
+%     cfg         = [];
+%     cfg.order   = 10; % lag, default=10
+%     cfg.toolbox = 'bsmart';
+%     cfg.channel = data.label([chsAC, chsPFC + size(trialsECOG_AC{1}, 1)]);
+%     mdata       = ft_mvaranalysis(cfg, data);
+%     
+%     %% Parametric computation of the spectral transfer function
+%     cfg         = [];
+%     cfg.method  = 'mvar';
+%     cfg.channel = data.label([chsAC, chsPFC + size(trialsECOG_AC{1}, 1)]);
+%     mfreq       = ft_freqanalysis(cfg, mdata);
+%     
+%     %% Granger
+%     cfg         = [];
+%     cfg.method  = 'granger';
+%     cfg.channel = data.label([chsAC, chsPFC + size(trialsECOG_AC{1}, 1)]);
+%     granger     = ft_connectivityanalysis(cfg, mfreq);
+
+    % Nonparametric computation of the cross-spectral density matrix
+    cfg           = [];
+    cfg.method    = 'mtmfft';
+    cfg.taper     = 'hanning';
+    cfg.output    = 'fourier';
+    cfg.tapsmofrq = 2;
+    cfg.channel   = data.label(labelIdx);
+    freq          = ft_freqanalysis(cfg, data);
+
+    % Nonparametric computation of Granger causality
+    cfg = [];
+    cfg.method    = 'granger';
+    cfg.channel   = data.label(labelIdx);
+    granger       = ft_connectivityanalysis(cfg, freq);
 
     res(:, :, :, index) = granger.grangerspctrm;
 end

@@ -143,7 +143,7 @@ end
 t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
 tMMN = linspace(windowMMN(1), windowMMN(2), size(trialsECOG_MMN{1}, 2))';
 
-pool = 2:length(dRatio); % include std group
+pool = 2:length(dRatio);
 
 try
     load([MONKEYPATH, AREANAME, '_PE_CBPT'], "stat", "-mat");

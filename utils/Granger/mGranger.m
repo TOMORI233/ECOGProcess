@@ -77,7 +77,7 @@ else
     % Nonparametric computation of the cross-spectral density matrix
     cfg           = [];
     cfg.method    = 'mtmfft';
-    cfg.taper     = 'dpss';
+    cfg.taper     = 'hanning';
     cfg.output    = 'fourier';
     cfg.tapsmofrq = 2;
     cfg.channel   = data.label(labelIdx);

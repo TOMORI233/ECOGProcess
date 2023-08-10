@@ -2,11 +2,12 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     % Description: load data from *.mat or TDT block
     % Input:
     %     DATAPATH: full path of *.mat or TDT block path
-    %     params:
+    %     params: * marks not-null fields
     %         - posStr: all possible recording storages
-    %         - posIndex: position number, 1-AC, 2-PFC
+    %        *- posIndex: position number, 1-AC, 2-PFC
     %         - choiceWin: choice window, in ms
-    %         - processFcn: behavior processing function handle
+    %        *- processFcn: behavior processing function handle
+    %         - other parameters for specific protocols
     %     behaviorOnly: if set true, return [trialAll] only
     %     patch: channel adjustment option
     % Output:
@@ -55,7 +56,7 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
         disp("Try loading data from TDT BLOCK...");
         temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'epocs'});
         epocs = temp.epocs;
-        trialAll = processFcn(epocs, choiceWin);
+        trialAll = processFcn(epocs, params);
     
         if ~behaviorOnly
             temp = TDTbin2mat(char(DATAPATH), 'TYPE', {'streams'}, 'STORE', {char(posStr(posIndex))});
