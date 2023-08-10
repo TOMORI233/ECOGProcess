@@ -2,11 +2,11 @@
 
     FigWave = plotRawWaveMulti_SPR(RegRatio, Window, titleStr, [8, 8]);
     scaleAxes(FigWave, "y", [-yScale(mIndex) yScale(mIndex)]);
-    scaleAxes(FigWave, "x", [-10 600]);
     setAxes(FigWave, 'yticklabel', '');
     setAxes(FigWave, 'xticklabel', '');
     setAxes(FigWave, 'visible', 'off');
     setLine(FigWave, "YData", [-yScale(mIndex) yScale(mIndex)], "LineStyle", "--");
+    scaleAxes(FigWave, "x", plotWin);
     pause(1);
     set(FigWave, "outerposition", [300, 100, 800, 670]);
     plotLayout(FigWave, params.posIndex + 2 * (mIndex - 1), 0.3);

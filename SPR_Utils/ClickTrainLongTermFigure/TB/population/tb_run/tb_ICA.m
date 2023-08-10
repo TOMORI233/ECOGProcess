@@ -10,7 +10,7 @@
     if ~exist(ICAName, "file")
         chs2doICA = channels;
         chs2doICA(ismember(chs2doICA, badCHs)) = [];
-        [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG_MergeTemp, fs, Window, chs2doICA);
+        [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG_MergeTemp, fs, Window, chs2doICA);
                 temp = validateInput(['Input bad channel number (empty for default: ', num2str(badCHs'), '): '], @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
                 if ~isempty(temp)
                     badCHs = unique([badCHs; reshape(temp, [numel(temp), 1])]);
@@ -32,7 +32,13 @@
             trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
             trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
         end
-        close(FigTopoICA);
+        mPrint(FigTopoICA, fullfile(FIGPATH, "ICA_Topo.jpg"));
+        mPrint(FigIC, fullfile(FIGPATH, "ICA_IC.jpg"));
+        mPrint(FigWave(1), fullfile(FIGPATH, "RawWave.jpg"));
+        mPrint(FigWave(2), fullfile(FIGPATH, "Restructed Wave.jpg"));
+        
+        close([FigTopoICA, FigIC, FigWave]);
+        
         save(ICAName, "compT", "comp", "ICs", "icaOpt", "chs2doICA", "badCHs", "-mat");
     else
         

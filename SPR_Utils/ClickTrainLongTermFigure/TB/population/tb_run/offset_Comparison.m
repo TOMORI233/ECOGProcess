@@ -25,7 +25,7 @@ for gIndex = 1 : length(group_Index)
 end
 %% scale
 scaleAxes([FigGroup, FigGroupS1] , "x", PlotWin);
-scaleAxes([FigGroup, FigGroupS1], "y", "on");
+scaleAxes([FigGroup, FigGroupS1], "y", [-1,1]*yScale(mIndex));
 for gIndex = 1 : length(FigGroup)
     print(FigGroup(gIndex), strcat(FIGPATH, group_Str(gIndex)), "-djpeg", "-r200");
     close(FigGroup(gIndex));

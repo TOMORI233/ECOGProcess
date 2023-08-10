@@ -1,4 +1,3 @@
-
 %% Patch
 temp = changeCellRowNum(trialsECOG_Merge);
 temp = temp(ECOGSitePatch(AREANAME));

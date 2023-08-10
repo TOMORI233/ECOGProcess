@@ -18,7 +18,7 @@ segOption = ["trial onset", "dev onset"];
 
 
 %% Processing
-[trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params, "patch", "matchIssue");
+[trialAll, ECOGDataset] = ECOGPreprocess(MATPATH, params, "patch", patch);
 trialAll(1) = [];
 trialAll([trialAll.devOrdr] == 0) = [];
 trialAll(end) = [];
