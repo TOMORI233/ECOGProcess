@@ -159,7 +159,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     
     % Absolute threshold
     if ~isempty(absTh)
-        tIdx = tIdx & cellfun(@(x) all(x(goodChIdx, :) < absTh, "all"), trialsData);
+        tIdx = tIdx & cellfun(@(x) all(abs(x(goodChIdx, :)) < absTh, "all"), trialsData);
     end
 
     if any(~tIdx)
