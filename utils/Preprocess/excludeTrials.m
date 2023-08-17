@@ -10,6 +10,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     %           The smaller, the stricter and the more bad channels. (default: 0.1)
     %     userDefineOpt: If set "on", bad channels will be defined by user.
     %                    If set "off", use [chTh] setting to exclude bad channels. (default: "off")
+    %     absTh: absolute threshold (default: [])
     % Output:
     %     tIdx: excluded trial index (double column vector)
     %     chIdx: bad channel index (double column vector)
