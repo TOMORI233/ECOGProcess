@@ -151,7 +151,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
                 disp('Preview: All will pass.');
             end
 
-            k = validateInput('Press Y or Enter to continue or N to reselect bad channels: ', @(x) any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');
+            k = validateInput('Press Y or Enter to continue or N to reselect bad channels: ', @(x) isempty(x) || any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');
         end
 
     end
