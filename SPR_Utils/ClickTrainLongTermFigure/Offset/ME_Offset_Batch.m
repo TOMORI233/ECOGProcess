@@ -1,5 +1,5 @@
 clear; clc;
-rootPathMat = "E:\ECoG\MAT Data\XX\ClickTrainLongTerm\Offset\";
+rootPathMat = "E:\ECoG\MAT Data\CC\ClickTrainLongTerm\Offset\";
 rootPathFig = "E:\ECoG\corelDraw\ClickTrainLongTerm\Offset\";
 
 %% set protocols
@@ -10,7 +10,7 @@ protocols = string({temp.name}');
 %% select data
 areaSel = "AC";
 dateSel = "";
-protSel = ["Offset_Anesthesia_16_64_Rate_40"];
+protSel = ["Offset_Var_4ms_Last4_8_16"];
 
 % validate areaSel
 if ~matches(areaSel, ["AC", "PFC"]) || length(areaSel) > 1

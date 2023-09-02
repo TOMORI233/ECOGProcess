@@ -1,4 +1,4 @@
-function [normAmp, amp, rmsSpon] = waveAmp_Norm(wave, window, testWin, method, sponWin)
+function [normAmp, amp, rmsSpon, area, peak, trough] = waveAmp_Norm(wave, window, testWin, method, sponWin)
 % method: 1, rms; 2, area; 3, peak or trough; 4, mean
 narginchk(3, 5);
 if nargin < 4
@@ -24,6 +24,8 @@ tIndex = t > testWin(1) & t < testWin(2);
 temp = wave(:, tIndex);
 amp = rms(temp, 2);
 area = sum(abs(temp), 2);
+peak = max(temp, [], 2);
+trough = min(temp, [], 2);
 
 switch method
     case 1 % Resp_devided_by_Spon

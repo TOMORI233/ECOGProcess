@@ -28,7 +28,7 @@ temp = string(split(MATPATH, '\'));
 DateStr = temp(end - 1);
 Protocol = temp(end - 2);
 FIGPATH = strcat(rootPathFig, "Figure_", protStr,"\", DateStr, "_", AREANAME, "\Figures\");
-mkdir(FIGPATH)
+
 if exist(FIGPATH, "dir")
     return
 end
@@ -36,7 +36,9 @@ end
 tic
 [trialAll, trialsECOG_Merge, trialsECOG_S1_Merge, badCHs] =  mergeCTLTrialsECOG(MATPATH, params.posIndex, OffsetParams);
 toc
-
+if ~exist(FIGPATH, "dir")
+    mkdir(FIGPATH);
+end
 %% ICA
 % % align to certain duration
 % ICPATH = strrep(FIGPATH, "Figures", "ICA");
@@ -66,7 +68,7 @@ toc
 %     trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
 %     trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);
 % end
-run("tb_ICA.m");
+% run("tb_ICA.m");
 run("tb_chPatch.m");
 run("tb_interpolateBadChs");
 
@@ -151,9 +153,7 @@ ampNormS1.(strcat(monkeyStr, "_S1_raw")) = changeCellRowNum(temp);
 [S1H, S1P] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(ampS1), changeCellRowNum(rmsSponS1), "UniformOutput", false);
 
 
-if ~exist(FIGPATH, "dir")
-    mkdir(FIGPATH);
-end
+
 
 %% plot figure
 for gIndex = 1 : length(group_Index)
@@ -176,7 +176,8 @@ for gIndex = 1 : length(group_Index)
 end
 %% scale
 scaleAxes([FigGroup, FigGroupS1] , "x", PlotWin);
-scaleAxes([FigGroup, FigGroupS1], "y", [-1, 1]*yScale(mIndex));
+scaleAxes([FigGroup, FigGroupS1], "y", [-1, 1]*yScale(1));
+mkdir(FIGPATH)
 for gIndex = 1 : length(FigGroup)
     print(FigGroup(gIndex), strcat(FIGPATH, group_Str(gIndex)), "-djpeg", "-r200");
     close(FigGroup(gIndex));
