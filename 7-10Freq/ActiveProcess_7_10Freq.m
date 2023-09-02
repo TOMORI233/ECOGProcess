@@ -1,8 +1,11 @@
-function trialAll = ActiveProcess_7_10Freq(epocs, choiceWin)
+function trialAll = ActiveProcess_7_10Freq(epocs, params)
     narginchk(1, 2);
 
     if nargin < 2
         choiceWin = [0, 600];
+    else
+        parseStruct(params);
+        choiceWin = getOr(params, "choiceWin", [0, 600]);
     end
 
     %% Information extraction

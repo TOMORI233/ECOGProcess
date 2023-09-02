@@ -10,6 +10,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     %           The smaller, the stricter and the more bad channels. (default: 0.1)
     %     userDefineOpt: If set "on", bad channels will be defined by user.
     %                    If set "off", use [chTh] setting to exclude bad channels. (default: "off")
+    %     absTh: absolute threshold (default: [])
     % Output:
     %     tIdx: excluded trial index (double column vector)
     %     chIdx: bad channel index (double column vector)
@@ -33,11 +34,13 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     mIp.addOptional("tTh", 0.2, @(x) validateattributes(x, {'numeric'}, {'scalar', '>', 0, '<', 1}));
     mIp.addOptional("chTh", 0.1, @(x) validateattributes(x, {'numeric'}, {'scalar', '>=', 0}));
     mIp.addParameter("userDefineOpt", "off", @(x) any(validatestring(x, {'on', 'off'})));
+    mIp.addParameter("absTh", [], @(x) validateattributes(x, {'numeric'}, {'scalar'}));
     mIp.parse(trialsData, varargin{:});
 
     tTh = mIp.Results.tTh;
     chTh = mIp.Results.chTh;
     userDefineOpt = mIp.Results.userDefineOpt;
+    absTh = mIp.Results.absTh;
 
     % statistics
     chMeanAll = mean(cell2mat(trialsData));
@@ -148,12 +151,18 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
                 disp('Preview: All will pass.');
             end
 
-            k = validateInput('Press Y or Enter to continue or N to reselect bad channels: ', @(x) any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');
+            k = validateInput('Press Y or Enter to continue or N to reselect bad channels: ', @(x) isempty(x) || any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');
         end
 
     end
 
     tIdx = cellfun(@(x) ~any(x(goodChIdx) > tTh), tIdx); % marked true means reserved trials
+    
+    % Absolute threshold
+    if ~isempty(absTh)
+        tIdx = tIdx & cellfun(@(x) all(abs(x(goodChIdx, :)) < absTh, "all"), trialsData);
+    end
+
     if any(~tIdx)
         tIdx = find(~tIdx);
         disp(['Trials excluded: ', num2str(tIdx')]);
