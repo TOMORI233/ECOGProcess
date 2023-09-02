@@ -1,5 +1,5 @@
 function mCheckUpdate_ECOGProcess(logstr, syncOpt)
-    % Commit current work and check update for MATLAB-Utils
+    % Commit your work and check update for current project.
     % Putting it in your startup.m is RECOMMENDED.
     % Use it for other projects, rename and put it in the root path of the project.
     %
