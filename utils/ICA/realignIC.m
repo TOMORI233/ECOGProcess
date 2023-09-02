@@ -6,7 +6,7 @@ function [comp, pw] = realignIC(comp, window, t1, t2)
     %     t1: starting time point of interest, in ms
     %     t2: ending time point of interest, in ms
     % Output:
-    %     comp: with topo, unmixing and trial realigned
+    %     comp: with topo, unmixing and realigned trial
     % Example:
     %     window = [-2000, 2000];
     %     comp = mICA(ECOGDataset, trialAll(10:40), window, "dev onset", fs);
@@ -26,8 +26,8 @@ function [comp, pw] = realignIC(comp, window, t1, t2)
 
     ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
     fs = comp.fsample;
-    tIdx1 = max(fix((t1 - window(1)) / 1000 * fs), 1);
-    tIdx2 = min(fix((t2 - window(1)) / 1000 * fs), size(ICMean, 2));
+    tIdx1 = max([fix((t1 - window(1)) / 1000 * fs), 1]);
+    tIdx2 = min([fix((t2 - window(1)) / 1000 * fs), size(ICMean, 2)]);
 
     temp = [];
 
