@@ -90,6 +90,7 @@ function trialAll = ActiveProcess_7_10Freq(epocs, params)
             if firstPush >= trialAll(tIndex, 1).soundOnsetSeq(end) + choiceWin(1) && firstPush <= trialAll(tIndex, 1).soundOnsetSeq(end) + choiceWin(2)
                 pushInWinFlag = true;
                 trialAll(tIndex, 1).firstPush = firstPush;
+                trialAll(tIndex, 1).pushLatency = firstPush - trialAll(tIndex, 1).soundOnsetSeq(end);
             else
                 pushInWinFlag = false;
     

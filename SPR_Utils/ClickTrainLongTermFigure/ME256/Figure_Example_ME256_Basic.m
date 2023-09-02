@@ -117,9 +117,7 @@ ampNormS1.(strcat(monkeyStr, "_S1_raw")) = changeCellRowNum(temp);
 [S1H, S1P] = cellfun(@(x, y) ttest(x, y), changeCellRowNum(ampS1), changeCellRowNum(rmsSponS1), "UniformOutput", false);
 
 
-if ~exist(FIGPATH, "dir")
-    mkdir(FIGPATH);
-end
+
 
 %% plot figure
 for gIndex = 1 : length(group_Index)
@@ -141,6 +139,10 @@ for gIndex = 1 : length(group_Index)
 %     addLegend2Fig(FigGroupS1, stimStrs(group_Index{gIndex}));
 end
 %% scale
+if ~exist(FIGPATH, "dir")
+    mkdir(FIGPATH);
+end
+
 scaleAxes([FigGroup, FigGroupS1] , "x", PlotWin);
 scaleAxes([FigGroup, FigGroupS1], "y", [-1, 1]*yScale(1));
 group_Str = ["Top-Left", "Top-Right", "Bottom-Left", "Bottom-Right"];
@@ -220,8 +222,8 @@ S1H(isnan(S1H)) = 0;
 sigCh= find(S1H);
 nSigCh = find(~S1H);
 
-compare.amp_mean_se_S1Sig = [(1:length(devType))', CTL_Compute_Compare(ampNorm, sigCh, devType, monkeyStr)];
-compare.amp_mean_se_S1nSig = [(1:length(devType))', CTL_Compute_Compare(ampNorm, nSigCh, devType, monkeyStr)];
+% compare.amp_mean_se_S1Sig = [(1:length(devType))', CTL_Compute_Compare(ampNorm, sigCh, devType, monkeyStr)];
+% compare.amp_mean_se_S1nSig = [(1:length(devType))', CTL_Compute_Compare(ampNorm, nSigCh, devType, monkeyStr)];
 
 % %% Diff ICI latency comparison
 % compare.latency_mean_se_S1Sig = [(1:length(devType))', CTL_Compute_Compare(latency, sigCh, devType, monkeyStr)];
@@ -229,5 +231,5 @@ compare.amp_mean_se_S1nSig = [(1:length(devType))', CTL_Compute_Compare(ampNorm,
 
 
 ResName = strcat(FIGPATH, "cdrPlot_", AREANAME, ".mat");
-save(ResName, "cdrPlot", "chMean", "Protocol", "compare", "-mat");
+save(ResName, "cdrPlot", "chMean", "Protocol", "-mat");
 
