@@ -51,7 +51,7 @@ params.badCHsAC = dataAC.badCHs;
 params.badCHsPFC = dataPFC.badCHs;
 params.nIter = 1e3;
 
-tIdx = fix((windowGranger(1) - windowData(1)) / 1000 * fs) + 1:fix((windowGranger(2) - windowData(1)) / 1000 * fs);
+tIdx = fix((windowGranger(1) - windowData(1)) / 1000 * fs):fix((windowGranger(2) - windowData(1)) / 1000 * fs);
 trialsECOG_AC  = cellfun(@(x) x(:, tIdx), trialsECOG_AC, "UniformOutput", false);
 trialsECOG_PFC = cellfun(@(x) x(:, tIdx), trialsECOG_PFC, "UniformOutput", false);
 

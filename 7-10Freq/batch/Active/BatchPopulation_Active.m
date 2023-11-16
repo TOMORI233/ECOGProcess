@@ -32,7 +32,7 @@ params = windowConfig_7_10Freq(params);
 params.dataOnlyOpt = "off"; % "on" will save data only
 
 %% Exclude trials and bad channels
-params.icaOpt = "off"; % % "on" here will perform ICA on all channels and decide bad channels after ICA
+params.icaOpt = "off"; % "on" here will perform ICA on all channels and decide bad channels after ICA
 params.userDefineOpt = "off";
 Pre_ProcessFcn(params);
 

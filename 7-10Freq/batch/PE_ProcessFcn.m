@@ -1,5 +1,5 @@
 function PE_ProcessFcn(params)
-close all;
+close all force;
 parseStruct(params);
 
 alpha = 0.05; % For ANOVA
@@ -140,13 +140,12 @@ for dIndex = 1:length(dRatio)
 end
 
 %% Multiple comparison
-t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
-tMMN = linspace(windowMMN(1), windowMMN(2), size(trialsECOG_MMN{1}, 2))';
-
 pool = 2:length(dRatio);
 
+t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
 try
-    load([MONKEYPATH, AREANAME, '_PE_CBPT'], "stat", "-mat");
+    load([MONKEYPATH, AREANAME, '_PE_CBPT.mat'], "stat", "-mat");
+%     load([MONKEYPATH, AREANAME, '_PE_FDR.mat'], "stat", "-mat");
 catch
     data = [];
     for dIndex = 1:length(pool)
@@ -160,28 +159,36 @@ catch
         % trialinfo nTrial*1
         data(dIndex).trialinfo = repmat(dIndex, [length(temp), 1]);
     end
+    
     stat = CBPT(data);
     mSave([MONKEYPATH, AREANAME, '_PE_CBPT.mat'], "stat");
+
+%     stat = mFDR(data);
+%     mSave([MONKEYPATH, AREANAME, '_PE_FDR.mat'], "stat", "-mat");
 end
 
-try
-    load([MONKEYPATH, AREANAME, '_PE_MMN_CBPT'], "statMMN", "-mat");
-catch
-    dataMMN = [];
-    for dIndex = 1:length(pool)
-        tempMMN = trialsECOG_MMN(dRatioAll == dRatio(pool(dIndex)));
-        % time 1*nSample
-        dataMMN(dIndex).time = tMMN' / 1000;
-        % label nCh*1 cell
-        dataMMN(dIndex).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
-        % trial nTrial*nCh*nSample
-        dataMMN(dIndex).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), tempMMN, "UniformOutput", false));
-        % trialinfo nTrial*1
-        dataMMN(dIndex).trialinfo = repmat(dIndex, [length(tempMMN), 1]);
-    end
-    statMMN = CBPT(dataMMN);
-    mSave([MONKEYPATH, AREANAME, '_PE_MMN_CBPT.mat'], "statMMN");
-end
+% tMMN = linspace(windowMMN(1), windowMMN(2), size(trialsECOG_MMN{1}, 2))';
+% try
+% %     load([MONKEYPATH, AREANAME, '_PE_MMN_CBPT.mat'], "statMMN", "-mat");
+%     load([MONKEYPATH, AREANAME, '_PE_MMN_FDR.mat'], "statMMN", "-mat");
+% catch
+%     dataMMN = [];
+%     for dIndex = 1:length(pool)
+%         tempMMN = trialsECOG_MMN(dRatioAll == dRatio(pool(dIndex)));
+%         % time 1*nSample
+%         dataMMN(dIndex).time = tMMN' / 1000;
+%         % label nCh*1 cell
+%         dataMMN(dIndex).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
+%         % trial nTrial*nCh*nSample
+%         dataMMN(dIndex).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), tempMMN, "UniformOutput", false));
+%         % trialinfo nTrial*1
+%         dataMMN(dIndex).trialinfo = repmat(dIndex, [length(tempMMN), 1]);
+%     end
+% %     statMMN = CBPT(dataMMN);
+% %     mSave([MONKEYPATH, AREANAME, '_PE_MMN_CBPT.mat'], "statMMN");
+%     statMMN = mFDR(dataMMN);
+%     mSave([MONKEYPATH, AREANAME, '_PE_MMN_FDR.mat'], "statMMN");
+% end
 
 %% Raw wave CBPT
 run("PE_PlotImpl_RawCBPT.m");
@@ -190,30 +197,24 @@ run("PE_PlotImpl_RawCBPT.m");
 run("PE_PlotImpl_RawTopo.m");
 
 %% MMN CBPT
-run("PE_PlotImpl_MMN_CBPT.m");
+% run("PE_PlotImpl_MMN_CBPT.m");
 
 %% Topo-tuning & p of MMN
-run("PE_PlotImpl_MMN_Topo.m");
+% run("PE_PlotImpl_MMN_Topo.m");
 
 %% Example
 ch = input('Input example channel: ');
 t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
-tMMN = linspace(windowMMN(1), windowMMN(2), size(trialsECOG_MMN{1}, 2))';
 
 plotRawWaveMulti(chData, windowPE, 'Raw', [1, 1], ch);
-scaleAxes("x", [0, 800]);
+scaleAxes("x", [-100, 400]);
 yRange = scaleAxes("y");
 hold on;
 tTemp = t(V0(ch, :) > 0);
-bar(tTemp, repmat(yRange(1), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
-bar(tTemp, repmat(yRange(2), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
-
-plotRawWaveMulti(chDataMMN, windowMMN, 'MMN', [1, 1], ch);
-yRange = scaleAxes("y");
-hold on;
-tTemp = tMMN(V0_MMN(ch, :) > 0);
-bar(tTemp, repmat(yRange(1), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
-bar(tTemp, repmat(yRange(2), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
+b = bar(tTemp, repmat(yRange(1), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
+setLegendOff(b);
+b = bar(tTemp, repmat(yRange(2), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
+setLegendOff(b);
 
 a = ones(length(t), 1) * (-100);
 a(V0(ch, :) > 0) = 100;
@@ -225,39 +226,49 @@ resultWave = [t, ...
               chData(5).chMean(ch, :)', ...
               a];
 
-a = ones(length(tMMN), 1) * (-100);
-a(V0_MMN(ch, :) > 0) = 100;
-resultWaveMMN = [tMMN, ...
-                 chDataMMN(1).chMean(ch, :)', ...
-                 chDataMMN(2).chMean(ch, :)', ...
-                 chDataMMN(3).chMean(ch, :)', ...
-                 chDataMMN(4).chMean(ch, :)', ...
-                 chDataMMN(5).chMean(ch, :)', ...
-                 a];
-
 resultTuning = cellfun(@(x, y) [x(:, ch), y(:, ch)], tuningMean, tuningSE, "UniformOutput", false);
 figure;
 maximizeFig;
 for wIndex = 1:length(resultTuning)
     mSubplot(3, 4, wIndex, 1, margins, paddings);
     errorbar(resultTuning{wIndex}(:, 1), resultTuning{wIndex}(:, 2), "k-", "LineWidth", 1);
-    title(['[', num2str(edge(wIndex)), ', ', num2str(edge(wIndex) + binSize), '] | p=', num2str(P(ch, wIndex))]);
+    str = ['[', num2str(edge(wIndex)), ',', num2str(edge(wIndex) + binSize), '] | p=', num2str(P(ch, wIndex))];
+    title(str);
     xlim([0.5, 5.5]);
     xticks(1:5);
     xticklabels(num2str(dRatio'));
 end
 scaleAxes;
 
-resultTuningMMN = cellfun(@(x, y) [x(:, ch), y(:, ch)], tuningMeanMMN, tuningSEMMN, "UniformOutput", false);
-figure;
-maximizeFig;
-plotSize = autoPlotSize(length(resultTuningMMN));
-for wIndex = 1:length(resultTuningMMN)
-    mSubplot(plotSize(1), plotSize(2), wIndex, 1, margins, paddings);
-    errorbar(resultTuningMMN{wIndex}(:, 1), resultTuningMMN{wIndex}(:, 2), "k-", "LineWidth", 1);
-    title(['[', num2str(edgeMMN(wIndex)), ', ', num2str(edgeMMN(wIndex + 1)), '] | p=', num2str(P_MMN(ch, wIndex))]);
-    xlim([0.5, 5.5]);
-    xticks(1:5);
-    xticklabels(num2str(dRatio'));
-end
-scaleAxes;
+% MMN
+% tMMN = linspace(windowMMN(1), windowMMN(2), size(trialsECOG_MMN{1}, 2))';
+% plotRawWaveMulti(chDataMMN, windowMMN, 'MMN', [1, 1], ch);
+% yRange = scaleAxes("y");
+% hold on;
+% tTemp = tMMN(V0_MMN(ch, :) > 0);
+% bar(tTemp, repmat(yRange(1), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
+% bar(tTemp, repmat(yRange(2), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
+
+% a = ones(length(tMMN), 1) * (-100);
+% a(V0_MMN(ch, :) > 0) = 100;
+% resultWaveMMN = [tMMN, ...
+%                  chDataMMN(1).chMean(ch, :)', ...
+%                  chDataMMN(2).chMean(ch, :)', ...
+%                  chDataMMN(3).chMean(ch, :)', ...
+%                  chDataMMN(4).chMean(ch, :)', ...
+%                  chDataMMN(5).chMean(ch, :)', ...
+%                  a];
+
+% resultTuningMMN = cellfun(@(x, y) [x(:, ch), y(:, ch)], tuningMeanMMN, tuningSEMMN, "UniformOutput", false);
+% figure;
+% maximizeFig;
+% plotSize = autoPlotSize(length(resultTuningMMN));
+% for wIndex = 1:length(resultTuningMMN)
+%     mSubplot(plotSize(1), plotSize(2), wIndex, 1, margins, paddings);
+%     errorbar(resultTuningMMN{wIndex}(:, 1), resultTuningMMN{wIndex}(:, 2), "k-", "LineWidth", 1);
+%     title(['[', num2str(edgeMMN(wIndex)), ', ', num2str(edgeMMN(wIndex + 1)), '] | p=', num2str(P_MMN(ch, wIndex))]);
+%     xlim([0.5, 5.5]);
+%     xticks(1:5);
+%     xticklabels(num2str(dRatio'));
+% end
+% scaleAxes;

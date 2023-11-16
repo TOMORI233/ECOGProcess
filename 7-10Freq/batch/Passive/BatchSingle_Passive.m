@@ -3,6 +3,7 @@ clear; clc; close all;
 
 params.choiceWin = [100, 600];
 params.processFcn = @PassiveProcess_7_10Freq;
+params.normOpt = "off"; % normalization option
 
 params.monkeyID = 2; % 1-CC, 2-XX
 
@@ -23,7 +24,7 @@ end
 params = windowConfig_7_10Freq(params);
 
 %% Single day ----------------------------------------------------------------
-params.dataOnlyOpt = "off"; % "on" will save data only
+params.dataOnlyOpt = "on"; % "on" will save data only
 
 for index = 1:length(DATESTRs)
     params.DATESTRs = DATESTRs(index);
@@ -34,17 +35,15 @@ for index = 1:length(DATESTRs)
     params.userDefineOpt = "on";
     Pre_ProcessFcn(params);
 
-    params.normOpt = "on"; % normalization option
-
     % PE
-    params.icaOpt = "on"; % "off" in preprocess and "on" here will perform ICA on good channels
-    params.MONKEYPATH = [SINGLEROOTPATH, 'PE\', DATESTRs{index}, '\'];
-    params.AREANAME = 'AC';
-    params.posIndex = 1; % 1-AC, 2-PFC
-    PE_ProcessFcn(params);
-    params.AREANAME = 'PFC';
-    params.posIndex = 2; % 1-AC, 2-PFC
-    PE_ProcessFcn(params);
+%     params.icaOpt = "on"; % "off" in preprocess and "on" here will perform ICA on good channels
+%     params.MONKEYPATH = [SINGLEROOTPATH, 'PE\', DATESTRs{index}, '\'];
+%     params.AREANAME = 'AC';
+%     params.posIndex = 1; % 1-AC, 2-PFC
+%     PE_ProcessFcn(params);
+%     params.AREANAME = 'PFC';
+%     params.posIndex = 2; % 1-AC, 2-PFC
+%     PE_ProcessFcn(params);
 
     % Prediction
     params.MONKEYPATH = [SINGLEROOTPATH, 'Prediction\', DATESTRs{index}, '\'];

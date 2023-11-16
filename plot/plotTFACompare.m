@@ -10,7 +10,7 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotS
     end
 
     if nargin < 7
-        plotSize = autoPlotSize(size(chData(1).chMean, 1));
+        plotSize = autoPlotSize(size(chMean1, 1));
     end
 
     if nargin < 8

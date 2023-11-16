@@ -3,7 +3,7 @@ figure;
 maximizeFig;
 mSubplot(2, 2, 1);
 sTimePFC_DM = rowFcn(@(x) find(x ~= 0, 1) / fs * 1000, tuningDM_PFC.V0(:, tDM >= 0), "UniformOutput", false);
-sTimePFC_PE = rowFcn(@(x) find(x ~= 0, 1) / fs * 1000, tuningPE_PFC.V0_MMN(:, tPE >= 0), "UniformOutput", false);
+sTimePFC_PE = rowFcn(@(x) find(x ~= 0, 1) / fs * 1000, tuningPE_PFC.V0(:, tPE >= 0), "UniformOutput", false);
 channels = (1:length(idxPFC_DM))';
 chIdxDM = cellfun(@(x) ~isempty(x) && x < timeLim, sTimePFC_DM);
 chIdxPE = cellfun(@(x) ~isempty(x) && x < timeLim, sTimePFC_PE);
@@ -35,7 +35,7 @@ lines.X = 0;
 addLines2Axes(gca, lines);
 
 mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-left", "margin_top", 0.2, "shape", "square-min");
-sTimePFC_DM = cellfun(@(x) replaceVal(x, inf), sTimePFC_DM);
+sTimePFC_DM = cellfun(@(x) replaceVal(x, inf, @isempty), sTimePFC_DM);
 while any(isinf(sTimePFC_DM))
     for tIndex = 1:length(sTimePFC_DM)
         if isinf(sTimePFC_DM(tIndex))
@@ -51,7 +51,7 @@ hold on;
 plotLayout(gca, (monkeyID - 1) * 2 + 2, 0.4);
 
 mSubplot(2, 1, 2, [0.3, 1], "alignment", "top-center", "margin_top", 0.2, "shape", "square-min");
-sTimePFC_PE = cellfun(@(x) replaceVal(x, inf), sTimePFC_PE);
+sTimePFC_PE = cellfun(@(x) replaceVal(x, inf, @isempty), sTimePFC_PE);
 while any(isinf(sTimePFC_PE))
     for tIndex = 1:length(sTimePFC_PE)
         if isinf(sTimePFC_PE(tIndex))

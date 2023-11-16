@@ -50,7 +50,7 @@ catch
     trialsECOG_PFC = cellfun(@(x) cell2mat(cellfun(@(y) mean(x(y, :), 1), chMapPFC, "UniformOutput", false)), trialsECOG_PFC, "UniformOutput", false);
     chsAC = channels(~cellfun(@isempty, chMapAC));
     chsPFC = channels(~cellfun(@isempty, chMapPFC));
-    granger = mGranger_PermutationTest(trialsECOG_AC, trialsECOG_PFC, windowData, fs, nIter, chsAC, chsPFC);
+    granger = mGranger_PermutationTest(trialsECOG_AC, trialsECOG_PFC, windowData, fs, nIter);
     mSave([SAVEPATH, 'GrangerData_', labelStr, '.mat'], "granger");
 end
 

@@ -74,7 +74,7 @@ mAxe = mSubplot(1,1,1,"shape","square-min");
 plotTopo(mAxe, res);
 plotLayout(mAxe, 1, 0.5);
 cb = colorbar(mAxe, 'position', [0.75, 0.12, 0.01, 0.8]);
-cb.Label.String = 'Correlation between behavioral and non-behavioral task';
+cb.Label.String = 'Correlation between behavioral task and non-behavioral task';
 cb.Label.FontSize = 12;
 cb.Label.VerticalAlignment = 'bottom';
 cb.Label.Rotation = -90;

@@ -1,15 +1,12 @@
-function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible)
+function Fig = plotRawWaveMulti(chData, window, varargin)
     % Description: plot serveral raw waves in one subplot
     % Input:
     %     chData: n*1 struct of fields:
-    %         - chMean: [nCh,nSample]
-    %         - color: [R,G,B]
-    %         - legend: string
-    %         - skipChs: channels not to plot
-    %     window: xlim
-    %     titleStr: title of subplot
-    %     plotSize: [nRows, nColumns] or nSubplots(for auto mapping)
-    %     chs: a nRows*nColumns matrix with each element specifying a channel number
+    %             - chMean: [nCh,nSample]
+    %             - color: [R, G, B] or valid color string
+    %             - legend: string or char, if set empty
+    %             - skipChs: channels not to plot
+    %     other params: see plotRawWave.m
     % Output:
     %     Fig: figure object
     % Example:
@@ -19,33 +16,43 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
     %     chData(2).color = "b";
     %     Fig = plotRawWaveMulti(chData, window, "A vs B");
 
-    narginchk(2, 6);
+    mIp = inputParser;
+    mIp.addRequired("chData", @(x) isstruct(x));
+    mIp.addRequired("window", @(x) validateattributes(x, {'numeric'}, {'numel', 2, 'increasing'}));
+    mIp.addOptional("titleStr", [], @(x) isempty(x) || isstring(x) || ischar(x));
+    mIp.addOptional("plotSize", autoPlotSize(size(chData(1).chMean, 1)), @(x) all(fix(x) == x) && numel(x) <= 2 && all(x > 0));
+    mIp.addOptional("chs",      [], @(x) all(fix(x) == x & x >= 0));
+    mIp.addOptional("visible",  "on", @(x) any(validatestring(x, {'on', 'off'})));
+    mIp.parse(chData, window, varargin{:});
 
-    if nargin < 3 || isempty(titleStr) 
+    titleStr = mIp.Results.titleStr;
+    plotSize = mIp.Results.plotSize;
+    chs = mIp.Results.chs;
+    visible = mIp.Results.visible;
+
+    if isempty(titleStr)
         titleStr = '';
     else
         titleStr = [' | ', char(titleStr)];
     end
 
-    if nargin < 4
-        plotSize = autoPlotSize(size(chData(1).chMean, 1));
-    end
-
-    if numel(plotSize) == 1
+    if isempty(plotSize) && isempty(chs)
+        error("chs should be specified if plotSize is set empty");
+    elseif numel(plotSize) == 1 % the number of channels
         plotSize = autoPlotSize(plotSize);
+    elseif isempty(plotSize)
+        plotSize = autoPlotSize(numel(chs));
     end
 
-    if nargin < 5
+    if isempty(chs)
         chs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
-    end
-
-    if nargin < 6
-        visible = "on";
-    end
-
-    if size(chs, 1) ~= plotSize(1) || size(chs, 2) ~= plotSize(2)
-        disp("chs option not matched with plotSize. Resize chs...");
+    elseif isscalar(chs)
         chs = reshape(chs(1):(chs(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
+    elseif size(chs, 1) ~= plotSize(1) || size(chs, 2) ~= plotSize(2)
+        disp("chs option not matched with plotSize. Resize chs...");
+        temp = zeros(plotSize(1) * plotSize(2), 1);
+        temp(1:numel(chs)) = chs;
+        chs = reshape(temp, plotSize(2), plotSize(1))';
     end
 
     Fig = figure("Visible", visible);
@@ -57,7 +64,7 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
 
         for cIndex = 1:plotSize(2)
 
-            if chs(rIndex, cIndex) > size(chData(1).chMean, 1)
+            if chs(rIndex, cIndex) == 0 || chs(rIndex, cIndex) > size(chData(1).chMean, 1)
                 continue;
             end
 
@@ -77,9 +84,9 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
                 t = linspace(window(1), window(2), size(chMean, 2));
 
                 if ~isempty(chData(index).legend)
-                    plot(t, chMean(chNum, :), "Color", color, "LineWidth", 1.5, "DisplayName", chData(index).legend);
+                    ltemp = plot(t, chMean(chNum, :), "Color", color, "LineWidth", 1.5, "DisplayName", chData(index).legend);
                 else
-                    plot(t, chMean(chNum, :), "Color", color, "LineWidth", 1.5);
+                    ltemp = plot(t, chMean(chNum, :), "Color", color, "LineWidth", 1.5);
                 end
 
                 hold on;
@@ -90,6 +97,11 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
 
             if (rIndex == 1 && cIndex == 1) && ~isempty([chData.legend])
                 legend(gca, "show");
+
+                if isempty(chData(index).legend)
+                    setLegendOff(ltemp);
+                end
+
             else
                 legend(gca, "hide");
             end
@@ -107,15 +119,7 @@ function Fig = plotRawWaveMulti(chData, window, titleStr, plotSize, chs, visible
 
     end
 
-    yRange = scaleAxes(Fig, "y", "on");
-    
-    allAxes = findobj(Fig, "Type", "axes");
+    scaleAxes(Fig, "y", "on", "symOpt", "max");
 
-    for aIndex = 1:length(allAxes)
-        h = plot(allAxes(aIndex), [0, 0], yRange, "k--", "LineWidth", 0.6);
-        set(get(get(h, 'Annotation'), 'LegendInformation'), 'IconDisplayStyle', 'off');
-    end
-
-    drawnow;
     return;
 end

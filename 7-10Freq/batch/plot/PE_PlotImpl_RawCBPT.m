@@ -24,7 +24,7 @@ for index = 1:length(rankV)
 end
 V = V0(chIdx, :);
 
-FigCBPT = figure;
+FigMCP = figure;
 maximizeFig;
 mSubplot(1, 1, 1, 1, [0, 0, 0, 0], [0.03, 0.01, 0.06, 0.03]);
 imagesc("XData", t, "YData", channels, "CData", V);
@@ -45,4 +45,5 @@ cb.Label.FontSize = 12;
 cb.Label.Position = [2.5, 0];
 cb.Label.Rotation = -90;
 scaleAxes("c", "symOpts", "max");
-mPrint(FigCBPT, [MONKEYPATH, AREANAME, '_PE_CBPT.jpg'], "-djpeg", "-r600");
+mPrint(FigMCP, [MONKEYPATH, AREANAME, '_PE_CBPT.jpg'], "-djpeg", "-r600");
+% mPrint(FigMCP, [MONKEYPATH, AREANAME, '_PE_FDR.jpg'], "-djpeg", "-r600");

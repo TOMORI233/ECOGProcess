@@ -11,6 +11,8 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     %     userDefineOpt: If set "on", bad channels will be defined by user.
     %                    If set "off", use [chTh] setting to exclude bad channels. (default: "off")
     %     absTh: absolute threshold (default: [])
+    %     badCHs: bad channel number array (default: [])
+    %             If specified, [chTh] and [userDefineOpt] will not work.
     % Output:
     %     tIdx: excluded trial index (double column vector)
     %     chIdx: bad channel index (double column vector)
@@ -35,12 +37,14 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     mIp.addOptional("chTh", 0.1, @(x) validateattributes(x, {'numeric'}, {'scalar', '>=', 0}));
     mIp.addParameter("userDefineOpt", "off", @(x) any(validatestring(x, {'on', 'off'})));
     mIp.addParameter("absTh", [], @(x) validateattributes(x, {'numeric'}, {'scalar'}));
+    mIp.addParameter("badCHs", [], @(x) validateattributes(x, {'numeric'}, {'positive', 'integer', 'vector', '<=', size(trialsData{1}, 1)}));
     mIp.parse(trialsData, varargin{:});
 
     tTh = mIp.Results.tTh;
     chTh = mIp.Results.chTh;
     userDefineOpt = mIp.Results.userDefineOpt;
     absTh = mIp.Results.absTh;
+    badCHs = mIp.Results.badCHs;
 
     % statistics
     chMeanAll = mean(cell2mat(trialsData));
@@ -84,74 +88,81 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
         disp(['Possible bad channel numbers: ', num2str(find(~goodChIdx)')]);
     end
 
-    % bad channels defined by user
-    if strcmp(userDefineOpt, "on")
-        badCHs = validateInput('Please input bad channel number (0 for preview): ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'nonnegative'}));
-
-        if isequal(badCHs, 0)
-            % raw wave
-            plotRawWave(chMean, chStd, [0, 1], 'origin');
-            scaleAxes("y", "symOpts", "max", "uiOpt", "show");
-
-            % good trials (mean, red) against bad trials (single, grey)
-%             previewRawWave(trialsData, badtrialIdx, V_All);
-
-            % histogram
-            temp = changeCellRowNum(tIdx);
-            figure;
-            maximizeFig;
-            margins = [0.05, 0.05, 0.1, 0.1];
-            paddings = [0.01, 0.03, 0.01, 0.01];
-            for index = 1:length(channels)
-                mSubplot(8, 8, index, "margins", margins, "paddings", paddings);
-                binSize = 0.05;
-                histogram(temp{index}, "Normalization", "probability", "BinWidth", binSize, "FaceColor", "b", "DisplayName", "Single");
-                hold on;
-                histogram(V0_All{index}, "Normalization", "probability", "BinWidth", binSize, "FaceColor", "r", "DisplayName", "All");
-                if ismember(index, find(~goodChIdx))
-                    title(['CH ', num2str(index), ' (bad)']);
-                else
-                    title(['CH ', num2str(index)]);
+    if ~isempty(badCHs) % fixed bad channels
+        goodChIdx = true(length(goodChIdx), 1);
+        goodChIdx(badCHs) = false;
+    else
+        % bad channels defined by user
+        if strcmp(userDefineOpt, "on")
+            badCHs = validateInput('Please input bad channel number (0 for preview): ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'nonnegative'}));
+    
+            if isequal(badCHs, 0)
+                % raw wave
+                plotRawWave(chMean, chStd, [0, 1], 'origin');
+                scaleAxes("y", "symOpts", "max", "uiOpt", "show");
+    
+                %%% good trials (mean, red) against bad trials (single, grey)
+                % previewRawWave(trialsData, badtrialIdx, V_All);
+    
+                % histogram
+                temp = changeCellRowNum(tIdx);
+                figure;
+                maximizeFig;
+                margins = [0.05, 0.05, 0.1, 0.1];
+                paddings = [0.01, 0.03, 0.01, 0.01];
+                plotSize = autoPlotSize(length(channels));
+                for index = 1:length(channels)
+                    mSubplot(plotSize(1), plotSize(2), index, "margins", margins, "paddings", paddings);
+                    binSize = 0.05;
+                    histogram(temp{index}, "Normalization", "probability", "BinWidth", binSize, "FaceColor", "b", "DisplayName", "Single");
+                    hold on;
+                    histogram(V0_All{index}, "Normalization", "probability", "BinWidth", binSize, "FaceColor", "r", "DisplayName", "All");
+                    if ismember(index, find(~goodChIdx))
+                        title(['CH ', num2str(index), ' (bad)']);
+                    else
+                        title(['CH ', num2str(index)]);
+                    end
+                    if index <= (plotSize(1) - 1) * plotSize(2)
+                        xticklabels('');
+                    end
+                    if mod(index - 1, plotSize(2)) ~= 0
+                        yticklabels('');
+                    end
+                    if index == 1
+                        legend(gca, "show");
+                    else
+                        legend(gca, "hide");
+                    end
                 end
-                if index <= 56
-                    xticklabels('');
-                end
-                if mod(index - 1, 8) ~= 0
-                    yticklabels('');
-                end
-                if index == 1
-                    legend(gca, "show");
-                else
-                    legend(gca, "hide");
-                end
-            end
-            scaleAxes("x", [0.1, inf]);
-            scaleAxes("y", "on", "type", "hist");
-            lines.X = tTh;
-            addLines2Axes(gcf, lines);
-
-            k = 'N';
-        else
-            k = 'Y';
-            goodChIdx = true(length(goodChIdx), 1);
-            goodChIdx(badCHs) = false;
-        end
-
-        while strcmpi(k, 'n')
-            badCHs = validateInput('Please input bad channel number: ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
-            
-            % sort trials - preview
-            goodChIdx = true(length(goodChIdx), 1);
-            goodChIdx(badCHs) = false;
-            tIdxTemp = cellfun(@(x) sum(x(goodChIdx, :) > chMean(goodChIdx, :) + 3 * chStd(goodChIdx, :) | x(goodChIdx, :) < chMean(goodChIdx, :) - 3 * chStd(goodChIdx, :), 2) / size(x, 2), trialsData, "UniformOutput", false);
-            tIdxTemp = cellfun(@(x) ~any(x > tTh), tIdxTemp); % marked true means reserved trials
-            if any(~tIdxTemp)
-                disp(['Preview: Trial ', num2str(find(~tIdxTemp)'), ' will be excluded.']);
+                scaleAxes("x", [0.1, inf]);
+                scaleAxes("y", "on", "type", "hist");
+                lines.X = tTh;
+                addLines2Axes(gcf, lines);
+    
+                k = 'N';
             else
-                disp('Preview: All will pass.');
+                k = 'Y';
+                goodChIdx = true(length(goodChIdx), 1);
+                goodChIdx(badCHs) = false;
             end
-
-            k = validateInput('Press Y or Enter to continue or N to reselect bad channels: ', @(x) isempty(x) || any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');
+    
+            while strcmpi(k, 'n')
+                badCHs = validateInput('Please input bad channel number: ', @(x) validateattributes(x, {'numeric'}, {'2d', 'integer', 'positive'}));
+                
+                % sort trials - preview
+                goodChIdx = true(length(goodChIdx), 1);
+                goodChIdx(badCHs) = false;
+                tIdxTemp = cellfun(@(x) sum(x(goodChIdx, :) > chMean(goodChIdx, :) + 3 * chStd(goodChIdx, :) | x(goodChIdx, :) < chMean(goodChIdx, :) - 3 * chStd(goodChIdx, :), 2) / size(x, 2), trialsData, "UniformOutput", false);
+                tIdxTemp = cellfun(@(x) ~any(x > tTh), tIdxTemp); % marked true means reserved trials
+                if any(~tIdxTemp)
+                    disp(['Preview: Trial ', num2str(find(~tIdxTemp)'), ' will be excluded.']);
+                else
+                    disp('Preview: All will pass.');
+                end
+    
+                k = validateInput('Press Y or Enter to continue or N to reselect bad channels: ', @(x) isempty(x) || any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');
+            end
+    
         end
 
     end
@@ -175,7 +186,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     if ~isempty(chIdx)
         disp(['Bad Channels: ', num2str(chIdx')]);
     else
-        disp('All channels are good.');
+        disp('No channel is excluded.');
     end
 
     return;
@@ -201,6 +212,6 @@ function previewRawWave(trialsData, badtrialIdx, V)
     end
 
     Fig = plotRawWaveMulti(chData, [0, 1]);
-    scaleAxes(Fig, "y", "cutoffRange", [-200, 200], "symOpts", "max");
+    scaleAxes(Fig, "y", "cutoffRange", [-200, 200], "symOpts", "max", "uiOpt", "show");
     return;
 end

@@ -29,12 +29,12 @@ for index = 1:length(rankV)
 end
 V = V0(chIdx, :);
 
-FigCBPT = figure;
+FigMCP = figure;
 maximizeFig(gcf);
 mSubplot(gcf, 1, 1, 1, 1, [0, 0, 0, 0], [0.03, 0.01, 0.06, 0.03]);
 imagesc("XData", t, "YData", channels, "CData", V);
-xlim([0, windowDM(2)]);
-ylim([0.5, 64.5]);
+set(gca, "XLimitMethod", "tight");
+set(gca, "YLimitMethod", "tight");
 yticks(channels);
 yticklabels(num2str(channels(chIdx)'));
 cm = colormap('jet');
@@ -50,4 +50,5 @@ cb.Label.FontSize = 12;
 cb.Label.Position = [2.5, 0];
 cb.Label.Rotation = -90;
 scaleAxes("c", "symOpts", "max");
-mPrint(FigCBPT, [MONKEYPATH, AREANAME, '_DM_CBPT.jpg'], "-djpeg", "-r600");
+% mPrint(FigMCP, [MONKEYPATH, AREANAME, '_DM_CBPT.jpg'], "-djpeg", "-r600");
+mPrint(FigMCP, [MONKEYPATH, AREANAME, '_DM_FDR.jpg'], "-djpeg", "-r600");

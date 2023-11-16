@@ -188,23 +188,17 @@ mPrint(FigTuning, [MONKEYPATH, AREANAME, '_Prediction_tuning.jpg'], "-djpeg", "-
 FigAOITopo = figure;
 maximizeFig;
 mSubplot(1, 1, 1, "shape", "square-min");
-if params.posIndex == 1
-    temp = rowFcn(@(x) mean(x(7:9)) - mean(x(1:3)), AoiMean);
-    mAxe = plotTopo(temp);
-    title('AOIF Topography of AC | mean AOIF_{7,8,9} - mean AOIF_{1,2,3}');
-    plotLayout(gca, 2 * (monkeyID - 1) + params.posIndex);
-else
-    temp = rowFcn(@(x) mean(x(7:9)) - mean(x(3:5)), AoiMean);
-    mAxe = plotTopo(temp);
-    title('AOIF Topography of PFC | mean AOIF_{7,8,9} - mean AOIF_{3,4,5}');
-    plotLayout(gca, 2 * (monkeyID - 1) + params.posIndex);
-end
+temp = rowFcn(@(x) x(7) - x(3), AoiMean);
+mAxe = plotTopo(temp);
+title('AOIF Topography of AC | mean AOIF_{7} - mean AOIF_{3}');
+scaleAxes("c", "on", "symOpt", "max");
 colormap('jet');
 cb = colorbar(mAxe, 'position', [0.75, 0.12, 0.01, 0.8]);
 cb.Label.String = '\Delta Amplitude of interested frequency band';
 cb.Label.FontSize = 12;
 cb.Label.VerticalAlignment = 'bottom';
 cb.Label.Rotation = -90;
+plotLayout(gca, 2 * (monkeyID - 1) + params.posIndex);
 mPrint(FigAOITopo, [MONKEYPATH, AREANAME, '_AOIF_Topo.jpg'], "-djpeg", "-r600");
 
 %% Example
