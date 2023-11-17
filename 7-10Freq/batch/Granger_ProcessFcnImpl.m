@@ -23,7 +23,6 @@ paramsDefault = struct("fs", 500, ...
                        "nSmooth", 2, ...
                        "topoSize", [8, 8], ...
                        "borderPercentage", 0.95, ...
-                       "fRange", [0, 250], ...
                        "SAVEPATH", [pwd, '\'], ...
                        "labelStr", '');
 params = getOrFull(params, paramsDefault);
@@ -53,32 +52,6 @@ catch
     mSave([SAVEPATH, 'GrangerData_', labelStr, '.mat'], "granger");
 end
 
-%% Granger indexation
-% sum
-grangerIndex = sum(granger.grangerspctrm(:, :, granger.freq >= fRange(1) & granger.freq <= fRange(2)), 3);
-
-% max
-% grangerIndex = max(granger.grangerspctrm(:, :, granger.freq >= fRange(1) & granger.freq <= fRange(2)), [], 3);
-
-areaAC = 1:sum(~cellfun(@isempty, chMapAC));
-areaPFC = 1:sum(~cellfun(@isempty, chMapPFC));
-
-AC2AC   = grangerIndex(areaAC, areaAC);
-AC2PFC  = grangerIndex(areaAC, areaPFC + length(areaAC));
-PFC2AC  = grangerIndex(areaPFC + length(areaAC), areaAC);
-PFC2PFC = grangerIndex(areaPFC + length(areaAC), areaPFC + length(areaAC));
-
-% insert bad channels with 0
-idxAC   = find(cellfun(@isempty, chMapAC));
-idxPFC  = find(cellfun(@isempty, chMapPFC));
-AC2AC   = insertRows(insertRows(AC2AC, idxAC)', idxAC)';
-AC2PFC  = insertRows(insertRows(AC2PFC, idxAC)', idxPFC)';
-PFC2AC  = insertRows(insertRows(PFC2AC, idxPFC)', idxAC)';
-PFC2PFC = insertRows(insertRows(PFC2PFC, idxPFC)', idxPFC)';
-
-areaAC = channels;
-areaPFC = channels;
-
 %% ft plot
 if nSmooth > 1
     cfg           = [];
@@ -90,14 +63,53 @@ if nSmooth > 1
     mPrint(ftcpFig, [SAVEPATH, labelStr, '_ftconnectivityplot.jpg'], "-djpeg", "-r600");
 end
 
-%% Hist plot
-run("Granger_PlotImpl_Hist.m");
+%% Granger indexation
+fRange{1} = [1, 3.5]; % delta
+fRange{2} = [3.7, 7.3]; % theta
+fRange{3} = [7.9, 12.6]; % alpha
+fRange{4} = [13.5, 28.9]; % beta
+fRange{5} = [31, 71.6]; % gamma
+bandNames = ["delta", "theta", "alpha", "beta", "gamma"];
 
-%% Grangerspectrm topo
-run("Granger_PlotImpl_Topo.m");
+SAVEPATH0 = SAVEPATH;
 
-%% Diff plot
-run("Granger_PlotImpl_Diff.m");
+for fRangeIndex = 1:length(fRange)
+    close all;
+    SAVEPATH = [fullfile(SAVEPATH0, char(bandNames(fRangeIndex))), '\'];
+    mkdir(SAVEPATH);
 
-%% Diff plot topo
-run("Granger_PlotImpl_Diff_Topo.m")
+    % mean
+    grangerIndex = mean(granger.grangerspctrm(:, :, granger.freq >= fRange{fRangeIndex}(1) & granger.freq <= fRange{fRangeIndex}(2)), 3);
+
+    areaAC = 1:sum(~cellfun(@isempty, chMapAC));
+    areaPFC = 1:sum(~cellfun(@isempty, chMapPFC));
+
+    AC2AC   = grangerIndex(areaAC, areaAC);
+    AC2PFC  = grangerIndex(areaAC, areaPFC + length(areaAC));
+    PFC2AC  = grangerIndex(areaPFC + length(areaAC), areaAC);
+    PFC2PFC = grangerIndex(areaPFC + length(areaAC), areaPFC + length(areaAC));
+
+    % insert bad channels with 0
+    idxAC   = find(cellfun(@isempty, chMapAC));
+    idxPFC  = find(cellfun(@isempty, chMapPFC));
+    AC2AC   = insertRows(insertRows(AC2AC, idxAC)', idxAC)';
+    AC2PFC  = insertRows(insertRows(AC2PFC, idxAC)', idxPFC)';
+    PFC2AC  = insertRows(insertRows(PFC2AC, idxPFC)', idxAC)';
+    PFC2PFC = insertRows(insertRows(PFC2PFC, idxPFC)', idxPFC)';
+
+    areaAC = channels;
+    areaPFC = channels;
+
+    %% Hist plot
+    run("Granger_PlotImpl_Hist.m");
+
+    %% Grangerspectrm topo
+    run("Granger_PlotImpl_Topo.m");
+
+    %% Diff plot
+    run("Granger_PlotImpl_Diff.m");
+
+    %% Diff plot topo
+    run("Granger_PlotImpl_Diff_Topo.m")
+
+end

@@ -42,7 +42,7 @@ else
     temp = cellfun(@(x, y) x + S1Duration(y), devTemp, {trialAll.ordrSeq}', "UniformOutput", false);
 end
 trialAll = addFieldToStruct(trialAll, temp, "devOnset");
-
+trialAll(1) = [];
 
 % filter
 trialsECOG = selectEcog(ECOGDataset, trialAll, segOption(2), Window);

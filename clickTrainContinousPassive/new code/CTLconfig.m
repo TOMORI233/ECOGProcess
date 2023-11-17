@@ -1,5 +1,91 @@
 switch Protocol
-            case "Add_on_Reg_Rep1_TimeCourse"
+    case "Anesthesia_BaseICI_Ratio_Tone_Push_Spon"
+        titleStr = "SFigure_Anesthesia_BaseICI_Ratio_Tone_Push_Spon";
+        colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#AAAAAA"];
+        stimStrs = ["4-4o06", "8-8o12", "4-5", "250-200Hz", "4-4o5"];
+        S1Duration = [0, 0, 0, 0, 0];
+        winStart = -3000;
+        Window = [winStart 1000];
+        ICAWin = Window;
+        FFTWin = [-2000, 0];
+    case "Anesthesia_BaseICI_Ratio_Tone_Push"
+        titleStr = "SFigure_Anesthesia_BaseICI_Ratio_Tone_Push";
+        colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#888888"];
+        stimStrs = ["4-4o06", "8-8o12", "4-5", "250-200Hz", "4-4o5"];
+        S1Duration = [2001.9,2001.9, 2001.9, 2000, 2001.9];
+        winStart = -2500;
+        Window = [winStart 3000];
+        ICAWin = Window;
+        FFTWin = [0 2000];
+    case "Add_on_LocalChange_4ms_2s-1s_N01248"
+        titleStr = "Add_on_LocalChange_4ms_2s";
+        stimStrs = ["Control", "N1", "N2", "N4", "N8"];
+        S1Duration = [2001.9,2001.9, 2001.9,2001.9, 2001.9];
+
+        winStart = -2500;
+        Window = [winStart 3000];
+        ICAWin = Window;
+        FFTWin = [0 2000];
+    case "SFigure_Anesthesia_BaseICI_Ratio_Tone"
+        titleStr = "SFigure_Anesthesia_BaseICI_Ratio_Tone";
+        colors = ["#FF0000", "#FFA500", "#6A5ACD", "#0000FF", "#888888", "#000000"];
+
+        stimStrs = ["4-4o06", "8-8o12", "4-4o5", "4-5", "250-200Hz", "5000-4000Hz"];
+        S1Duration = [2001.9,2001.9, 2001.9,2001.9, 2000, 2000];
+
+        winStart = -2500;
+        Window = [winStart 3000];
+        ICAWin = Window;
+        FFTWin = [0 2000];
+    case "TB_Anesthesia_BasicTone"
+        titleStr = "TB_Anesthesia_BasicTone";
+        stimStrs = ["4-4o06", "250-200Hz", "250-246Hz"];
+        S1Duration = [2001.9,2000,2000];
+
+        winStart = -2500;
+        Window = [winStart 1500];
+        ICAWin = Window;
+        FFTWin = [0 2000];
+    case "TB_Anesthesia_Ratio"
+        titleStr = "TB_Anesthesia_Ratio";
+        stimStrs = ["4-4o06", "4-4o5", "4-5"];
+        S1Duration = [2001.9,2001.9,2001.9];
+
+        winStart = -2500;
+        Window = [winStart 1500];
+        ICAWin = Window;
+        FFTWin = [0 2000];
+    case "TB_Anesthesia_Osci_Rate_30_ketamine"
+        titleStr = "TB_Anesthesia_Osci_Rate_30_ketamine";
+        stimStrs = ["250ms","120ms", "Tone250_246_120ms", "Tone250_200_120ms"];
+        S1Duration = zeros(1, 4);
+        correspFreq = 1000./[250, 120, 120 ,120];
+        winStart = 0;
+        Window = [winStart 10000];
+        ICAWin = [0 10000];
+        FFTWin = [0 10000];
+
+    case "TB_Anesthesia_BaseICI_Awake"
+        titleStr = "TB_Anesthesia_BaseICI_Awake";
+        stimStr = ["4-4o06", "8-8o12", "16-16o24", "32-32o48"];
+        S1Duration = [2001.9,2001.9,2000.6,2016];
+
+        winStart = -2500;
+        Window = [winStart 1500];
+        ICAWin = Window;
+        FFTWin = [0 2000];
+
+    case "TB_Anesthesia_Osci_Rate_40_ketamine"
+        titleStr = "TB_Anesthesia_Osci_Rate_40_ketamine";
+        stimStr = ["120ms","60ms", "Tone250_246_60ms", "Tone250_200_60ms"];
+        S1Duration = zeros(1, 4);
+        correspFreq = 1000./[120, 60, 60 ,60];
+        winStart = -1000;
+        Window = [winStart 7000];
+        ICAWin = [0 7000];
+        FFTWin = [0 5500];
+
+    case "Add_on_Reg_Rep1_TimeCourse"
         %% 1：1-2-3-4-5
         titleStr = "LocalChange_Dur";
         S1Duration = 0;
@@ -9,11 +95,11 @@ switch Protocol
         FFTWin = [0 5000];
         tTh = 0.1;
         chTh = 0.1;
-        case "Add_on_Reg_Rep1_Dur"
+    case "Add_on_Reg_Rep1_Dur"
         %% 1. 0.5s  2. 1s   3. 3s 4. 5s
         titleStr = "LocalChange_Dur";
-%         colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#000000"];
-%         stimStrs = ["4ms", "8ms", "20ms", "40ms", "80ms"];
+        %         colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#000000"];
+        %         stimStrs = ["4ms", "8ms", "20ms", "40ms", "80ms"];
         S1Duration = [500.5, 1001, 3002.9, 5004.8];
         winStart = -1000;
         Window = [winStart 1500];
@@ -25,7 +111,7 @@ switch Protocol
         titleStr = "DiffICI_Merge";
         colors = ["#FF0000", "#FFA500", "#0000FF", "#000000", "#000000"];
         stimStrs = ["4ms", "8ms", "20ms", "40ms", "80ms"];
-        S1Duration = [5009,2001.9, 5013, 2025, 5045, 5045];
+        S1Duration = [5009, 5013, 5025, 5045, 5045];
         winStart = -5500;
         Window = [winStart 5500];
         ICAWin = [-1500 1500];
@@ -43,7 +129,7 @@ switch Protocol
         ICAWin = [-2500 1500];
         tTh = 0.2;
         chTh = 0.2;
-        case "Add_on_Reg_Insert_5s-2s"
+    case "Add_on_Reg_Insert_5s-2s"
         %% 1. Reg4-4.06   2. Reg4-4   3. Reg4-4.06-4
         titleStr = "Add_on_TB_Reg_Insert_5s";
         stimStr = ["Reg4_4o06", "Reg4_4", "Reg4_4o06_4"];
@@ -65,13 +151,13 @@ switch Protocol
         ICAWin = [-1000 800];
         tTh = 0.2;
         chTh = 0.2;
-    %% TITS 框架：
-    % 1. 发现offset(reg & Irreg， 10+ VS 1-8， 跟随， 纯音/噪声对照)
-    % 2. 改变duration(时间整合需要时间， 纯音/噪声对照）
-    % 3. 节律的建立和节律的打破
-    % 4. 一个节律变成另外一个节律
-        case "TITS_4_25_noise_3s_4s_Reg_Irreg_Rev"   % 1. wavelet 2. 1Hz oscillation 3. PFC    
-        %% 1. 3s-4s Base ICI: 4ms, 15ms, 20ms, 25ms   2. noise-regular(15ms)   3. 4ms Reg-15Reg,   4ms Irreg - 15Reg,  30 Irreg - 15Reg  
+        %% TITS 框架：
+        % 1. 发现offset(reg & Irreg， 10+ VS 1-8， 跟随， 纯音/噪声对照)
+        % 2. 改变duration(时间整合需要时间， 纯音/噪声对照）
+        % 3. 节律的建立和节律的打破
+        % 4. 一个节律变成另外一个节律
+    case "TITS_4_25_noise_3s_4s_Reg_Irreg_Rev"   % 1. wavelet 2. 1Hz oscillation 3. PFC
+        %% 1. 3s-4s Base ICI: 4ms, 15ms, 20ms, 25ms   2. noise-regular(15ms)   3. 4ms Reg-15Reg,   4ms Irreg - 15Reg,  30 Irreg - 15Reg
         titleStr = "TITS_4_25_noise_3s_4s_Reg_Irreg_Rev";
         stimStr = ["4ms_Reg_Irreg", "4ms_Irreg_Reg", "15ms_Reg_Irreg", "15ms_Irreg_Reg", "20ms_Reg_Irreg", "20ms_Irreg_Reg", "25ms_Reg_Irreg", "25ms_Irreg_Reg", "noise_15ms_Reg"];
         S1Duration = [4003.9, 4000, 4005.4, 3982.2, 4001.8, 4000, 4001, 4009.3, 2994.4];
@@ -79,8 +165,8 @@ switch Protocol
         Window = [winStart 4000];
         FFTWin = [500, 3500];
         ICAWin = [-2000 2000];
-    case "TITS_15_30_3s_13s_Reg_Irreg_Rev"   % 1. wavelet 2. 1Hz oscillation 3. PFC    
-        %% 1. 3s-4s Base ICI: 4ms, 15ms, 20ms, 25ms   2. noise-regular(15ms)   3. 4ms Reg-15Reg,   4ms Irreg - 15Reg,  30 Irreg - 15Reg  
+    case "TITS_15_30_3s_13s_Reg_Irreg_Rev"   % 1. wavelet 2. 1Hz oscillation 3. PFC
+        %% 1. 3s-4s Base ICI: 4ms, 15ms, 20ms, 25ms   2. noise-regular(15ms)   3. 4ms Reg-15Reg,   4ms Irreg - 15Reg,  30 Irreg - 15Reg
         titleStr = "TITS_15_30_3s_13s_Reg_Irreg_Rev";
         stimStr = ["15ms_Reg_Irreg", "15ms_Irreg_Reg", "30ms_Reg_Irreg", "30ms_Irreg_Reg"];
         S1Duration = [3000.3, 2977.5, 3000.3, 2936.3];
@@ -125,9 +211,9 @@ switch Protocol
         Window = [winStart 1500];
         FFTWin = [-2500 -500];
         ICAWin = [-1000 1000];
-    case "TITS_Offset_30_DiffRep" 
+    case "TITS_Offset_30_DiffRep"
         titleStr = "TITS_Offset_30_DiffRep";
-        stimStr = ["Reg30_Rep0", "Reg30_Rep3", "Reg30_Rep6", "Reg30_Rep9", "Reg30_Rep12", "Irreg30_Rep1", "Irreg30_Rep2", "Irreg30_Rep3", "Irreg30_Rep4", "Irreg30_Rep5"];        
+        stimStr = ["Reg30_Rep0", "Reg30_Rep3", "Reg30_Rep6", "Reg30_Rep9", "Reg30_Rep12", "Irreg30_Rep1", "Irreg30_Rep2", "Irreg30_Rep3", "Irreg30_Rep4", "Irreg30_Rep5"];
         S1Duration = [3000.3, 2998,  3004.5, 2998.7, 3001, 3017.7,  3003.5, 29873, 3006.5, 3004.9];
         changeTime = [3000.3, 2910.3, 2820.3, 2730.3, 2640.3, 2987.7, 2943.5, 2897.2, 2886.5, 2854.9];
         winStart = -3500;
@@ -143,7 +229,7 @@ switch Protocol
         Window = [winStart 1500];
         FFTWin = [-2500 -500];
         ICAWin = [-1000 1000];
-    case "TITS_Offset_60_24_26o4" 
+    case "TITS_Offset_60_24_26o4"
         titleStr = "TITS_Offset_60_24_26o4";
         stimStr = ["24_26o4Reg", "24_26o4Irreg", "60_24Reg", "60_24Irreg"];
         S1Duration = [3000.3, 2979.7,  3000.3, 2997.1];
@@ -153,7 +239,7 @@ switch Protocol
         Window = [winStart 2500];
         FFTWin = [-2000 0];
         ICAWin = [-1000 1000];
-    case "TITS_Offset_SPL" 
+    case "TITS_Offset_SPL"
         titleStr = "TITS_Offset_SPL";
         stimStr = ["Reg30_0o1", "Reg30_0o2", "Reg30_0o4", "Reg30_0o7", "Reg30_1", "Reg60_0o1", "Reg60_0o2", "Reg60_0o4", "Reg60_0o7", "Reg60_1", ];
         S1Duration = ones(1, 10) * 3000.5;
@@ -162,17 +248,17 @@ switch Protocol
         Window = [winStart 2500];
         FFTWin = [-2000 0];
         ICAWin = [-1000 1000];
-    case "TITS_Offset_Reg_Irreg_15_120" 
+    case "TITS_Offset_Reg_Irreg_15_120"
         titleStr = "TITS_Offset_Reg_Irreg_15_120";
         stimStr = ["Reg15", "Irreg15", "Reg30", "Irreg30", "Reg60", "Irreg60", "Reg120", "Irreg120"];
         S1Duration = [3000.3, 3000.1,  3000.3, 3018.8, 3000.3, 3010.1,  3000.1, 2976.8];
-        
+
         cursor = [62.5, 62.5, 62.5 ,62.5];
         winStart = -3500;
         Window = [winStart 2500];
         FFTWin = [-2000 0];
         ICAWin = [-1000 1000];
-    case "TITS_X_24_Reg_Irreg" 
+    case "TITS_X_24_Reg_Irreg"
         titleStr = "TITS_X_24_Reg_Irreg";
         stimStr = ["36_24Reg", "36_24Irreg", "60_24Reg", "60_24Irreg"];
         S1Duration = [2988.3, 3047.3,  3000.3, 2963.4];
@@ -223,7 +309,7 @@ switch Protocol
         Window = [winStart 2500];
         FFTWin = [300 1900];
         ICAWin = [-1000 1000];
-    case "TITS_Tone"  % fix Tone Amp to 10, click train SPL 
+    case "TITS_Tone"  % fix Tone Amp to 10, click train SPL
         titleStr = "TITS_Tone";
         % S1: 24_60, S2: 60_24
         stimStr = ["S1_Amp1", "S1_Amp2", "S1_Amp4", "S1_Amp7", "S1_Amp10", "S2_Amp1", "S2_Amp2", "S2_Amp3", "S2_Amp4", "S2_Amp5"];
@@ -379,7 +465,7 @@ switch Protocol
         soundDur = [10009.2, 10009.2, 10068.8, 10068.8];
         winStart = -5500;
         Window = [winStart 5500];
-        ICAWin = [-1000 1000];
+        ICAWin = [-1000 10000];
     case "Add_on_Basic_Tone"
         titleStr = "Add_on_Basic_Tone";
         stimStr = {'250_246Hz','246_250Hz','250_200Hz','200_250Hz'};

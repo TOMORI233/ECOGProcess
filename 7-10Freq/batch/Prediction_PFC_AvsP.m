@@ -1,6 +1,6 @@
 clear; clc; close all force;
 %% Active
-load('D:\Education\Lab\Projects\ECOG\ECOG process\7-10Freq\batch\Active\CC\Single\Prediction\cc20220520\PFC_Prediction_Data.mat');
+load('D:\Education\Lab\Projects\ECOG\ECOG process\7-10Freq\batch\Active\CC\Population\Prediction\PFC_Prediction_Data.mat');
 
 t = (0:size(trialsECOG{1}, 2) - 1)' / fs * 1000 + windowP(1);
 nCh = size(trialsECOG{1}, 1);
@@ -27,13 +27,13 @@ mAxe = mSubplot(1,1,1,"shape","square-min");
 plotTopo(mAxe, res);
 plotLayout(mAxe, 2, 0.5);
 cb = colorbar(mAxe, 'position', [0.75, 0.12, 0.01, 0.8]);
-cb.Label.String = 'Correlation in day 1';
+cb.Label.String = 'Correlation among behavioral task trials';
 cb.Label.FontSize = 12;
 cb.Label.VerticalAlignment = 'bottom';
 cb.Label.Rotation = -90;
 
 %% Passive
-load('D:\Education\Lab\Projects\ECOG\ECOG process\7-10Freq\batch\Active\CC\Single\Prediction\cc20220801\PFC_Prediction_Data.mat');
+load('D:\Education\Lab\Projects\ECOG\ECOG process\7-10Freq\batch\Passive\CC\Population\Prediction\PFC_Prediction_Data.mat');
 [~, chMean] = joinSTD(trialAll, trialsECOG, fs);
 chMeanP = chMean;
 chData(2).chMean = chMeanP;
@@ -52,7 +52,7 @@ mAxe = mSubplot(1,1,1,"shape","square-min");
 plotTopo(mAxe, res);
 plotLayout(mAxe, 2, 0.5);
 cb = colorbar(mAxe, 'position', [0.75, 0.12, 0.01, 0.8]);
-cb.Label.String = 'Correlation in day 2';
+cb.Label.String = 'Correlation among non-behavioral trials';
 cb.Label.FontSize = 12;
 cb.Label.VerticalAlignment = 'bottom';
 cb.Label.Rotation = -90;
@@ -73,7 +73,7 @@ mAxe = mSubplot(1,1,1,"shape","square-min");
 plotTopo(mAxe, res);
 plotLayout(mAxe, 2, 0.5);
 cb = colorbar(mAxe, 'position', [0.75, 0.12, 0.01, 0.8]);
-cb.Label.String = 'Correlation among days';
+cb.Label.String = 'Correlation between behavioral task and non-behavioral task';
 cb.Label.FontSize = 12;
 cb.Label.VerticalAlignment = 'bottom';
 cb.Label.Rotation = -90;

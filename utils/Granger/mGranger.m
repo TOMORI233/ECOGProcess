@@ -20,7 +20,6 @@ function [granger, coh] = mGranger(trialsECOG_AC, trialsECOG_PFC, windowData, fs
 %     granger (NP): nonparametric Granger spectrum
 %     coh (NP): coherence of non-parametric computation of the cross-spectral density matrix
 
-
 mIp = inputParser;
 mIp.addRequired("trialsECOG_AC", @iscell);
 mIp.addRequired("trialsECOG_PFC", @iscell);
@@ -74,12 +73,12 @@ if strcmpi(parametricOpt, "P")
         coh         = ft_connectivityanalysis(cfg, mfreq);
     end
 else
-    % Nonparametric computation of the cross-spectral density matrix
+    % Nonparametric computation of the cross-spectral density matrix using fft
     cfg           = [];
     cfg.method    = 'mtmfft';
-    cfg.taper     = 'hanning';
-    cfg.output    = 'fourier';
+    cfg.taper     = 'dpss';
     cfg.tapsmofrq = 2;
+    cfg.output    = 'fourier';
     cfg.channel   = data.label(labelIdx);
     freq          = ft_freqanalysis(cfg, data);
 

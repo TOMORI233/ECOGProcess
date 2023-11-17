@@ -8,13 +8,15 @@ for dIndex = 1:length(devType)
     trialsECOG_S1 = trialsECOG_S1_Merge(tIndex);
 
     % compute CRI
-    [temp, amp, rmsSpon] = cellfun(@(x) waveAmp_Norm(x, Window, quantWin, CRIMethod, sponWin), trialsECOG, 'UniformOutput', false);
+    [temp, amp, rmsSpon, ~, peak, trough] = cellfun(@(x) waveAmp_Norm(x, Window, quantWin, CRIMethod, sponWin), trialsECOG, 'UniformOutput', false);
     CRI(dIndex).info = stimStrs(dIndex);
     CRI(dIndex).mean = cellfun(@mean, changeCellRowNum(temp));
     CRI(dIndex).se = cellfun(@(x) std(x)/sqrt(length(x)), changeCellRowNum(temp));
     CRI(dIndex).raw = changeCellRowNum(temp);
     CRI(dIndex).rsp = changeCellRowNum(amp);
     CRI(dIndex).base = changeCellRowNum(rmsSpon);
+    CRI(dIndex).peak = changeCellRowNum(peak);
+    CRI(dIndex).trough = changeCellRowNum(trough);
 
     CRMS(dIndex).mean = cellfun(@mean, CRI(dIndex).rsp); 
     CRMS(dIndex).se =  cellfun(@(x) std(x)/sqrt(length(x)), CRI(dIndex).rsp);

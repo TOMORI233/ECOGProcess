@@ -69,7 +69,9 @@ disp("Exporting ClickTrainLongTerm LocalChange, 4.06 in 4, N=0,1,2,4,8...");
 SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_LocalChange_4ms_2s-1s_N01248\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECOG\xiaoxiao\xx20230404\Block-2'; % 20230404 export
-
+BLOCKPATH{2} = 'G:\ECOG\xiaoxiao\xx20230513\Block-6'; % 20230630 export
+BLOCKPATH{3} = 'G:\ECOG\xiaoxiao\xx20230515\Block-3'; % 20230630 export
+BLOCKPATH{4} = 'G:\ECOG\xiaoxiao\xx20230516\Block-3'; % 20230630 export
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 params.patch = "matchIssue";
 exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);
@@ -78,7 +80,9 @@ disp("Exporting ClickTrainLongTerm add_on 4.06 in 4,Rep1, time course...");
 SAVEPATH = "E:\ECOG\MAT Data\XX\ClickTrainLongTerm\TB\Add_on_Reg_Rep1_TimeCourse\";
 BLOCKPATH = [];
 BLOCKPATH{1} = 'G:\ECOG\xiaoxiao\xx20230310\Block-4'; % 20230313 export
-
+BLOCKPATH{2} = 'G:\ECOG\xiaoxiao\xx20230513\Block-6'; % 20230630 export
+BLOCKPATH{3} = 'G:\ECOG\xiaoxiao\xx20230515\Block-3'; % 20230630 export
+BLOCKPATH{4} = 'G:\ECOG\xiaoxiao\xx20230516\Block-3'; % 20230630 export
 params.processFcn = @PassiveProcess_clickTrainContinuous;
 params.patch = "matchIssue";
 exportDataFcn(BLOCKPATH, SAVEPATH, params, fd, 1);

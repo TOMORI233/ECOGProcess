@@ -69,8 +69,9 @@
             {"name": "trialsData", "kind": "required", "type": ["cell"], "description": "trial data"},
             {"name": "tTh", "kind": "ordered", "type": ["scalar", "numeric"], "description": "trial threshold"},
             {"name": "chTh", "kind": "ordered", "type": ["scalar", "numeric"], "description": "channel threshold (percentage or nTrials)"},
-            {"name": "userDefineOpt", "kind": "namevalue", "type": ["choices={'on', 'off'}"]},
-            {"name": "absTh", "kind": "namevalue", "type": ["scalar", "numeric"]}
+            {"name": "userDefineOpt", "kind": "namevalue", "type": ["choices={'on', 'off'}"], "description": "bad channels defined by user"},
+            {"name": "absTh", "kind": "namevalue", "type": ["scalar", "numeric"], "description": "absolute threshold"},
+            {"name": "badCHs", "kind": "namevalue", "type": ["numeric"], "description": "bad channel number vector"}
         ]
     }
     

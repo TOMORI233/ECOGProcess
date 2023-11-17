@@ -8,7 +8,7 @@ narginchk(2, 6);
     end
 
     if nargin < 4
-        plotSize = [8, 11];
+        plotSize = [8, 8];
     end
 
     if nargin < 5
@@ -19,7 +19,7 @@ narginchk(2, 6);
         visible = "on";
     end
 
-    Fig = plotRawWave256(chData(1).chMean, [], window, titleStr, plotSize, chs, visible);
+    Fig = plotRawWave(chData(1).chMean, [], window, titleStr, plotSize, chs, visible);
     setLine(Fig, "Color", chData(1).color, "LineWidth", 1.5);
     if length(chData) > 1
         for i = 2 : length(chData)

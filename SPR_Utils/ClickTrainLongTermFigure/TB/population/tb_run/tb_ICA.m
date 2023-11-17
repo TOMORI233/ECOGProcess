@@ -27,7 +27,6 @@
             trialsECOG_S1_Merge = reconstructData(trialsECOG_S1_Merge, comp, ICs);
             trialsECOG_S1_Merge = cellfun(@(x) insertRows(x, channels(ismember(channels, badCHs) & ~ismember(channels, chs2doICA))), trialsECOG_S1_Merge, "UniformOutput", false);
        
-
         else
             trialsECOG_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_MergeTemp, "UniformOutput", false);
             trialsECOG_S1_Merge = cellfun(@(x) compT.topo * comp.unmixing * x, trialsECOG_S1_MergeTemp, "UniformOutput", false);

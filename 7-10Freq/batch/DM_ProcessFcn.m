@@ -1,5 +1,5 @@
 function DM_ProcessFcn(params)
-close all;
+close all force;
 parseStruct(params);
 
 alpha = 0.05; % For ANOVA
@@ -132,22 +132,26 @@ chData(2).color = "k";
 t = linspace(windowDM(1), windowDM(2), size(trialsECOG_correct{1}, 2))';
 
 try
-    load([MONKEYPATH, AREANAME, '_DM_CBPT'], "stat", "-mat");
+    load([MONKEYPATH, AREANAME, '_DM_CBPT.mat'], "stat", "-mat");
+%     load([MONKEYPATH, AREANAME, '_DM_FDR.mat'], "stat", "-mat");
 catch
     data = [];
+    scaleFactor = 100;
 
     data(1).time = t' / 1000;
     data(1).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
-    data(1).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), resultC, "UniformOutput", false));
+    data(1).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), resultC, "UniformOutput", false)) * scaleFactor;
     data(1).trialinfo = ones(length(resultC), 1);
 
     data(2).time = t' / 1000;
     data(2).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
-    data(2).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), resultW, "UniformOutput", false));
+    data(2).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), resultW, "UniformOutput", false)) * scaleFactor;
     data(2).trialinfo = 2 * ones(length(resultW), 1);
 
     stat = CBPT(data);
     mSave([MONKEYPATH, AREANAME, '_DM_CBPT.mat'], "stat");
+%     stat = mFDR(data);
+%     mSave([MONKEYPATH, AREANAME, '_DM_FDR.mat'], "stat");
 end
 
 %% Plot raw wave, z-scored wave and CBPT res of z-scored wave
@@ -160,53 +164,53 @@ run("DM_PlotImpl_DRP.m");
 run("DM_PlotImpl_Topo.m");
 
 %% Example
-% t = linspace(windowDM(1), windowDM(2), size(trialsECOG_correct{1}, 2))';
-% ch = input('Input example channel: ');
-% 
-% % Z-scored wave
-% plotRawWaveMulti(chData, windowDM, '', [1, 1], ch);
-% scaleAxes("x", [0, 800]);
-% yRange = scaleAxes("y");
-% hold on;
-% tTemp = t(V0(ch, :) > 0);
-% bar(tTemp, repmat(yRange(1), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
-% bar(tTemp, repmat(yRange(2), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
-% 
-% a = ones(length(t), 1) * (-100);
-% a(V0(ch, :) ~= 0) = 100;
-% resultZscore = [t, ...
-%                 chData(1).chMean(ch, :)', ...
-%                 chData(2).chMean(ch, :)', ...
-%                 a];
-% 
-% % Raw wave
-% resultRawWave = [t, ...
-%                  chData0(1).chMean(ch, :)', ...
-%                  chData0(2).chMean(ch, :)'];
-% plotRawWaveMulti(chData0, windowDM, '', [1, 1], ch);
-% 
-% % DRP
-% figure;
-% maximizeFig(gcf);
-% V_s = [];
-% W_s = [];
-% V_ns = [];
-% W_ns = [];
-% for wIndex = 1:length(resDP)
-%     if resDP(wIndex).p(ch) < alpha
-%         V_s = [V_s; resDP(wIndex).v(ch)];
-%         W_s = [W_s; mean(resDP(wIndex).window)];
-%     else
-%         V_ns = [V_ns; resDP(wIndex).v(ch)];
-%         W_ns = [W_ns; mean(resDP(wIndex).window)];
-%     end
-% end
-% scatter(W_s, V_s, sz, "black", "filled");
-% hold on;
-% scatter(W_ns, V_ns, sz, "black");
-% X = cellfun(@mean, {resDP.window});
-% Y = cellfun(@(x) x(ch), {resDP.v});
-% plot(X, Y, "k", "LineWidth", 1);
-% resultDRP_s = [W_s, V_s];
-% resultDRP_ns = [W_ns, V_ns];
-% resultDRP_line = [X', Y'];
+t = linspace(windowDM(1), windowDM(2), size(trialsECOG_correct{1}, 2))';
+ch = input('Input example channel: ');
+
+% Z-scored wave
+plotRawWaveMulti(chData, windowDM, '', [1, 1], ch);
+scaleAxes("x", [0, 800]);
+yRange = scaleAxes("y");
+hold on;
+tTemp = t(V0(ch, :) > 0);
+bar(tTemp, repmat(yRange(1), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
+bar(tTemp, repmat(yRange(2), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
+
+a = ones(length(t), 1) * (-100);
+a(V0(ch, :) ~= 0) = 100;
+resultZscore = [t, ...
+                chData(1).chMean(ch, :)', ...
+                chData(2).chMean(ch, :)', ...
+                a];
+
+% Raw wave
+resultRawWave = [t, ...
+                 chData0(1).chMean(ch, :)', ...
+                 chData0(2).chMean(ch, :)'];
+plotRawWaveMulti(chData0, windowDM, '', [1, 1], ch);
+
+% DRP
+figure;
+maximizeFig(gcf);
+V_s = [];
+W_s = [];
+V_ns = [];
+W_ns = [];
+for wIndex = 1:length(resDP)
+    if resDP(wIndex).p(ch) < alpha
+        V_s = [V_s; resDP(wIndex).v(ch)];
+        W_s = [W_s; mean(resDP(wIndex).window)];
+    else
+        V_ns = [V_ns; resDP(wIndex).v(ch)];
+        W_ns = [W_ns; mean(resDP(wIndex).window)];
+    end
+end
+scatter(W_s, V_s, sz, "black", "filled");
+hold on;
+scatter(W_ns, V_ns, sz, "black");
+X = cellfun(@mean, {resDP.window});
+Y = cellfun(@(x) x(ch), {resDP.v});
+plot(X, Y, "k", "LineWidth", 1);
+resultDRP_s = [W_s, V_s];
+resultDRP_ns = [W_ns, V_ns];
+resultDRP_line = [X', Y'];

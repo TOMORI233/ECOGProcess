@@ -9,7 +9,7 @@ protocols = string({temp.name}');
 
 %% select data
 areaSel = "AC";
-dateSel = "";
+dateSel = "20230715";
 protSel = ["TB_Basic", "TB_BaseICI", "TB_Ratio", "TB_Jitter"];
 
 % validate areaSel

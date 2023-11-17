@@ -1,16 +1,19 @@
 %% Process data of each day and batch processed data of each day
 clear; clc; close all;
+set(0, "DefaultAxesFontWeight", "bold");
 
 params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
+params.normOpt = "off"; % Normalization
 
-params.monkeyID = 1; % 1-CC, 2-XX
+params.monkeyID = 2; % 1-CC, 2-XX
 
 CURRENTPATH = pwd;
 
 if params.monkeyID == 1
     params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Active\';
     DATESTRs = {'cc20220520', 'cc20220706', 'cc20220801', 'cc20221014', 'cc20221015'};
+%     DATESTRs = {'cc20220520', 'cc20220706', 'cc20220801', 'cc20221014'};
 %     DATESTRs = {'cc20220908'}; % ISI=700
 %     DATESTRs = {'cc20221019'}; % ISI=400
     POPUROOTPATH = [CURRENTPATH, '\CC\Population\'];
@@ -26,7 +29,7 @@ end
 params = windowConfig_7_10Freq(params);
 
 %% Single day ----------------------------------------------------------------
-params.dataOnlyOpt = "off"; % "on" will save data only
+params.dataOnlyOpt = "on"; % "on" will save data only
 
 for index = 1:length(DATESTRs)
     params.DATESTRs = DATESTRs(index);
@@ -36,8 +39,6 @@ for index = 1:length(DATESTRs)
     params.icaOpt = "on"; % "on" here will perform ICA on all channels and decide bad channels after ICA
     params.userDefineOpt = "on";
     Pre_ProcessFcn(params);
-
-    params.normOpt = "on"; % normalization option
 
     % PE
     params.icaOpt = "on"; % "off" in preprocess and "on" here will perform ICA on good channels
@@ -175,8 +176,8 @@ Prediction_ProcessFcn(params);
 %% Compare single
 params.MONKEYPATH = [POPUROOTPATH, 'Compare\'];
 params.DATAPATH = [];
-params.DATAPATH{1} = [POPUROOTPATH, 'PE\AC_PE_MMN_tuning.mat'];
-params.DATAPATH{2} = [POPUROOTPATH, 'PE\PFC_PE_MMN_tuning.mat'];
+params.DATAPATH{1} = [POPUROOTPATH, 'PE\AC_PE_tuning.mat'];
+params.DATAPATH{2} = [POPUROOTPATH, 'PE\PFC_PE_tuning.mat'];
 params.DATAPATH{3} = [POPUROOTPATH, 'DM\AC_DM_tuning.mat'];
 params.DATAPATH{4} = [POPUROOTPATH, 'DM\PFC_DM_tuning.mat'];
 Compare_ProcessFcn(params);
@@ -195,25 +196,62 @@ params.nSmooth = 1;
 params.protocolType = 1; % 1-PE, 2-DM, 3-Prediction
 params.DATAPATH{1} = [POPUROOTPATH, 'PE\AC_PE_Data.mat'];
 params.DATAPATH{2} = [POPUROOTPATH, 'PE\PFC_PE_Data.mat'];
-params.windowGranger = [0, 500]; % ms
+params.windowGranger = [200, 500]; % ms
 params.trialType = 1; % 1-dev, 2-std
 Granger_ProcessFcn(params);
 params.trialType = 2; % 1-dev, 2-std
 Granger_ProcessFcn(params);
+
+% params.protocolType = 2; % 1-PE, 2-DM, 3-Prediction
+% params.DATAPATH{1} = [POPUROOTPATH, 'DM\AC_DM_Data.mat'];
+% params.DATAPATH{2} = [POPUROOTPATH, 'DM\PFC_DM_Data.mat'];
+% params.windowGranger = [0, 500]; % ms
+% params.trialType = 1; % 1-correct, 2-wrong
+% Granger_ProcessFcn(params);
+% params.trialType = 2; % 1-correct, 2-wrong
+% Granger_ProcessFcn(params);
+% 
+% params.protocolType = 3; % 1-PE, 2-DM, 3-Prediction
+% params.DATAPATH{1} = [POPUROOTPATH, 'Prediction\AC_Prediction_Data.mat'];
+% params.DATAPATH{2} = [POPUROOTPATH, 'Prediction\PFC_Prediction_Data.mat'];
+% params.windowGranger = [0, 500];
+% Granger_ProcessFcn(params);
+% params.windowGranger = [3000, 3500];
+% Granger_ProcessFcn(params);
+
+%% Granger PT
+params.DATAPATH = [];
+
+% smooth
+params.MONKEYPATH = [POPUROOTPATH, 'Granger PT\'];
+params.nSmooth = 2;
+
+% no smooth
+% params.MONKEYPATH = [POPUROOTPATH, 'Granger PT (no smoothing)\'];
+% params.nSmooth = 1;
+
+params.protocolType = 1; % 1-PE, 2-DM, 3-Prediction
+params.DATAPATH{1} = [POPUROOTPATH, 'PE\AC_PE_Data.mat'];
+params.DATAPATH{2} = [POPUROOTPATH, 'PE\PFC_PE_Data.mat'];
+params.windowGranger = [0, 500]; % ms
+params.trialType = 1; % 1-dev, 2-std
+GrangerPT_ProcessFcn(params);
+params.trialType = 2; % 1-dev, 2-std
+GrangerPT_ProcessFcn(params);
 
 params.protocolType = 2; % 1-PE, 2-DM, 3-Prediction
 params.DATAPATH{1} = [POPUROOTPATH, 'DM\AC_DM_Data.mat'];
 params.DATAPATH{2} = [POPUROOTPATH, 'DM\PFC_DM_Data.mat'];
 params.windowGranger = [0, 500]; % ms
 params.trialType = 1; % 1-correct, 2-wrong
-Granger_ProcessFcn(params);
+GrangerPT_ProcessFcn(params);
 params.trialType = 2; % 1-correct, 2-wrong
-Granger_ProcessFcn(params);
+GrangerPT_ProcessFcn(params);
 
 params.protocolType = 3; % 1-PE, 2-DM, 3-Prediction
 params.DATAPATH{1} = [POPUROOTPATH, 'Prediction\AC_Prediction_Data.mat'];
 params.DATAPATH{2} = [POPUROOTPATH, 'Prediction\PFC_Prediction_Data.mat'];
 params.windowGranger = [0, 500];
-Granger_ProcessFcn(params);
+GrangerPT_ProcessFcn(params);
 params.windowGranger = [3000, 3500];
-Granger_ProcessFcn(params);
+GrangerPT_ProcessFcn(params);

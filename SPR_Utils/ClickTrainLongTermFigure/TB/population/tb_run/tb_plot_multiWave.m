@@ -1,6 +1,6 @@
     %% plot compare wave ( for diff-ICI/ICI-Thr/Duration/Variance
 
-    FigWave = plotRawWaveMulti_SPR(RegRatio, Window, titleStr, [8, 8]);
+    FigWave = plotRawWaveMulti(RegRatio, Window, titleStr, [8, 8]);
     scaleAxes(FigWave, "y", [-yScale(mIndex) yScale(mIndex)]);
     setAxes(FigWave, 'yticklabel', '');
     setAxes(FigWave, 'xticklabel', '');
