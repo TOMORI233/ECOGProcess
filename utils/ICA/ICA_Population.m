@@ -64,7 +64,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
         FigWave(2) = plotRawWave(chMean, chStd, windowICA, "reconstruct");
         scaleAxes(FigWave(2), "y", "on", "symOpts", "max");
 
-        k = validateInput('Press Y or Enter to continue or N to reselect ICs: ', @(x) any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');
+        k = validateInput('Press Y or Enter to continue or N to reselect ICs: ', @(x) isempty(x) || any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');
     end
 
     comp.trial = [];

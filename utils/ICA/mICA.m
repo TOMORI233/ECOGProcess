@@ -101,7 +101,7 @@ end
 %% ICA
 disp("Performing ICA...");
 cfg = [];
-cfg.method = 'runica';
+cfg.method = 'fastica';
 cfg.channel = chs2doICA;
 comp = ft_componentanalysis(cfg, data);
 
