@@ -10,6 +10,7 @@ fs = dataAC.fs;
 
 %% 
 for cIndex = 1:size(trialsECOG_AC{1}, 1)
-    temp = cellfun(@(x) x(cIndex, :), trialsECOG_AC, "UniformOutput", false);
-    res = mGrangerWavelet(temp, trialsECOG_PFC, fs);
+    temp1 = cellfun(@(x) x(cIndex, :), trialsECOG_AC, "UniformOutput", false);
+    temp2 = cellfun(@(x) x(1, :), trialsECOG_PFC, "UniformOutput", false);
+    res = mGrangerWavelet(temp1, temp2, fs);
 end

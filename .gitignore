@@ -2,6 +2,11 @@
 # Edit by Waschl 
 #This file is created by: touch.gitignore 
 #put it in the root folder
+
+#ignore untitled files
+**/untitled*.m
+untitled*.m
+
 #ignore slprj folder
 **/slprj/
 /slprj/
