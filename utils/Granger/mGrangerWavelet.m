@@ -10,17 +10,32 @@ if nargin < 4
 end
 
 %% Wavelet transform
+disp('Performing cwt on data...');
+tic;
 trialsData = cellfun(@(x, y) [x; y], trialsDataSeed, trialsDataTarget, "UniformOutput", false);
-[cwtres, f, coi] = cellfun(@(x) cwtMultiAll(x', fs), trialsData, "UniformOutput", false);
+[nChs, nTime] = size(trialsData{1});
+if exist(['cwtMultiAll', num2str(nTime), 'x', num2str(nChs), '_mex.mexw64'], 'file')
+    disp('Using GPU...');
+    cwtFcn = eval(['@cwtMultiAll', num2str(nTime), 'x', num2str(nChs), '_mex']);
+    [cwtres, f, coi] = cellfun(@(x) cwtFcn(x', fs), trialsData, "UniformOutput", false);
+    cwtres = cellfun(@gather, cwtres, "UniformOutput", false);
+    f = gather(f{1});
+    coi = gather(coi{1});
+else
+    disp('Using CPU...');
+    cwtFcn = @cwtMultiAll;
+    [cwtres, f, coi] = cellfun(@(x) cwtFcn(x', fs), trialsData, "UniformOutput", false);
+    f = f{1};
+    coi = coi{1};
+end
+toc;
 
 % trans log-scaled [f] to linear-spaced and pad with zero
-f = f{1};
 f = 10 * log(f);
 c = 0 - f(end);
 f = f + c;
 
 t = (0:size(trialsData{1}, 2) - 1) / fs;
-coi = coi{1};
 
 cwtres = cellfun(@(x) permute(x, [4, 3, 1, 2]), cwtres, "UniformOutput", false);
 cwtres = cell2mat(cwtres); % rpt_chan_freq_time

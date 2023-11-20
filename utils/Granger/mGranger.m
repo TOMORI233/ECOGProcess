@@ -82,38 +82,6 @@ else
     cfg.channel   = data.label(labelIdx);
     freq          = ft_freqanalysis(cfg, data);
 
-    % Nonparametric computation of the cross-spectral density matrix using wavelet
-%     fcn = ['cwtMultiAll', num2str(size(trialsECOG_AC{1}, 2)), 'x', num2str(length(data.label)), '_mex'];
-%     if ~isempty(which(fcn))
-%         fcn = eval(['@', fcn]);
-%     else
-%         fcn = @cwtMultiAll;
-%     end
-%     temp = cellfun(@(x) x', data.trial, "UniformOutput", false)';
-%     [cwtres, f, ~] = cellfun(@(x) fcn(x, fs), temp, "UniformOutput", false);
-%     cwtres = cellfun(@gather, cwtres, "UniformOutput", false);
-%     
-%     temp = arrayfun(@(x) cellfun(@(y) y(:, :, x), cwtres, "UniformOutput", false), (1:length(data.label))', "UniformOutput", false);
-%     cwtres = cellfun(@(x) cell2mat(cellfun(@(y) mean(y, 1), changeCellRowNum(x), "UniformOutput", false)), temp, "UniformOutput", false);
-%     cwtres = cell2mat(cellfun(@(x) permute(flip(x, 1), [3, 1, 2]), cwtres, "UniformOutput", false));
-% 
-%     freq.label     = data.label;
-%     freq.freq      = flip(gather(f{1})');
-%     freq.time      = data.time{1};
-%     freq.powspctrm = cwtres;
-%     freq.dimord    = 'chan_freq_time';
-    
-    % fourier
-%     cfg = [];
-%     cfg.method     = 'wavelet';
-%     cfg.output     = 'fourier';
-%     cfg.taper      = 'hanning';
-%     cfg.toi        = 'all';
-%     cfg.foilim     = [0, fs / 2];
-%     freq           = ft_freqanalysis(cfg, data);
-%     freq.dimord    = 'rpt_chan_freq_time';
-%     freq.fourierspctrm(isnan(freq.fourierspctrm)) = 0 + 1i * 0;
-
     % Nonparametric computation of Granger causality
     cfg = [];
     cfg.method    = 'granger';
