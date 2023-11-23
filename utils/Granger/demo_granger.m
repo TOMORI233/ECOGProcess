@@ -84,7 +84,7 @@ plotTFA(chMean, fs, [], [0, 1000]);
 %% wavelet granger causality
 yseed = cellfun(@(x) x(1, :), y, "UniformOutput", false);
 ytarget = cellfun(@(x) x(2:end, :), y, "UniformOutput", false);
-gdata = mGrangerWavelet(yseed, ytarget, fs, nperm);
+gdata = mGrangerWavelet(yseed, ytarget, fs, [], nperm);
 grangerspctrm = gdata.grangerspctrm;
 
 %%

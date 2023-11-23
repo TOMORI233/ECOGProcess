@@ -1,23 +1,27 @@
-function res = mGrangerWavelet(trialsDataSeed, trialsDataTarget, fs, fRange, nperm)
-% Compute granger causality using raw data.
+function res = mGrangerWavelet2(cwtres, f, coi, fs, fRange, nperm)
+% Compute granger causality using existed cwt data.
 % 
-% [trialsDataSeed] is nTrial*1 cell with elements of 1*nSample vector.
-% [trialsDataTarget] is nTrial*1 cell with elements of nChs*nSample matrix.
+% The procedure is independent for each time sample. Thus, it is possible to segment cwt 
+% data for computation effeciency (consider coi in this step).
+% 
+% [cwtres] is a nTrial*nCh*nFreq*nTime matrix.
+% The first channel is 'seed' and the rest channels are 'target'.
+% [f] is a descendent column vector in log scale.
 % [fRange] specifies frequency limit for granger causality computation. (default: [] for all)
 % If [nperm] is larger than 1, perform permutation test by randomizing trial order.
 
-narginchk(3, 5);
+narginchk(4, 6);
 
-if nargin < 4
+if nargin < 5
     fRange = [];
 end
 
-if nargin < 5
+if nargin < 6
     nperm = 1;
 end
 
 %% Wavelet transform
-data = prepareDataRaw(trialsDataSeed, trialsDataTarget, fs, fRange);
+data = prepareDataFourier(cwtres, f, coi, fs, fRange);
 c = data.c;
 
 %% granger causality computation
