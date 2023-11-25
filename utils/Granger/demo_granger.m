@@ -1,5 +1,6 @@
 ccc;
 
+ft_defaults;
 ft_setPath2Top;
 
 rng default
