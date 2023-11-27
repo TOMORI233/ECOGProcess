@@ -1,11 +1,18 @@
 ccc;
 
-dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\AC_Prediction_Data.mat");
-dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\PFC_Prediction_Data.mat");
+% dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\AC_Prediction_Data.mat");
+% dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\PFC_Prediction_Data.mat");
 
-trialsECOG_AC = dataAC.trialsECOG;
-trialsECOG_PFC = dataPFC.trialsECOG;
-window = dataAC.windowP;
+dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\PE\AC_PE_Data.mat");
+dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\PE\PFC_PE_Data.mat");
+
+% trialsECOG_AC = dataAC.trialsECOG([dataAC.dRatioAll] == 1);
+% trialsECOG_PFC = dataPFC.trialsECOG([dataPFC.dRatioAll] == 1);
+
+trialsECOG_AC = dataAC.trialsECOG([dataAC.dRatioAll] > 1);
+trialsECOG_PFC = dataPFC.trialsECOG([dataPFC.dRatioAll] > 1);
+
+window = dataAC.windowPE;
 fs = dataAC.fs;
 
 nChsAC = size(trialsECOG_AC{1}, 1);
@@ -35,14 +42,15 @@ for cIndexAC = 7
     for cIndexPFC = 35
         tempAC = cellfun(@(x) x(cIndexAC, :), trialsECOG_AC, "UniformOutput", false);
         tempPFC = cellfun(@(x) x(cIndexPFC, :), trialsECOG_PFC, "UniformOutput", false);
-        res = mGrangerWavelet(tempAC, tempPFC, fs);
+        res = mGrangerWaveletRaw(tempAC, tempPFC, fs, [], 10);
     end
 end
 
 %%
 figure;
+maximizeFig;
 mSubplot(1, 2, 1);
-imagesc("XData", t, "YData", res.freq, "CData", squeeze(res.grangerspctrm(1, :, :)));
+imagesc("XData", t, "YData", res.freq, "CData", squeeze(res.grangerspctrm(1, :, :, 1)));
 hold on;
 plot(t, res.coi, "w--", "LineWidth", 1.5);
 set(gca, "YScale", "log");
@@ -52,7 +60,7 @@ set(gca, "YLimitMethod", "tight");
 title('From AC-1 to PFC-1');
 
 mSubplot(1, 2, 2);
-imagesc("XData", t, "YData", res.freq, "CData", squeeze(res.grangerspctrm(2, :, :)));
+imagesc("XData", t, "YData", res.freq, "CData", squeeze(res.grangerspctrm(2, :, :, 1)));
 hold on;
 plot(t, res.coi, "w--", "LineWidth", 1.5);
 set(gca, "YScale", "log");
@@ -63,6 +71,7 @@ title('From PFC-1 to AC-1');
 
 colormap('jet');
 scaleAxes("c");
-scaleAxes("x", [-100, 3500]);
-addLines2Axes(struct("X", num2cell((0:6)' * dataAC.trialAll(1).ISI), "color", "w", "width", 1.5));
+% scaleAxes("x", [-100, 3500]);
+addLines2Axes(struct("X", 0, "color", "w", "width", 1.5));
+% addLines2Axes(struct("X", num2cell((0:6)' * dataAC.trialAll(1).ISI), "color", "w", "width", 1.5));
 colorbar('position', [0.96, 0.1, 0.5 * 0.03, 0.8]);

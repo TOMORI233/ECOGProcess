@@ -1,26 +1,31 @@
-function res = mGrangerWavelet(trialsDataSeed, trialsDataTarget, fs, fRange, nperm)
-% Compute granger causality using raw data.
+function res = mGrangerWaveletFourier(cwtres, f, coi, fs, fRange, nperm)
+% Compute granger causality using existed cwt data.
 % 
-% [trialsDataSeed] is nTrial*1 cell with elements of 1*nSample vector.
-% [trialsDataTarget] is nTrial*1 cell with elements of nChs*nSample matrix.
+% The procedure is independent for each time sample. Thus, it is possible to segment cwt 
+% data for computation effeciency (consider coi in this step).
+% 
+% [cwtres] is a nTrial*nCh*nFreq*nTime matrix.
+% The first channel is 'seed' and the rest channels are 'target'.
+% [f] is a descendent column vector in log scale.
 % [fRange] specifies frequency limit for granger causality computation. (default: [] for all)
 % If [nperm] is larger than 1, perform permutation test by randomizing trial order.
 
-narginchk(3, 5);
+narginchk(4, 6);
 
-if nargin < 4
+if nargin < 5
     fRange = [];
 end
 
-if nargin < 5
+if nargin < 6
     nperm = 1;
 end
 
 %% Wavelet transform
-data = prepareDataRaw(trialsDataSeed, trialsDataTarget, fs, fRange);
+data = prepareDataFourier(cwtres, f, coi, fs, fRange);
 c = data.c;
 
 %% granger causality computation
+disp('Granger causality computation starts...');
 t0 = tic;
 currentPath = pwd;
 cd(fullfile(fileparts(which("ft_defaults")), 'connectivity', 'private'));
@@ -34,13 +39,13 @@ res.chancmbtype = {'from', 'to'};
 [nTrial, nCh, nFreq, nTime] = size(data.fourierspctrm);
 
 if nperm > 1
-    disp("Performing permutation test...");
+    disp(['Performing permutation test (total: ', num2str(nperm), ')...']);
     
     grangerspctrm = zeros((nCh - 1) * 2, nFreq, nTime, nperm + 1);
     grangerspctrm(:, :, :, 1) = res.grangerspctrm;
     for index = 1:nperm
-        fprintf('Randomization %d: ', index);
-        tic;
+        fprintf('Randomization %d/%d: ', index, nperm);
+        t1 = tic;
         % trial randomization
         for chIdx = 1:size(data.fourierspctrm, 2)
             data.fourierspctrm(:, chIdx, :, :) = data.fourierspctrm(randperm(size(data.fourierspctrm, 1)), chIdx, :, :);
@@ -48,15 +53,14 @@ if nperm > 1
     
         temp = mGrangerWaveletImpl(data);
         grangerspctrm(:, :, :, 1 + index) = temp.grangerspctrm;
-        toc;
+        fprintf('done in %.4f s\n', toc(t1));
     end
 
     res.grangerspctrm = grangerspctrm;
     res.dimord = 'chancmb_freq_time_perm';
 end
 
-disp("Granger causality computation from wavelet transforms of time series data done");
+disp(['Nonparametric Granger causality computation from wavelet transforms of time series data done in ', num2str(toc(t0)), ' s']);
 cd(currentPath);
-toc(t0);
 return;
 end

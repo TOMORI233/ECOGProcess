@@ -203,42 +203,42 @@ run("PE_PlotImpl_RawTopo.m");
 % run("PE_PlotImpl_MMN_Topo.m");
 
 %% Example
-ch = input('Input example channel: ');
-t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
-
-plotRawWaveMulti(chData, windowPE, 'Raw', [1, 1], ch);
-scaleAxes("x", [-100, 400]);
-yRange = scaleAxes("y");
-hold on;
-tTemp = t(V0(ch, :) > 0);
-b = bar(tTemp, repmat(yRange(1), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
-setLegendOff(b);
-b = bar(tTemp, repmat(yRange(2), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
-setLegendOff(b);
-
-a = ones(length(t), 1) * (-100);
-a(V0(ch, :) > 0) = 100;
-resultWave = [t, ...
-              chData(1).chMean(ch, :)', ...
-              chData(2).chMean(ch, :)', ...
-              chData(3).chMean(ch, :)', ...
-              chData(4).chMean(ch, :)', ...
-              chData(5).chMean(ch, :)', ...
-              a];
-
-resultTuning = cellfun(@(x, y) [x(:, ch), y(:, ch)], tuningMean, tuningSE, "UniformOutput", false);
-figure;
-maximizeFig;
-for wIndex = 1:length(resultTuning)
-    mSubplot(3, 4, wIndex, 1, margins, paddings);
-    errorbar(resultTuning{wIndex}(:, 1), resultTuning{wIndex}(:, 2), "k-", "LineWidth", 1);
-    str = ['[', num2str(edge(wIndex)), ',', num2str(edge(wIndex) + binSize), '] | p=', num2str(P(ch, wIndex))];
-    title(str);
-    xlim([0.5, 5.5]);
-    xticks(1:5);
-    xticklabels(num2str(dRatio'));
-end
-scaleAxes;
+% ch = input('Input example channel: ');
+% t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
+% 
+% plotRawWaveMulti(chData, windowPE, 'Raw', [1, 1], ch);
+% scaleAxes("x", [-100, 400]);
+% yRange = scaleAxes("y");
+% hold on;
+% tTemp = t(V0(ch, :) > 0);
+% b = bar(tTemp, repmat(yRange(1), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
+% setLegendOff(b);
+% b = bar(tTemp, repmat(yRange(2), [length(tTemp), 1]), 1, 'FaceColor', [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1, 'ShowBaseLine', 'off');
+% setLegendOff(b);
+% 
+% a = ones(length(t), 1) * (-100);
+% a(V0(ch, :) > 0) = 100;
+% resultWave = [t, ...
+%               chData(1).chMean(ch, :)', ...
+%               chData(2).chMean(ch, :)', ...
+%               chData(3).chMean(ch, :)', ...
+%               chData(4).chMean(ch, :)', ...
+%               chData(5).chMean(ch, :)', ...
+%               a];
+% 
+% resultTuning = cellfun(@(x, y) [x(:, ch), y(:, ch)], tuningMean, tuningSE, "UniformOutput", false);
+% figure;
+% maximizeFig;
+% for wIndex = 1:length(resultTuning)
+%     mSubplot(3, 4, wIndex, 1, margins, paddings);
+%     errorbar(resultTuning{wIndex}(:, 1), resultTuning{wIndex}(:, 2), "k-", "LineWidth", 1);
+%     str = ['[', num2str(edge(wIndex)), ',', num2str(edge(wIndex) + binSize), '] | p=', num2str(P(ch, wIndex))];
+%     title(str);
+%     xlim([0.5, 5.5]);
+%     xticks(1:5);
+%     xticklabels(num2str(dRatio'));
+% end
+% scaleAxes;
 
 % MMN
 % tMMN = linspace(windowMMN(1), windowMMN(2), size(trialsECOG_MMN{1}, 2))';

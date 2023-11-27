@@ -31,13 +31,13 @@ cfg.noisecov      = [ 0.3    0    0 ;
 
 data              = ft_connectivitysimulation(cfg);
 
-cfg         = [];
-cfg.order   = 5;
-cfg.toolbox = 'bsmart';
-mdata       = ft_mvaranalysis(cfg, data);
-cfg         = [];
-cfg.method  = 'mvar';
-mfreq       = ft_freqanalysis(cfg, mdata); 
+cfg           = [];
+cfg.order     = 5;
+cfg.method    = 'bsmart';
+mdata         = ft_mvaranalysis(cfg, data);
+cfg           = [];
+cfg.method    = 'mvar';
+mfreq         = ft_freqanalysis(cfg, mdata); 
 cfg           = [];
 cfg.method    = 'granger';
 grangerP      = ft_connectivityanalysis(cfg, mfreq);
@@ -85,7 +85,7 @@ plotTFA(chMean, fs, [], [0, 1000]);
 %% wavelet granger causality
 yseed = cellfun(@(x) x(1, :), y, "UniformOutput", false);
 ytarget = cellfun(@(x) x(2:end, :), y, "UniformOutput", false);
-gdata = mGrangerWavelet(yseed, ytarget, fs, [], nperm);
+gdata = mGrangerWaveletRaw(yseed, ytarget, fs, [], nperm);
 grangerspctrm = gdata.grangerspctrm;
 
 %%

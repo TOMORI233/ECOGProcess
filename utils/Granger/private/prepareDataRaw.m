@@ -7,10 +7,10 @@ end
 
 %% Wavelet transform
 disp('Performing cwt on data...');
-tic;
+t0 = tic;
 trialsData = cellfun(@(x, y) [x; y], trialsDataSeed, trialsDataTarget, "UniformOutput", false);
 [cwtres, f, coi] = cwtAny(trialsData, fs, "mode", "GPU");
-toc;
+disp(['cwt computation done in ', num2str(toc(t0)), ' s']);
 
 if numel(fRange) == 2 && fRange(2) > fRange(1)
     idx = find(f <= fRange(2), 1):find(f >= fRange(1), 1, "last");
