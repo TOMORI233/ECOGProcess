@@ -36,6 +36,18 @@ res.chancmbtype = {'from', 'to'};
 
 if nperm > 1
     disp(['Performing permutation test (total: ', num2str(nperm), ')...']);
+
+    % Use fixed permutation order
+    try
+        % Delete this file for randomized permutation order
+        load(fullfile(fileparts(mfilename("fullpath")), "private", "randord.mat"), "randord");
+    catch
+        randord = zeros(nperm, size(data.fourierspctrm, 1));
+        for index = 1:nperm
+            randord(index, :) = randperm(size(data.fourierspctrm, 1));
+        end
+        save(fullfile(fileparts(mfilename("fullpath")), "private", "randord.mat"), "randord");
+    end
     
     grangerspctrm = zeros((nCh - 1) * 2, nFreq, nTime, nperm + 1);
     grangerspctrm(:, :, :, 1) = res.grangerspctrm;
@@ -44,7 +56,7 @@ if nperm > 1
         t1 = tic;
         % trial randomization
         for chIdx = 1:size(data.fourierspctrm, 2)
-            data.fourierspctrm(:, chIdx, :, :) = data.fourierspctrm(randperm(size(data.fourierspctrm, 1)), chIdx, :, :);
+            data.fourierspctrm(:, chIdx, :, :) = data.fourierspctrm(randord(index, :), chIdx, :, :);
         end
     
         temp = mGrangerWaveletImpl(data);
