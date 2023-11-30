@@ -41,10 +41,17 @@ if nperm > 1
     try
         % Delete this file for randomized permutation order
         load(fullfile(fileparts(mfilename("fullpath")), "private", "randord.mat"), "randord");
-    catch
-        randord = zeros(nperm, size(data.fourierspctrm, 1));
+        if size(randord, 1) ~= nperm || size(randord, 2) ~= nTrial
+            ME = MException('mGrangerWavelet:SizeNotMatch', ...
+                            'Size of random order matrix does not match size of data');
+            throw(ME);
+        end
+    catch ME
+        disp(ME.message);
+        disp('Generate random trial orders for seed channel');
+        randord = zeros(nperm, nTrial);
         for index = 1:nperm
-            randord(index, :) = randperm(size(data.fourierspctrm, 1));
+            randord(index, :) = randperm(nTrial);
         end
         save(fullfile(fileparts(mfilename("fullpath")), "private", "randord.mat"), "randord");
     end
@@ -54,13 +61,14 @@ if nperm > 1
     for index = 1:nperm
         fprintf('Randomization %d/%d: ', index, nperm);
         t1 = tic;
-        % trial randomization
-        for chIdx = 1:size(data.fourierspctrm, 2)
-            data.fourierspctrm(:, chIdx, :, :) = data.fourierspctrm(randord(index, :), chIdx, :, :);
-        end
-    
+
+        % Trial randomization: based on the random orders of the last permutation
+        data.fourierspctrm(:, 1, :, :) = data.fourierspctrm(randord(index, :), 1, :, :);
+        
+        % GC computation
         temp = mGrangerWaveletImpl(data);
         grangerspctrm(:, :, :, 1 + index) = temp.grangerspctrm;
+
         fprintf('done in %.4f s\n', toc(t1));
     end
 
