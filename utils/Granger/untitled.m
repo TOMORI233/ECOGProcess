@@ -1,20 +1,19 @@
 ccc;
 
-dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\AC_Prediction_Data.mat");
-dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\PFC_Prediction_Data.mat");
+% dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\AC_Prediction_Data.mat");
+% dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\PFC_Prediction_Data.mat");
+% trialsECOG_AC = dataAC.trialsECOG;
+% trialsECOG_PFC = dataPFC.trialsECOG;
+% window = dataAC.windowP;
 
-% dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\PE\AC_PE_Data.mat");
-% dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\PE\PFC_PE_Data.mat");
-
+dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\PE\AC_PE_Data.mat");
+dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\PE\PFC_PE_Data.mat");
 % trialsECOG_AC = dataAC.trialsECOG([dataAC.dRatioAll] == 1);
 % trialsECOG_PFC = dataPFC.trialsECOG([dataPFC.dRatioAll] == 1);
-% trialsECOG_AC = dataAC.trialsECOG([dataAC.dRatioAll] > 1);
-% trialsECOG_PFC = dataPFC.trialsECOG([dataPFC.dRatioAll] > 1);
+trialsECOG_AC = dataAC.trialsECOG([dataAC.dRatioAll] > 1);
+trialsECOG_PFC = dataPFC.trialsECOG([dataPFC.dRatioAll] > 1);
+window = dataAC.windowPE;
 
-trialsECOG_AC = dataAC.trialsECOG;
-trialsECOG_PFC = dataPFC.trialsECOG;
-
-window = dataAC.windowP;
 fs = dataAC.fs;
 
 nChsAC = size(trialsECOG_AC{1}, 1);
@@ -79,7 +78,8 @@ title('From PFC-1 to AC-1');
 
 colormap('jet');
 scaleAxes("c");
-scaleAxes("x", [-100, 3500]);
-addLines2Axes(struct("X", num2cell((0:6)' * dataAC.trialAll(1).ISI), "color", "w", "width", 1.5));
-% addLines2Axes(struct("X", 0, "color", "w", "width", 1.5));
+scaleAxes("x", [-200, 800]);
+% scaleAxes("x", [-100, 3500]);
+% addLines2Axes(struct("X", num2cell((0:6)' * dataAC.trialAll(1).ISI), "color", "w", "width", 1.5));
+addLines2Axes(struct("X", 0, "color", "w", "width", 1.5));
 colorbar('position', [0.96, 0.1, 0.5 * 0.03, 0.8]);

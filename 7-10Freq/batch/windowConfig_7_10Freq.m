@@ -10,7 +10,7 @@ function params = windowConfig_7_10Freq(params, ISI)
 
     switch ISI
         case 500
-            params.windowPE  = [-1000, 1000];
+            params.windowPE  = [-2000, 2000];
             params.windowMMN = [0    , 500 ];
             params.windowDM  = [-1000, 1000];
             params.windowP   = [-3000, 7000];

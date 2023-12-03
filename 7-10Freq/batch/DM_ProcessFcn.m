@@ -63,7 +63,7 @@ catch
         for mIndex = 1:length(MATPATHs)
             [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHs{mIndex}, params);
             trials = trialAll_temp(~[trialAll_temp.interrupt]);
-            trialsECOG_temp = selectEcog(ECOGDataset, trials, "dev onset", windowICA);
+            trialsECOG_temp = selectEcog(ECOGDataset, trials, "dev onset", windowDM);
             trials(excludeIdxAll{mIndex}) = [];
             trialsECOG_temp(excludeIdxAll{mIndex}) = [];
             trialAll = [trialAll; trials];
@@ -93,9 +93,6 @@ catch
         trialsECOG = interpolateBadChs(trialsECOG, badCHs);
 
         [dRatioAll, dRatio] = computeDevRatio(trialAll);
-        startIdx = fix((windowDM(1) - windowICA(1)) / 1000 * fs);
-        endIdx = fix((windowDM(2) - windowICA(1)) / 1000 * fs);
-        trialsECOG = cellfun(@(x) x(:, startIdx:endIdx), trialsECOG, "UniformOutput", false);
 
         % Z-score
         for dIndex = 2:4
