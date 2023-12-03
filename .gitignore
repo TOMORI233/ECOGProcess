@@ -20,7 +20,7 @@ untitled*.m
 **/XX/
 
 #ignore data
-**/ac.mat
+**/*.mat
 
 #ignore following files;
 *.asv
