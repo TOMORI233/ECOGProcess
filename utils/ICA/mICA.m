@@ -18,6 +18,8 @@ function comp = mICA(dataset, windowICA, arg3, varargin)
 %     comp = mICA(ECOGDataset, windowICA, trials, [fsD], [segOption]);
 %     comp = mICA(trialsECOG, windowICA, fs, [fsD]);
 
+ft_setPath2Top;
+
 mIp = inputParser;
 mIp.addRequired("dataset");
 mIp.addRequired("windowICA", @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
@@ -74,18 +76,6 @@ data.trialinfo = ones(length(trialsECOG), 1);
 data.sampleinfo = sampleinfo;
 data = ft_selectdata(cfg, data);
 
-% Filter
-cfg = [];
-cfg.demean = 'no';
-cfg.lpfilter = 'yes';
-cfg.lpfreq = 50;
-cfg.hpfilter = 'yes';
-cfg.hpfreq = 0.5;
-cfg.hpfiltord = 3;
-cfg.dftfilter = 'yes';
-cfg.dftfreq = [50 100 150]; % line noise frequencies in Hz for DFT filter (default = [50 100 150])
-data = ft_preprocessing(cfg, data);
-
 %% Resampling
 disp("Resampling...");
 
@@ -101,7 +91,8 @@ end
 %% ICA
 disp("Performing ICA...");
 cfg = [];
-cfg.method = 'fastica';
+cfg.method = 'runica'; % default
+% cfg.method = 'fastica';
 cfg.channel = chs2doICA;
 comp = ft_componentanalysis(cfg, data);
 

@@ -25,15 +25,15 @@ t = linspace(window(1), window(2), nTime);
 nperm = 0;
 
 %% 
-window1 = [-1000, 1000];
-tIdx = fix((window1(1) - window(1)) / 1000 * fs):fix((window1(2) - window(1)) / 1000 * fs);
-trialsECOG_AC  = cellfun(@(x) x(:, tIdx), trialsECOG_AC, "UniformOutput", false);
-trialsECOG_PFC = cellfun(@(x) x(:, tIdx), trialsECOG_PFC, "UniformOutput", false);
-
-nTime = size(trialsECOG_AC{1}, 2);
-t = linspace(window1(1), window1(2), nTime);
-
-[cwtres, f, coi] = cwtAny(trialsECOG_AC(1:10), fs, 10, "mode", "GPU");
+% window1 = [-1000, 1000];
+% tIdx = fix((window1(1) - window(1)) / 1000 * fs):fix((window1(2) - window(1)) / 1000 * fs);
+% trialsECOG_AC  = cellfun(@(x) x(:, tIdx), trialsECOG_AC, "UniformOutput", false);
+% trialsECOG_PFC = cellfun(@(x) x(:, tIdx), trialsECOG_PFC, "UniformOutput", false);
+% 
+% nTime = size(trialsECOG_AC{1}, 2);
+% t = linspace(window1(1), window1(2), nTime);
+% 
+% [cwtres, f, coi] = cwtAny(trialsECOG_AC(1:10), fs, 10, "mode", "GPU");
 
 % for cIndexAC = 1:nChsAC
 %     for cIndexPFC = 1:nChsPFC
@@ -81,8 +81,9 @@ set(gca, "YLimitMethod", "tight");
 title('From PFC-1 to AC-1');
 
 colormap('jet');
-scaleAxes("c", "on");
-% scaleAxes("x", [-100, 3500]);
-% addLines2Axes(struct("X", num2cell((0:6)' * dataAC.trialAll(1).ISI), "color", "w", "width", 1.5));
+scaleAxes("c", [0, 0.2]);
+scaleAxes("y", [-inf, 70]);
+scaleAxes("x", [-100, 3500]);
+addLines2Axes(struct("X", num2cell((0:6)' * dataAC.trialAll(1).ISI), "color", "w", "width", 1.5));
 % addLines2Axes(struct("X", 0, "color", "w", "width", 1.5));
 colorbar('position', [0.96, 0.1, 0.5 * 0.03, 0.8]);
