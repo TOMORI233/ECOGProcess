@@ -13,19 +13,19 @@ function params = windowConfig_7_10Freq(params, ISI)
             params.windowPE  = [-2000, 2000];
             params.windowMMN = [0    , 500 ];
             params.windowDM  = [-1000, 1000];
-            params.windowP   = [-3000, 7000];
+            params.windowP   = [-2000, 7000];
             params.windowT0  = [0    , 500 ]; % sum cwt spect
         case 400
             params.windowPE  = [-400 , 800 ];
             params.windowMMN = [0    , 400 ];
             params.windowDM  = [-200 , 800 ];
-            params.windowP   = [-3000, 7000];
+            params.windowP   = [-2000, 6000];
             params.windowT0  = [0    , 400 ]; % sum cwt spect
         case 700
             params.windowPE  = [-700 , 800 ];
             params.windowMMN = [0    , 700 ];
             params.windowDM  = [-200 , 800 ];
-            params.windowP   = [-3000, 9000]; % cwtMulti6001_mex
+            params.windowP   = [-2000, 9000];
             params.windowT0  = [0    , 700 ]; % sum cwt spect
     end
 

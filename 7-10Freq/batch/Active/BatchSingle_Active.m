@@ -6,7 +6,7 @@ params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
 params.normOpt = "off"; % Normalization
 
-params.monkeyID = 2; % 1-CC, 2-XX
+params.monkeyID = 1; % 1-CC, 2-XX
 
 CURRENTPATH = pwd;
 
@@ -37,27 +37,27 @@ for index = 1:length(DATESTRs)
 
     % Exclude trials and bad channels
     params.icaOpt = "on"; % "on" here will perform ICA on all channels and decide bad channels after ICA
-    params.userDefineOpt = "on";
+    params.userDefineOpt = "off";
     Pre_ProcessFcn(params);
 
     % PE
-    params.icaOpt = "on"; % "off" in preprocess and "on" here will perform ICA on good channels
-    params.MONKEYPATH = [SINGLEROOTPATH, 'PE\', DATESTRs{index}, '\'];
-    params.AREANAME = 'AC';
-    params.posIndex = 1; % 1-AC, 2-PFC
-    PE_ProcessFcn(params);
-    params.AREANAME = 'PFC';
-    params.posIndex = 2; % 1-AC, 2-PFC
-    PE_ProcessFcn(params);
+    % params.icaOpt = "on"; % "off" in preprocess and "on" here will perform ICA on good channels
+    % params.MONKEYPATH = [SINGLEROOTPATH, 'PE\', DATESTRs{index}, '\'];
+    % params.AREANAME = 'AC';
+    % params.posIndex = 1; % 1-AC, 2-PFC
+    % PE_ProcessFcn(params);
+    % params.AREANAME = 'PFC';
+    % params.posIndex = 2; % 1-AC, 2-PFC
+    % PE_ProcessFcn(params);
 
     % DM
-    params.MONKEYPATH = [SINGLEROOTPATH, 'DM\', DATESTRs{index}, '\'];
-    params.AREANAME = 'AC';
-    params.posIndex = 1; % 1-AC, 2-PFC
-    DM_ProcessFcn(params);
-    params.AREANAME = 'PFC';
-    params.posIndex = 2; % 1-AC, 2-PFC
-    DM_ProcessFcn(params);
+    % params.MONKEYPATH = [SINGLEROOTPATH, 'DM\', DATESTRs{index}, '\'];
+    % params.AREANAME = 'AC';
+    % params.posIndex = 1; % 1-AC, 2-PFC
+    % DM_ProcessFcn(params);
+    % params.AREANAME = 'PFC';
+    % params.posIndex = 2; % 1-AC, 2-PFC
+    % DM_ProcessFcn(params);
 
     % Prediction
     params.MONKEYPATH = [SINGLEROOTPATH, 'Prediction\', DATESTRs{index}, '\'];

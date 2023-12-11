@@ -27,6 +27,8 @@ mIp.addOptional("segOption", "trial onset", @(x) any(validatestring(x, {'trial o
 mIp.addParameter("chs2doICA", 'all');
 mIp.parse(dataset, windowICA, arg3, varargin{:});
 
+ft_setPath2Top;
+
 fsD = mIp.Results.fsD;
 segOption = mIp.Results.segOption;
 chs2doICA = mIp.Results.chs2doICA;
@@ -75,16 +77,16 @@ data.sampleinfo = sampleinfo;
 data = ft_selectdata(cfg, data);
 
 % Filter
-cfg = [];
-cfg.demean = 'no';
-cfg.lpfilter = 'yes';
-cfg.lpfreq = 50;
-cfg.hpfilter = 'yes';
-cfg.hpfreq = 0.5;
-cfg.hpfiltord = 3;
-cfg.dftfilter = 'yes';
-cfg.dftfreq = [50 100 150]; % line noise frequencies in Hz for DFT filter (default = [50 100 150])
-data = ft_preprocessing(cfg, data);
+% cfg = [];
+% cfg.demean = 'no';
+% cfg.lpfilter = 'yes';
+% cfg.lpfreq = 50;
+% cfg.hpfilter = 'yes';
+% cfg.hpfreq = 0.5;
+% cfg.hpfiltord = 3;
+% cfg.dftfilter = 'yes';
+% cfg.dftfreq = [50 100 150]; % line noise frequencies in Hz for DFT filter (default = [50 100 150])
+% data = ft_preprocessing(cfg, data);
 
 %% Resampling
 disp("Resampling...");

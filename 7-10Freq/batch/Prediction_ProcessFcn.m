@@ -125,15 +125,19 @@ catch
         startIdx = (0:max([0, (floor(length(trialsECOG_temp) / nSmooth) - 1)])) * nSmooth + 1;
         endIdx = [startIdx(1:end - 1) + nSmooth - 1, length(trialsECOG_temp)];
         temp = arrayfun(@(x, y) cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG_temp(x:y)), "UniformOutput", false)), startIdx, endIdx, "UniformOutput", false);
+        [cwtres, f, coi] = cwtAny(temp', fs, 10, "mode", "GPU");
+        fIdx = zeros(1, 2);
+        fIdx(1) = max([1, find(f < fRange(1), 1) - 1]);
+        fIdx(2) = min([length(f), find(f > fRange(2), 1, "last") + 1]);
+        fIdx = unique(fIdx);
+        cwtres = squeeze(mean(abs(cwtres(:, :, fIdx, :)), 3));
 
-        tic
         result_temp = cell(length(startIdx), 1);
-        parfor index = 1:length(startIdx)
-            result_temp{index} = gather(cwtMulti_mex(temp{index}', fs, fRange))';
+        for index = 1:length(startIdx)
+            result_temp{index} = squeeze(cwtres(index, :, :));
         end
         resultCWTSmooth = [resultCWTSmooth; result_temp];
         stdNumSmooth = [stdNumSmooth; ones(length(startIdx), 1) * sIndex];
-        toc
     end
 
     resultCWTSmooth = changeCellRowNum(resultCWTSmooth);
