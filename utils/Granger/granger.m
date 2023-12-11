@@ -1,14 +1,18 @@
 ccc;
 
+% Prediction
 dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\AC_Prediction_Data.mat");
 dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\PFC_Prediction_Data.mat");
 window = dataAC.windowP;
+
 trialsECOG_AC = dataAC.trialsECOG;
 trialsECOG_PFC = dataPFC.trialsECOG;
 
+% PE
 % dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\PE\AC_PE_Data.mat");
 % dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\PE\PFC_PE_Data.mat");
 % window = dataAC.windowPE;
+% 
 % trialsECOG_AC = dataAC.trialsECOG([dataAC.dRatioAll] == 1);
 % trialsECOG_PFC = dataPFC.trialsECOG([dataPFC.dRatioAll] == 1);
 % trialsECOG_AC = dataAC.trialsECOG([dataAC.dRatioAll] > 1);
@@ -23,35 +27,49 @@ nTime = size(trialsECOG_AC{1}, 2);
 t = linspace(window(1), window(2), nTime);
 
 nperm = 0;
+fRange = [0, 70];
 
 %% 
-% window1 = [-1000, 1000];
-% tIdx = fix((window1(1) - window(1)) / 1000 * fs):fix((window1(2) - window(1)) / 1000 * fs);
-% trialsECOG_AC  = cellfun(@(x) x(:, tIdx), trialsECOG_AC, "UniformOutput", false);
-% trialsECOG_PFC = cellfun(@(x) x(:, tIdx), trialsECOG_PFC, "UniformOutput", false);
-% 
-% nTime = size(trialsECOG_AC{1}, 2);
-% t = linspace(window1(1), window1(2), nTime);
-% 
-% [cwtres, f, coi] = cwtAny(trialsECOG_AC(1:10), fs, 10, "mode", "GPU");
+[~, f, coi] = cwtAny(trialsECOG_AC{1}(1, :), fs, "mode", "CPU");
+nTrial = length(trialsECOG_AC);
+nFreq = length(f);
 
-% for cIndexAC = 1:nChsAC
-%     for cIndexPFC = 1:nChsPFC
-%         tempAC = cellfun(@(x) x(cIndexAC, :), trialsECOG_AC, "UniformOutput", false);
-%         tempPFC = cellfun(@(x) x(cIndexPFC, :), trialsECOG_PFC, "UniformOutput", false);
-%         res = mGrangerWavelet(tempAC, tempPFC, fs);
-%     end
-% end
+for cIndex = 1:nChsAC
+    temp = cellfun(@(x) x(cIndex, :), trialsECOG_AC, "UniformOutput", false);
+    cwtres = cwtAny(temp, fs, 10, "mode", "GPU");
+    save(['cwt result\cwtres_AC-', num2str(cIndex), '.mat'], "cwtres", "f", "coi", "t");
+end
 
-for cIndexAC = 7
-    for cIndexPFC = 35
-        tempAC = cellfun(@(x) x(cIndexAC, :), trialsECOG_AC, "UniformOutput", false);
-        tempPFC = cellfun(@(x) x(cIndexPFC, :), trialsECOG_PFC, "UniformOutput", false);
-        res = mGrangerWaveletRaw(tempAC, tempPFC, fs, [], nperm);
-    end
+for cIndex = 1:nChsPFC
+    temp = cellfun(@(x) x(cIndex, :), trialsECOG_PFC, "UniformOutput", false);
+    cwtres = cwtAny(temp, fs, 10, "mode", "GPU");
+    save(['cwt result\cwtres_PFC-', num2str(cIndex), '.mat'], "cwtres", "f", "coi", "t");
 end
 
 %%
+windowNew = [-200, 800];
+tIdx = fix((windowNew(1) - window(1)) / 1000 * fs) + 1:fix((windowNew(2) - window(1)) / 1000 * fs);
+load('cwt result\cwtres_AC-1.mat', "f", "coi");
+coi = coi(tIdx);
+
+for cIndexAC = 1:nChsAC
+    cwtresAC = load(['cwt result\cwtres_AC-', num2str(cIndexAC), '.mat']).cwtres;
+    for cIndexPFC = 1:nChsPFC
+        cwtresPFC = load(['cwt result\cwtres_PFC-', num2str(cIndexPFC), '.mat']).cwtres;
+        temp = cat(2, cwtresAC, cwtresPFC);
+        temp = temp(:, :, :, tIdx);
+        res = mGrangerWaveletFourier(temp, f, coi, fs, fRange, nperm);
+        res.channelcmb([1, 4]) = {['AC-', num2str(cIndexAC)]};
+        res.channelcmb([2, 3]) = {['PFC-', num2str(cIndexPFC)]};
+        res.time = linspace(windowNew(1), windowNew(2), length(tIdx));
+        mSave(['granger result\grangerres_AC-', num2str(cIndexAC), '_PFC-', num2str(cIndexPFC), '.mat'], "res");
+    end
+end
+
+
+%%
+t = res.time;
+
 figure;
 maximizeFig;
 mSubplot(1, 2, 1);
@@ -81,9 +99,9 @@ set(gca, "YLimitMethod", "tight");
 title('From PFC-1 to AC-1');
 
 colormap('jet');
-scaleAxes("c", [0, 0.2]);
-scaleAxes("y", [-inf, 70]);
-scaleAxes("x", [-100, 3500]);
-addLines2Axes(struct("X", num2cell((0:6)' * dataAC.trialAll(1).ISI), "color", "w", "width", 1.5));
-% addLines2Axes(struct("X", 0, "color", "w", "width", 1.5));
+scaleAxes("c", "on");
+scaleAxes("x", [-200, 800]);
+addLines2Axes(struct("X", 0, "color", "w", "width", 1.5));
+% scaleAxes("x", [-100, 3500]);
+% addLines2Axes(struct("X", num2cell((0:6)' * dataAC.trialAll(1).ISI), "color", "w", "width", 1.5));
 colorbar('position', [0.96, 0.1, 0.5 * 0.03, 0.8]);

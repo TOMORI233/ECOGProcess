@@ -62,7 +62,8 @@ catch
         for mIndex = 1:length(MATPATHs)
             [trialAll_temp, ECOGDataset] = ECOGPreprocess(MATPATHs{mIndex}, params);
             trials = trialAll_temp(~cellfun(@(x) isequal(x, true), {trialAll_temp.interrupt}));
-            trialsECOG_temp = selectEcog(ECOGDataset, trials, "dev onset", windowICA);
+            windowTemp = [min([windowPE, windowICA]), max([windowPE, windowICA])];
+            trialsECOG_temp = selectEcog(ECOGDataset, trials, "dev onset", windowTemp);
             
             % Normalization
             if strcmpi(normOpt, "on")
@@ -93,7 +94,8 @@ catch
             try
                 load([PrePATH, AREANAME, '_ICA'], "-mat", "comp", "ICs", "badCHs", "chs2doICA");
             catch
-                [comp, ICs, FigTopoICA] = ICA_Population(trialsECOG, fs, windowICA, chs2doICA);
+                temp = cellfun(@(x) x(:, fix((windowICA(1) - windowTemp(1)) / 1000 * fs) + 1:fix((windowICA(2) - windowTemp(1)) / 1000 * fs)), trialsECOG, "UniformOutput", false);
+                [comp, ICs, FigTopoICA] = ICA_Population(temp, fs, windowICA, chs2doICA);
                 mPrint(FigTopoICA, strcat(PrePATH, AREANAME, "_Topo_ICA"), "-djpeg", "-r400");
                 mSave([PrePATH, AREANAME, '_ICA.mat'], "comp", "ICs", "badCHs", "chs2doICA");
             end
@@ -107,8 +109,8 @@ catch
 
         [dRatioAll, dRatio] = computeDevRatio(trialAll(~cellfun(@(x) isequal(x, false), {trialAll.correct})));
 
-        startIdx = fix((windowPE(1) - windowICA(1)) / 1000 * fs);
-        endIdx = fix((windowPE(2) - windowICA(1)) / 1000 * fs);
+        startIdx = fix((windowPE(1) - windowTemp(1)) / 1000 * fs) + 1;
+        endIdx = fix((windowPE(2) - windowTemp(1)) / 1000 * fs);
         trialsECOG = cellfun(@(x) x(:, startIdx:endIdx), trialsECOG(~cellfun(@(x) isequal(x, false), {trialAll.correct})), "UniformOutput", false);
         ISI = roundn(mean([trialAll.ISI]), 0);
     end
