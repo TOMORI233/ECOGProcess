@@ -1,5 +1,7 @@
 ccc;
 
+SAVEROOTPATH = 'F:\Lab\Projects\ECOG\Granger Causality\DATA\prediction';
+
 % Prediction
 dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\AC_Prediction_Data.mat");
 dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\PFC_Prediction_Data.mat");
@@ -29,40 +31,45 @@ t = linspace(window(1), window(2), nTime);
 nperm = 0;
 fRange = [0, 70];
 
+windowNew = [0, 5000]; % from 1st to 10th ISI
+
 %% 
 [~, f, coi] = cwtAny(trialsECOG_AC{1}(1, :), fs, "mode", "CPU");
-nTrial = length(trialsECOG_AC);
-nFreq = length(f);
+
+fIdx = find(f < fRange(2), 1) - 1:length(f);
+f = f(fIdx);
+
+tIdx = fix((windowNew(1) - window(1)) / 1000 * fs) + 1:fix((windowNew(2) - window(1)) / 1000 * fs);
+t = t(tIdx);
+coi = coi(tIdx);
 
 for cIndex = 1:nChsAC
     temp = cellfun(@(x) x(cIndex, :), trialsECOG_AC, "UniformOutput", false);
     cwtres = cwtAny(temp, fs, 10, "mode", "GPU");
-    save(['cwt result\cwtres_AC-', num2str(cIndex), '.mat'], "cwtres", "f", "coi", "t");
+    cwtres = cwtres(:, :, fIdx, tIdx);
+    save(fullfile(SAVEROOTPATH, ['cwt result\cwtres_AC-', num2str(cIndex), '.mat']), "cwtres", "f", "coi", "t");
 end
 
 for cIndex = 1:nChsPFC
     temp = cellfun(@(x) x(cIndex, :), trialsECOG_PFC, "UniformOutput", false);
     cwtres = cwtAny(temp, fs, 10, "mode", "GPU");
-    save(['cwt result\cwtres_PFC-', num2str(cIndex), '.mat'], "cwtres", "f", "coi", "t");
+    cwtres = cwtres(:, :, fIdx, tIdx);
+    save(fullfile(SAVEROOTPATH, ['cwt result\cwtres_PFC-', num2str(cIndex), '.mat']), "cwtres", "f", "coi", "t");
 end
 
 %%
-windowNew = [-200, 800];
-tIdx = fix((windowNew(1) - window(1)) / 1000 * fs) + 1:fix((windowNew(2) - window(1)) / 1000 * fs);
-load('cwt result\cwtres_AC-1.mat', "f", "coi");
-coi = coi(tIdx);
+load(fullfile(SAVEROOTPATH, 'cwt result\cwtres_AC-1.mat'), "f", "coi");
 
 for cIndexAC = 1:nChsAC
-    cwtresAC = load(['cwt result\cwtres_AC-', num2str(cIndexAC), '.mat']).cwtres;
+    cwtresAC = load(fullfile(SAVEROOTPATH, ['cwt result\cwtres_AC-', num2str(cIndexAC), '.mat'])).cwtres;
     for cIndexPFC = 1:nChsPFC
-        cwtresPFC = load(['cwt result\cwtres_PFC-', num2str(cIndexPFC), '.mat']).cwtres;
+        cwtresPFC = load(fullfile(SAVEROOTPATH, ['cwt result\cwtres_PFC-', num2str(cIndexPFC), '.mat'])).cwtres;
         temp = cat(2, cwtresAC, cwtresPFC);
-        temp = temp(:, :, :, tIdx);
         res = mGrangerWaveletFourier(temp, f, coi, fs, fRange, nperm);
         res.channelcmb([1, 4]) = {['AC-', num2str(cIndexAC)]};
         res.channelcmb([2, 3]) = {['PFC-', num2str(cIndexPFC)]};
         res.time = linspace(windowNew(1), windowNew(2), length(tIdx));
-        mSave(['granger result\grangerres_AC-', num2str(cIndexAC), '_PFC-', num2str(cIndexPFC), '.mat'], "res");
+        mSave(fullfile(SAVEROOTPATH, ['granger result\grangerres_AC-', num2str(cIndexAC), '_PFC-', num2str(cIndexPFC), '.mat']), "res");
     end
 end
 
