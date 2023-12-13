@@ -1,17 +1,20 @@
 ccc;
 
-MATPATHs = dir("dev\granger result\*.mat");
+MATPATHs = dir("std\granger result\*.mat");
+SAVEROOTPATH = 'std\Figures';
 temp = arrayfun(@(x) split(x.name, '_'), MATPATHs, "UniformOutput", false);
 temp = cellfun(@(x) x(2), temp, "UniformOutput", false);
 temp = cellfun(@(x) split(x, '-'), temp, "UniformOutput", false);
 temp = cellfun(@(x) str2double(x{2}), temp);
 chsAC = unique(temp);
 
+mkdir(SAVEROOTPATH);
+
 % AC as seed
 for cIndexAC = 1:length(chsAC)
     close all force;
 
-    PATHs = dir(['dev\granger result\grangerres_AC-', num2str(chsAC(cIndexAC)), '_*.mat']);
+    PATHs = dir(['std\granger result\grangerres_AC-', num2str(chsAC(cIndexAC)), '_*.mat']);
     data = arrayfun(@(x) load(fullfile(x.folder, x.name)).res, PATHs);
     f = data(1).freq;
     t = data(1).time;
@@ -47,7 +50,7 @@ for cIndexAC = 1:length(chsAC)
     scaleAxes("y", [f(end - 1), 70]);
     addLines2Axes(struct("X", {0; t}, "Y", {[]; coi}, "color", "w", "width", 1.5));
     colorbar('position', [0.96, 0.1, 0.5 * 0.03, 0.8]);
-    mPrint(Fig, ['dev\Figures\From seed AC-', num2str(chsAC(cIndexAC)), ' to target PFC-all.jpg'], "-djpeg", "-r200");
+    mPrint(Fig, fullfile(SAVEROOTPATH, ['From seed AC-', num2str(chsAC(cIndexAC)), ' to target PFC-all.jpg']), "-djpeg", "-r200");
 
     % PFC as source
     [~, idx] = sort(temp(2:2:end, 1), "ascend");
@@ -73,5 +76,5 @@ for cIndexAC = 1:length(chsAC)
     scaleAxes("y", [f(end - 1), 70]);
     addLines2Axes(struct("X", {0; t}, "Y", {[]; coi}, "color", "w", "width", 1.5));
     colorbar('position', [0.96, 0.1, 0.5 * 0.03, 0.8]);
-    mPrint(Fig, ['dev\Figures\From target PFC-all to seed AC-', num2str(chsAC(cIndexAC)), '.jpg'], "-djpeg", "-r200");
+    mPrint(Fig, fullfile(SAVEROOTPATH, ['From target PFC-all to seed AC-', num2str(chsAC(cIndexAC)), '.jpg']), "-djpeg", "-r200");
 end
