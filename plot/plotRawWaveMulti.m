@@ -3,7 +3,10 @@ function Fig = plotRawWaveMulti(chData, window, varargin)
     % Input:
     %     chData: n*1 struct of fields:
     %             - chMean: [nCh,nSample]
+    %             - chErr: [nCh, nSample], errorbar (if left empty, errorbar will not be shown)
     %             - color: [R, G, B] or valid color string
+    %             - errColor: errorbar color (default: chMean color decreased by 30% in saturation)
+    %             - errAlpha: face alpha value of errorbar (default: 0.5)
     %             - legend: string or char, if set empty
     %             - skipChs: channels not to plot
     %     other params: see plotRawWave.m
@@ -70,10 +73,23 @@ function Fig = plotRawWaveMulti(chData, window, varargin)
 
             chNum = chs(rIndex, cIndex);
             mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
+            hold(gca, "on");
 
             for index = 1:length(chData)
                 chMean = chData(index).chMean;
+                chErr = getOr(chData(index), "chErr");
+
                 color = getOr(chData(index), "color", "r");
+                hsi = rgb2hsv(color);
+                if hsi(2) == 0 % gray or black
+                    hsi(3) = min([1.1 * hsi(3), 0.9]);
+                else
+                    hsi(2) = 0.7 * hsi(2);
+                end
+                errColor = getOr(chData(index), "errColor", hsv2rgb(hsi));
+
+                errAlpha = getOr(chData(index), "errAlpha", 0.5);
+
                 chData(index).legend = string(getOr(chData(index), "legend", []));
                 skipChs = getOr(chData(index), "skipChs");
 
@@ -83,17 +99,30 @@ function Fig = plotRawWaveMulti(chData, window, varargin)
 
                 t = linspace(window(1), window(2), size(chMean, 2));
 
+                if ~isempty(chErr)
+                    y1 = chMean(chNum, :) + chErr(chNum, :);
+                    y2 = chMean(chNum, :) - chErr(chNum, :);
+                    eb = fill([t fliplr(t)], [y1 fliplr(y2)], errColor, 'edgealpha', 0, 'facealpha', errAlpha);
+                    setLegendOff(eb);
+                end
+
                 if ~isempty(chData(index).legend)
                     ltemp = plot(t, chMean(chNum, :), "Color", color, "LineWidth", 1.5, "DisplayName", chData(index).legend);
                 else
                     ltemp = plot(t, chMean(chNum, :), "Color", color, "LineWidth", 1.5);
                 end
 
-                hold on;
             end
 
             xlim(window);
-            title(['CH ', num2str(chNum), titleStr]);
+            if chNum > 1
+                title(['CH ', num2str(chNum), titleStr]);
+            else
+                if numel(titleStr) > 3 && strcmp(titleStr(1:3), ' | ')
+                    titleStr = titleStr(4:end);
+                end
+                title(titleStr);
+            end
 
             if (rIndex == 1 && cIndex == 1) && ~isempty([chData.legend])
                 legend(gca, "show");

@@ -140,6 +140,9 @@ set(gca, "XLimitMethod", "tight");
 set(gca, "YLimitMethod", "tight");
 title('From signal003 to signal001');
 
+[~, ~, coi] = cwtAny(data.trial{1}, fs, 3, "mode", "GPU");
+addLines2Axes(struct("X", t, "Y", coi, "color", "w"));
+
 colormap('jet');
 % scaleAxes("c");
-colorbar('position', [1 - 0.03, 0.1, 0.5 * 0.03, 0.8]);
+colorbar('position', [1 - 0.04, 0.1, 0.5 * 0.03, 0.8]);

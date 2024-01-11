@@ -13,7 +13,7 @@ function stat = mFDR(data, cfg)
 %          - method: method to calculate significance probability (default: 'analytic')
 %        * - statistic: 'indepsamplesT'(for 2 groups), 'indepsamplesF'(for more than 2 groups)
 %          - correctm: 'no', 'max', 'cluster', 'bonferoni', 'holms', or 'fdr'(default).
-%        * - alpha: alpha level of the permutation test (default = 0.025)
+%        * - alpha: alpha level of FDR (default = 0.05)
 %          - latency: time interval over which the experimental conditions must be compared (in seconds)
 %          - channel: cell-array with selected channel labels (default = 'all')
 %          - design: design matrix of trialinfo (DO NOT SPECIFY IN YOUR cfg)
@@ -35,7 +35,7 @@ function stat = mFDR(data, cfg)
 %         data(dIndex).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), temp, "UniformOutput", false));
 %         data(dIndex).trialinfo = repmat(dIndex, [length(temp), 1]);
 %     end
-%     stat = CBPT(data);
+%     stat = mFDR(data);
 %     % plot result
 %     figure;
 %     imagesc("XData", t, "YData", channels, "CData", stat.stat .* stat.mask);
@@ -50,21 +50,21 @@ if nargin < 2
     cfg = [];
 end
 
-cfg_default.method           = 'analytic';           % use the Monte Carlo Method to calculate the significance probability
-cfg_default.correctm         = 'fdr';
+cfg_default.method   = 'analytic';
+cfg_default.correctm = 'fdr';                       % FDR correction
 
-cfg_default.alpha            = 0.05;                 % alpha level of the permutation test
+cfg_default.alpha    = 0.05;                        % alpha level of the permutation test
 
-% cfg_default.latency          = [0 1];                % time interval over which the experimental conditions must be compared (in seconds)
+% cfg_default.latency          = [0 1];               % time interval over which the experimental conditions must be compared (in seconds)
 
 if numel(data) == 2
-    cfg_default.statistic    = 'indepsamplesT';      % statistic method to evaluate the effect at the sample level
-    cfg_default.tail         = 0;                    % -1, 1 or 0 (default = 0); one-sided or two-sided test
-    cfg_default.clustertail  = 0;                    % identical to tail option
+    cfg_default.statistic   = 'indepsamplesT';      % statistic method to evaluate the effect at the sample level
+    cfg_default.tail        = 0;                    % -1, 1 or 0 (default = 0); one-sided or two-sided test
+    cfg_default.clustertail = 0;                    % identical to tail option
 else
-    cfg_default.statistic    = 'indepsamplesF';      % statistic method to evaluate the effect at the sample level
-    cfg_default.tail         = 1;                    % -1, 1 or 0 (default = 0); one-sided or two-sided test
-    cfg_default.clustertail  = 1;                    % identical to tail option
+    cfg_default.statistic   = 'indepsamplesF';      % statistic method to evaluate the effect at the sample level
+    cfg_default.tail        = 1;                    % -1, 1 or 0 (default = 0); one-sided or two-sided test
+    cfg_default.clustertail = 1;                    % identical to tail option
 end
 
 cfg = getOrFull(cfg, cfg_default);
