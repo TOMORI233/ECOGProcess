@@ -1,8 +1,9 @@
 function res = mGrangerWaveletFourier(cwtres, f, coi, fs, fRange, nperm)
 % Compute granger causality using existed cwt data.
 % 
-% The procedure is independent for each time sample. Thus, it is possible to segment cwt 
-% data for computation effeciency (consider coi in this step).
+% The procedure is independent for each time sample and frequency. 
+% Thus, it is possible to segment cwt data for computation effeciency 
+% (consider coi in this step).
 % 
 % [cwtres] is a nTrial*nCh*nFreq*nTime matrix.
 % The first channel is 'seed' and the rest channels are 'target'.

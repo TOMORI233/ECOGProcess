@@ -14,6 +14,11 @@ function trialsECOG = interpolateBadChs(trialsECOG, badCHs, neighbours)
         
         for tIndex = 1:length(trialsECOG)
             chsTemp = neighbours{badCHs(bIndex)};
+
+            if all(ismember(chsTemp, badCHs))
+                error(['All neighbour channels are bad for channel ', num2str(badCHs(bIndex))]);
+            end
+
             trialsECOG{tIndex}(badCHs(bIndex), :) = mean(trialsECOG{tIndex}(chsTemp(~ismember(chsTemp, badCHs)), :), 1);
         end
 

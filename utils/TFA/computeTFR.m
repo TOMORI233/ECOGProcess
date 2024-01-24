@@ -1,4 +1,6 @@
 function [TFR, t, f, coi] = computeTFR(chMean, fs, fsD, freqLimits, fRange)
+    % Not Recommended any more. Please use `cwtAny` instead.
+
     narginchk(2, 5);
 
     if nargin < 3

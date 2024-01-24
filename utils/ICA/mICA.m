@@ -18,6 +18,8 @@ function comp = mICA(dataset, windowICA, arg3, varargin)
 %     comp = mICA(ECOGDataset, windowICA, trials, [fsD], [segOption]);
 %     comp = mICA(trialsECOG, windowICA, fs, [fsD]);
 
+ft_setPath2Top;
+
 mIp = inputParser;
 mIp.addRequired("dataset");
 mIp.addRequired("windowICA", @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
@@ -103,7 +105,8 @@ end
 %% ICA
 disp("Performing ICA...");
 cfg = [];
-cfg.method = 'fastica';
+cfg.method = 'runica'; % default
+% cfg.method = 'fastica';
 cfg.channel = chs2doICA;
 comp = ft_componentanalysis(cfg, data);
 
