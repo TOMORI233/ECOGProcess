@@ -1,7 +1,7 @@
 ccc;
 
-MATPATHs = dir("std\granger result\*.mat");
-SAVEROOTPATH = 'std\Figures';
+MATPATHs = dir("F:\Lab\Projects\ECOG\Granger Causality\DATA\prediction\granger result\*.mat");
+SAVEROOTPATH = 'F:\Lab\Projects\ECOG\Granger Causality\DATA\prediction\Figures';
 temp = arrayfun(@(x) split(x.name, '_'), MATPATHs, "UniformOutput", false);
 temp = cellfun(@(x) obtainArgoutN(@fileparts, 2, x(3)), temp, "UniformOutput", false);
 temp = cellfun(@(x) split(x, '-'), temp, "UniformOutput", false);
@@ -14,7 +14,7 @@ mkdir(SAVEROOTPATH);
 for cIndexPFC = 1:length(chsPFC)
     close all force;
 
-    PATHs = dir(['std\granger result\grangerres*PFC-', num2str(chsPFC(cIndexPFC)), '.mat']);
+    PATHs = dir(['F:\Lab\Projects\ECOG\Granger Causality\DATA\prediction\granger result\grangerres*PFC-', num2str(chsPFC(cIndexPFC)), '.mat']);
     data = arrayfun(@(x) load(fullfile(x.folder, x.name)).res, PATHs);
     f = data(1).freq;
     t = data(1).time;
