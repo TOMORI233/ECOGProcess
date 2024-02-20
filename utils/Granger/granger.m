@@ -25,8 +25,7 @@ fs = dataAC.fs;
 nChsAC = size(trialsECOG_AC{1}, 1);
 nChsPFC = size(trialsECOG_PFC{1}, 1);
 
-nTime = size(trialsECOG_AC{1}, 2);
-t = linspace(window(1), window(2), nTime);
+t = linspace(window(1), window(2), size(trialsECOG_AC{1}, 2));
 
 nperm = 0;
 fRange = [0, 70];
@@ -39,7 +38,7 @@ windowNew = [0, 5000]; % from 1st to 10th ISI
 fIdx = find(f < fRange(2), 1) - 1:length(f);
 f = f(fIdx);
 
-tIdx = fix((windowNew(1) - window(1)) / 1000 * fs) + 1:fix((windowNew(2) - window(1)) / 1000 * fs);
+tIdx = find(t >= windowNew(1), 1):find(t >= windowNew(2), 1);
 t = t(tIdx);
 coi = coi(tIdx);
 
@@ -63,12 +62,16 @@ load(fullfile(SAVEROOTPATH, 'cwt result\cwtres_AC-1.mat'), "f", "coi");
 for cIndexAC = 1:nChsAC
     cwtresAC = load(fullfile(SAVEROOTPATH, ['cwt result\cwtres_AC-', num2str(cIndexAC), '.mat'])).cwtres;
     for cIndexPFC = 1:nChsPFC
+        if exist(fullfile(SAVEROOTPATH, ['granger result\grangerres_AC-', num2str(cIndexAC), '_PFC-', num2str(cIndexPFC), '.mat']), "file")
+            disp([fullfile(SAVEROOTPATH, ['granger result\grangerres_AC-', num2str(cIndexAC), '_PFC-', num2str(cIndexPFC), '.mat']), ' exist. Skip']);
+            continue;
+        end
         cwtresPFC = load(fullfile(SAVEROOTPATH, ['cwt result\cwtres_PFC-', num2str(cIndexPFC), '.mat'])).cwtres;
         temp = cat(2, cwtresAC, cwtresPFC);
         res = mGrangerWaveletFourier(temp, f, coi, fs, fRange, nperm);
         res.channelcmb([1, 4]) = {['AC-', num2str(cIndexAC)]};
         res.channelcmb([2, 3]) = {['PFC-', num2str(cIndexPFC)]};
-        res.time = linspace(windowNew(1), windowNew(2), length(tIdx));
+        res.time = t;
         mSave(fullfile(SAVEROOTPATH, ['granger result\grangerres_AC-', num2str(cIndexAC), '_PFC-', num2str(cIndexPFC), '.mat']), "res");
     end
 end
