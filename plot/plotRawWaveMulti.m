@@ -80,6 +80,7 @@ function Fig = plotRawWaveMulti(chData, window, varargin)
                 chErr = getOr(chData(index), "chErr");
 
                 color = getOr(chData(index), "color", "r");
+                color = validatecolor(color);
                 hsi = rgb2hsv(color);
                 if hsi(2) == 0 % gray or black
                     hsi(3) = min([1.1 * hsi(3), 0.9]);
@@ -148,7 +149,7 @@ function Fig = plotRawWaveMulti(chData, window, varargin)
 
     end
 
-    scaleAxes(Fig, "y", "on", "symOpt", "max");
+    scaleAxes(Fig, "y", "on");
 
     return;
 end
