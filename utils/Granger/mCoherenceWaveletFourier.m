@@ -32,7 +32,7 @@ currentPath = pwd;
 cd(fullfile(fileparts(which("ft_defaults")), 'connectivity', 'private'));
 
 res = mCoherenceWaveletImpl(data);
-res.dimord = 'chan_chan_freq_time';
+res.dimord = 'chancmb_freq_time';
 res.freq = exp((res.freq - c) / 10);
 res.coi = data.coi;
 
@@ -77,7 +77,7 @@ if nperm > 1
     end
 
     res.coherencespctrm = coherencespctrm;
-    res.dimord = 'chan_chan_freq_time_perm';
+    res.dimord = 'chancmb_freq_time_perm';
 end
 
 disp(['Coherence computation from wavelet transforms of time series data done in ', num2str(toc(t0)), ' s']);
