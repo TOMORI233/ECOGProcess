@@ -5,7 +5,7 @@ function res = mGrangerWaveletImpl(data)
 %     label: nchan*1 cellstr
 %     dimord: 'rpt_chan_freq_time'
 %     cumtapcnt: ones(length(data.time), length(data.freq))
-%     fourierspctrm: 1*nchan*nfreq*ntime complex double matrix, obtained by wavelet transform
+%     fourierspctrm: nrpt*nchan*nfreq*ntime complex double matrix, obtained by wavelet transform
 
 %% Parameter settings
 numiteration = 100;
