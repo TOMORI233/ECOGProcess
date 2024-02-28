@@ -8,6 +8,7 @@ function res = mGrangerWaveletFourier(cwtres, f, coi, fs, fRange, nperm)
 % [cwtres] is a nTrial*nCh*nFreq*nTime matrix.
 % The first channel is 'seed' and the rest channels are 'target'.
 % [f] is a descendent column vector in log scale.
+% [coi] does not influence the result. Leave it empty if you do not need it.
 % [fRange] specifies frequency limit for granger causality computation. (default: [] for all)
 % If [nperm] is larger than 1, perform permutation test by randomizing trial order.
 
