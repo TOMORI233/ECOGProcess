@@ -38,7 +38,7 @@ ft_setPath2Top;
 
 %% Prepare data
 data.trial = cellfun(@(x, y) [x; y], trialsDataArea1, trialsDataArea2, "UniformOutput", false)';
-data.time = repmat({linspArea1e(windowData(1), windowData(2), size(trialsDataArea1{1}, 2)) / 1000}, [1, length(data.trial)]); % normalize
+data.time = repmat({linspace(windowData(1), windowData(2), size(trialsDataArea1{1}, 2)) / 1000}, [1, length(data.trial)]); % normalize
 data.fsample = fs;
 data.label = mat2cell(char([rowFcn(@(x) strcat('Area1-', strrep(x, ' ', '0')), string(num2str((1:size(trialsDataArea1{1}, 1))'))); ...
                             rowFcn(@(x) strcat('Area2-', strrep(x, ' ', '0')), string(num2str((1:size(trialsDataArea2{1}, 1))')))]), ...
