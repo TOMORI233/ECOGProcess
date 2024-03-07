@@ -94,29 +94,21 @@ cdata = mCoherenceWaveletRaw(yseed, ytarget, fs, [], nperm);
 %% 
 figure;
 maximizeFig;
-mSubplot(1, 3, 1);
-imagesc("XData", cdata.time, "YData", cdata.freq, "CData", squeeze(cdata.coherencespctrm(1, 2, :, :, 1)));
+mSubplot(1, 2, 1);
+imagesc("XData", cdata.time, "YData", cdata.freq, "CData", squeeze(cdata.coherencespctrm(1, :, :, 1)));
 set(gca, "YScale", "log");
 yticks([0, 2.^(0:nextpow2(max(gdata.freq)) - 1)]);
 set(gca, "XLimitMethod", "tight");
 set(gca, "YLimitMethod", "tight");
 title('Coherence: signal001 vs signal002');
 
-mSubplot(1, 3, 2);
-imagesc("XData", cdata.time, "YData", cdata.freq, "CData", squeeze(cdata.coherencespctrm(1, 3, :, :, 1)));
+mSubplot(1, 2, 2);
+imagesc("XData", cdata.time, "YData", cdata.freq, "CData", squeeze(cdata.coherencespctrm(2, :, :, 1)));
 set(gca, "YScale", "log");
 yticks([0, 2.^(0:nextpow2(max(gdata.freq)) - 1)]);
 set(gca, "XLimitMethod", "tight");
 set(gca, "YLimitMethod", "tight");
 title('Coherence: signal001 vs signal003');
-
-mSubplot(1, 3, 3);
-imagesc("XData", cdata.time, "YData", cdata.freq, "CData", squeeze(cdata.coherencespctrm(2, 3, :, :, 1)));
-set(gca, "YScale", "log");
-yticks([0, 2.^(0:nextpow2(max(gdata.freq)) - 1)]);
-set(gca, "XLimitMethod", "tight");
-set(gca, "YLimitMethod", "tight");
-title('Coherence: signal002 vs signal003');
 
 colormap('jet');
 scaleAxes("c");
