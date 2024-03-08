@@ -3,16 +3,16 @@ ccc;
 SAVEROOTPATH = 'F:\Lab\Projects\ECOG\Granger Causality\DATA\prediction';
 
 % Prediction
-load("D:\Lab members\KXK\TrialDataAreas.mat");
+% load("D:\Lab members\KXK\TrialDataAreas.mat");
 
 
 
-% dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\AC_Prediction_Data.mat");
-% dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\PFC_Prediction_Data.mat");
-window = DataAC.window;
+dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\AC_Prediction_Data.mat");
+dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\PFC_Prediction_Data.mat");
+window = dataAC.window;
 
-trialsECOG_AC = DataAC.trialsECOG;
-trialsECOG_PFC = DataPFC.trialsECOG;
+trialsECOG_AC = dataAC.trialsECOG;
+trialsECOG_PFC = dataPFC.trialsECOG;
 
 % PE
 % dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\PE\AC_PE_Data.mat");
