@@ -6,7 +6,7 @@ params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
 params.normOpt = "off"; % Normalization
 
-params.monkeyID = 1; % 1-CC, 2-XX
+params.monkeyID = 2; % 1-CC, 2-XX
 
 CURRENTPATH = pwd;
 
@@ -29,7 +29,7 @@ end
 params = windowConfig_7_10Freq(params);
 
 %% Single day ----------------------------------------------------------------
-params.dataOnlyOpt = "on"; % "on" will save data only
+params.dataOnlyOpt = "off"; % "on" will save data only
 
 for index = 1:length(DATESTRs)
     params.DATESTRs = DATESTRs(index);
@@ -68,9 +68,10 @@ for index = 1:length(DATESTRs)
     params.posIndex = 2; % 1-AC, 2-PFC
     Prediction_ProcessFcn(params);
 
-    if strcmpi(params.dataOnlyOpt, "on")
-        continue;
-    end
+%     if strcmpi(params.dataOnlyOpt, "on")
+%         continue;
+%     end
+    continue;
 
     % Compare single
     params.MONKEYPATH = [SINGLEROOTPATH, 'Compare\', DATESTRs{index}, '\'];
