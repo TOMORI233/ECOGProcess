@@ -58,10 +58,9 @@ function Fig = plotRawWaveMulti(chData, window, varargin)
         chs = reshape(temp, plotSize(2), plotSize(1))';
     end
 
-    Fig = figure("Visible", visible);
+    Fig = figure("Visible", visible, "WindowState", "maximized");
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
-    maximizeFig(Fig);
 
     for rIndex = 1:plotSize(1)
 

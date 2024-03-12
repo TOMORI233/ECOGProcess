@@ -19,9 +19,11 @@ function varargout = ECOGFilter(dataset, fhp, flp, varargin)
     mIp.addRequired("fhp", @(x) validateattributes(x, {'numeric'}, {'scalar', 'positive'}));
     mIp.addRequired("flp", @(x) validateattributes(x, {'numeric'}, {'scalar', 'positive'}));
     mIp.addOptional("fs", [], @(x) validateattributes(x, {'numeric'}, {'scalar', 'positive'}));
+    mIp.addParameter("Notch", "off", @(x) any(validatestring(x, {'on', 'off'})));
     mIp.parse(dataset, fhp, flp, varargin{:});
 
     fs = mIp.Results.fs;
+    NotchOpt = mIp.Results.Notch;
 
     switch class(dataset)
         case 'cell'
@@ -63,10 +65,18 @@ function varargout = ECOGFilter(dataset, fhp, flp, varargin)
     cfg.hpfilter = 'yes';
     cfg.hpfreq = fhp;
     cfg.hpfiltord = 3;
-    cfg.dftfilter = 'yes';
-    cfg.dftfreq = [50 100 150]; % line noise frequencies in Hz for DFT filter (default = [50 100 150])
+    % cfg.dftfilter = 'yes';
+    % cfg.dftfreq = [50 100 150]; % line noise frequencies in Hz for DFT filter (default = [50 100 150])
     data = ft_preprocessing(cfg, data);
 
+    % Notch
+    if strcmp(NotchOpt, "on")
+        butter = path2func(fullfile(matlabroot, "toolbox/signal/signal/butter.m"));
+        filtfilt = path2func(fullfile(matlabroot, "toolbox/signal/signal/filtfilt.m"));
+        [b, a] = butter(3, [49, 51] / (fs / 2), "stop");
+        data.trial = cellfun(@(x) cell2mat(cellfun(@(y) filtfilt(b, a, y), x, "UniformOutput", false)), data.trial, "UniformOutput", false);
+    end
+    
     %% output
     if isstruct(dataset)
         dataset.data = data.trial{1};

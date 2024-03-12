@@ -23,7 +23,7 @@ function Exported = exportDataFcn(BLOCKPATHs, SAVEPATHs, params, Exported, skipI
             tic
             [trialAll, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params, "patch", patchOpt);
             ECOGDataset = ECOGResample(ECOGDataset, fd);
-            ECOGDataset = ECOGFilter(ECOGDataset, fhp, flp);
+            ECOGDataset = ECOGFilter(ECOGDataset, fhp, flp, "Notch", "on");
             disp("Saving...");
             save(strcat(SAVEPATHs{idxAll(index)}, DateStr, "\", DateStr, "_", AREANAMEs(params.posIndex), ".mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");
             toc
@@ -34,7 +34,7 @@ function Exported = exportDataFcn(BLOCKPATHs, SAVEPATHs, params, Exported, skipI
             tic
             [~, ECOGDataset] = ECOGPreprocess(BLOCKPATHs{idxAll(index)}, params, "patch", patchOpt);
             ECOGDataset = ECOGResample(ECOGDataset, fd);
-            ECOGDataset = ECOGFilter(ECOGDataset, fhp, flp);
+            ECOGDataset = ECOGFilter(ECOGDataset, fhp, flp, "Notch", "on");
             disp("Saving...");
             save(strcat(SAVEPATHs{idxAll(index)}, DateStr, "\", DateStr, "_", AREANAMEs(params.posIndex), ".mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");
             toc

@@ -1,4 +1,7 @@
-function [Fig, res] = plotTFA(chMean, fs0, fsD, window, titleStr, plotSize, chs, visible)
+function [Fig, res] = plotTFA(data, fs0, fsD, window, titleStr, plotSize, chs, visible)
+    % If [data] is [trialsData], perform cwt on each trial and average the result.
+    % If [data] is [chMean], perform cwt on the averaged wave.
+
     narginchk(4, 8);
     
     if nargin < 5
@@ -9,8 +12,14 @@ function [Fig, res] = plotTFA(chMean, fs0, fsD, window, titleStr, plotSize, chs,
         titleStr = '';
     end
 
+    if iscell(data)
+        nChs = size(data{1}, 1);
+    else
+        nChs = size(data, 1);
+    end
+
     if nargin < 6
-        plotSize = autoPlotSize(size(chMean, 1));
+        plotSize = autoPlotSize(nChs);
     end
     
     if nargin < 7
@@ -26,24 +35,41 @@ function [Fig, res] = plotTFA(chMean, fs0, fsD, window, titleStr, plotSize, chs,
         chs = reshape(chs(1):(chs(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
     end
 
-    Fig = figure("Visible", visible);
+    Fig = figure("Visible", visible, "WindowState", "maximized");
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
-    maximizeFig(Fig);
 
     res.TFR = [];
+
+    if iscell(data)
+        if ~isempty(fsD) && fsD < fs0
+            temp = resampleData(data, fs0, fsD);
+            [cwtres, Y, coi] = cwtAny(temp, fsD, 10, "mode", "GPU");
+            t = (1:size(temp{1}, 2)) / fsD;
+        else
+            [cwtres, Y, coi] = cwtAny(data, fs0, 10, "mode", "GPU");
+            t = (1:size(data{1}, 2)) / fs0;
+        end
+        cwtres = squeeze(mean(abs(cwtres), 1));
+    end
     
     for rIndex = 1:plotSize(1)
     
         for cIndex = 1:plotSize(2)
 
-            if chs(rIndex, cIndex) > size(chMean, 1)
+            if chs(rIndex, cIndex) > nChs
                 continue;
             end
 
             chNum = chs(rIndex, cIndex);
             mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
-            [t, Y, CData, coi] = mCWT(double(chMean(chNum, :)), fs0, 'morlet', fsD);
+            
+            if iscell(data)
+                CData = squeeze(cwtres(chNum, :, :));
+            else
+                [t, Y, CData, coi] = mCWT(data(chNum, :), fs0, 'morlet', fsD);
+            end
+
             X = t * 1000 + window(1);
             imagesc('XData', X, 'YData', Y, 'CData', CData);
             res.TFR = [res.TFR; {CData}];

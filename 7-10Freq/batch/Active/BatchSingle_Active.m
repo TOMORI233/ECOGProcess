@@ -11,7 +11,7 @@ params.monkeyID = 2; % 1-CC, 2-XX
 CURRENTPATH = pwd;
 
 if params.monkeyID == 1
-    params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\CC\7-10Freq Active\';
+    params.ROOTPATH = 'D:\Lab members\XHX\ECOG\MAT Data\raw\CC\7-10Freq Active\';
     DATESTRs = {'cc20220520', 'cc20220706', 'cc20220801', 'cc20221014', 'cc20221015'};
 %     DATESTRs = {'cc20220520', 'cc20220706', 'cc20220801', 'cc20221014'};
 %     DATESTRs = {'cc20220908'}; % ISI=700
@@ -19,7 +19,7 @@ if params.monkeyID == 1
     POPUROOTPATH = [CURRENTPATH, '\CC\Population\'];
     SINGLEROOTPATH = [CURRENTPATH, '\CC\Single\'];
 else
-    params.ROOTPATH = 'D:\Education\Lab\Projects\ECOG\MAT Data\XX\7-10Freq Active\';
+    params.ROOTPATH = 'D:\Lab members\XHX\ECOG\MAT Data\raw\XX\7-10Freq Active\';
     DATESTRs = {'xx20220711', 'xx20220812', 'xx20220820', 'xx20220822', 'xx20220913'};
 %     DATESTRs = {'xx20221017'}; % ISI=400
     POPUROOTPATH = [CURRENTPATH, '\XX\Population\'];
@@ -29,7 +29,7 @@ end
 params = windowConfig_7_10Freq(params);
 
 %% Single day ----------------------------------------------------------------
-params.dataOnlyOpt = "off"; % "on" will save data only
+params.dataOnlyOpt = "on"; % "on" will save data only
 
 for index = 1:length(DATESTRs)
     params.DATESTRs = DATESTRs(index);
