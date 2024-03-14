@@ -26,7 +26,7 @@ if behavOnly
 else
     duration(1) = size(varargin{1}.streams.(sfNames(1)).data, 2) / varargin{1}.streams.(sfNames(1)).fs;
 end
-segTimePoint = [0 duration(1)];
+segTimePoint = [0, duration(1)];
 for dIndex = 2:length(varargin)
     if behavOnly
         duration(dIndex) = duration(dIndex - 1) + varargin{dIndex}.time_ranges(2);
@@ -34,7 +34,7 @@ for dIndex = 2:length(varargin)
         duration(dIndex) = duration(dIndex - 1) + size(varargin{dIndex}.streams.(sfNames(1)).data, 2) / varargin{dIndex}.streams.(sfNames(1)).fs;
     end
 
-    segTimePoint = [segTimePoint; [duration(dIndex -1)  duration(dIndex)] ];
+    segTimePoint = [segTimePoint; [duration(dIndex - 1), duration(dIndex)]];
 
     for eIndex = 1:length(efNames)
         try
@@ -61,7 +61,8 @@ for eIndex = 1:length(efNames)
 end
 
 for dIndex = 1:length(varargin)
-    trialOnsetIdx = find(varargin{dIndex}.epocs.num0.data == 1);
+    % trialOnsetIdx = find(varargin{dIndex}.epocs.num0.data == 1);
+    trialOnsetIdx = 1:length(varargin{dIndex}.epocs.Swep.data);
 
     for eIndex = 1:length(efNames)
 
