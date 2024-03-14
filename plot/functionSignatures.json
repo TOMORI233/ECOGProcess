@@ -74,6 +74,38 @@
             {"name": "chs", "kind": "ordered", "type": [["numel=1"], ["numel=2"], "integer", "@(x) x >= 0"]},
             {"name": "visible", "kind": "ordered", "type": ["choices = {'on', 'off'}"]}
         ]
+    },
+
+    "plotTFA": {
+        "inputs": [
+            {"mutuallyExclusiveGroup": [
+                [
+                    {"name": "trialsData", "kind": "required", "type": ["cell"]},
+                    {"name": "fs0", "kind": "required", "type": ["scalar", "positive", "integer"], "description": "sample rate (Hz)"},
+                    {"name": "fsD", "kind": "required", "type": ["scalar", "positive", "integer"], "description": "downsample rate (Hz)"}
+                ],
+                [
+                    {"name": "chMean", "kind": "required", "type": ["@(x) ismatrix(x)"]},
+                    {"name": "fs0", "kind": "required", "type": ["scalar", "positive", "integer"], "description": "sample rate (Hz)"},
+                    {"name": "fsD", "kind": "required", "type": ["scalar", "positive", "integer"], "description": "downsample rate (Hz)"}
+                ],
+                [
+                    {"name": "cwtresRaw", "kind": "required", "type": ["@(x) isa(x, 'double') && ndims(x) == 4"], "description": "nTrial*nCh*nFreq*nTime"},
+                    {"name": "f", "kind": "required", "type": ["positive"], "description": "frequency vector (Hz)"},
+                    {"name": "coi", "kind": "required", "type": ["positive"], "description": "cone of influence"}
+                ],
+                [
+                    {"name": "cwtresAbs", "kind": "required", "type": ["@(x) isa(x, 'double') && ndims(x) == 3"], "description": "nCh*nFreq*nTime"},
+                    {"name": "f", "kind": "required", "type": ["positive"], "description": "frequency vector (Hz)"},
+                    {"name": "coi", "kind": "required", "type": ["positive"], "description": "cone of influence"}
+                ]
+            ]},
+            {"name": "window", "kind": "required", "type": ["numeric", "numel=2", "@(x) x(2) > x(1)"]},
+            {"name": "titleStr", "kind": "ordered", "type": ["@(x) isstring(x) || ischar(x) || isempty(x)"]},
+            {"name": "plotSize", "kind": "ordered", "type": ["@(x) numel(x) <= 2", "integer", "positive"]},
+            {"name": "chs", "kind": "ordered", "type": [["numel=1"], ["numel=2"], "integer", "@(x) x >= 0"]},
+            {"name": "visible", "kind": "ordered", "type": ["choices = {'on', 'off'}"]}
+        ]
     }
 
 }

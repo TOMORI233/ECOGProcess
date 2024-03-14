@@ -35,8 +35,8 @@
                     {"name": "fhp", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "high pass cutoff frequency"},
                     {"name": "flp", "kind": "required", "type": ["numeric", "positive", "numel=1"], "purpose": "low pass cutoff frequency"}
                 ]
-            ]}
-            
+            ]},
+            {"name": "Notch", "kind": "namevalue", "type": ["choices={'on', 'off'}"]}
         ]
     },
 

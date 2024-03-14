@@ -155,7 +155,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
                 tIdxTemp = cellfun(@(x) sum(x(goodChIdx, :) > chMean(goodChIdx, :) + 3 * chStd(goodChIdx, :) | x(goodChIdx, :) < chMean(goodChIdx, :) - 3 * chStd(goodChIdx, :), 2) / size(x, 2), trialsData, "UniformOutput", false);
                 tIdxTemp = cellfun(@(x) ~any(x > tTh), tIdxTemp); % marked true means reserved trials
                 if any(~tIdxTemp)
-                    disp(['Preview: Trial ', num2str(find(~tIdxTemp)'), ' will be excluded.']);
+                    disp(['Preview: A number of ', num2str(sum(~tIdxTemp)), ' trials will be excluded.']);
                 else
                     disp('Preview: All will pass.');
                 end
@@ -176,7 +176,7 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
 
     if any(~tIdx)
         tIdx = find(~tIdx);
-        disp(['Trials excluded: ', num2str(tIdx')]);
+        disp(['Trials excluded (N=', num2str(length(tIdx)), '): ', num2str(tIdx')]);
     else
         tIdx = [];
         disp('All pass.');

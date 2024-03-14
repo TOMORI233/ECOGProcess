@@ -125,13 +125,14 @@ catch
 
         if nSmooth == 1
             temp = trialsECOG_temp;
+            startIdx = 1:length(trialsECOG_temp);
         else
             startIdx = (0:max([0, (floor(length(trialsECOG_temp) / nSmooth) - 1)])) * nSmooth + 1;
             endIdx = [startIdx(1:end - 1) + nSmooth - 1, length(trialsECOG_temp)];
             temp = arrayfun(@(x, y) cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG_temp(x:y)), "UniformOutput", false)), startIdx, endIdx, "UniformOutput", false)';
         end
         
-        [cwtres, f, coi] = cwtAny(temp, fs, 5, "mode", "GPU");
+        [cwtres, f, coi] = cwtAny(temp, fs, 10, "mode", "GPU");
         fIdx = zeros(1, 2);
         fIdx(1) = max([1, find(f < fRange(1), 1) - 1]);
         fIdx(2) = min([length(f), find(f > fRange(2), 1, "last") + 1]);

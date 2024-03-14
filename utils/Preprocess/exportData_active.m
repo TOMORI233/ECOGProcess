@@ -45,13 +45,13 @@ for jIdx = 1:length(joinIdx)
 
     ECOGDataset = jointData.streams.LAuC;
     ECOGDataset = ECOGResample(ECOGDataset, params.fd);
-    ECOGDataset = ECOGFilter(ECOGDataset, params.fhp, params.flp);
+    ECOGDataset = ECOGFilter(ECOGDataset, params.fhp, params.flp, "Notch", "on");
     ECOGDataset.data = ECOGDataset.data(ECOGSitePatch("AC"), :);
     save(strcat(SAVEPATHs{joinIdx{jIdx}(dIdx)}, DateStr, "\", DateStr, "_AC.mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");
     
     ECOGDataset = jointData.streams.LPFC;
     ECOGDataset = ECOGResample(ECOGDataset, params.fd);
-    ECOGDataset = ECOGFilter(ECOGDataset, params.fhp, params.flp);
+    ECOGDataset = ECOGFilter(ECOGDataset, params.fhp, params.flp, "Notch", "on");
     ECOGDataset.data = ECOGDataset.data(ECOGSitePatch("PFC"), :);
     save(strcat(SAVEPATHs{joinIdx{jIdx}(dIdx)}, DateStr, "\", DateStr, "_PFC.mat"), "ECOGDataset", "trialAll", "-mat", "-v7.3");
 end
