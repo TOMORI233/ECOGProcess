@@ -18,8 +18,7 @@ function Fig = plotTopoICA(topo, topoSize, plotSize, ICs)
         ICs = reshape(ICs(1):(ICs(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
     end
 
-    Fig = figure;
-    maximizeFig(Fig);
+    Fig = figure("WindowState", "maximized");
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
     

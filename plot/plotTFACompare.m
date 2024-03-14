@@ -22,10 +22,9 @@ function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotS
         chs = reshape(chs(1):(chs(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
     end
 
-    Fig = figure;
+    Fig = figure("WindowState", "maximized");
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
-    maximizeFig(Fig);
 
     for rIndex = 1:plotSize(1)
 
