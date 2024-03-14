@@ -58,10 +58,9 @@ function Fig = plotRawWaveMulti(chData, window, varargin)
         chs = reshape(temp, plotSize(2), plotSize(1))';
     end
 
-    Fig = figure("Visible", visible);
+    Fig = figure("Visible", visible, "WindowState", "maximized");
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
-    maximizeFig(Fig);
 
     for rIndex = 1:plotSize(1)
 
@@ -80,6 +79,7 @@ function Fig = plotRawWaveMulti(chData, window, varargin)
                 chErr = getOr(chData(index), "chErr");
 
                 color = getOr(chData(index), "color", "r");
+                color = validatecolor(color);
                 hsi = rgb2hsv(color);
                 if hsi(2) == 0 % gray or black
                     hsi(3) = min([1.1 * hsi(3), 0.9]);
@@ -148,7 +148,7 @@ function Fig = plotRawWaveMulti(chData, window, varargin)
 
     end
 
-    scaleAxes(Fig, "y", "on", "symOpt", "max");
+    scaleAxes(Fig, "y", "on");
 
     return;
 end

@@ -1,8 +1,8 @@
-function Fig = plotRawWave(chMean, chStd, window, varargin)
+function Fig = plotRawWave(chMean, chErr, window, varargin)
     % Description: plot raw wave of continous channel-by-time data (single-condition)
     % Input:
     %     chMean: channel-by-time matrix of mean waves (2-D), not empty.
-    %     chStd: channel-by-time matrix of wave stds (2-D). If set empty, error bars will not be shown.
+    %     chErr: channel-by-time matrix of wave stds (2-D). If set empty, error bars will not be shown.
     %     window: time window in ms, a strictly increasing 2-element vector.
     %     titleStr: the default title is 'CH xx'. If not set empty, it would be 'CH xx | titleStr' for each channel plot
     %     plotSize: default is autoPlotSize(size(chMean, 1)), where autoPlotSize is a function that
@@ -32,13 +32,13 @@ function Fig = plotRawWave(chMean, chStd, window, varargin)
 
     mIp = inputParser;
     mIp.addRequired("chMean", @(x) validateattributes(x, {'numeric'}, {'2d'}));
-    mIp.addRequired("chStd",  @(x) validateattributes(x, {'numeric'}, {'2d'}));
+    mIp.addRequired("chErr",  @(x) validateattributes(x, {'numeric'}, {'2d'}));
     mIp.addRequired("window", @(x) validateattributes(x, {'numeric'}, {'numel', 2, 'increasing'}));
     mIp.addOptional("titleStr", [], @(x) isempty(x) || isstring(x) || ischar(x));
     mIp.addOptional("plotSize", autoPlotSize(size(chMean, 1)), @(x) all(fix(x) == x) && numel(x) <= 2 && all(x > 0));
     mIp.addOptional("chs",      [], @(x) all(fix(x) == x & x >= 0));
     mIp.addOptional("visible",  "on", @(x) any(validatestring(x, {'on', 'off'})));
-    mIp.parse(chMean, chStd, window, varargin{:});
+    mIp.parse(chMean, chErr, window, varargin{:});
 
     titleStr = mIp.Results.titleStr;
     plotSize = mIp.Results.plotSize;
@@ -70,10 +70,9 @@ function Fig = plotRawWave(chMean, chStd, window, varargin)
         chs = reshape(temp, plotSize(2), plotSize(1))';
     end
 
-    Fig = figure("Visible", visible);
+    Fig = figure("Visible", visible, "WindowState", "maximized");
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
-    maximizeFig(Fig);
 
     for rIndex = 1:plotSize(1)
 
@@ -88,9 +87,9 @@ function Fig = plotRawWave(chMean, chStd, window, varargin)
             mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
             hold(gca, "on");
 
-            if ~isempty(chStd)
-                y1 = chMean(chNum, :) + chStd(chNum, :);
-                y2 = chMean(chNum, :) - chStd(chNum, :);
+            if ~isempty(chErr)
+                y1 = chMean(chNum, :) + chErr(chNum, :);
+                y2 = chMean(chNum, :) - chErr(chNum, :);
                 fill([t fliplr(t)], [y1 fliplr(y2)], [0, 0, 0], 'edgealpha', '0', 'facealpha', '0.3', 'DisplayName', 'Error bar');
             end
 
@@ -111,8 +110,7 @@ function Fig = plotRawWave(chMean, chStd, window, varargin)
 
     end
 
-    scaleAxes(Fig, "y", "on", "symOpt", "max");
-    addLines2Axes(Fig, struct("X", 0));
+    scaleAxes(Fig, "y", "on");
 
     return;
 end

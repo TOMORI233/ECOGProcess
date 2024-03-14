@@ -28,7 +28,6 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     mIp.addParameter("patch", "reject", @(x) any(validatestring(x, {'reject', 'matchIssue', 'bankIssue'})));
     mIp.parse(DATAPATH, params, varargin{:});
 
-
     RHDPATH = mIp.Results.RHDPATH;
     behaviorOnly = mIp.Results.behaviorOnly;
     patch = mIp.Results.patch;
@@ -42,7 +41,6 @@ function [trialAll, ECOGDataset] = ECOGPreprocess(DATAPATH, params, varargin)
     if isempty(processFcn)
         error("Process function is not specified");
     end
-
 
     %% Loading data
     try

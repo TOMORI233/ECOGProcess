@@ -33,6 +33,11 @@ function mAxe = plotTopo(varargin)
     if numel(Data) ~= topoSize(1) * topoSize(2)
         error("Numel of input data should be topoSize(1)*topoSize(2)");
     end
+
+    if any(isnan(Data))
+        warning("NaN found in your data. NaN will be replaced by zero");
+        Data(isnan(Data)) = 0;
+    end
     
     C = flipud(reshape(Data, topoSize)');
     C = padarray(C, [1, 1], "replicate");
@@ -46,7 +51,7 @@ function mAxe = plotTopo(varargin)
         % contour option may not work for linear array
         try
             hold on;
-            contour(X, Y, C, "LineColor", "k");
+            contour(mAxe, X, Y, C, "LineColor", "k");
         end
 
     end

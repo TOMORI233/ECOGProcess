@@ -3,9 +3,13 @@ ccc;
 SAVEROOTPATH = 'F:\Lab\Projects\ECOG\Granger Causality\DATA\prediction';
 
 % Prediction
+% load("D:\Lab members\KXK\TrialDataAreas.mat");
+
+
+
 dataAC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\AC_Prediction_Data.mat");
 dataPFC = load("..\..\7-10Freq\batch\Active\CC\Population\Prediction\PFC_Prediction_Data.mat");
-window = dataAC.windowP;
+window = dataAC.window;
 
 trialsECOG_AC = dataAC.trialsECOG;
 trialsECOG_PFC = dataPFC.trialsECOG;
@@ -20,7 +24,7 @@ trialsECOG_PFC = dataPFC.trialsECOG;
 % trialsECOG_AC = dataAC.trialsECOG([dataAC.dRatioAll] > 1);
 % trialsECOG_PFC = dataPFC.trialsECOG([dataPFC.dRatioAll] > 1);
 
-fs = dataAC.fs;
+fs = DataAC.fs;
 
 nChsAC = size(trialsECOG_AC{1}, 1);
 nChsPFC = size(trialsECOG_PFC{1}, 1);
@@ -33,7 +37,7 @@ fRange = [0, 70];
 windowNew = [0, 5000]; % from 1st to 10th ISI
 
 %% 
-[~, f, coi] = cwtAny(trialsECOG_AC{1}(1, :), fs, "mode", "CPU");
+[~, f, coi] = cwtAny(trialsECOG_AC, fs, "mode", "CPU");
 
 fIdx = find(f < fRange(2), 1) - 1:length(f);
 f = f(fIdx);
