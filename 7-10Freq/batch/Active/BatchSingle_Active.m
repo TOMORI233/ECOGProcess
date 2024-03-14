@@ -6,7 +6,7 @@ params.choiceWin = [100, 600];
 params.processFcn = @ActiveProcess_7_10Freq;
 params.normOpt = "off"; % Normalization
 
-params.monkeyID = 1; % 1-CC, 2-XX
+params.monkeyID = 2; % 1-CC, 2-XX
 
 CURRENTPATH = pwd;
 
