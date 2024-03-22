@@ -8,32 +8,14 @@ function mCheckUpdate_ECOGProcess(logstr, syncOpt)
 
     narginchk(0, 2);
 
+    if nargin < 1
+        logstr = [];
+    end
+
     if nargin < 2
         syncOpt = false;
     end
     
-    currentPath = pwd;
-    cd(fileparts(mfilename("fullpath")));
-    [~, currentUser] = system("whoami");
-    currentUser = strrep(currentUser, newline, '');
-    currentUser = split(currentUser, '\');
-    currentUser = currentUser{2};
-    
-    system("git add .");
-
-    if nargin < 1 || isempty(char(logstr))
-        system(strcat("git commit -m ""update ", string(datetime), " by ", currentUser, """"));
-    else
-        logstr = strrep(logstr, '"', '""');
-        system(strcat("git commit -m """, logstr, """"));
-    end
-
-    system("git pull origin master");
-
-    if syncOpt
-        system("git push origin master");
-    end
-    
-    cd(currentPath);
+    syncRepositories(logstr, "RepositoryPaths", fileparts(mfilename("fullpath")), "SyncOption", syncOpt);
     return;
 end
