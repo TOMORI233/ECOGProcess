@@ -1,4 +1,4 @@
-function Fig = plotRawWave(chMean, chErr, window, varargin)
+function varargout = plotRawWave(chMean, chErr, window, varargin)
     % Description: plot raw wave of continous channel-by-time data (single-condition)
     % Input:
     %     chMean: channel-by-time matrix of mean waves (2-D), not empty.
@@ -111,6 +111,12 @@ function Fig = plotRawWave(chMean, chErr, window, varargin)
     end
 
     scaleAxes(Fig, "y", "on");
+
+    if nargout == 1
+        varargout{1} = Fig;
+    elseif nargout > 1
+        error("plotRawWave(): output number should be <= 1");
+    end
 
     return;
 end

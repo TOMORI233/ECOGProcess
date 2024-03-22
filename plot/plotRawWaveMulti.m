@@ -1,4 +1,4 @@
-function Fig = plotRawWaveMulti(chData, window, varargin)
+function varargout = plotRawWaveMulti(chData, window, varargin)
     % Description: plot serveral raw waves in one subplot
     % Input:
     %     chData: n*1 struct of fields:
@@ -8,7 +8,7 @@ function Fig = plotRawWaveMulti(chData, window, varargin)
     %             - errColor: errorbar color (default: chMean color decreased by 30% in saturation)
     %             - errAlpha: face alpha value of errorbar (default: 0.5)
     %             - legend: string or char, if set empty
-    %             - skipChs: channels not to plot
+    %             - skipChs: channels not to plot, leave blank at the location
     %     other params: see plotRawWave.m
     % Output:
     %     Fig: figure object
@@ -149,6 +149,12 @@ function Fig = plotRawWaveMulti(chData, window, varargin)
     end
 
     scaleAxes(Fig, "y", "on");
+
+    if nargout == 1
+        varargout{1} = Fig;
+    elseif nargout > 1
+        error("plotRawWaveMulti(): output number should be <= 1");
+    end
 
     return;
 end

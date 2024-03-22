@@ -1,4 +1,4 @@
-function Fig = plotTFA(data, arg2, arg3, window, titleStr, plotSize, chs, visible)
+function varargout = plotTFA(data, arg2, arg3, window, titleStr, plotSize, chs, visible)
     % If [data] is [trialsData] (nTrial*1 cell with nCh*nTime double), 
     % perform cwt on each trial and average the result. The second and
     % thrid inputs are origin sample rate [fs0] and downsample rate [fsD].
@@ -125,5 +125,11 @@ function Fig = plotTFA(data, arg2, arg3, window, titleStr, plotSize, chs, visibl
         addLines2Axes(struct("X", t, "Y", coi, "color", "w", "style", "--", "width", 0.6));
     end
     
+    if nargout == 1
+        varargout{1} = Fig;
+    elseif nargout > 1
+        error("plotTFA(): output number should be <= 1");
+    end
+
     return;
 end

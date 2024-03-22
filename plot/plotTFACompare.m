@@ -1,5 +1,9 @@
 function Fig = plotTFACompare(chMean1, chMean2, fs0, fs, window, titleStr, plotSize, chs)
     % Description: plot cwt difference between chMean1 and chMean2
+    % Warning: This function is obsolete since 2024/03. Please use
+    %          plotTFA() instead.
+
+    warning("This function is obsolete since 2024/03. Please use plotTFA() instead.");
 
     narginchk(5, 8);
 

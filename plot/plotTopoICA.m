@@ -1,4 +1,4 @@
-function Fig = plotTopoICA(topo, topoSize, plotSize, ICs)
+function Fig = plotTopoICA(topo, topoSize, plotSize, ICs2Plot)
     narginchk(1, 4);
 
     if nargin < 2
@@ -10,12 +10,12 @@ function Fig = plotTopoICA(topo, topoSize, plotSize, ICs)
     end
 
     if nargin < 4
-        ICs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
+        ICs2Plot = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
     end
 
-    if size(ICs, 1) ~= plotSize(1) || size(ICs, 2) ~= plotSize(2)
+    if size(ICs2Plot, 1) ~= plotSize(1) || size(ICs2Plot, 2) ~= plotSize(2)
         disp("chs option not matched with plotSize. Resize chs...");
-        ICs = reshape(ICs(1):(ICs(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
+        ICs2Plot = reshape(ICs2Plot(1):(ICs2Plot(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
     end
 
     Fig = figure("WindowState", "maximized");
@@ -25,9 +25,9 @@ function Fig = plotTopoICA(topo, topoSize, plotSize, ICs)
     for rIndex = 1:plotSize(1)
     
         for cIndex = 1:plotSize(2)
-            ICNum = ICs(rIndex, cIndex);
+            ICNum = ICs2Plot(rIndex, cIndex);
 
-            if ICs(rIndex, cIndex) > size(topo, 2)
+            if ICs2Plot(rIndex, cIndex) > size(topo, 2)
                 continue;
             end
 

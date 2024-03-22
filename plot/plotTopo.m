@@ -1,9 +1,10 @@
-function mAxe = plotTopo(varargin)
+function varargout = plotTopo(varargin)
     % Description: remap Data according to [topoSize] and plot color map to axes
     % Input:
     %     mAxe: target axes
-    %     Data: data to plot, make sure numel(data) == topoSize(1) * topoSize(2)
-    %     topoSize: [x,y], Data will be remapped as a [x,y] matrix
+    %     Data: vector, make sure numel(data) == topoSize(1) * topoSize(2).
+    %     topoSize: [x,y], Data will be remapped as a [x,y] matrix.
+    %               [x,y] -> [nCol,nRow], indices start from left-top.
     %     contourOpt: contour option "on" or "off" (default="on")
     %     resolution: apply 2-D interpolation to the remapped [Data], which is an
     %                 N-point insertion. Thus, resolution = N.
@@ -19,7 +20,7 @@ function mAxe = plotTopo(varargin)
 
     mIp = inputParser;
     mIp.addRequired("mAxe", @(x) isgraphics(x, "axes"));
-    mIp.addRequired("Data");
+    mIp.addRequired("Data", @(x) isnumeric(x) && isvector(x));
     mIp.addOptional("topoSize", [8, 8], @(x) validateattributes(x, 'numeric', {'numel', 2, 'positive', 'integer'}));
     mIp.addParameter("contourOpt", "on", @(x) any(validatestring(x, {'on', 'off'})));
     mIp.addParameter("resolution", 5, @(x) validateattributes(x, 'numeric', {'scalar', 'positive', 'integer'}));
@@ -56,9 +57,17 @@ function mAxe = plotTopo(varargin)
 
     end
 
-    xlim([0.5, topoSize(1) + 0.5]);
-    ylim([0.5, topoSize(2) + 0.5]);
+    set(mAxes, "XLimitMethod", "tight");
+    set(mAxes, "YLimitMethod", "tight");
     xticklabels('');
     yticklabels('');
     colormap(mAxe, 'jet');
+
+    if nargout == 1
+        varargout{1} = mAxe;
+    elseif nargout > 1
+        error("plotTopo(): output number should be <= 1");
+    end
+
+    return;
 end
