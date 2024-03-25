@@ -57,8 +57,8 @@ function varargout = plotTopo(varargin)
 
     end
 
-    set(mAxes, "XLimitMethod", "tight");
-    set(mAxes, "YLimitMethod", "tight");
+    set(mAxe, "XLimitMethod", "tight");
+    set(mAxe, "YLimitMethod", "tight");
     xticklabels('');
     yticklabels('');
     colormap(mAxe, 'jet');
