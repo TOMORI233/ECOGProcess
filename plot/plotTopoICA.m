@@ -1,4 +1,4 @@
-function Fig = plotTopoICA(topo, topoSize, plotSize, ICs2Plot)
+function varargout = plotTopoICA(topo, topoSize, plotSize, ICs2Plot)
     narginchk(1, 4);
 
     if nargin < 2
@@ -39,6 +39,12 @@ function Fig = plotTopoICA(topo, topoSize, plotSize, ICs2Plot)
             colorbar;
         end
     
+    end
+
+    if nargout == 1
+        varargout{1} = Fig;
+    elseif nargout > 1
+        error("plotTopoICA(): output number should be <= 1");
     end
 
     return;
