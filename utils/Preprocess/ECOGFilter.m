@@ -20,10 +20,16 @@ function varargout = ECOGFilter(dataset, fhp, flp, varargin)
     mIp.addRequired("flp", @(x) validateattributes(x, {'numeric'}, {'scalar', 'positive'}));
     mIp.addOptional("fs", [], @(x) validateattributes(x, {'numeric'}, {'scalar', 'positive'}));
     mIp.addParameter("Notch", "off", @(x) any(validatestring(x, {'on', 'off'})));
+    mIp.addParameter("fNotch", 50, @(x) validateattributes(x, {'numeric'}, {'positive', 'vector'}));
     mIp.parse(dataset, fhp, flp, varargin{:});
 
     fs = mIp.Results.fs;
     NotchOpt = mIp.Results.Notch;
+    fNotch = mIp.Results.fNotch;
+
+    if any(fNotch > fs / 2)
+        error("ECOGFilter(): Notch frequency should not exceed fs/2");
+    end
 
     switch class(dataset)
         case 'cell'
@@ -73,8 +79,12 @@ function varargout = ECOGFilter(dataset, fhp, flp, varargin)
     if strcmp(NotchOpt, "on")
         butter = path2func(fullfile(matlabroot, "toolbox/signal/signal/butter.m"));
         filtfilt = path2func(fullfile(matlabroot, "toolbox/signal/signal/filtfilt.m"));
-        [b, a] = butter(3, [49, 51] / (fs / 2), "stop");
-        data.trial = cellfun(@(x) cell2mat(cellfun(@(y) filtfilt(b, a, y), x, "UniformOutput", false)), data.trial, "UniformOutput", false);
+
+        for fIndex = 1:length(fNotch)
+            [b, a] = butter(3, (fNotch(fIndex) + [-1, 1]) / (fs / 2), "stop");
+            data.trial = cellfun(@(x) cell2mat(cellfun(@(y) filtfilt(b, a, y), x, "UniformOutput", false)), data.trial, "UniformOutput", false);
+        end
+
     end
     
     %% output
