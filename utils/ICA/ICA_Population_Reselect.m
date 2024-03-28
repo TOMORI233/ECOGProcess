@@ -1,7 +1,7 @@
 function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population_Reselect(comp, trialsECOG, windowData)
     % Description: reselect ICs for reconstruction after performing ICA_Population
     % Input:
-    %     comp: result of ICA (FieldTrip)
+    %     comp: result of ICA (FieldTrip) without field [trial]
     %     trialsECOG: nTrial*1 cell array of trial data (nCh*nSample matrix)
     %     windowData: time window for [trialsECOG], in ms
     % Output:
@@ -20,24 +20,21 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population_Reselect(comp,
     FigTopoICA = plotTopoICA(topo, [8, 8], [8, 8]);
     
     % Origin raw wave
-    temp = changeCellRowNum(interpolateBadChs(trialsECOG, badCHs));
-    chMean = cell2mat(cellfun(@mean, temp, "UniformOutput", false));
-    chStd = cell2mat(cellfun(@std, temp, "UniformOutput", false));
-    FigWave(1) = plotRawWave(chMean, chStd, windowData, "origin");
-    scaleAxes(FigWave(1), "y", "on", "symOpts", "max");
+    temp = interpolateBadChs(trialsECOG, badCHs);
+    FigWave(1) = plotRawWave(calchMean(temp), calchErr(temp), windowData, "origin");
+    scaleAxes(FigWave(1), "y", "cutoffRange", [-100, 100], "symOpts", "max");
 
     % Remove bad channels in trialsECOG
     trialsECOG = cellfun(@(x) x(chs2doICA, :), trialsECOG, "UniformOutput", false);
 
     % IC Wave
-    temp = changeCellRowNum(comp.unmixing * trialsECOG);
-    ICMean = cell2mat(cellfun(@mean, temp, "UniformOutput", false));
-    ICStd = cell2mat(cellfun(@(x) std(x, [], 1), temp, "UniformOutput", false));
-    FigIC = plotRawWave(ICMean, ICStd, windowData, "ICA");
+    temp = comp.unmixing * trialsECOG;
+    FigIC = plotRawWave(calchMean(temp), calchErr(temp), windowData, "ICA");
+    scaleAxes(FigIC, "y", "cutoffRange", [-50, 50], "symOpts", "max");
     
     k = 'N';
     while ~any(strcmpi(k, {'y', ''}))
-        try
+        if isvalid(FigWave(2))
             close(FigWave(2));
         end
 
@@ -51,16 +48,11 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population_Reselect(comp,
         temp = reconstructData(trialsECOG, comp, ICs);
         temp = cellfun(@(x) insertRows(x, badCHs), temp, "UniformOutput", false);
         temp = interpolateBadChs(temp, badCHs);
-        chMean = cell2mat(cellfun(@mean, changeCellRowNum(temp), "UniformOutput", false));
-        chStd = cell2mat(cellfun(@std, changeCellRowNum(temp), "UniformOutput", false));
-        FigWave(2) = plotRawWave(chMean, chStd, windowData, "reconstruct");
+        FigWave(2) = plotRawWave(calchMean(temp), calchErr(temp), windowICA, "reconstruct");
         scaleAxes(FigWave(2), "y", "on", "symOpts", "max");
 
         k = validateInput('Press Y or Enter to continue or N to reselect ICs: ', @(x) isempty(x) || any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');
     end
-
-    comp.trial = [];
-    comp.chs2doICA = chs2doICA;
 
     return;
 end
