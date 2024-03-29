@@ -6,7 +6,7 @@ function varargout = plotTopoICA(topo, topoSize, plotSize, ICs2Plot)
     end
 
     if nargin < 3
-        plotSize = autoPlotSize(size(topo, 2));
+        plotSize = autoPlotSize(size(topo, 2)); % topo is nCh-by-nIC
     end
 
     if nargin < 4

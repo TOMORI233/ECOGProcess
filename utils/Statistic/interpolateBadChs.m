@@ -9,7 +9,7 @@ function trialsECOG = interpolateBadChs(trialsECOG, badCHs, neighbours)
         neighbours = mPrepareNeighbours;
     end
     
-    neighbch = neighbours.neighbch;
+    neighbch = {neighbours.neighbch}';
 
     % Replace bad chs by averaging neighbour chs
     for bIndex = 1:numel(badCHs)

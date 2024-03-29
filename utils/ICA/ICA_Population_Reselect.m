@@ -17,7 +17,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population_Reselect(comp,
     channels = 1:size(trialsECOG{1}, 1);
     badCHs = channels(~ismember(channels, chs2doICA));
     topo = insertRows(comp.topo, badCHs);
-    FigTopoICA = plotTopoICA(topo, [8, 8], [8, 8]);
+    FigTopoICA = plotTopoICA(topo, [8, 8]);
     
     % Origin raw wave
     temp = interpolateBadChs(trialsECOG, badCHs);
