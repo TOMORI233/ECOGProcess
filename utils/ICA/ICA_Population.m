@@ -18,8 +18,8 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
         chs2doICA = 1:size(trialsECOG{1}, 1);
     end
 
-    comp0 = mICA(trialsECOG, windowICA, fs, "chs2doICA", chs2doICA);
-    comp = realignIC(comp0, windowICA);
+    comp = mICA(trialsECOG, windowICA, fs, "chs2doICA", chs2doICA);
+    % comp = realignIC(comp, windowICA);
 
     % IC Wave
     FigIC = plotRawWave(calchMean(comp.trial), calchStd(comp.trial), windowICA, "ICA");
