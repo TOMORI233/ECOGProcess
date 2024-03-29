@@ -27,10 +27,6 @@ function varargout = ECOGFilter(dataset, fhp, flp, varargin)
     NotchOpt = mIp.Results.Notch;
     fNotch = mIp.Results.fNotch;
 
-    if any(fNotch > fs / 2)
-        error("ECOGFilter(): Notch frequency should not exceed fs/2");
-    end
-
     switch class(dataset)
         case 'cell'
             trialsECOG = dataset;
@@ -46,7 +42,11 @@ function varargout = ECOGFilter(dataset, fhp, flp, varargin)
     end
 
     if isempty(fs)
-        error("fs input missing for filtering trial data");
+        error("ECOGFilter(): fs input missing for filtering trial data");
+    end
+
+    if any(fNotch > fs / 2)
+        error("ECOGFilter(): Notch frequency should not exceed fs/2");
     end
 
     %% Preprocessing
@@ -82,7 +82,7 @@ function varargout = ECOGFilter(dataset, fhp, flp, varargin)
 
         for fIndex = 1:length(fNotch)
             [b, a] = butter(3, (fNotch(fIndex) + [-1, 1]) / (fs / 2), "stop");
-            data.trial = cellfun(@(x) cell2mat(cellfun(@(y) filtfilt(b, a, y), x, "UniformOutput", false)), data.trial, "UniformOutput", false);
+            data.trial = cellfun(@(x) filtfilt(b, a, x')', data.trial, "UniformOutput", false);
         end
 
     end

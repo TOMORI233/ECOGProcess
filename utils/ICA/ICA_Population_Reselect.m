@@ -21,7 +21,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population_Reselect(comp,
     
     % Origin raw wave
     temp = interpolateBadChs(trialsECOG, badCHs);
-    FigWave(1) = plotRawWave(calchMean(temp), calchErr(temp), windowData, "origin");
+    FigWave(1) = plotRawWave(calchMean(temp), calchStd(temp), windowData, "origin");
     scaleAxes(FigWave(1), "y", "cutoffRange", [-100, 100], "symOpts", "max");
 
     % Remove bad channels in trialsECOG
@@ -29,12 +29,12 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population_Reselect(comp,
 
     % IC Wave
     temp = comp.unmixing * trialsECOG;
-    FigIC = plotRawWave(calchMean(temp), calchErr(temp), windowData, "ICA");
+    FigIC = plotRawWave(calchMean(temp), calchStd(temp), windowData, "ICA");
     scaleAxes(FigIC, "y", "cutoffRange", [-50, 50], "symOpts", "max");
     
     k = 'N';
     while ~any(strcmpi(k, {'y', ''}))
-        if isvalid(FigWave(2))
+        try
             close(FigWave(2));
         end
 
@@ -48,7 +48,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population_Reselect(comp,
         temp = reconstructData(trialsECOG, comp, ICs);
         temp = cellfun(@(x) insertRows(x, badCHs), temp, "UniformOutput", false);
         temp = interpolateBadChs(temp, badCHs);
-        FigWave(2) = plotRawWave(calchMean(temp), calchErr(temp), windowICA, "reconstruct");
+        FigWave(2) = plotRawWave(calchMean(temp), calchStd(temp), windowICA, "reconstruct");
         scaleAxes(FigWave(2), "y", "on", "symOpts", "max");
 
         k = validateInput('Press Y or Enter to continue or N to reselect ICs: ', @(x) isempty(x) || any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');
