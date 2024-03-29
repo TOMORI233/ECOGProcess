@@ -18,13 +18,11 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
         chs2doICA = 1:size(trialsECOG{1}, 1);
     end
 
-    comp0 = mICA(trialsECOG, windowICA, fs, "chs2doICA", chs2doICA);
-    comp = realignIC(comp0, windowICA);
+    comp = mICA(trialsECOG, windowICA, fs, "chs2doICA", chs2doICA);
+    % comp = realignIC(comp, windowICA);
 
     % IC Wave
-    ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
-    ICStd = cell2mat(cellfun(@(x) std(x, [], 1), changeCellRowNum(comp.trial), "UniformOutput", false));
-    FigIC = plotRawWave(ICMean, ICStd, windowICA, "ICA");
+    FigIC = plotRawWave(calchMean(comp.trial), calchStd(comp.trial), windowICA, "ICA");
     scaleAxes(FigIC, "y", "cutoffRange", [-50, 50], "symOpts", "max");
 
     % IC topo
@@ -34,10 +32,8 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
     FigTopoICA = plotTopoICA(topo, [8, 8]);
     
     % Origin raw wave
-    temp = changeCellRowNum(interpolateBadChs(trialsECOG, badCHs));
-    chMean = cell2mat(cellfun(@mean, temp, "UniformOutput", false));
-    chStd = cell2mat(cellfun(@std, temp, "UniformOutput", false));
-    FigWave(1) = plotRawWave(chMean, chStd, windowICA, "origin");
+    temp = interpolateBadChs(trialsECOG, badCHs);
+    FigWave(1) = plotRawWave(calchMean(temp), calchStd(temp), windowICA, "origin");
     scaleAxes(FigWave(1), "y", "cutoffRange", [-100, 100], "symOpts", "max");
 
     % Remove bad channels in trialsECOG
@@ -59,9 +55,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
         temp = reconstructData(trialsECOG, comp, ICs);
         temp = cellfun(@(x) insertRows(x, badCHs), temp, "UniformOutput", false);
         temp = interpolateBadChs(temp, badCHs);
-        chMean = cell2mat(cellfun(@mean, changeCellRowNum(temp), "UniformOutput", false));
-        chStd = cell2mat(cellfun(@std, changeCellRowNum(temp), "UniformOutput", false));
-        FigWave(2) = plotRawWave(chMean, chStd, windowICA, "reconstruct");
+        FigWave(2) = plotRawWave(calchMean(temp), calchStd(temp), windowICA, "reconstruct");
         scaleAxes(FigWave(2), "y", "on", "symOpts", "max");
 
         k = validateInput('Press Y or Enter to continue or N to reselect ICs: ', @(x) isempty(x) || any(validatestring(x, {'y', 'n', 'N', 'Y', ''})), 's');

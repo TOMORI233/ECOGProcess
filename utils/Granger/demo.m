@@ -79,8 +79,7 @@ plot(data.time{1}, data.trial{1});
 legend(data.label);
 xlabel('time (s)');
 
-chMean = cell2mat(cellfun(@(x) mean(x, 1), changeCellRowNum(data.trial), "UniformOutput", false));
-plotTFA(chMean, fs, [], [0, 1000]);
+plotTFA(calchMean(data.trial), fs, [], [0, 1000]);
 
 %% wavelet granger causality
 yseed = cellfun(@(x) x(1, :), y, "UniformOutput", false);
@@ -94,21 +93,29 @@ cdata = mCoherenceWaveletRaw(yseed, ytarget, fs, [], nperm);
 %% 
 figure;
 maximizeFig;
-mSubplot(1, 2, 1);
-imagesc("XData", cdata.time, "YData", cdata.freq, "CData", squeeze(cdata.coherencespctrm(1, :, :, 1)));
+mSubplot(2, 2, 1);
+imagesc("XData", cdata.time, "YData", cdata.freq, "CData", squeeze(cdata.coherencespctrm(1, 2, :, :, 1)));
 set(gca, "YScale", "log");
 yticks([0, 2.^(0:nextpow2(max(gdata.freq)) - 1)]);
 set(gca, "XLimitMethod", "tight");
 set(gca, "YLimitMethod", "tight");
 title('Coherence: signal001 vs signal002');
 
-mSubplot(1, 2, 2);
-imagesc("XData", cdata.time, "YData", cdata.freq, "CData", squeeze(cdata.coherencespctrm(2, :, :, 1)));
+mSubplot(2, 2, 2);
+imagesc("XData", cdata.time, "YData", cdata.freq, "CData", squeeze(cdata.coherencespctrm(1, 3, :, :, 1)));
 set(gca, "YScale", "log");
 yticks([0, 2.^(0:nextpow2(max(gdata.freq)) - 1)]);
 set(gca, "XLimitMethod", "tight");
 set(gca, "YLimitMethod", "tight");
 title('Coherence: signal001 vs signal003');
+
+mSubplot(2, 2, 3);
+imagesc("XData", cdata.time, "YData", cdata.freq, "CData", squeeze(cdata.coherencespctrm(2, 3, :, :, 1)));
+set(gca, "YScale", "log");
+yticks([0, 2.^(0:nextpow2(max(gdata.freq)) - 1)]);
+set(gca, "XLimitMethod", "tight");
+set(gca, "YLimitMethod", "tight");
+title('Coherence: signal002 vs signal003');
 
 colormap('jet');
 scaleAxes("c");

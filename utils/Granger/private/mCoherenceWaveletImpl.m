@@ -19,13 +19,9 @@ res = keepfields(data, {'freq', 'time'});
 res.dimord = 'rpt_chan_chan_freq_time';
 
 optarg = {'hasjack', 0, 'pownorm', 1, 'powindx', [], 'dimord', res.dimord};
-res.coherencespctrm = ft_connectivity_corr(crsspctrm, optarg{:});
+res.coherencespctrm = ft_connectivity_corr(crsspctrm, optarg{:}); % chan_chan_freq_time
 
-% only keep coherence of paired channels from different area
-res.coherencespctrm = squeeze(res.coherencespctrm(1, 2:end, :, :));
-res.channelcmb = [repmat(data.label(1), [length(data.label) - 1, 1]), data.label(2:end)];
-
-res = keepfields(res, {'time', 'freq', 'coherencespctrm', 'channelcmb'});
+res = keepfields(res, {'time', 'freq', 'coherencespctrm'});
 
 return;
 end
