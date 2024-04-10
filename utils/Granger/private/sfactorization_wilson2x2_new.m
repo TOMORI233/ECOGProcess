@@ -89,7 +89,6 @@ function [H, Z, S, psi] = sfactorization_wilson2x2_new(S, freq, Niterations, tol
 
     % --- Step 4: Iterations to get spectral factors
     for iter = 1:Niterations
-        %   ft_progress(iter./Niterations, 'computing iteration %d/%d\n', iter, Niterations);
         invpsi = inv2x2(psi);
         %     % --
         %     function J =Jacobian1(t)

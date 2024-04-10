@@ -6,6 +6,17 @@ function res = mGrangerWaveletImpl(data)
 %     dimord: 'rpt_chan_freq_time'
 %     cumtapcnt: ones(length(data.time), length(data.freq))
 %     fourierspctrm: nrpt*nchan*nfreq*ntime complex double matrix, obtained by wavelet transform
+% [res] contains
+%     grangerspctrm: nchannelcmb*nfreq*ntime double, nchannelcmb=2*(nchan-1)
+%     freq
+%     time
+%     channelcmb: nchannelcmb*2 cell
+%                 e.g.
+%                 {'seed'} -> {'1'   }
+%                 {'1'   } -> {'seed'}
+%                 {'seed'} -> {'2'   }
+%                 {'2'   } -> {'seed'}
+%                 ...
 
 %% Parameter settings
 numiteration = 100;
