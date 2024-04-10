@@ -13,19 +13,18 @@ function trialsECOG = interpolateBadChs(trialsECOG, badCHs, neighbours)
 
     % Replace bad chs by averaging neighbour chs
     for bIndex = 1:numel(badCHs)
+        chsTemp = neighbch{badCHs(bIndex)};
+
+        if isempty(chsTemp)
+            warning(['No neighbours specified for channel ', num2str(badCHs(bIndex)), '. Skip']);
+            continue;
+        end
+
+        if all(ismember(chsTemp, badCHs))
+            error(['All neighbour channels are bad for channel ', num2str(badCHs(bIndex))]);
+        end
         
         for tIndex = 1:length(trialsECOG)
-            chsTemp = neighbch{badCHs(bIndex)};
-
-            if isempty(chsTemp)
-                warning(['No neighbours specified for channel ', num2str(tIndex), '. Skip']);
-                continue;
-            end
-
-            if all(ismember(chsTemp, badCHs))
-                error(['All neighbour channels are bad for channel ', num2str(badCHs(bIndex))]);
-            end
-
             trialsECOG{tIndex}(badCHs(bIndex), :) = mean(trialsECOG{tIndex}(chsTemp(~ismember(chsTemp, badCHs)), :), 1);
         end
 
