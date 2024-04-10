@@ -59,7 +59,7 @@ if nperm > 1
     grangerspctrm = zeros((nCh - 1) * 2, nFreq, nTime, nperm + 1);
     grangerspctrm(:, :, :, 1) = res.grangerspctrm;
     parfor_progress(nperm);
-    parfor index = 1:nperm
+    for index = 1:nperm
         % Trial randomization
         dataTemp = data;
         dataTemp.fourierspctrm(:, 1, :, :) = data.fourierspctrm(randord(index, :), 1, :, :);

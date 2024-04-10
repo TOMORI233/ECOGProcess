@@ -63,7 +63,7 @@ if nperm > 1
     coherencespctrm = zeros(nCh, nCh, nFreq, nTime, nperm + 1);
     coherencespctrm(:, :, :, :, 1) = res.coherencespctrm;
     parfor_progress(nperm);
-    parfor index = 1:nperm
+    for index = 1:nperm
         % Trial randomization
         dataTemp = data;
         dataTemp.fourierspctrm(:, 1, :, :) = data.fourierspctrm(randord(index, :), 1, :, :);

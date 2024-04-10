@@ -1,16 +1,16 @@
 function res = mGrangerWaveletImpl(data)
 % [data] contains
-%     freq: 1*nfreq double
-%     time: 1*ntime double
-%     label: nchan*1 cellstr
-%     dimord: 'rpt_chan_freq_time'
-%     cumtapcnt: ones(length(data.time), length(data.freq))
-%     fourierspctrm: nrpt*nchan*nfreq*ntime complex double matrix, obtained by wavelet transform
+%     - freq: 1*nfreq double
+%     - time: 1*ntime double
+%     - label: nchan*1 cellstr
+%     - dimord: 'rpt_chan_freq_time'
+%     - cumtapcnt: ones(length(data.time), length(data.freq))
+%     - fourierspctrm: nrpt*nchan*nfreq*ntime complex double matrix, obtained by wavelet transform
 % [res] contains
-%     grangerspctrm: nchannelcmb*nfreq*ntime double, nchannelcmb=2*(nchan-1)
-%     freq
-%     time
-%     channelcmb: nchannelcmb*2 cell
+%     - grangerspctrm: nchannelcmb*nfreq*ntime double, nchannelcmb=2*(nchan-1)
+%     - freq
+%     - time
+%     - channelcmb: nchannelcmb*2 cell
 %                 e.g.
 %                 {'seed'} -> {'1'   }
 %                 {'1'   } -> {'seed'}

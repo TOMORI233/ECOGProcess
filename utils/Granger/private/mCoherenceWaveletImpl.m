@@ -1,11 +1,11 @@
 function res = mCoherenceWaveletImpl(data)
 % [data] contains
-%     freq: 1*nfreq double
-%     time: 1*ntime double
-%     label: nchan*1 cellstr
-%     dimord: 'rpt_chan_freq_time'
-%     cumtapcnt: ones(length(data.time), length(data.freq))
-%     fourierspctrm: nrpt*nchan*nfreq*ntime complex double matrix, obtained by wavelet transform
+%     - freq: 1*nfreq double
+%     - time: 1*ntime double
+%     - label: nchan*1 cellstr
+%     - dimord: 'rpt_chan_freq_time'
+%     - cumtapcnt: ones(length(data.time), length(data.freq))
+%     - fourierspctrm: nrpt*nchan*nfreq*ntime complex double matrix, obtained by wavelet transform
 
 %% coherence computation
 [nrpt, nchan, nfreq, ntime] = size(data.fourierspctrm);
