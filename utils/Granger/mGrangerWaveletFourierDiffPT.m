@@ -68,8 +68,10 @@ end
 [grangerspctrm1, grangerspctrm2] = deal(zeros((nCh - 1) * 2, nFreq, nTime, nperm + 1));
 grangerspctrm1(:, :, :, 1) = res1.grangerspctrm;
 grangerspctrm2(:, :, :, 1) = res2.grangerspctrm;
+delete(gcp('nocreate'));
+parpool(4);
 parfor_progress(nperm);
-for index = 1:nperm
+parfor index = 1:nperm
     % Trial randomization
     dataTemp = data1;
     dataTemp.fourierspctrm(:, 1, :, :) = data1.fourierspctrm(randord1(index, :), 1, :, :);
@@ -84,7 +86,8 @@ end
 parfor_progress(0);
 
 grangerspctrmDiff = grangerspctrm1 - grangerspctrm2;
-p = sum(abs(grangerspctrmDiff(:, :, :, 2:end)) > abs(grangerspctrmDiff(:, :, :, 1)), 4) ./ nperm;
+p = sum((grangerspctrmDiff(:, :, :, 1) > 0 & grangerspctrmDiff(:, :, :, 2:end) > grangerspctrmDiff(:, :, :, 1)) | ...
+        (grangerspctrmDiff(:, :, :, 1) < 0 & grangerspctrmDiff(:, :, :, 2:end) < grangerspctrmDiff(:, :, :, 1))) ./ nperm;
 
 disp(['Permutation test for differential GC done in ', num2str(toc(t0)), ' s']);
 cd(currentPath);

@@ -48,15 +48,13 @@ weightMat(:,nanInds) = 0 ;
 % SUMij((WEIGHTij*(Xj-Xmean))*(Xi-Xmean)) and calculating
 % (WEIGHTij*(Xj-Xmean)) first
 weightedDeviationsI1 = (weightMat*featureVectorCentered1) ;
-% weightedDeviationsI2 = (weightMat*featureVectorCentered2) ;
+weightedDeviationsI2 = (weightMat*featureVectorCentered2) ;
 % Now multiply by (Xi-Xmean) (ie centered feature vector)
-weightedDeviationsIJ1 = weightedDeviationsI1.*featureVectorCentered2 ;
-% weightedDeviationsIJ2 = weightedDeviationsI2.*featureVectorCentered2 ;
+weightedDeviationsIJ1 = weightedDeviationsI1.*featureVectorCentered1 ;
+weightedDeviationsIJ2 = weightedDeviationsI2.*featureVectorCentered2 ;
 % Now divide by SUMi((Xi-Xmean)^2) (ie sum of squared deviations)
-% weightedDeviations = nansum(weightedDeviationsIJ1+weightedDeviationsIJ2)/...
-%     nansum(featureVectorCentered1.^2+featureVectorCentered2.^2);
-weightedDeviations = nansum(weightedDeviationsIJ1)/...
-    nansum(featureVectorCentered1.^2);
+weightedDeviations = nansum(weightedDeviationsIJ1+weightedDeviationsIJ2)/...
+    nansum(featureVectorCentered1.^2+featureVectorCentered2.^2);
 % Calculate sample size and weight normalization term
 nwWeight = (N/sum(nansum(weightMat))) ;
 % Now apply sample size and weight normalization term

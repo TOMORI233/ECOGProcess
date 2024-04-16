@@ -28,14 +28,16 @@
                     {"name": "Data", "kind": "required", "type": ["numeric"]},
                     {"name": "topoSize", "kind": "ordered", "type": ["numel=2", "positive", "integer"]},
                     {"name": "contourOpt", "kind": "namevalue", "type": ["choices = {'on', 'off'}"]},
-                    {"name": "resolution", "kind": "namevalue", "type": ["scalar", "positive", "integer"]}
+                    {"name": "resolution", "kind": "namevalue", "type": ["scalar", "positive", "integer"]},
+                    {"name": "contourVal", "kind": "namevalue", "type": ["vector"]}
                 ],
                 [
                     {"name": "FigOrAxes", "kind": "required", "type": ["@(args) isgraphics(args(1), 'axes')"]},
                     {"name": "Data", "kind": "required", "type": ["numeric"]},
                     {"name": "topoSize", "kind": "ordered", "type": ["numel=2", "positive", "integer"]},
                     {"name": "contourOpt", "kind": "namevalue", "type": ["choices = {'on', 'off'}"]},
-                    {"name": "resolution", "kind": "namevalue", "type": ["scalar", "positive", "integer"]}
+                    {"name": "resolution", "kind": "namevalue", "type": ["scalar", "positive", "integer"]},
+                    {"name": "contourVal", "kind": "namevalue", "type": ["vector"]}
                 ]
             ]}
         ]
