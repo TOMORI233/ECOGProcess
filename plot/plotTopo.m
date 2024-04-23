@@ -57,6 +57,7 @@ function varargout = plotTopo(varargin)
     X = linspace(0, topoSize(1) + 1, size(C, 1));
     Y = linspace(0, topoSize(2) + 1, size(C, 2));
     imagesc(mAxe, "XData", X, "YData", Y, "CData", C);
+    cRange = get(mAxe, "CLim");
 
     if strcmpi(contourOpt, "on")
         hold on;
@@ -97,8 +98,9 @@ function varargout = plotTopo(varargin)
 
     set(mAxe, "XLimitMethod", "tight");
     set(mAxe, "YLimitMethod", "tight");
-    xticklabels('');
-    yticklabels('');
+    xticklabels(mAxe, '');
+    yticklabels(mAxe, '');
+    set(mAxe, "CLim", cRange); % reset c limit
     colormap(mAxe, 'jet');
 
     if nargout == 1

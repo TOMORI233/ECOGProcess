@@ -119,13 +119,21 @@ for rIndex = 1:plotSize(1)
         end
 
         xlim(window);
-        if chNum > 1
+        if all(plotSize > 1)
             title(['CH ', num2str(chNum), titleStr]);
         else
-            if numel(titleStr) > 3 && strcmp(titleStr(1:3), ' | ')
-                titleStr = titleStr(4:end);
+
+            if chNum > 1 || all(plotSize > 1)
+                title(['CH ', num2str(chNum), titleStr]);
+            else
+
+                if numel(titleStr) > 3 && strcmp(titleStr(1:3), ' | ')
+                    titleStr = titleStr(4:end);
+                end
+                
+                title(titleStr);
             end
-            title(titleStr);
+            
         end
 
         if (rIndex == 1 && cIndex == 1) && ~isempty([chData.legend])
