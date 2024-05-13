@@ -16,8 +16,7 @@ function [Fig, mAxe, nPush, nTotal] = plotBehaviorOnly(trials, color, varargin)
     xlabelStr = mIp.Results.xlabelStr;
 
     if isempty(Fig)
-        Fig = figure;
-        maximizeFig(Fig);
+        Fig = figure("WindowState", "maximized");
     end
 
     margins = [0.1, 0.1, 0.1, 0.1];

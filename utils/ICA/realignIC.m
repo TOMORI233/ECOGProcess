@@ -1,7 +1,7 @@
 function [comp, pw] = realignIC(comp, window, t1, t2)
     % Description: realign IC by std descend
     % Input:
-    %     comp: result of ICA (FieldTrip)
+    %     comp: result of ICA (FieldTrip). It should contain field [trial]
     %     window: time window of data of each trial
     %     t1: starting time point of interest, in ms
     %     t2: ending time point of interest, in ms
@@ -24,7 +24,7 @@ function [comp, pw] = realignIC(comp, window, t1, t2)
         t2 = repmat(window(2), 1, length(t1));
     end
 
-    ICMean = cell2mat(cellfun(@mean, changeCellRowNum(comp.trial), "UniformOutput", false));
+    ICMean = calchMean(comp.trial);
     fs = comp.fsample;
     tIdx1 = max([fix((t1 - window(1)) / 1000 * fs), 1]);
     tIdx2 = min([fix((t2 - window(1)) / 1000 * fs), size(ICMean, 2)]);

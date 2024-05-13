@@ -1,17 +1,26 @@
 function res = mGrangerWaveletImpl(data)
 % [data] contains
-%     freq: 1*nfreq double
-%     time: 1*ntime double
-%     label: nchan*1 cellstr
-%     dimord: 'rpt_chan_freq_time'
-%     cumtapcnt: ones(length(data.time), length(data.freq))
-%     fourierspctrm: nrpt*nchan*nfreq*ntime complex double matrix, obtained by wavelet transform
+%     - freq: 1*nfreq double
+%     - time: 1*ntime double
+%     - label: nchan*1 cellstr
+%     - dimord: 'rpt_chan_freq_time'
+%     - cumtapcnt: ones(length(data.time), length(data.freq))
+%     - fourierspctrm: nrpt*nchan*nfreq*ntime complex double matrix, obtained by wavelet transform
+% [res] contains
+%     - grangerspctrm: nchannelcmb*nfreq*ntime double, nchannelcmb=2*(nchan-1)
+%     - freq
+%     - time
+%     - channelcmb: nchannelcmb*2 cell
+%                 e.g.
+%                 {'seed'} -> {'1'   }
+%                 {'1'   } -> {'seed'}
+%                 {'seed'} -> {'2'   }
+%                 {'2'   } -> {'seed'}
+%                 ...
 
 %% Parameter settings
 numiteration = 100;
 tol = 1e-18;
-fb = 'none';
-init = 'rand';
 checkconvergence = true;
 stabilityfix = true;
 
@@ -26,15 +35,13 @@ cfg.cmbindx = [ones(size(cfg.channelcmb, 1), 1), (2:size(cfg.channelcmb, 1) + 1)
 data.crsspctrm = zeros(nchan, nchan, nfreq, ntime); % chan_chan_freq_time
 data.crsspctrm = pagemtimes(pagectranspose(data.fourierspctrm), data.fourierspctrm) ./ nrpt;
 
-[Htmp, Ztmp, Stmp] = sfactorization2x2_time_hm(data.crsspctrm, ...
-                                               data.freq, ...
-                                               numiteration, ...
-                                               tol, ...
-                                               cfg.cmbindx, ...
-                                               fb, ...
-                                               init, ...
-                                               checkconvergence, ...
-                                               stabilityfix);
+[Htmp, Ztmp, Stmp] = sfactorization_wilson2x2_new(data.crsspctrm, ...
+                                                  data.freq, ...
+                                                  numiteration, ...
+                                                  tol, ...
+                                                  cfg.cmbindx, ...
+                                                  checkconvergence, ...
+                                                  stabilityfix);
 
 res = keepfields(data, {'freq', 'time'});
 res.crsspctrm(1, :, :, :) = Stmp;

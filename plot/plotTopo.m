@@ -1,14 +1,23 @@
-function mAxe = plotTopo(varargin)
-    % Description: remap Data according to [topoSize] and plot color map to axes
+function varargout = plotTopo(varargin)
+    % Description: remap [Data] according to [topoSize] and plot color map to axes
     % Input:
     %     mAxe: target axes
-    %     Data: data to plot, make sure numel(data) == topoSize(1) * topoSize(2)
-    %     topoSize: [x,y], Data will be remapped as a [x,y] matrix
+    %     Data: double vector, make sure that numel(Data) equals prod(topoSize).
+    %     topoSize: [x,y], [Data] will be remapped as a [x,y] matrix.
+    %               [x,y] -> [nCol,nRow], indices start from left-top.
     %     contourOpt: contour option "on" or "off" (default="on")
     %     resolution: apply 2-D interpolation to the remapped [Data], which is an
     %                 N-point insertion. Thus, resolution = N.
+    %     contourVal: contour levels, specified as a numeric vector or a
+    %                 logical vector. If specified as a logical vector
+    %                 (mask), it should be the same size as [Data].
     % Output:
     %     mAxe: output axes
+    % Example:
+    %     % plot significant levels
+    %     plotTopo(gca, 1-log(p), [8, 8], ...
+    %              "contourOpt", "on", ...
+    %              "contourVal", p < 0.01);
 
     if isgraphics(varargin{1}(1), "axes")
         mAxe = varargin{1}(1);
@@ -19,18 +28,20 @@ function mAxe = plotTopo(varargin)
 
     mIp = inputParser;
     mIp.addRequired("mAxe", @(x) isgraphics(x, "axes"));
-    mIp.addRequired("Data");
+    mIp.addRequired("Data", @(x) isnumeric(x) && isvector(x));
     mIp.addOptional("topoSize", [8, 8], @(x) validateattributes(x, 'numeric', {'numel', 2, 'positive', 'integer'}));
     mIp.addParameter("contourOpt", "on", @(x) any(validatestring(x, {'on', 'off'})));
     mIp.addParameter("resolution", 5, @(x) validateattributes(x, 'numeric', {'scalar', 'positive', 'integer'}));
+    mIp.addParameter("contourVal", [], @(x) validateattributes(x, {'numeric', 'logical'}, {'vector'}));
     mIp.parse(mAxe, varargin{:})
 
     Data = mIp.Results.Data;
     topoSize = mIp.Results.topoSize;
     contourOpt = mIp.Results.contourOpt;
     N = mIp.Results.resolution;
+    contourVal = mIp.Results.contourVal;
 
-    if numel(Data) ~= topoSize(1) * topoSize(2)
+    if numel(Data) ~= prod(topoSize)
         error("Numel of input data should be topoSize(1)*topoSize(2)");
     end
 
@@ -46,19 +57,57 @@ function mAxe = plotTopo(varargin)
     X = linspace(0, topoSize(1) + 1, size(C, 1));
     Y = linspace(0, topoSize(2) + 1, size(C, 2));
     imagesc(mAxe, "XData", X, "YData", Y, "CData", C);
+    cRange = get(mAxe, "CLim");
 
     if strcmpi(contourOpt, "on")
-        % contour option may not work for linear array
-        try
-            hold on;
-            contour(mAxe, X, Y, C, "LineColor", "k");
+        hold on;
+        
+        if isempty(contourVal)
+            % contour option may not work with linear array
+            try
+                contour(mAxe, X, Y, C, "LineColor", "k");
+            end
+
+        else
+            
+            if isnumeric(contourVal)
+                % for each contour level
+                for index = 1:numel(contourVal)
+                    C = flipud(reshape(double(Data >= contourVal(index)), topoSize)');
+                    C = padarray(C, [1, 1], "replicate");
+                    C = interp2(C, N);
+                    C = imgaussfilt(C, 8);
+                    contour(mAxe, X, Y, C, [0.6, 0.6], "LineColor", "k");
+                end
+                
+            elseif islogical(contourVal)
+
+                if any(contourVal) && any(~contourVal)
+                    C = flipud(reshape(double(contourVal), topoSize)');
+                    C = padarray(C, [1, 1], "replicate");
+                    C = interp2(C, N);
+                    C = imgaussfilt(C, 8);
+                    contour(mAxe, X, Y, C, [0.6, 0.6], "LineColor", "k");
+                end
+
+            end
+
         end
 
     end
 
-    xlim([0.5, topoSize(1) + 0.5]);
-    ylim([0.5, topoSize(2) + 0.5]);
-    xticklabels('');
-    yticklabels('');
+    set(mAxe, "XLimitMethod", "tight");
+    set(mAxe, "YLimitMethod", "tight");
+    xticklabels(mAxe, '');
+    yticklabels(mAxe, '');
+    set(mAxe, "CLim", cRange); % reset c limit
     colormap(mAxe, 'jet');
+
+    if nargout == 1
+        varargout{1} = mAxe;
+    elseif nargout > 1
+        error("plotTopo(): output number should be <= 1");
+    end
+
+    return;
 end

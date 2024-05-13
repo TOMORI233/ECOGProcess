@@ -1,4 +1,4 @@
-function Fig = plotTopoICA(topo, topoSize, plotSize, ICs)
+function varargout = plotTopoICA(topo, topoSize, plotSize, ICs2Plot)
     narginchk(1, 4);
 
     if nargin < 2
@@ -6,29 +6,28 @@ function Fig = plotTopoICA(topo, topoSize, plotSize, ICs)
     end
 
     if nargin < 3
-        plotSize = autoPlotSize(size(topo, 2));
+        plotSize = autoPlotSize(size(topo, 2)); % topo is nCh-by-nIC
     end
 
     if nargin < 4
-        ICs = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
+        ICs2Plot = reshape(1:(plotSize(1) * plotSize(2)), plotSize(2), plotSize(1))';
     end
 
-    if size(ICs, 1) ~= plotSize(1) || size(ICs, 2) ~= plotSize(2)
+    if size(ICs2Plot, 1) ~= plotSize(1) || size(ICs2Plot, 2) ~= plotSize(2)
         disp("chs option not matched with plotSize. Resize chs...");
-        ICs = reshape(ICs(1):(ICs(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
+        ICs2Plot = reshape(ICs2Plot(1):(ICs2Plot(1) + plotSize(1) * plotSize(2) - 1), plotSize(2), plotSize(1))';
     end
 
-    Fig = figure;
-    maximizeFig(Fig);
+    Fig = figure("WindowState", "maximized");
     margins = [0.05, 0.05, 0.1, 0.1];
     paddings = [0.01, 0.03, 0.01, 0.01];
     
     for rIndex = 1:plotSize(1)
     
         for cIndex = 1:plotSize(2)
-            ICNum = ICs(rIndex, cIndex);
+            ICNum = ICs2Plot(rIndex, cIndex);
 
-            if ICs(rIndex, cIndex) > size(topo, 2)
+            if ICs2Plot(rIndex, cIndex) > size(topo, 2)
                 continue;
             end
 
@@ -40,6 +39,12 @@ function Fig = plotTopoICA(topo, topoSize, plotSize, ICs)
             colorbar;
         end
     
+    end
+
+    if nargout == 1
+        varargout{1} = Fig;
+    elseif nargout > 1
+        error("plotTopoICA(): output number should be <= 1");
     end
 
     return;

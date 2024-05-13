@@ -58,19 +58,19 @@ if nperm > 1
     
     grangerspctrm = zeros((nCh - 1) * 2, nFreq, nTime, nperm + 1);
     grangerspctrm(:, :, :, 1) = res.grangerspctrm;
+    parfor_progress(nperm);
     for index = 1:nperm
-        fprintf('Randomization %d/%d: ', index, nperm);
-        t1 = tic;
-
-        % Trial randomization: based on the random orders of the last permutation
-        data.fourierspctrm(:, 1, :, :) = data.fourierspctrm(randord(index, :), 1, :, :);
+        % Trial randomization
+        dataTemp = data;
+        dataTemp.fourierspctrm(:, 1, :, :) = data.fourierspctrm(randord(index, :), 1, :, :);
         
         % GC computation
-        temp = mGrangerWaveletImpl(data);
+        temp = mGrangerWaveletImpl(dataTemp);
         grangerspctrm(:, :, :, 1 + index) = temp.grangerspctrm;
 
-        fprintf('done in %.4f s\n', toc(t1));
+        parfor_progress;
     end
+    parfor_progress(0);
 
     res.grangerspctrm = grangerspctrm;
     res.dimord = 'chancmb_freq_time_perm';

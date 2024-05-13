@@ -3,13 +3,18 @@ function res = mGrangerWaveletFourier(cwtres, f, coi, fs, fRange, nperm)
 % 
 % The procedure is independent for each time sample and frequency. 
 % Thus, it is possible to segment cwt data for computation effeciency 
-% (consider coi in this step).
+% (consider [coi] in this step).
 % 
 % [cwtres] is a nTrial*nCh*nFreq*nTime matrix.
 % The first channel is 'seed' and the rest channels are 'target'.
+% 
 % [f] is a descendent column vector in log scale.
-% [coi] does not influence the result. Leave it empty if you do not need it.
+% 
+% [coi] does not influence the result.
+% Leave it empty if you do not need it.
+% 
 % [fRange] specifies frequency limit for granger causality computation. (default: [] for all)
+% 
 % If [nperm] is larger than 1, perform permutation test by randomizing trial order.
 
 narginchk(4, 6);
@@ -23,6 +28,7 @@ if nargin < 6
 end
 
 %% Wavelet transform
+% Use existed cwt data
 data = prepareDataFourier(cwtres, f, coi, fs, fRange);
 c = data.c;
 
@@ -64,19 +70,19 @@ if nperm > 1
     
     grangerspctrm = zeros((nCh - 1) * 2, nFreq, nTime, nperm + 1);
     grangerspctrm(:, :, :, 1) = res.grangerspctrm;
+    parfor_progress(nperm);
     for index = 1:nperm
-        fprintf('Randomization %d/%d: ', index, nperm);
-        t1 = tic;
-
-        % Trial randomization: based on the random orders of the last permutation
-        data.fourierspctrm(:, 1, :, :) = data.fourierspctrm(randord(index, :), 1, :, :);
+        % Trial randomization
+        dataTemp = data;
+        dataTemp.fourierspctrm(:, 1, :, :) = data.fourierspctrm(randord(index, :), 1, :, :);
         
         % GC computation
         temp = mGrangerWaveletImpl(data);
         grangerspctrm(:, :, :, 1 + index) = temp.grangerspctrm;
 
-        fprintf('done in %.4f s\n', toc(t1));
+        parfor_progress;
     end
+    parfor_progress(0);
 
     res.grangerspctrm = grangerspctrm;
     res.dimord = 'chancmb_freq_time_perm';
