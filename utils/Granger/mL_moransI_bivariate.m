@@ -2,6 +2,10 @@ function[I] = mL_moransI_bivariate(featureMat1,featureMat2,weightMat)
 % Computes Moran's I of a spatial feature matrix [featureMat] using the weights
 % [weightMat]. Moran's I is a measure of spatial autocorrelation. See
 % https://en.wikipedia.org/wiki/Moran%27s_I for a good explanation.
+% 
+% [featureMat1] and [featureMat2] are X-by-Y matrices or vectors.
+% [weightMat] is a N-by-N matrix, where N=numel(featureMat1)=X*Y. Each row
+% of [weightMat] represents a vectorized weight matrix for one element.
 %
 % Put simply, for each index in matrix [featureMat], the difference between
 % that value and each other value in the matrix is multiplied, and each of

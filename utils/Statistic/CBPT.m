@@ -5,10 +5,11 @@ function stat = CBPT(data, cfg)
 %         the beginning of pathdef.m (or via path settings).
 % Input:
 %     data: n*1 struct with fields:
-%           - time: [1, nSample]
-%           - label: channel label, [nCh, 1] char cell array
-%           - trial: trial data, [nTrial, nCh, nSample]
-%           - trialinfo: trial type label (>=1 and begins with 1), [nTrial, 1]
+%           - time: 1-by-nSample double
+%           - label: channel label, nCh-by-1 char cell array
+%           - trial: trial data, nTrial*nCh*nSample double
+%           - trialinfo: trial type label (>=1 and begins with 1),
+%                        nTrial-by-1 double
 %     cfg: configurations (you can alter settings marked * for better performance)
 %          - method: method to calculate significance probability (default: 'montecarlo')
 %        * - statistic: 'indepsamplesT'(for 2 groups), 'indepsamplesF'(for more than 2 groups)
