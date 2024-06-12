@@ -24,7 +24,7 @@ function varargout = plotTFA(data, arg2, arg3, window, titleStr, plotSize, chs, 
 %         [titleStr], [plotSize], [chs], [visible]);
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% If [data] is abs([cwtres]) (nCh*nFreq*nTime real) averaged across trials, 
+% If [data] is abs([cwtres]) (nTrial*nCh*nFreq*nTime or nCh*nFreq*nTime real),
 % directly plot. The second and third inputs are frequency [f] and cone of 
 % influence [coi].
 % In this case, this function can plot the difference of [cwtres] of 2
@@ -96,9 +96,22 @@ else
 end
 
 if ndims(cwtres) == 3 % nCh_nFreq_nTime
-
+    % do nothing
 elseif ndims(cwtres) == 4 % nTrial_nCh_nFreq_nTime
-    cwtres = squeeze(mean(abs(cwtres), 1));
+    % average across trials
+    if isreal(cwtres) % input [cwtres] is abs(cwtres)
+        cwtres = squeeze(mean(cwtres, 1)); % nCh_nFreq_nTime
+    else
+        cwtres = squeeze(mean(abs(cwtres), 1)); % nCh_nFreq_nTime
+    end
+
+    if ndims(cwtres) == 2 % single-channel
+        [nfreq, ntime] = size(cwtres);
+        temp = zeros(1, nfreq, ntime);
+        temp(1, :, :) = cwtres;
+        cwtres = temp;
+    end
+
 else
     error("Invalid cwt result input");
 end
@@ -136,10 +149,9 @@ for rIndex = 1:plotSize(1)
 end
 
 colormap("jet");
-colorbar('position', [1 - paddings(2), 0.1, 0.5 * paddings(2), 0.8]);
+colorbar('position', [0.96, 0.1, 0.01, 0.8]);
 
 scaleAxes(Fig, "c");
-addLines2Axes(struct("X", 0, "color", "w", "style", "--", "width", 0.6));
 
 if ~isempty(coi)
     addLines2Axes(struct("X", t, "Y", coi, "color", "w", "style", "--", "width", 0.6));
