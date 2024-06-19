@@ -45,7 +45,7 @@ function stat = CBPT(data, cfg)
 %     for dIndex = 1:length(pool)
 %         temp = trialsECOG(dRatioAll == dRatio(pool(dIndex)));
 %         data(dIndex).time = t' / 1000;
-%         data(dIndex).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
+%         data(dIndex).label = arrayfun(@num2str, channels(:), "UniformOutput", false);
 %         data(dIndex).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), temp, "UniformOutput", false));
 %         data(dIndex).trialinfo = repmat(dIndex, [length(temp), 1]);
 %     end
