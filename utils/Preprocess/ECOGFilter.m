@@ -1,4 +1,4 @@
-function varargout = ECOGFilter(dataset, fhp, flp, varargin)
+function res = ECOGFilter(dataset, fhp, flp, varargin)
     % Description: perform band pass filter on data
     % Input:
     %     dataset:
@@ -28,6 +28,14 @@ function varargout = ECOGFilter(dataset, fhp, flp, varargin)
     fNotch = mIp.Results.fNotch;
 
     switch class(dataset)
+        case 'double'
+            trialsECOG = {dataset};
+            channels = 1:size(trialsECOG{1}, 1);
+            sampleinfo = [1, size(trialsECOG{1}, 2)];
+        case 'single'
+            trialsECOG = {dataset};
+            channels = 1:size(trialsECOG{1}, 1);
+            sampleinfo = [1, size(trialsECOG{1}, 2)];
         case 'cell'
             trialsECOG = dataset;
             channels = 1:size(trialsECOG{1}, 1);
@@ -90,9 +98,11 @@ function varargout = ECOGFilter(dataset, fhp, flp, varargin)
     %% output
     if isstruct(dataset)
         dataset.data = data.trial{1};
-        varargout{1} = dataset;
-    else
-        varargout{1} = data.trial';
+        res = dataset;
+    elseif isnumeric(dataset)
+        res = data.trial{1};
+    elseif iscell(dataset)
+        res = data.trial(:);
     end
 
     return;
