@@ -85,14 +85,7 @@ function res = ECOGFilter(dataset, fhp, flp, varargin)
 
     % Notch
     if strcmp(NotchOpt, "on")
-        butter = path2func(fullfile(matlabroot, "toolbox/signal/signal/butter.m"));
-        filtfilt = path2func(fullfile(matlabroot, "toolbox/signal/signal/filtfilt.m"));
-
-        for fIndex = 1:length(fNotch)
-            [b, a] = butter(3, (fNotch(fIndex) + [-1, 1]) / (fs / 2), "stop");
-            data.trial = cellfun(@(x) filtfilt(b, a, x')', data.trial, "UniformOutput", false);
-        end
-
+        data.trial = cellfun(@(x) mFilter(x, fs, "fnotch", fNotch), data.trial, "UniformOutput", false);
     end
     
     %% output
