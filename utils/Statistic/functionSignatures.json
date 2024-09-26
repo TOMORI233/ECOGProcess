@@ -35,6 +35,14 @@
             {"name": "X", "kind": "required", "type": ["2d", "numeric"]},
             {"name": "rows", "kind": "required", "type": ["vector", "integer", "positive"]}
         ]
+    },
+
+    "mPrepareNeighbours": {
+        "inputs": [
+            {"name": "channels", "kind": "ordered", "type": ["positive", "numeric"]},
+            {"name": "topoSize", "kind": "ordered", "type": ["positive", "numel=2"]},
+            {"name": "opt", "kind": "ordered", "type": ["choices = {'orthogonal', 'surrounding'}"]}
+        ]
     }
 
 }
