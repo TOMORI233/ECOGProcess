@@ -5,10 +5,11 @@ function stat = CBPT(data, cfg)
 %         the beginning of pathdef.m (or via path settings).
 % Input:
 %     data: n*1 struct with fields:
-%           - time: [1, nSample]
-%           - label: channel label, [nCh, 1] char cell array
-%           - trial: trial data, [nTrial, nCh, nSample]
-%           - trialinfo: trial type label (>=1 and begins with 1), [nTrial, 1]
+%           - time: 1-by-nSample double
+%           - label: channel label, nCh-by-1 char cell array
+%           - trial: trial data, nTrial*nCh*nSample double
+%           - trialinfo: trial type label (>=1 and begins with 1),
+%                        nTrial-by-1 double
 %     cfg: configurations (you can alter settings marked * for better performance)
 %          - method: method to calculate significance probability (default: 'montecarlo')
 %        * - statistic: 'indepsamplesT'(for 2 groups), 'indepsamplesF'(for more than 2 groups)
@@ -44,7 +45,7 @@ function stat = CBPT(data, cfg)
 %     for dIndex = 1:length(pool)
 %         temp = trialsECOG(dRatioAll == dRatio(pool(dIndex)));
 %         data(dIndex).time = t' / 1000;
-%         data(dIndex).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
+%         data(dIndex).label = arrayfun(@num2str, channels(:), "UniformOutput", false);
 %         data(dIndex).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), temp, "UniformOutput", false));
 %         data(dIndex).trialinfo = repmat(dIndex, [length(temp), 1]);
 %     end

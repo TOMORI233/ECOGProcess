@@ -1,7 +1,7 @@
-function [trialsECOG, chMean, chStd] = reconstructData(trialsECOG, comp, ICs)
+function [trialsData, chMean, chStd] = reconstructData(trialsData, comp, ICs)
     % Reconstruct data using ICA result
     % Input:
-    %     trialsECOG: nTrials*1 cell vector with each cell containing an nCh*nSample matrix of data
+    %     trialsData: nTrials*1 cell vector with each cell containing an nCh*nSample matrix of data
     %     comp: ICA result of fieldtrip, with fields:
     %           - topo: channel-by-IC
     %           - unmixing: IC-by-channel
@@ -23,9 +23,9 @@ function [trialsECOG, chMean, chStd] = reconstructData(trialsECOG, comp, ICs)
     %     X = topo * S;
 
     comp.topo(:, ~ismember(1:size(comp.topo, 2), ICs)) = 0;
-    trialsICA = cellfun(@(x) comp.unmixing * x, trialsECOG, "UniformOutput", false);
-    trialsECOG = cellfun(@(x) comp.topo * x, trialsICA, "UniformOutput", false);
-    chMean = cell2mat(cellfun(@mean, changeCellRowNum(trialsECOG), "UniformOutput", false));
-    chStd = cell2mat(cellfun(@std, changeCellRowNum(trialsECOG), "UniformOutput", false));
+    trialsICA = cellfun(@(x) comp.unmixing * x, trialsData, "UniformOutput", false);
+    trialsData = cellfun(@(x) comp.topo * x, trialsICA, "UniformOutput", false);
+    chMean = calchMean(trialsData);
+    chStd = calchStd(trialsData);
     return;
 end

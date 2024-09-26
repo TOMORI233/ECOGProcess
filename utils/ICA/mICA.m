@@ -24,7 +24,7 @@ mIp = inputParser;
 mIp.addRequired("dataset");
 mIp.addRequired("windowICA", @(x) validateattributes(x, {'numeric'}, {'2d', 'increasing'}));
 mIp.addRequired("arg3", @(x) isnumeric(x) || isstruct(x));
-mIp.addOptional("fsD", 500, @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
+mIp.addOptional("fsD", [], @(x) validateattributes(x, {'numeric'}, {'numel', 1, 'positive'}));
 mIp.addOptional("segOption", "trial onset", @(x) any(validatestring(x, {'trial onset', 'dev onset', 'push onset', 'last std'})));
 mIp.addParameter("chs2doICA", 'all');
 mIp.parse(dataset, windowICA, arg3, varargin{:});
