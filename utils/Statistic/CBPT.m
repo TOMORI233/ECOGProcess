@@ -66,6 +66,10 @@ end
 
 cfg_default.method           = 'montecarlo';         % use the Monte Carlo Method to calculate the significance probability
 cfg_default.correctm         = 'cluster';
+cfg_default.correcttail      = 'alpha';              % 'alpha': equivalent to performing a Bonferroni correction for the two tails, i.e., 
+                                                     %          divide alpha by two. Each tail will be tested with alpha = 0.025.
+                                                     % 'prob': multiplying the p-values with a factor of 2
+                                                     
 cfg_default.clusterstatistic = 'maxsum';             % test statistic that will be evaluated under the permutation distribution.
 
 cfg_default.clusteralpha     = 0.05;                 % alpha level of the sample-specific test statistic that will be used for thresholding
