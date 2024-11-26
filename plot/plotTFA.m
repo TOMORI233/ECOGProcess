@@ -85,9 +85,9 @@ if iscell(data) || ismatrix(data)
     fsD = arg3;
     if ~isempty(fsD) && fsD < fs0
         temp = resampleData(data, fs0, fsD);
-        [cwtres, f, coi] = cwtAny(temp, fsD, 10, "mode", "GPU");
+        [cwtres, f, coi] = cwtAny(temp, fsD, 10, "mode", "auto");
     else
-        [cwtres, f, coi] = cwtAny(data, fs0, 10, "mode", "GPU");
+        [cwtres, f, coi] = cwtAny(data, fs0, 10, "mode", "auto");
     end
 else
     f = arg2;
@@ -105,7 +105,7 @@ elseif ndims(cwtres) == 4 % nTrial_nCh_nFreq_nTime
         cwtres = squeeze(mean(abs(cwtres), 1)); % nCh_nFreq_nTime
     end
 
-    if ndims(cwtres) == 2 % single-channel
+    if ismatrix(cwtres) % single-channel
         [nfreq, ntime] = size(cwtres);
         temp = zeros(1, nfreq, ntime);
         temp(1, :, :) = cwtres;

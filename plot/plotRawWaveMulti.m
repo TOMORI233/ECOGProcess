@@ -28,8 +28,8 @@ mIp.addRequired("chData", @(x) isstruct(x));
 mIp.addRequired("window", @(x) validateattributes(x, {'numeric'}, {'numel', 2, 'increasing'}));
 mIp.addOptional("titleStr", [], @(x) isempty(x) || isstring(x) || ischar(x));
 mIp.addOptional("plotSize", autoPlotSize(size(chData(1).chMean, 1)), @(x) all(fix(x) == x) && numel(x) <= 2 && all(x > 0));
-mIp.addOptional("chs",      [], @(x) all(fix(x) == x & x >= 0));
-mIp.addOptional("visible",  "on", @(x) any(validatestring(x, {'on', 'off'})));
+mIp.addOptional("chs", [], @(x) all(fix(x) == x & x >= 0));
+mIp.addOptional("visible", "on", @(x) any(validatestring(x, {'on', 'off'})));
 mIp.parse(chData, window, varargin{:});
 
 titleStr = mIp.Results.titleStr;
@@ -45,9 +45,9 @@ end
 
 if isempty(plotSize) && isempty(chs)
     error("chs should be specified if plotSize is set empty");
-elseif numel(plotSize) == 1 % the number of channels
+elseif isscalar(plotSize) % the number of channels
     plotSize = autoPlotSize(plotSize);
-elseif isempty(plotSize)
+elseif isempty(plotSize) && ~isempty(chs)
     plotSize = autoPlotSize(numel(chs));
 end
 
