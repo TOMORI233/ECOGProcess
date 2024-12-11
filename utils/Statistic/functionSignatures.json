@@ -35,6 +35,13 @@
             {"name": "X", "kind": "required", "type": ["2d", "numeric"]},
             {"name": "rows", "kind": "required", "type": ["vector", "integer", "positive"]}
         ]
+    },
+
+    "CBPT": {
+        "inputs": [
+            {"name": "cfg", "kind": "required", "type": [["struct"], ["@isempty"]]},
+            {"name": "trialsData", "kind": "required", "type": ["cell"], "repeating": true}
+        ]
     }
 
 }
