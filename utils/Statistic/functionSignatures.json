@@ -42,6 +42,14 @@
             {"name": "cfg", "kind": "required", "type": [["struct"], ["@isempty"]]},
             {"name": "trialsData", "kind": "required", "type": ["cell"], "repeating": true}
         ]
+    },
+    
+    "mPrepareNeighbours": {
+        "inputs": [
+            {"name": "channels", "kind": "ordered", "type": ["positive", "numeric"]},
+            {"name": "topoSize", "kind": "ordered", "type": ["positive", "numel=2"]},
+            {"name": "opt", "kind": "ordered", "type": ["choices = {'orthogonal', 'surrounding'}"]}
+        ]
     }
 
 }
