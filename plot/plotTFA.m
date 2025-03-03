@@ -135,7 +135,7 @@ for rIndex = 1:plotSize(1)
         xlim(window);
         set(gca, "YScale", "log");
         set(gca, "YLimitMethod", "tight");
-        yticks([0, 2.^(0:nextpow2(max(f)) - 1)]);
+        yticks([0, 2.^(-1:nextpow2(max(f)) - 1)]);
 
         if ~mod(((rIndex - 1) * plotSize(2) + cIndex - 1), plotSize(2)) == 0
             yticklabels('');
@@ -149,7 +149,7 @@ for rIndex = 1:plotSize(1)
 end
 
 colormap("jet");
-colorbar('position', [0.96, 0.1, 0.01, 0.8]);
+colorbar('position', [0.97, 0.1, 0.01, 0.8]);
 
 scaleAxes(Fig, "c");
 

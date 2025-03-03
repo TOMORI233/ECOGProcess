@@ -19,8 +19,6 @@ function varargout = plotTopoICA(topo, topoSize, plotSize, ICs2Plot)
     end
 
     Fig = figure("WindowState", "maximized");
-    margins = [0.05, 0.05, 0.1, 0.1];
-    paddings = [0.01, 0.03, 0.01, 0.01];
     
     for rIndex = 1:plotSize(1)
     
@@ -31,12 +29,12 @@ function varargout = plotTopoICA(topo, topoSize, plotSize, ICs2Plot)
                 continue;
             end
 
-            mAxe = mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, [1, 1], margins, paddings);
+            mAxe = mSubplot(Fig, plotSize(1), plotSize(2), (rIndex - 1) * plotSize(2) + cIndex, "shape", "square-min");
             plotTopo(mAxe, topo(:, ICNum), topoSize);
             [~, idx] = max(abs(topo(:, ICNum)));
             title(['IC ', num2str(ICNum), ' | max - ', num2str(idx)]);
             scaleAxes(mAxe, "c", "on", "symOpts", "max");
-            colorbar;
+            mColorbar("Width", 0.005);
         end
     
     end

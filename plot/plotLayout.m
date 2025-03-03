@@ -1,4 +1,4 @@
-function plotLayout(varargin)
+function varargout = plotLayout(varargin)
 % Description: plot layout image to figures or axes
 % Input:
 %     FigsOrAxes: target figures or axes array
@@ -78,6 +78,12 @@ for fIndex = 1:length(FigsOrAxes)
 
     set(layAx, 'Visible', 'off');
     set(h, "alphadata", ~imbinarize(rgb2gray(h.CData)) * alphaValue);
+end
+
+if nargout > 1
+    error("Unspecified outputs");
+elseif nargout == 1
+    varargout{1} = layAx;
 end
 
 return;

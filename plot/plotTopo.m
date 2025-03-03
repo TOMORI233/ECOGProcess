@@ -11,6 +11,7 @@ function varargout = plotTopo(varargin)
     %     contourVal: contour levels, specified as a numeric vector or a
     %                 logical vector. If specified as a logical vector
     %                 (mask), it should be the same size as [Data].
+    %     contourTh: contour threshold (default=0.6)
     % Output:
     %     mAxe: output axes
     % Example:
@@ -33,6 +34,7 @@ function varargout = plotTopo(varargin)
     mIp.addParameter("contourOpt", "on", @(x) any(validatestring(x, {'on', 'off'})));
     mIp.addParameter("resolution", 5, @(x) validateattributes(x, 'numeric', {'scalar', 'positive', 'integer'}));
     mIp.addParameter("contourVal", [], @(x) validateattributes(x, {'numeric', 'logical'}, {'vector'}));
+    mIp.addParameter("contourTh", 0.6, @(x) validateattributes(x, {'numeric'}, {'scalar', 'real'}));
     mIp.parse(mAxe, varargin{:})
 
     Data = mIp.Results.Data;
@@ -40,6 +42,7 @@ function varargout = plotTopo(varargin)
     contourOpt = mIp.Results.contourOpt;
     N = mIp.Results.resolution;
     contourVal = mIp.Results.contourVal;
+    contourTh = mIp.Results.contourTh;
 
     if numel(Data) ~= prod(topoSize)
         error("Numel of input data should be topoSize(1)*topoSize(2)");
@@ -73,11 +76,7 @@ function varargout = plotTopo(varargin)
             if isnumeric(contourVal)
                 % for each contour level
                 for index = 1:numel(contourVal)
-                    C = flipud(reshape(double(Data >= contourVal(index)), topoSize)');
-                    C = padarray(C, [1, 1], "replicate");
-                    C = interp2(C, N);
-                    C = imgaussfilt(C, 8);
-                    contour(mAxe, X, Y, C, [0.6, 0.6], "LineColor", "k");
+                    contour(mAxe, X, Y, C, [contourVal(index), contourVal(index)], "LineColor", "k", "LineWidth", 1);
                 end
                 
             elseif islogical(contourVal)
@@ -87,7 +86,7 @@ function varargout = plotTopo(varargin)
                     C = padarray(C, [1, 1], "replicate");
                     C = interp2(C, N);
                     C = imgaussfilt(C, 8);
-                    contour(mAxe, X, Y, C, [0.6, 0.6], "LineColor", "k");
+                    contour(mAxe, X, Y, C, [contourTh, contourTh], "LineColor", "k", "LineWidth", 1);
                 end
 
             end
@@ -98,10 +97,14 @@ function varargout = plotTopo(varargin)
 
     set(mAxe, "XLimitMethod", "tight");
     set(mAxe, "YLimitMethod", "tight");
-    xticklabels(mAxe, '');
-    yticklabels(mAxe, '');
+    set(mAxe, "Box", "on");
+    set(mAxe, "BoxStyle", "full");
+    set(mAxe, "LineWidth", 3);
+    set(mAxe, "XTickLabels", '');
+    set(mAxe, "YTickLabels", '');
     set(mAxe, "CLim", cRange); % reset c limit
-    colormap(mAxe, 'jet');
+    % colormap(mAxe, 'jet');
+    colormap(mAxe, mColormap('b', 'r'));
 
     if nargout == 1
         varargout{1} = mAxe;
