@@ -25,7 +25,7 @@ function stat = cbptImpl(data, cfg)
 %        * - alpha: alpha level of the permutation test (default = 0.025)
 %        * - numrandomization: number of draws from the permutation distribution (default = 1e3)
 %          - tail & clustertail: -1, 1 or 0 (default = 0): one-sided or two-sided test
-%          - neighbours: the neighbours specify for each sensor with which other sensors it can
+%        * - neighbours: the neighbours specify for each sensor with which other sensors it can
 %                        form clusters
 %        * - minnbchan: minimum number of neighborhood channels that is required for a selected
 %                       sample to be included in the clustering algorithm (default = 0).

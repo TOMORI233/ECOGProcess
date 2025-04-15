@@ -24,16 +24,16 @@ function stat = CBPT(cfg, varargin)
 %                          for thresholding (default = 0.05)
 %        * - alpha: alpha level of the permutation test (default = 0.025)
 %        * - numrandomization: number of draws from the permutation distribution (default = 1e3)
-%          - tail & clustertail: -1, 1 or 0 (default = 0): one-sided or two-sided test
-%          - neighbours: the neighbours specify for each sensor with which other sensors it can
+%          - tail & clustertail: -1 (right), 1 (left) or 0 (both) (default = 0)
+%        * - neighbours: the neighbours specify for each sensor with which other sensors it can
 %                        form clusters
 %        * - minnbchan: minimum number of neighborhood channels that is required for a selected
 %                       sample to be included in the clustering algorithm (default = 0).
 %          - latency: time interval over which the experimental conditions must be compared (in seconds)
 %          - channel: cell-array with selected channel labels (default = 'all')
-%          - design: design matrix of trialinfo (DO NOT SPECIFY IN YOUR cfg)
+%          - design: design matrix of trialinfo (DO NOT specify it in your [cfg])
 %          - ivar: number or list with indices indicating the independent variable(s)
-%                  (default = 1, DO NOT SPECIFY IN YOUR cfg)
+%                  (default = 1, DO NOT specify it in your [cfg])
 % Output:
 %     stat: result of fieldtrip
 %           - prob: prob of cluster-based Monte Carlo permutation test, [nCh, nSample]

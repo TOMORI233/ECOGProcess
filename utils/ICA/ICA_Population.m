@@ -23,7 +23,7 @@ function [comp, ICs, FigTopoICA, FigWave, FigIC] = ICA_Population(trialsECOG, fs
 
     % IC Wave
     FigIC = plotRawWave(calchMean(comp.trial), calchStd(comp.trial), windowICA, "ICA");
-    scaleAxes(FigIC, "y", "cutoffRange", [-50, 50], "symOpts", "max");
+    scaleAxes(FigIC, "y", "cutoffRange", [-50, 50], "symOpts", "max", "uiOpt", "show");
 
     % IC topo
     channels = 1:size(trialsECOG{1}, 1);

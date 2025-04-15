@@ -16,6 +16,11 @@ xx_AC_sulcus_square = temIMG(1:3:end, 1:3:end, :);
 temIMG = imread("xx_PFC_sulcus_square.jpg");
 xx_PFC_sulcus_square = temIMG(1:3:end, 1:3:end, :);
 
+save('layout.mat', 'cc_AC_sulcus_large','cc_PFC_sulcus_large', ...
+                   'cc_AC_sulcus_square', 'cc_PFC_sulcus_square', ...
+                   'xx_AC_sulcus_square', 'xx_PFC_sulcus_square');
+
+%% 
 temIMG = imread("SlideA_256.jpg");
 SlideA_256 = temIMG(1:3:end, 1:3:end, :);
 
@@ -27,7 +32,6 @@ SlideC_256 = temIMG(1:3:end, 1:3:end, :);
 
 temIMG = imread("SlideD_256.jpg");
 SlideD_256 = temIMG(1:3:end, 1:3:end, :);
-
 
 save('layout.mat', 'cc_AC_sulcus_large','cc_PFC_sulcus_large', ...
     'cc_AC_sulcus_square', 'cc_PFC_sulcus_square', ...
