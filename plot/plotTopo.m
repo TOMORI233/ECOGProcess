@@ -73,21 +73,21 @@ function varargout = plotTopo(varargin)
             if isnumeric(contourVal)
                 % for each contour level
                 for index = 1:numel(contourVal)
-                    C = flipud(reshape(double(Data >= contourVal(index)), topoSize)');
-                    C = padarray(C, [1, 1], "replicate");
-                    C = interp2(C, N);
-                    C = imgaussfilt(C, 8);
-                    contour(mAxe, X, Y, C, [0.6, 0.6], "LineColor", "k");
+                    contour(mAxe, X, Y, C, [contourVal(index), contourVal(index)], "LineColor", "k", "LineWidth", 1);
                 end
                 
             elseif islogical(contourVal)
 
-                if any(contourVal) && any(~contourVal)
+                if all(contourVal)
+                    disp('Contour mask all true');
+                elseif all(~contourVal)
+                    disp('Contour mask all false');
+                else
                     C = flipud(reshape(double(contourVal), topoSize)');
                     C = padarray(C, [1, 1], "replicate");
                     C = interp2(C, N);
                     C = imgaussfilt(C, 8);
-                    contour(mAxe, X, Y, C, [0.6, 0.6], "LineColor", "k");
+                    contour(mAxe, X, Y, C, [0.6, 0.6], "LineColor", "k", "LineWidth", 1);
                 end
 
             end
