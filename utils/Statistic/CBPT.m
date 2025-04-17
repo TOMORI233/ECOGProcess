@@ -5,12 +5,6 @@ function stat = CBPT(cfg, varargin)
 %         the beginning of pathdef.m (or via path settings) or run `ft_setPath2Top` 
 %         script.
 % Input:
-%     data: n*1 struct with fields:
-%           - time: 1-by-nSample double
-%           - label: channel label, nCh-by-1 char cell array
-%           - trial: trial data, nTrial*nCh*nSample double
-%           - trialinfo: trial type label (>=1 and begins with 1),
-%                        nTrial-by-1 double
 %     cfg: configurations (you can alter settings marked * for better performance)
 %          - method: method to calculate significance probability (default: 'montecarlo')
 %        * - statistic: 'indepsamplesT'(for 2 groups), 'indepsamplesF'(for more than 2 groups)
@@ -34,6 +28,7 @@ function stat = CBPT(cfg, varargin)
 %          - design: design matrix of trialinfo (DO NOT specify it in your [cfg])
 %          - ivar: number or list with indices indicating the independent variable(s)
 %                  (default = 1, DO NOT specify it in your [cfg])
+%     trialsData: cell data of trial
 % Output:
 %     stat: result of fieldtrip
 %           - prob: prob of cluster-based Monte Carlo permutation test, [nCh, nSample]
