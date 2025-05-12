@@ -1,34 +1,42 @@
-function trialsECOG = interpolateBadChs(trialsECOG, badCHs, neighbours)
-    % Description: Interpolate data of bad channels by averaging neighbour channels
-    % Input parameter [neighbours]: see mPrepareNeighbours.m
+function trialsData = interpolateBadChs(trialsData, badCHs, neighbours)
+% Description: Interpolate data of bad channels by averaging neighbour channels
+% Input parameter [neighbours]: see mPrepareNeighbours and ft_prepare_neighbours
 
-    narginchk(2, 3);
+narginchk(2, 3);
 
-    if nargin < 3 || isempty(neighbours)
-        % default: for ECoG recording of an 8*8 electrode array
-        neighbours = mPrepareNeighbours;
-    end
-    
-    neighbch = {neighbours.neighbch}';
+if nargin < 3 || isempty(neighbours)
+    % default: for ECoG recording of an 8*8 electrode array
+    neighbours = mPrepareNeighbours;
+end
 
-    % Replace bad chs by averaging neighbour chs
-    for bIndex = 1:numel(badCHs)
-        chsTemp = neighbch{badCHs(bIndex)};
+neighbch = {neighbours.neighbch}';
 
-        if isempty(chsTemp)
-            warning(['No neighbours specified for channel ', num2str(badCHs(bIndex)), '. Skip']);
-            continue;
-        end
+% Ranking
+score = cellfun(@(x) sum(~ismember(x, badCHs)) / numel(x), neighbch);
+[~, sortIdx] = sort(score, "descend");
+badCHs = badCHs(sortIdx);
 
-        if all(ismember(chsTemp, badCHs))
-            error(['All neighbour channels are bad for channel ', num2str(badCHs(bIndex))]);
-        end
-        
-        for tIndex = 1:length(trialsECOG)
-            trialsECOG{tIndex}(badCHs(bIndex), :) = mean(trialsECOG{tIndex}(chsTemp(~ismember(chsTemp, badCHs)), :), 1);
-        end
+% Replace bad chs by averaging neighbour chs
+interpolateFlag = false(numel(badCHs), 1);
+for bIndex = 1:numel(badCHs)
+    chsTemp = neighbch{badCHs(bIndex)};
+    badCHsRemained = badCHs(~interpolateFlag);
 
+    if isempty(chsTemp)
+        warning(['No neighbours specified for channel ', num2str(badCHs(bIndex)), '. Skip']);
+        continue;
     end
 
-    return;
+    if all(ismember(chsTemp, badCHsRemained))
+        error(['All neighbour channels are bad for channel ', num2str(badCHs(bIndex))]);
+    end
+
+    for tIndex = 1:length(trialsData)
+        trialsData{tIndex}(badCHs(bIndex), :) = mean(trialsData{tIndex}(chsTemp(~ismember(chsTemp, badCHsRemained)), :), 1);
+    end
+
+    interpolateFlag(bIndex) = true;
+end
+
+return;
 end
