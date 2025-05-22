@@ -35,6 +35,7 @@ function varargout = plotTopo(varargin)
     mIp.addParameter("resolution", 5, @(x) validateattributes(x, 'numeric', {'scalar', 'positive', 'integer'}));
     mIp.addParameter("contourVal", [], @(x) validateattributes(x, {'numeric', 'logical'}, {'vector'}));
     mIp.addParameter("contourTh", 0.6, @(x) validateattributes(x, {'numeric'}, {'scalar', 'real'}));
+    mIp.addParameter("marker", "none", @(x) true);
     mIp.parse(mAxe, varargin{:})
 
     Data = mIp.Results.Data;
@@ -43,6 +44,7 @@ function varargout = plotTopo(varargin)
     N = mIp.Results.resolution;
     contourVal = mIp.Results.contourVal;
     contourTh = mIp.Results.contourTh;
+    marker = mIp.Results.marker;
 
     if numel(Data) ~= prod(topoSize)
         error("Numel of input data should be topoSize(1)*topoSize(2)");
@@ -93,6 +95,11 @@ function varargout = plotTopo(varargin)
                     contour(mAxe, X, Y, C, [contourTh, contourTh], "LineColor", "k", "LineWidth", 1);
                 end
 
+                if ~strcmpi(marker, "none")
+                    [ytemp, xtemp] = find(flipud(reshape(contourVal, topoSize)'));
+                    scatter(mAxe, xtemp, ytemp, "black", "Marker", marker, "LineWidth", 1);
+                end
+
             end
 
         end
@@ -107,8 +114,9 @@ function varargout = plotTopo(varargin)
     set(mAxe, "XTickLabels", '');
     set(mAxe, "YTickLabels", '');
     set(mAxe, "CLim", cRange); % reset c limit
-    % colormap(mAxe, 'jet');
-    colormap(mAxe, mColormap('b', 'r'));
+    colormap(mAxe, 'jet');
+    % colormap(mAxe, mColormap('b', 'r'));
+    % colormap(flipud(slanCM('RdYlBu')));
 
     if nargout == 1
         varargout{1} = mAxe;
