@@ -12,7 +12,8 @@ end
 neighbch = {neighbours.neighbch}';
 
 % Ranking
-score = cellfun(@(x) sum(~ismember(x, badCHs)) / numel(x), neighbch);
+score = cellfun(@(x) sum(~ismember(x, badCHs)) / numel(x), neighbch(badCHs));
+score(isnan(score)) = -1;
 [~, sortIdx] = sort(score, "descend");
 badCHs = badCHs(sortIdx);
 
@@ -28,7 +29,7 @@ for bIndex = 1:numel(badCHs)
     end
 
     if all(ismember(chsTemp, badCHsRemained))
-        error(['All neighbour channels are bad for channel ', num2str(badCHs(bIndex))]);
+        warning(['All neighbour channels are bad for channel ', num2str(badCHs(bIndex))]);
     end
 
     for tIndex = 1:length(trialsData)
