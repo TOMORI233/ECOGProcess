@@ -30,7 +30,9 @@
                     {"name": "contourOpt", "kind": "namevalue", "type": ["choices = {'on', 'off'}"]},
                     {"name": "resolution", "kind": "namevalue", "type": ["scalar", "positive", "integer"]},
                     {"name": "contourVal", "kind": "namevalue", "type": ["vector"]},
-                    {"name": "contourTh", "kind": "namevalue", "type": ["scalar", "numeric"]}
+                    {"name": "contourTh", "kind": "namevalue", "type": ["scalar", "numeric"]},
+                    {"name": "marker", "kind": "namevalue", "type": ["choices = {'o', 'x', 'pentagram', '+'}"]},
+                    {"name": "markerSize", "kind": "namevalue", "type": ["scalar", "positive"], "purpose": "default: 36"}
                 ],
                 [
                     {"name": "FigOrAxes", "kind": "required", "type": ["@(args) isgraphics(args(1), 'axes')"]},
@@ -39,7 +41,9 @@
                     {"name": "contourOpt", "kind": "namevalue", "type": ["choices = {'on', 'off'}"]},
                     {"name": "resolution", "kind": "namevalue", "type": ["scalar", "positive", "integer"]},
                     {"name": "contourVal", "kind": "namevalue", "type": ["vector"]},
-                    {"name": "contourTh", "kind": "namevalue", "type": ["scalar", "numeric"]}
+                    {"name": "contourTh", "kind": "namevalue", "type": ["scalar", "numeric"]},
+                    {"name": "marker", "kind": "namevalue", "type": ["choices = {'o', 'x', 'pentagram', '+'}"]},
+                    {"name": "markerSize", "kind": "namevalue", "type": ["scalar", "positive"], "purpose": "default: 36"}
                 ]
             ]}
         ]
