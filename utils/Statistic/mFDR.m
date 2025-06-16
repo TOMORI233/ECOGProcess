@@ -23,25 +23,6 @@ function stat = mFDR(data, cfg)
 %     stat: result of fieldtrip
 %           - mask: significant sample position, [nCh, nSample] logical
 %           - stat: the effect at the sample level (t-value or f-value by cfg.statistic), [nCh, nSample]
-% Example:
-%     % Perform CBPT on data with different deviant freq ratio
-%     t = linspace(windowPE(1), windowPE(2), size(trialsECOG{1}, 2))';
-%     channels = ECOGDataset.channels;
-%     pool = 2:5;
-%     for dIndex = 1:length(pool)
-%         temp = trialsECOG(dRatioAll == dRatio(pool(dIndex)));
-%         data(dIndex).time = t' / 1000;
-%         data(dIndex).label = cellfun(@(x) num2str(x), num2cell(channels)', 'UniformOutput', false);
-%         data(dIndex).trial = cell2mat(cellfun(@(x) permute(x, [3, 1, 2]), temp, "UniformOutput", false));
-%         data(dIndex).trialinfo = repmat(dIndex, [length(temp), 1]);
-%     end
-%     stat = mFDR(data);
-%     % plot result
-%     figure;
-%     imagesc("XData", t, "YData", channels, "CData", stat.stat .* stat.mask);
-%     xlim([0, windowPE(2)]);
-%     ylim([0.5, 63.5]);
-%     scaleAxes(gcf, "c", [], [], "max");
 
 ft_setPath2Top
 narginchk(1, 2);
@@ -52,10 +33,7 @@ end
 
 cfg_default.method   = 'analytic';
 cfg_default.correctm = 'fdr';                       % FDR correction
-
 cfg_default.alpha    = 0.05;                        % alpha level of the permutation test
-
-% cfg_default.latency          = [0 1];               % time interval over which the experimental conditions must be compared (in seconds)
 
 if numel(data) == 2
     cfg_default.statistic   = 'indepsamplesT';      % statistic method to evaluate the effect at the sample level
