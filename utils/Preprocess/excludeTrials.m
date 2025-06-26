@@ -47,16 +47,16 @@ function [tIdx, chIdx] = excludeTrials(trialsData, varargin)
     badCHs = mIp.Results.badCHs;
 
     % statistics
-    chMeanAll = mean(cell2mat(trialsData));
-    chStdAll = std(cell2mat(trialsData));
+    chMeanAll = mean(cat(1, trialsData{:}), 1);
+    chStdAll = std(cat(1, trialsData{:}), [], 1);
     tIdxAll = cellfun(@(x) sum(x > chMeanAll + 3 * chStdAll | x < chMeanAll - 3 * chStdAll, 2) / size(x, 2), trialsData, "UniformOutput", false);
 
-    temp = changeCellRowNum(trialsData);
-    chMean = cell2mat(cellfun(@mean, temp, "UniformOutput", false));
-    chStd = cell2mat(cellfun(@std, temp, "UniformOutput", false));
+    chMean = calchMean(trialsData);
+    chStd = calchStd(trialsData);
     tIdx = cellfun(@(x) sum(x > chMean + 3 * chStd | x < chMean - 3 * chStd, 2) / size(x, 2), trialsData, "UniformOutput", false);
     
     % sort channels
+    temp = changeCellRowNum(trialsData);
     V0_All = cellfun(@(x) sum(x > chMeanAll + 3 * chStdAll | x < chMeanAll - 3 * chStdAll, 2) / size(x, 2), temp, "UniformOutput", false);
     V_All = cellfun(@(x) x > tTh, V0_All, "UniformOutput", false);
     V0 = cellfun(@(x) sum(x > mean(x, 1) + 3 * std(x, [], 1) | x < mean(x, 1) - 3 * std(x, [], 1), 2) / size(x, 2), temp, "UniformOutput", false);

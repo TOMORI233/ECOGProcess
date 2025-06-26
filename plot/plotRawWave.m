@@ -113,7 +113,7 @@ for rIndex = 1:plotSize(1)
 
 end
 
-scaleAxes(Fig, "y", "on");
+scaleAxes(Fig, "y", "on", "autoTh", [0, 1]);
 
 if nargout == 1
     varargout{1} = Fig;
