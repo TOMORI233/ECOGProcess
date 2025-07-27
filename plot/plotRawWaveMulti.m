@@ -10,7 +10,8 @@ function varargout = plotRawWaveMulti(chData, window, varargin)
 %                         0 for completely transparent.
 %                         1 for completely opaque.
 %             - legend: string or char, not shown if set empty.
-%             - skipChs: channels not to plot. Leave blank at the location.
+%             - LineWidth: specify line width for each group (default: using the general setting)
+%             - skipChs: channels not to plot (blank at the location).
 %     other params: see PLOTRAWWAVE
 % Output:
 %     Fig: figure object
@@ -30,12 +31,14 @@ mIp.addOptional("titleStr", [], @(x) isempty(x) || isstring(x) || ischar(x));
 mIp.addOptional("plotSize", autoPlotSize(size(chData(1).chMean, 1)), @(x) all(fix(x) == x) && numel(x) <= 2 && all(x > 0));
 mIp.addOptional("chs", [], @(x) all(fix(x) == x & x >= 0));
 mIp.addOptional("visible", "on", @(x) any(validatestring(x, {'on', 'off'})));
+mIp.addParameter("LineWidth", 1.5, @(x) validateattributes(x, 'numeric', {'scalar', 'positive'}));
 mIp.parse(chData, window, varargin{:});
 
 titleStr = mIp.Results.titleStr;
 plotSize = mIp.Results.plotSize;
 chs = mIp.Results.chs;
 visible = mIp.Results.visible;
+defaultLineWidth = mIp.Results.LineWidth;
 
 if isempty(titleStr)
     titleStr = '';
@@ -81,6 +84,7 @@ for rIndex = 1:plotSize(1)
         for index = 1:length(chData)
             chMean = chData(index).chMean;
             chErr = getOr(chData(index), "chErr");
+            t = linspace(window(1), window(2), size(chMean, 2));
 
             color = getOr(chData(index), "color", "r");
             color = validatecolor(color);
@@ -91,17 +95,12 @@ for rIndex = 1:plotSize(1)
                 hsi(2) = 0.7 * hsi(2);
             end
             errColor = getOr(chData(index), "errColor", hsv2rgb(hsi));
-
             errAlpha = getOr(chData(index), "errAlpha", 0.5);
-
-            chData(index).legend = string(getOr(chData(index), "legend", []));
+            
             skipChs = getOr(chData(index), "skipChs");
-
             if ismember(chNum, skipChs)
                 continue;
             end
-
-            t = linspace(window(1), window(2), size(chMean, 2));
 
             if ~isempty(chErr)
                 y1 = chMean(chNum, :) + chErr(chNum, :);
@@ -110,10 +109,12 @@ for rIndex = 1:plotSize(1)
                 setLegendOff(eb);
             end
 
+            chData(index).legend = string(getOr(chData(index), "legend", []));
+            LineWidth = getOr(chData(index), "LineWidth", defaultLineWidth);
             if ~isempty(chData(index).legend)
-                ltemp = plot(t, chMean(chNum, :), "Color", color, "LineWidth", 1.5, "DisplayName", chData(index).legend);
+                ltemp = plot(t, chMean(chNum, :), "Color", color, "LineWidth", LineWidth, "DisplayName", chData(index).legend);
             else
-                ltemp = plot(t, chMean(chNum, :), "Color", color, "LineWidth", 1.5);
+                ltemp = plot(t, chMean(chNum, :), "Color", color, "LineWidth", LineWidth);
             end
 
         end

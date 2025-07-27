@@ -24,7 +24,7 @@ temp = changeCellRowNum(trialsECoG);
 
 mParpool = gcp;
 
-chTemp = cellfun(@(x) array2VectorCell(x), temp, "uni", false);
+chTemp = cellfun(@(x) num2cell(x, 2), temp, "uni", false);
 P = cell(length(chTemp), 1);
 for ch = 1 : length(chTemp)
 if isequal(method, 1) || strcmpi(method, "power")

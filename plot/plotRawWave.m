@@ -17,6 +17,7 @@ function varargout = plotRawWave(chMean, chErr, window, varargin)
 %          channels will be determined by [plotSize] (automatically resize).
 %          Notice: zeros in [chs] will be skipped.
 %     visible: visibility of the figure, "on" or "off", default: "on"
+%     LineWidth: name-value, line width (default=1.5)
 % Output:
 %     Fig: the figure object
 % Example:
@@ -41,12 +42,14 @@ mIp.addOptional("titleStr", [], @(x) isempty(x) || isstring(x) || ischar(x));
 mIp.addOptional("plotSize", autoPlotSize(size(chMean, 1)), @(x) all(fix(x) == x) && numel(x) <= 2 && all(x > 0));
 mIp.addOptional("chs", [], @(x) all(fix(x) == x & x >= 0));
 mIp.addOptional("visible",  "on", @(x) any(validatestring(x, {'on', 'off'})));
+mIp.addParameter("LineWidth", 1.5, @(x) validateattributes(x, 'numeric', {'scalar', 'positive'}));
 mIp.parse(chMean, chErr, window, varargin{:});
 
 titleStr = mIp.Results.titleStr;
 plotSize = mIp.Results.plotSize;
 chs = mIp.Results.chs;
 visible = mIp.Results.visible;
+LineWidth = mIp.Results.LineWidth;
 
 if isempty(titleStr)
     titleStr = '';
@@ -96,7 +99,7 @@ for rIndex = 1:plotSize(1)
             fill([t fliplr(t)], [y1 fliplr(y2)], [0, 0, 0], 'edgealpha', '0', 'facealpha', '0.3', 'DisplayName', 'Error bar');
         end
 
-        plot(t, chMean(chNum, :), "r", "LineWidth", 1.5);
+        plot(t, chMean(chNum, :), "r", "LineWidth", LineWidth);
         xlim(window);
         title(['CH ', num2str(chNum), titleStr]);
 
